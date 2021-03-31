@@ -1,0 +1,26 @@
+{
+  "name": "aftr",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
+  },
+  "dependencies": {
+    "@tailwindcss/forms": "^0.2.1",
+    "install": "^0.13.0",
+    "material-design-icons": "^3.0.1",
+    "npm": "^7.7.0",
+    "vue": "^3.0.5",
+    "vue-router": "^4.0.5",
+    "vue-uuid": "^2.0.2"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^1.1.5",
+    "@vue/compiler-sfc": "^3.0.5",
+    "autoprefixer": "^10.2.5",
+    "postcss": "^8.2.8",
+    "tailwindcss": "^2.0.4",
+    "vite": "^2.1.0"
+  }
+}
