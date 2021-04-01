@@ -1,6 +1,6 @@
 <template>
 <div>
-Landing
+  Landing
 </div>
 </template>
 
