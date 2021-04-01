@@ -1,27 +1,9 @@
 <template>
-  <div>
-    <img src="./assets/aftr-market-landing.png" />
+  <div class="bg-black flex h-screen justify-center items-center">
+    <div class="text-center space-y-20">
+      <img class="" src="./assets/aftr-market-landing.png" />
+      <p class="text-white text-4xl">Get Ready To Come... Along For The Ride</p>
+      <h3 class="text-aftrDarkGrey-light text-2xl animate-pulse">Launching Soon!</h3>
+    </div>
   </div>
 </template>
-
-<script>
-
-</script>
-
-<style scoped>
-div {
-  width: 100vw;
-  height: 100vh;
-  background: #000;
-}
-
-img {
-  margin: 0;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 40%;
-  min-width: 200px;
-}
-</style>
