@@ -130,7 +130,7 @@
         </div>
       </header>
     </div>
-    </template>
+</template>
 
 <script>
 export default {
