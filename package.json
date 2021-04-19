@@ -4,13 +4,15 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "build:contract": "tsc"
   },
   "dependencies": {
     "@tailwindcss/forms": "^0.2.1",
     "install": "^0.13.0",
     "material-design-icons": "^3.0.1",
     "npm": "^7.7.0",
+    "typescript": "^4.2.4",
     "vue": "^3.0.5",
     "vue-router": "^4.0.5",
     "vue-uuid": "^2.0.2"
