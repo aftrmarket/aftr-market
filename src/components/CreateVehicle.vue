@@ -114,10 +114,10 @@
                                         </div>
                                     </td>
                                     <td class="text-right px-6 py-3">
-                                        {{ pst.balance }}
+                                        {{ formatNumber(pst.balance) }}
                                     </td>
                                     <td class="text-right px-6 py-3">
-                                        {{ pst.total }}
+                                        {{ formatNumber(pst.total, true) }}
                                     </td>
                                     <td class="text-center px-6 py-3">
                                         <button @click.prevent="removePst(pst.id)" type="submit" class="inline-flex items-center p-1 border border-transparent shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed">
@@ -168,6 +168,7 @@
 <script>
 //import { uuid } from 'vue-uuid';
 import Arweave from 'arweave';
+import numeral from 'numeral';
 
 export default {
   data() {
@@ -212,6 +213,13 @@ export default {
       ******/
   },
   methods: {
+    formatNumber(num, dec = false) {
+      if (dec) {
+        return numeral(num).format('0,0.0000');
+      } else {
+        return numeral(num).format('0,0');
+      }
+    },
     async arConnect() {
       try {
         const promiseResult = await window.arweaveWallet.connect(
