@@ -45,15 +45,18 @@
                       ></textarea>
                     </div>
                   </div>
-                  <div class="pt-6">
+                  <div v-if="arConnected" class="pt-6">
                     <label class="block text-sm font-medium text-gray-700">
                       Owner:
                       <span class="font-bold text-aftrRed"
-                        >c70bfcc0-86db-4b67-a0e5-868d10885926</span
+                        >{{ activeWallet }}</span
                       >
                     </label>
                   </div>
-
+                  <div v-else class="pt-6">
+                    <button @click="arConnect" type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-aftrBlue hover:bg-aftrBlue-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Sign-in to ArConnect</button>
+                  </div>
+<!--
                 <div class="pt-6">
                     <select v-model="selectedPst" @change="pstChange" id="selectedPst" name="selectedPst" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                         <option value="" disabled selected>Select PST</option>
@@ -71,7 +74,7 @@
                         </button>
                     </div>
                 </div>
-
+-->
                 <!-- Table of PSTs -->
                 <div v-if="vehiclePsts.length > 0" class="pt-1">
                     <div class="pt-2 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -98,7 +101,7 @@
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center">
                                           <div class="flex-shrink-0 h-10 w-10">
-                                              <img class="h-10 w-10 rounded-full" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixqx=5Rgz8QuoBn&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=4&w=256&h=256&q=60" alt="">
+                                              <img class="h-10 w-10 rounded-full" :src="`https://arweave.net/` + pst.logo" alt="">
                                           </div>
                                           <div class="ml-4">
                                               <div class="text-sm font-medium text-gray-900">
@@ -111,7 +114,7 @@
                                         </div>
                                     </td>
                                     <td class="text-right px-6 py-3">
-                                        {{ pst.tokens }}
+                                        {{ pst.balance }}
                                     </td>
                                     <td class="text-right px-6 py-3">
                                         {{ pst.total }}
@@ -164,11 +167,14 @@
 
 <script>
 //import { uuid } from 'vue-uuid';
+import Arweave from 'arweave';
 
 export default {
   data() {
     return {
+      arConnected: false,       // Is user logged in through ArConnect?
       pstSelected: false,
+      activeWallet: '',         // Active wallet address on ArConnect
       selectedPst: '',          // ID of selected PST
       inputTokens: null,        // Number of tokens of PST
       pricePerToken: null,      // Selected PST's price
@@ -206,6 +212,46 @@ export default {
       ******/
   },
   methods: {
+    async arConnect() {
+      try {
+        const promiseResult = await window.arweaveWallet.connect(
+          ['ACCESS_ADDRESS', 'ACCESS_ALL_ADDRESSES', 'SIGN_TRANSACTION']
+        );
+        this.activeWallet = await window.arweaveWallet.getActiveAddress();
+        this.arConnected = true;
+      } catch (error) {
+        console.log('ERROR during ArConnection: ' + error);
+      }
+
+      try {
+        // Now query Verto to get all PSTs contained in Wallet
+        const response = await fetch('http://v2.cache.verto.exchange/balance/' + this.activeWallet);
+        this.vehiclePsts = await response.json();
+        /**** RESPONSE RETURNS AS AN ARRAY OF KEY/VALUE PAIRS ****
+         * [ {
+         *  id: '',
+         *  balance: '',
+         *  name: '',
+         *  ticker: '',
+         *  logo: ''
+         * } ]
+        ****/
+      } catch (error) {
+        console.log('ERROR while fetching Verto balances: ' + error);
+      }
+
+      try {
+        // Query Verto to get AR prices for each token
+        for(let pst of this.vehiclePsts) {
+          const response = await fetch('http://v2.cache.verto.exchange/token/' + pst.id + '/price');
+          const jsonRes = await response.json();
+          const i = this.vehiclePsts.findIndex(item => item.id === pst.id);
+          this.vehiclePsts[i]['total'] = jsonRes.price * this.vehiclePsts[i]['balance'];
+        }
+      } catch(error) {
+        console.log('ERROR while fetching AR prices from Verto: ' + error);
+      }
+    },
     togglePstFields() {
       this.pstSelected = !this.pstSelected;
     },

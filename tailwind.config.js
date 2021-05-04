@@ -13,7 +13,8 @@ module.exports = {
           dark: '#202020'
         },
         aftrBlue: {
-          DEFAULT: '#6C8CFF'
+          DEFAULT: '#6C8CFF',
+          dark: '#3964FF'
         },
         aftrRed: {
           DEFAULT: '#FF6C8C'
