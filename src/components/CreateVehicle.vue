@@ -56,25 +56,30 @@
                   <div v-else class="pt-6">
                     <button @click="arConnect" type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-aftrBlue hover:bg-aftrBlue-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Sign-in to ArConnect</button>
                   </div>
-<!--
-                <div class="pt-6">
-                    <select v-model="selectedPst" @change="pstChange" id="selectedPst" name="selectedPst" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                <div v-if="arConnected" class="pt-6">
+                    <select v-model="selectedPstId" @change="pstChange" id="selectedPstId" name="selectedPstId" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                         <option value="" disabled selected>Select PST</option>
                         <option v-for="pst in psts" :key="pst.id" :value="pst.id">{{ pst.name }} ({{ pst.id }})</option>
                     </select>
                 </div>
                 
-                <div v-if="selectedPst !== ''">
-                    <input type="number" placeholder="Amount" v-model="inputTokens" @input="calcPstPrice" class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md"/> 
-                    <span class="pl-4 pr-6">@ {{ pricePerToken }} AR {{ inputTokens ? ' = ' + pstValue + ' AR' : '' }}</span>
-                    <div class="pt-2">
-                        <button v-if="inputTokens !== null" @click.prevent="addPst" type="submit" class="inline-flex justify-center py-2 px-4 border border-gray shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-transparent hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
-                            <img class="-ml-1 mr-2 h-5 w-5 text-current" src="../assets/add_circle-24px.svg"/>
-                            Add PST
-                        </button>
-                    </div>
+                <div v-if="selectedPstId !== ''">
+                  <div class="pt-6 pb-4">
+                    <label class="block text-sm font-medium text-gray-700">
+                      You have 
+                      <span class="font-bold text-aftrBlue">{{ pstBalance }} {{ pstTicker }}</span>
+                      <span> available to use in your vehicle.</span>
+                    </label>
+                  </div>
+                  <input type="number" placeholder="Amount" v-model="inputTokens" @input="calcPstPrice" :class="inputTokenBox"/> 
+                  <span v-if="inputTokens" class="pl-4 pr-6">@ {{ formatNumber(pricePerToken, true) }} AR {{ inputTokens ? ' = ' + formatNumber(pstValue, true) + ' AR' : '' }}</span>
+                  <div class="pt-2">
+                      <button v-if="inputValid && inputTokens !== ''" @click.prevent="addPst" type="submit" class="inline-flex justify-center py-2 px-4 border border-gray shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-transparent hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+                          <img class="-ml-1 mr-2 h-5 w-5 text-current" src="../assets/add_circle-24px.svg"/>
+                          Add PST
+                      </button>
+                  </div>
                 </div>
--->
                 <!-- Table of PSTs -->
                 <div v-if="vehiclePsts.length > 0" class="pt-1">
                     <div class="pt-2 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -108,13 +113,13 @@
                                               {{ pst.name + ' (' + pst.ticker + ')'}}
                                               </div>
                                               <div class="text-sm text-gray-500">
-                                              {{ pst.id.substr(1,5) + '...' }}
+                                              {{ pst.id.substr(0,5) + '...' }}
                                               </div>
                                           </div>
                                         </div>
                                     </td>
                                     <td class="text-right px-6 py-3">
-                                        {{ formatNumber(pst.balance) }}
+                                        {{ formatNumber(pst.tokens) }}
                                     </td>
                                     <td class="text-right px-6 py-3">
                                         {{ formatNumber(pst.total, true) }}
@@ -135,7 +140,7 @@
                 </div> <!-- End of PST Table -->
 
                 <div class="pl-6 pb-4 text-right">
-                    <div class="text-right"><span v-if="totalValue" class="px-6 py-3">Total: <span class="px-2 inline-flex text-lg leading-5 font-semibold rounded-full bg-green-100 text-green-800">{{ totalValue }} AR</span></span></div>
+                    <div class="text-right"><span v-if="totalValue" class="px-6 py-3">Total: <span class="px-2 inline-flex text-lg leading-5 font-semibold rounded-full bg-green-100 text-green-800">{{ formatNumber(totalValue, true) }} AR</span></span></div>
                 </div>
 
 
@@ -176,13 +181,16 @@ export default {
       arConnected: false,       // Is user logged in through ArConnect?
       pstSelected: false,
       activeWallet: '',         // Active wallet address on ArConnect
-      selectedPst: '',          // ID of selected PST
+      selectedPstId: '',        // ID of selected PST
       inputTokens: null,        // Number of tokens of PST
+      inputValid: false,
       pricePerToken: null,      // Selected PST's price
       pstValue: null,           // pricePerShare * inputShares
       totalValue: null,         // Sum of all PST values in vehicle
       vehiclePsts: [],          // Array of vehicle's PSTs
       checkedPsts: [],
+      psts: []
+      /****
       psts: [
             { id: '46c0bdd1-56a9-4179-8a56-164b702a5cb8', ticker: 'AFTR', name: 'AFTR Market', price: 0.05 },
             { id: '8f1d6790-b885-4078-af9d-4e431ed74cf6', ticker: 'ARDRIVE', name: 'ArDrive', price: 0.078 },
@@ -192,9 +200,25 @@ export default {
             { id: '919ce858-2513-424a-9fdb-de146eee1417', ticker: 'OPENBITS', name: 'OpenBits', price: 0.06 },
             { id: 'e6125855-8414-4ae1-b611-66aff71160a2', ticker: 'VRT', name: 'Verto Exchange', price: 0.1 }
       ]
+      ****/
     };
   },
   computed: {
+    pstBalance() {
+      const currentPst = this.psts.find(item => item.id === this.selectedPstId);
+      return this.formatNumber(currentPst.balance);
+    },
+    pstTicker() {
+      const currentPst = this.psts.find(item => item.id === this.selectedPstId);
+      return currentPst.ticker;
+    },
+    inputTokenBox() {
+      if (this.inputValid){
+        return "mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md";
+      } else {
+        return "mt-1 focus:ring-aftrRed focus:border-aftrRed shadow-sm sm:text-sm border-gray-300 rounded-md";
+      }
+    }
       // Code to handle a checkbox in the table to check/uncheck all rows. 
       /******
       selectAll: {
@@ -234,7 +258,7 @@ export default {
       try {
         // Now query Verto to get all PSTs contained in Wallet
         const response = await fetch('http://v2.cache.verto.exchange/balance/' + this.activeWallet);
-        this.vehiclePsts = await response.json();
+        this.psts = await response.json();
         /**** RESPONSE RETURNS AS AN ARRAY OF KEY/VALUE PAIRS ****
          * [ {
          *  id: '',
@@ -250,11 +274,12 @@ export default {
 
       try {
         // Query Verto to get AR prices for each token
-        for(let pst of this.vehiclePsts) {
+        for(let pst of this.psts) {
           const response = await fetch('http://v2.cache.verto.exchange/token/' + pst.id + '/price');
           const jsonRes = await response.json();
-          const i = this.vehiclePsts.findIndex(item => item.id === pst.id);
-          this.vehiclePsts[i]['total'] = jsonRes.price * this.vehiclePsts[i]['balance'];
+          const i = this.psts.findIndex(item => item.id === pst.id);
+          this.psts[i]['price'] = jsonRes.price;
+          this.psts[i]['total'] = jsonRes.price * this.psts[i]['balance'];
         }
       } catch(error) {
         console.log('ERROR while fetching AR prices from Verto: ' + error);
@@ -265,19 +290,28 @@ export default {
     },
     pstChange() {
         this.inputTokens = null;
+        this.pricePerToken = null;
     },
     calcPstPrice() {
-        const currentPst = this.psts.find(item => item.id === this.selectedPst);
+        const currentPst = this.psts.find(item => item.id === this.selectedPstId);
         this.pricePerToken = currentPst.price;
         this.pstValue = currentPst.price * this.inputTokens;
+        this.updateInputValid(currentPst.balance);
+    },
+    updateInputValid(balance) {
+        if (Number(this.inputTokens) <= balance) {
+          this.inputValid = true;
+        } else {
+          this.inputValid = false;
+        }
     },
     updateVehicleTotal() {
         this.totalValue = this.vehiclePsts.reduce((acc, item) => acc + item.total, 0);
     },
     addPst() {
         // Create temp object and add new keys
-        let currentPst = this.psts.find(item => item.id === this.selectedPst);
-        const existingIndex = this.vehiclePsts.findIndex(item => item.id === this.selectedPst);
+        let currentPst = this.psts.find(item => item.id === this.selectedPstId);
+        let existingIndex = this.vehiclePsts.findIndex(item => item.id === this.selectedPstId);
         if (existingIndex === -1) {
             // Add new PST to vehicle
             currentPst['tokens'] = parseInt(this.inputTokens);
@@ -287,10 +321,16 @@ export default {
             // Updated existing PST in vehicle
             this.vehiclePsts[existingIndex]['tokens'] += parseInt(this.inputTokens);
             this.vehiclePsts[existingIndex]['total'] += this.pstValue;
-        }        
+        }
+        // Subtract tokens from wallet pst
+        existingIndex = this.psts.findIndex(item => item.id === this.selectedPstId);
+        this.psts[existingIndex]['balance'] -= parseInt(this.inputTokens);
+        this.updateInputValid(this.psts[existingIndex]['balance']);
+        
+        /*** TODO:  SAVE WALLET UPDATES ON CREATE VEHICLE */
+        
         // Recalc the price
         this.updateVehicleTotal();
-        console.log(this.vehiclePsts);
     },
     removePst(id) {
         this.vehiclePsts.splice(this.vehiclePsts.findIndex(item => item.id === id), 1);
