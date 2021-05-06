@@ -45,6 +45,19 @@
                       ></textarea>
                     </div>
                   </div>
+                  <div class="pt-2">
+                    <label
+                      for="seats"
+                      class="block text-sm font-medium text-gray-700"
+                      >Number of Seats Available
+                    </label>
+                    <div class="flex justify-start items-center">
+                      <input type="number" v-model="seats" class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md"/>
+                      <label class="pl-4 block text-sm text-gray-700">~
+                        <span class="text-lg text-aftrBlue">{{ displaySeats }}</span> seats will be created
+                      </label>
+                    </div> 
+                  </div>
                   <div v-if="arConnected" class="pt-6">
                     <label class="block text-sm font-medium text-gray-700">
                       Owner:
@@ -53,8 +66,11 @@
                       >
                     </label>
                   </div>
-                  <div v-else class="pt-6">
-                    <button @click="arConnect" type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-aftrBlue hover:bg-aftrBlue-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Sign-in to ArConnect</button>
+                  <div v-else class="pt-6 flex justify-start items-center">
+                    <button @click="arConnect" type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-aftrBlue hover:bg-aftrBlue-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Login to ArConnect</button>
+                    <label class="pl-4 block text-sm text-gray-700">
+                      You must provide a wallet in order to create a vehicle
+                    </label>
                   </div>
                 <div v-if="arConnected" class="pt-6">
                     <select v-model="selectedPstId" @change="pstChange" id="selectedPstId" name="selectedPstId" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
@@ -173,24 +189,26 @@
 <script>
 //import { uuid } from 'vue-uuid';
 import Arweave from 'arweave';
+//import NumberInput from '/utils/NumberInput.vue';
 import numeral from 'numeral';
+import numberAbbreviate from 'number-abbreviate';
 
 export default {
   data() {
     return {
       arConnected: false,       // Is user logged in through ArConnect?
-      pstSelected: false,
+      pstSelected: false,       // Boolean that shows when a PST is selected
       activeWallet: '',         // Active wallet address on ArConnect
       selectedPstId: '',        // ID of selected PST
       inputTokens: null,        // Number of tokens of PST
-      inputValid: false,
+      seats: null,              // Number of seats available in vehicle
+      inputValid: false,        // Boolean to show when amount goes over tokens held
       pricePerToken: null,      // Selected PST's price
       pstValue: null,           // pricePerShare * inputShares
       totalValue: null,         // Sum of all PST values in vehicle
       vehiclePsts: [],          // Array of vehicle's PSTs
-      checkedPsts: [],
       psts: []
-      /****
+      /****  TEST object
       psts: [
             { id: '46c0bdd1-56a9-4179-8a56-164b702a5cb8', ticker: 'AFTR', name: 'AFTR Market', price: 0.05 },
             { id: '8f1d6790-b885-4078-af9d-4e431ed74cf6', ticker: 'ARDRIVE', name: 'ArDrive', price: 0.078 },
@@ -204,6 +222,9 @@ export default {
     };
   },
   computed: {
+    displaySeats() {
+      return numberAbbreviate(this.seats, 2);
+    },
     pstBalance() {
       const currentPst = this.psts.find(item => item.id === this.selectedPstId);
       return this.formatNumber(currentPst.balance);
