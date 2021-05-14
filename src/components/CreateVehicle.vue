@@ -24,6 +24,7 @@
                     <input
                       type="text"
                       name="vehicleName"
+                      v-model="vehicle.name"
                       id="vehicleName"
                       class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                     />
@@ -39,6 +40,7 @@
                       <textarea
                         id="vehicleDesc"
                         name="vehicleDesc"
+                        v-model="vehicle.desc"
                         rows="3"
                         class="shadow-sm focus:ring-aftrBlue focus:border-aftrBlue mt-1 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="Describe your fund."
@@ -56,6 +58,29 @@
                       <label class="pl-4 block text-sm text-gray-700">~
                         <span class="text-lg text-aftrBlue">{{ displaySeats }}</span> seats will be created
                       </label>
+                    </div> 
+                  </div>
+                  <div class="pt-2">
+                    <label
+                      for="seats"
+                      class="block text-sm font-medium text-gray-700"
+                      >Price per Seat
+                    </label>
+                    <div class="flex justify-start items-center">
+                      <input type="number" v-model="vehicle.seatPrice" class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md"/>
+                      <label class="pl-4 block text-sm text-gray-700">AR</label>
+                    </div> 
+                  </div>
+                  <div class="pt-2">
+                    <label
+                      for="leaseLength"
+                      class="block text-sm font-medium text-gray-700"
+                      >Lease Length
+                    </label>
+                    <div class="flex justify-start items-center space-x-4">
+                      <input type="number" placeholder="Min" v-model="minLease" class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md"/>
+                      <input type="number" placeholder="Max" v-model="maxLease" class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md"/>
+                      <label class="block text-sm text-gray-700">Blocks</label>
                     </div> 
                   </div>
                   <div v-if="arConnected" class="pt-6">
@@ -168,7 +193,7 @@
                       </svg>
                       <span class="pl-2">Cancel</span>
                   </button>
-                  <button type="submit"
+                  <button type="submit" @click.prevent="createVehicle"
                     class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                       <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"></path>
@@ -182,6 +207,7 @@
           </div>
         </div>
       </div>
+      {{ vehicle }}
     </main>
   </div>
 </template>
@@ -196,17 +222,21 @@ import numberAbbreviate from 'number-abbreviate';
 export default {
   data() {
     return {
+      testText: '',
       arConnected: false,       // Is user logged in through ArConnect?
       pstSelected: false,       // Boolean that shows when a PST is selected
       activeWallet: '',         // Active wallet address on ArConnect
       selectedPstId: '',        // ID of selected PST
       inputTokens: null,        // Number of tokens of PST
-      seats: null,              // Number of seats available in vehicle
+      seats: 0,                 // Number of seats available on vehicle
+      minLease: 2,              // Minimum seat lease length in blocks
+      maxLease: 24,             // Maximum seat lease length in blocks
       inputValid: false,        // Boolean to show when amount goes over tokens held
       pricePerToken: null,      // Selected PST's price
       pstValue: null,           // pricePerShare * inputShares
       totalValue: null,         // Sum of all PST values in vehicle
       vehiclePsts: [],          // Array of vehicle's PSTs
+      vehicle: {},              // Created vehicle object
       psts: []
       /****  TEST object
       psts: [
@@ -224,6 +254,9 @@ export default {
   computed: {
     displaySeats() {
       return numberAbbreviate(this.seats, 2);
+    },
+    convertToInt(value) {
+      return parseInt(value);
     },
     pstBalance() {
       const currentPst = this.psts.find(item => item.id === this.selectedPstId);
@@ -356,6 +389,25 @@ export default {
     removePst(id) {
         this.vehiclePsts.splice(this.vehiclePsts.findIndex(item => item.id === id), 1);
         this.updateVehicleTotal(); 
+    },
+    createVehicle() {
+        const id = "10000000000001"; // Temp ID
+        this.vehicle['id'] = id;
+        this.vehicle.wallet = this.activeWallet;
+        this.vehicle.seats = this.seats;
+        this.vehicle.minLease = this.minLease;
+        this.vehicle.maxLease = this.maxLease;
+        
+        const tmpPsts = this.vehiclePsts.map(item => {
+          return {
+            id: item.id,
+            name: item.name,
+            ticker: item.ticker,
+            logo: item.logo,
+            tokens: item.tokens,
+          };
+        });
+        this.vehicle.psts = tmpPsts;
     },
     cancelCreate() {
       this.$router.push('vehicles');
