@@ -214,7 +214,7 @@
 
 <script>
 //import { uuid } from 'vue-uuid';
-import Arweave from 'arweave';
+//import Arweave from 'arweave';
 //import NumberInput from '/utils/NumberInput.vue';
 import numeral from 'numeral';
 import numberAbbreviate from 'number-abbreviate';
@@ -222,7 +222,6 @@ import numberAbbreviate from 'number-abbreviate';
 export default {
   data() {
     return {
-      testText: '',
       arConnected: false,       // Is user logged in through ArConnect?
       pstSelected: false,       // Boolean that shows when a PST is selected
       activeWallet: '',         // Active wallet address on ArConnect
