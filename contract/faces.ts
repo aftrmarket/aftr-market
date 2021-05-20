@@ -18,7 +18,7 @@ export interface ActionInterface {
 }
 
 export interface InputInterface {
-  function: "transfer" | "balance";
+  function: 'transfer' | 'balance' | 'lease' | 'withdrawl';
   target?: string;
   qty?: number;
 }
