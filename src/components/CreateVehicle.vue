@@ -64,6 +64,17 @@
                     <label
                       for="seats"
                       class="block text-sm font-medium text-gray-700"
+                      >Vehicle Lock Period
+                    </label>
+                    <div class="flex justify-start items-center">
+                      <input type="number" v-model="lockPeriod" @change="lockChange" class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md"/>
+                      <label class="pl-4 block text-sm text-gray-700">Months (~<span class="text-lg text-aftrBlue">{{ monthsInBlocks(lockPeriod) }}</span> Blocks)</label>
+                    </div> 
+                  </div>
+                  <div class="pt-2">
+                    <label
+                      for="seats"
+                      class="block text-sm font-medium text-gray-700"
                       >Price per Seat
                     </label>
                     <div class="flex justify-start items-center">
@@ -80,7 +91,10 @@
                     <div class="flex justify-start items-center space-x-4">
                       <input type="number" placeholder="Min" v-model="minLease" class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md"/>
                       <input type="number" placeholder="Max" v-model="maxLease" class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md"/>
-                      <label class="block text-sm text-gray-700">Blocks</label>
+                      <label class="pl-4 block text-sm text-gray-700">
+                        Months (~<span class="text-lg text-aftrBlue">{{ monthsInBlocks(minLease) }}</span> to 
+                        <span class="text-lg text-aftrBlue">{{ monthsInBlocks(maxLease) }}</span> Blocks)
+                      </label>
                     </div> 
                   </div>
                   <div v-if="arConnected" class="pt-6">
@@ -227,9 +241,10 @@ export default {
       activeWallet: '',         // Active wallet address on ArConnect
       selectedPstId: '',        // ID of selected PST
       inputTokens: null,        // Number of tokens of PST
+      lockPeriod: 12,            // Period of time that the vehicle must exist
       seats: 0,                 // Number of seats available on vehicle
-      minLease: 2,              // Minimum seat lease length in blocks
-      maxLease: 24,             // Maximum seat lease length in blocks
+      minLease: 2,              // Minimum seat lease length in months
+      maxLease: 24,             // Maximum seat lease length in months
       inputValid: false,        // Boolean to show when amount goes over tokens held
       pricePerToken: null,      // Selected PST's price
       pstValue: null,           // pricePerShare * inputShares
@@ -297,6 +312,15 @@ export default {
         return numeral(num).format('0,0');
       }
     },
+    monthsInBlocks(value) {
+      // 1 block ~ 2 mins
+      if (value) {
+        const numBlocks = parseFloat(value) * (43800 / 2);
+        return numberAbbreviate(numBlocks, 2);
+      } else {
+        return '0';
+      }
+    },
     async arConnect() {
       try {
         const promiseResult = await window.arweaveWallet.connect(
@@ -340,6 +364,14 @@ export default {
     },
     togglePstFields() {
       this.pstSelected = !this.pstSelected;
+    },
+    lockChange() {
+      if (this.minLease > this.lockPeriod) {
+        this.minLease = this.lockPeriod;
+      }
+      if (this.maxLease < this.lockPeriod) {
+        this.maxLease = this.lockPeriod;
+      }
     },
     pstChange() {
         this.inputTokens = null;
@@ -394,6 +426,7 @@ export default {
         this.vehicle['id'] = id;
         this.vehicle.wallet = this.activeWallet;
         this.vehicle.seats = this.seats;
+        this.vehicle.lockPeriod = this.lockPeriod;
         this.vehicle.minLease = this.minLease;
         this.vehicle.maxLease = this.maxLease;
         
