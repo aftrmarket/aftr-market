@@ -1,9 +1,32 @@
 export interface StateInterface {
+  name: string;
   ticker: string;
-  reserve: string;
   balances: {
-    [addr: string]: number;
+    [addr: string]: number;                       // lessee wallet addr: number of seats leased
   };
+  lessor: string;                                 // Wallet of owner of vehicle
+  seats: number;                                  // Number of available seats in vehicle
+  lockPeriod: number;                             // Period of time in blocks that vehicle runs (lockPeriod can be renewed)
+  pricePerSeat: number;                           // Price per seat is customizable
+  minLength: number;                              // Minimum amount of blocks required to lease a seat
+  maxLength: number;                              // Maximum amount of blocks required to lease a seat (maximum can't exceed lockPeriod)
+  status: 'stopped' | 'started' | 'expired';      // Vehicle status can be stopped (not accepting leases), started (running), or expired (lock period has expired without being renewed)
+  leases: {
+    [lessee: string]: [                           // lessee wallet address
+      {
+        start: number;                            // Leased seat start time in blocks
+        end: number;                              // Leased seat end time in blocks
+      }
+    ];
+  };
+  settings: [
+    {
+      communityAppUrl: string,
+      communityDiscussionLinks: string,
+      communityDescription: string,
+      communityLogo: string
+    }
+  ];
 }
 
 export interface BalanceInterface {
@@ -18,7 +41,10 @@ export interface ActionInterface {
 }
 
 export interface InputInterface {
-  function: 'transfer' | 'balance' | 'lease' | 'withdrawl';
+  function: 'balance' | 'lease' | 'withdrawl';
   target?: string;
   qty?: number;
+  seats?: number;
+
+
 }
