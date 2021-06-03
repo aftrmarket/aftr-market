@@ -4,28 +4,48 @@
       <div class="max-w-7xl mx-auto pb-12 px-4 sm:px-6 lg:px-8">
         <div class="md:grid md:grid-cols-3 md:gap-6">
           <div class="mt-5 md:mt-0 md:col-span-2">
-            <div class="px-4 sm:px-0">
-              <h3 class="text-xl font-medium leading-6 text-white">
-                Create Your Vehicle
-              </h3>
-              <p class="mt-1 pb-4 text-sm text-aftrYellow">
-                You can edit this information later.
-              </p>
+            <div class="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
+              <div class="px-4 sm:px-0">
+                <h3 class="text-xl font-medium leading-6 text-white">
+                  Create Your Vehicle
+                </h3>
+                <p class="mt-1 pb-4 text-sm text-aftrYellow">
+                  You can edit this information later
+                </p>
+              </div>
+              <div class="relative pb-4">
+                <img v-if="vehicleLogo" class="h-16 w-16 rounded-full" :src="vehicleLogo" alt="">
+                <span class="absolute inset-0 shadow-inner rounded-full" aria-hidden="true"></span>
+              </div>
             </div>
             <form action="#" method="POST">
-              <div class="shadow overflow-hidden sm:rounded-md">
+              <div class="shadow overflow-hidden sm:rounded-md">                
                 <div class="bg-white sm:p-6">
-                  <div class="pt-2">
+                  <div class="pt-2 grid grid-cols-2 gap-4">
                     <label
                       for="vehicleName"
                       class="block text-sm font-medium text-gray-700"
                       >Vehicle Name
                     </label>
+                    <label
+                      for="vehicleTicker"
+                      class="block text-sm font-medium text-gray-700"
+                      >Ticker
+                    </label>
+                  </div>
+                  <div class="pt-2 grid grid-cols-2 gap-4">
                     <input
                       type="text"
                       name="vehicleName"
                       v-model="vehicle.name"
                       id="vehicleName"
+                      class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                    />
+                    <input
+                      type="text"
+                      name="vehicleTicker"
+                      v-model="vehicle.ticker"
+                      id="vehicleTicker"
                       class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                     />
                   </div>
@@ -43,8 +63,32 @@
                         v-model="vehicle.desc"
                         rows="3"
                         class="shadow-sm focus:ring-aftrBlue focus:border-aftrBlue mt-1 block w-full sm:text-sm border-gray-300 rounded-md"
-                        placeholder="Describe your fund."
+                        placeholder="Describe your fund"
                       ></textarea>
+                    </div>
+                  </div>
+                  <div>
+                    <label for="vehicleLogo" class="py-2 block text-sm font-medium text-gray-700">
+                      Logo
+                    </label>
+                    <div class="mt-2 sm:mt-0 sm:col-span-2">
+                      <div class="max-w-lg flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                        <div class="space-y-1 text-center">
+                          <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                          </svg>
+                          <div class="flex text-sm text-gray-600">
+                            <label for="vehicleLogo" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                              <span>Upload a file</span>
+                              <input @change="onFileChange" id="vehicleLogo" name="vehicleLogo" type="file" class="sr-only" />
+                            </label>
+                            <p class="pl-1">or drag and drop</p>
+                          </div>
+                          <p class="text-xs text-gray-500">
+                            16 x 16 PNG, JPG, or GIF
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                   <div class="pt-2">
@@ -55,9 +99,7 @@
                     </label>
                     <div class="flex justify-start items-center">
                       <input type="number" v-model="seats" class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md"/>
-                      <label class="pl-4 block text-sm text-gray-700">~
-                        <span class="text-lg text-aftrBlue">{{ displaySeats }}</span> seats will be created
-                      </label>
+                      <label class="pl-4 block text-sm text-gray-700">~<span class="text-lg text-aftrBlue">{{ displaySeats }}</span> seats will be created</label>
                     </div> 
                   </div>
                   <div class="pt-2">
@@ -241,7 +283,8 @@ export default {
       activeWallet: '',         // Active wallet address on ArConnect
       selectedPstId: '',        // ID of selected PST
       inputTokens: null,        // Number of tokens of PST
-      lockPeriod: 12,            // Period of time that the vehicle must exist
+      vehicleLogo: null,        // Logo for vehicle
+      lockPeriod: 12,           // Period of time that the vehicle must exist
       seats: 0,                 // Number of seats available on vehicle
       minLease: 2,              // Minimum seat lease length in months
       maxLease: 24,             // Maximum seat lease length in months
@@ -320,6 +363,10 @@ export default {
       } else {
         return '0';
       }
+    },
+    onFileChange(e) {
+      const file = e.target.files[0];
+      this.vehicleLogo = URL.createObjectURL(file);
     },
     async arConnect() {
       try {
@@ -429,6 +476,7 @@ export default {
         this.vehicle.lockPeriod = this.lockPeriod;
         this.vehicle.minLease = this.minLease;
         this.vehicle.maxLease = this.maxLease;
+        this.vehicle.logo = this.vehicleLogo;
         
         const tmpPsts = this.vehiclePsts.map(item => {
           return {
