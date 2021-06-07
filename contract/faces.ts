@@ -41,10 +41,7 @@ export interface ActionInterface {
 }
 
 export interface InputInterface {
-  function: 'balance' | 'lease' | 'withdrawl';
+  function: 'balance' | 'transfer' | 'lease' | 'withdrawl';
   target?: string;
   qty?: number;
-  seats?: number;
-
-
 }
