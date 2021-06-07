@@ -8,7 +8,7 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "sourceMap": true,
-    "outDir": "dist",
+    "outDir": "dist_contract",
     "rootDir": "contract",
     "baseUrl": ".",
     "removeComments": true,
