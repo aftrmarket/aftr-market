@@ -1,0 +1,23 @@
+{
+    "name" : "Initial Contract",
+    "ticker" : "AFTR-INIT",
+    "balances" : {
+
+    },
+    "creator" : "",
+    "seats" : 0,
+    "lockPeriod" : 1,
+    "pricePerSeat" : 1,
+    "minLength" : 1,
+    "maxLength" : 1,
+    "status" : "stopped",
+    "leases" : {
+
+    },
+    "settings" : [
+        [ "communityAppUrl", "https://aftr.market" ],
+        [ "communityDiscussionLinks", "" ],
+        [ "communityDescription", "" ],
+        [ "communityLogo", ""]
+    ]
+}

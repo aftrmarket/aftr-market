@@ -4,7 +4,7 @@ export interface StateInterface {
   balances: {
     [addr: string]: number;                       // lessee wallet addr: number of seats leased
   };
-  lessor: string;                                 // Wallet of owner of vehicle
+  creator: string;                                // Wallet of creator of vehicle
   seats: number;                                  // Number of available seats in vehicle
   lockPeriod: number;                             // Period of time in blocks that vehicle runs (lockPeriod can be renewed)
   pricePerSeat: number;                           // Price per seat is customizable
@@ -19,14 +19,7 @@ export interface StateInterface {
       }
     ];
   };
-  settings: [
-    {
-      communityAppUrl: string,
-      communityDiscussionLinks: string,
-      communityDescription: string,
-      communityLogo: string
-    }
-  ];
+  settings: [];
 }
 
 export interface BalanceInterface {

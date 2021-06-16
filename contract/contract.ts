@@ -11,7 +11,8 @@ export function handle(state: StateInterface, action: ActionInterface) {
     
     const target = input.target || caller;
     if (typeof target !== "string") {
-      //throw new ContractError("Must specificy target to get balance for.");
+      // @ts-expect-error
+      throw new ContractError("Must specificy target to get balance for.");
     }
     let balance = 0;
     if (target in balances) {
@@ -20,24 +21,48 @@ export function handle(state: StateInterface, action: ActionInterface) {
     return {result: {target, balance}};
   }
 
+  if (input.function === "lease") {
+    // Lease a seat, subtract balance from owner wallet, add to lessee
+    const target = input.target;  // Address of lessee
+    const qty = input.qty;        // Number of seats to lease
+
+    // 
+
+
+    if (!Number.isInteger(qty)) {
+      // @ts-expect-error
+      throw new ContractError('Invalid value for "qty". Must be an integer.');
+    }
+    if (qty <= 0 || caller === target) {
+      // @ts-expect-error
+      throw new ContractError("Invalid token lease.");
+    }
+
+    return {state};
+  }
+
   if (input.function === "transfer") {
-    // Add leased seats to balance array
     const target = input.target;
     const qty = input.qty;
     if (!Number.isInteger(qty)) {
-      //throw new ContractError('Invalid value for "qty". Must be an integer.');
+      // @ts-expect-error
+      throw new ContractError('Invalid value for "qty". Must be an integer.');
     }
     if (!target) {
-      //throw new ContractError("No target specified.");
+      // @ts-expect-error
+      throw new ContractError("No target specified.");
     }
     if (qty <= 0 || caller === target) {
-      //throw new ContractError("Invalid token transfer.");
+      // @ts-expect-error
+      throw new ContractError("Invalid token transfer.");
     }
     if (!(caller in balances)) {
-      //throw new ContractError("Caller doesn't own any DAO balance.");
+      // @ts-expect-error
+      throw new ContractError("Caller doesn't own any DAO balance.");
     }
     if (balances[caller] < qty) {
-      //throw new ContractError(`Caller balance not high enough to send ${qty} token(s)!`);
+      // @ts-expect-error
+      throw new ContractError(`Caller balance not high enough to send ${qty} token(s)!`);
     }
     balances[caller] -= qty;
     if (target in balances) {
