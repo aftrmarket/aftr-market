@@ -8,6 +8,7 @@
     "build:contract": "tsc"
   },
   "dependencies": {
+    "@heroicons/vue": "^1.0.1",
     "@tailwindcss/forms": "^0.2.1",
     "arweave": "^1.10.13",
     "install": "^0.13.0",
