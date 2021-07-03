@@ -8,6 +8,7 @@ import App from './App.vue';
 import VehicleList from './components/VehicleList.vue';
 import CreateVehicle from './components/CreateVehicle.vue';
 import VehicleInfo from './components/VehicleInfo.vue';
+import UiTest from './components/UiTest.vue';
 
 const router = createRouter({
     history: createWebHistory(),
@@ -16,6 +17,7 @@ const router = createRouter({
         { name: 'vehicles', path: '/vehicles', component: VehicleList, alias: '/', },
         { name: 'vehicle-info', path: '/vehicles/:vehicleId', component: VehicleInfo, props: true },
         { name: 'create', path: '/create', component: CreateVehicle },
+        { name: 'ui-test', path: '/ui-test', component: UiTest },
         { path: '/:notFound(.*)', redirect: '/' }
     ],
     linkActiveClass: 'active'

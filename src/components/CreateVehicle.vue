@@ -1,309 +1,302 @@
 <template>
-    <div>
-        <main class="-mt-32">
-            <div class="max-w-7xl mx-auto pb-12 px-4 sm:px-6 lg:px-8">
-                <!--<div class="md:grid md:grid-cols-3 md:gap-6">-->
-                <div class="mt-5 md:mt-0 md:col-span-2">
-                    <div class="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
-                        <div class="px-4 sm:px-0">
-                            <h3 class="text-xl font-medium leading-6 text-white">
-                                Create Your Vehicle
-                            </h3>
-                            <p class="mt-1 pb-4 text-sm text-aftrYellow">
-                                You can edit this information later
-                            </p>
-                        </div>
-                        <div class="relative pb-4">
-                            <img v-if="vehicleLogo" class="h-16 w-16 rounded-full" :src="vehicleLogo" alt="" />
-                            <span class="absolute inset-0 shadow-inner rounded-full" aria-hidden="true"></span>
-                        </div>
+    <main class="-mt-32">
+        <div class="max-w-7xl mx-auto pb-2 px-4 sm:px-6 lg:px-8">
+            <!--<div class="md:grid md:grid-cols-3 md:gap-6">-->
+            <div class="mt-5 md:mt-0 md:col-span-2">
+                <div class="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
+                    <div class="px-4 sm:px-0">
+                        <h3 class="text-xl font-medium leading-6 text-white">
+                            Create Your Vehicle
+                        </h3>
+                        <p class="mt-1 pb-4 text-sm text-aftrYellow">
+                            You can edit this information later
+                        </p>
                     </div>
-                    <div v-if="pageStatus != ''" class="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
-                        <!-- ***** Alert Messages ***** -->
-                        <div class="space-y-6 lg:col-start-1 lg:col-span-3">
-                            <div v-if="pageStatus === 'in-progress'" class="shadow overflow-hidden sm:rounded-md">
-                                <div class='bg-white sm:p-6'>
-                                    <div class='pt-2 grid grid-cols-2 gap-4'>
-                                        <div class='flex space-x-4'>
-                                            <div class='bg-yellow-50 border-l-4 border-yellow-400 p-4'>
-                                                <div class='animate-pulse flex'>
-                                                    <div class='flex-shrink-0'>
-                                                        <!--<ExclamationIcon class='h-5 w-5 text-yellow-400' aria-hidden='true' /> -->
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="#E49B0F">
-                                                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                                                        </svg>
-                                                    </div>
-                                                    <div class='ml-3'>
-                                                        <p class='text-sm text-aftrDarkGrey'>Your vehicle is being assembled...</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div v-else-if="pageStatus === 'error'" class="shadow overflow-hidden sm:rounded-md">
-                                <div class='bg-white sm:p-6'>
-                                    <div class='pt-2 grid grid-cols-2 gap-4'>
-                                        <div class='flex space-x-4'>
-                                            <div class='bg-red-50 border-l-4 border-red-400 p-4'>
-                                                <div class='animate-pulse flex'>
-                                                    <div class='flex-shrink-0'>
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="red">
-                                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                                                        </svg>
-                                                    </div>
-                                                    <div class='ml-3'>
-                                                        <p class='text-sm text-aftrDarkGrey'>A problem occurred while creating your vehicle.</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- ***** Alert Messages ***** -->
-                    </div>
-                    <div v-if="pageStatus === ''" class="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
-                        <div class="space-y-6 lg:col-start-1 lg:col-span-2">
-                            <form action="#" method="POST">
-                                <div class="shadow overflow-hidden sm:rounded-md">
-                                    <div class="bg-white sm:p-6">
-                                        <div class="pt-2 grid grid-cols-2 gap-4">
-                                            <label for="vehicleName" class="block text-sm font-medium text-gray-700">Vehicle Name</label>
-                                            <label for="vehicleTicker" class="block text-sm font-medium text-gray-700">Ticker</label>
-                                        </div>
-                                        <div class="pt-2 grid grid-cols-2 gap-4">
-                                            <input type="text" name="vehicleName" v-model="vehicle.name" ref="vehicleName" @input="nameValidate" :class="nameBox">
-                                            <input type="text" name="vehicleTicker" v-model="vehicle.ticker" ref="vehicleTicker" @input="tickerValidate" :class="tickerBox" />
-                                        </div>
-                                        <div>
-                                            <label for="vehicleDesc" class="pt-2 block text-sm font-medium text-gray-700">Description</label>
-                                            <div class="mt-1">
-                                                <textarea id="vehicleDesc" name="vehicleDesc" v-model="vehicle.desc" rows="3" class="shadow-sm focus:ring-aftrBlue focus:border-aftrBlue mt-1 block w-full sm:text-sm border-gray-300 rounded-md" placeholder="Describe your fund"></textarea>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label for="vehicleLogo" class="py-2 block text-sm font-medium text-gray-700">Logo</label>
-                                            <div class="mt-2 sm:mt-0 sm:col-span-2">
-                                                <div class="
-                                                            max-w-lg flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                                                    <div class="space-y-1 text-center">
-                                                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-                                                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                                        </svg>
-                                                        <div class="flex text-sm text-gray-600">
-                                                            <label for="vehicleLogo" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
-                                                                <span>Upload a file</span>
-                                                                <input @change="onFileChange" id="vehicleLogo" name="vehicleLogo" type="file" class="sr-only" />
-                                                            </label>
-                                                            <p class="pl-1"> or drag and drop</p>
-                                                        </div>
-                                                        <p class="text-xs text-gray-500">16 x 16 PNG, JPG, or GIF</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div v-if="leasingEnabled">
-                                            <div class="pt-2">
-                                                <label for="seats" class="block text-sm font-medium text-gray-700">Number of Seats Available</label>
-                                                <div class="flex justify-start items-center">
-                                                    <input type="number" v-model="seats" class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md" />
-                                                    <label class="pl-4 block text-sm text-gray-700">~<span class="text-lg text-aftrBlue">{{ displaySeats }}</span> seats will be created</label>
-                                                </div>
-                                            </div>
-                                            <div class="pt-2">
-                                                <label for="seats" class="block text-sm font-medium text-gray-700">Vehicle Lock Period</label>
-                                                <div class="flex justify-start items-center">
-                                                    <input type="number" v-model="lockPeriod" @change="lockChange" class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md" />
-                                                    <label class="pl-4 block text-sm text-gray-700">Months (~<span class="text-lg text-aftrBlue">{{ monthsInBlocks(lockPeriod) }}</span> Blocks)</label>
-                                                </div>
-                                            </div>
-                                            <div class="pt-2">
-                                                <label for="seats" class="block text-sm font-medium text-gray-700">Price per Seat</label>
-                                                <div class="flex justify-start items-center">
-                                                    <input type="number" v-model="vehicle.seatPrice" class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md" />
-                                                    <label class="pl-4 block text-sm text-gray-700">AR</label>
-                                                </div>
-                                            </div>
-                                            <div class="pt-2">
-                                                <label for="leaseLength" class="block text-sm font-medium text-gray-700">Lease Length</label>
-                                                <div class="flex justify-start items-center space-x-4">
-                                                    <input type="number" placeholder="Min" v-model="minLease" class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md" />
-                                                    <input type="number" placeholder="Max" v-model="maxLease" class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md" />
-                                                    <label class="pl-4 block text-sm text-gray-700">
-                                                        Months (~<span class="text-lg text-aftrBlue">{{ monthsInBlocks(minLease) }}</span> to <span class="text-lg text-aftrBlue">{{ monthsInBlocks(maxLease) }}</span> Blocks)
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div v-if="arConnected" class="pt-6">
-                                            <label class="block text-sm font-medium text-gray-700">
-                                                Owner: <span class="font-bold text-aftrRed">{{ activeWallet }}</span>
-                                            </label>
-                                        </div>
-                                        <div v-else class="pt-6 flex justify-start items-center">
-                                            <button @click="arConnect" type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-aftrBlue hover:bg-aftrBlue-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                                Login to ArConnect
-                                            </button>
-                                            <label class="pl-4 block text-sm text-gray-700">
-                                                You must provide a wallet in order to create a vehicle
-                                            </label>
-                                        </div>
-                                        <div v-if="arConnected" class="pt-6">
-                                            <select v-model="selectedPstId" @change="pstChange" id="selectedPstId" name="selectedPstId" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                                                <option value="" disabled selected>
-                                                    Select PST
-                                                </option>
-                                                <option v-for="pst in psts" :key="pst.id" :value="pst.id">
-                                                    {{ pst.name }} ({{ pst.id }})
-                                                </option>
-                                            </select>
-                                        </div>
-
-                                        <div v-if="selectedPstId !== ''">
-                                            <div class="pt-6 pb-4">
-                                                <label class="block text-sm font-medium text-gray-700">
-                                                    You have <span class="font-bold text-aftrBlue">{{ pstBalance }} {{ pstTicker }}</span><span> available to use in your vehicle.</span>
-                                                </label>
-                                            </div>
-                                            <input type="number" placeholder="Amount" v-model="inputTokens" @input="calcPstPrice" :class="inputTokenBox" />
-                                            <span v-if="inputTokens" class="pl-4 pr-6">@ {{ formatNumber( pricePerToken, true) }} AR {{ inputTokens ? " = " + formatNumber(pstValue, true) + " AR" : "" }}</span>
-                                            <div class="pt-2">
-                                                <button v-if="inputValid && inputTokens !== ''" @click.prevent="addPst" type="submit" class=" inline-flex justify-center py-2 px-4 border border-gray shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-transparent hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
-                                                    <img class="-ml-1 mr-2 h-5 w-5 text-current" src="../assets/add_circle-24px.svg" /> Add PST
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <!-- Table of PSTs -->
-                                        <div v-if="vehiclePsts.length > 0" class="pt-1">
-                                            <div class="pt-2 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                                                <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-                                                    <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                                                        <table class="min-w-full divide-y divide-gray-200">
-                                                            <thead class="bg-gray-50">
-                                                                <tr>
-                                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profit Sharing Token</th>
-                                                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Tokens</th>
-                                                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Value (AR)</th>
-                                                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody class="bg-white divide-y divide-gray-200">
-                                                                <tr v-for="pst in vehiclePsts" :key="pst.id" class="hover:bg-gray-50">
-                                                                    <td class="px-6 py-4 whitespace-nowrap">
-                                                                        <div class="flex items-center">
-                                                                            <div class="flex-shrink-0 h-10 w-10">
-                                                                                <img class="h-10 w-10 rounded-full" :src="`https://arweave.net/` + pst.logo" alt="" />
-                                                                            </div>
-                                                                            <div class="ml-4">
-                                                                                <div class="text-sm font-medium text-gray-900"> {{ pst.name + " (" + pst.ticker + ")" }} </div>
-                                                                                <div class="text-sm text-gray-500"> {{ pst.id.substr(0, 5) + "..." }}</div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </td>
-                                                                    <td class="text-right px-6 py-3">{{ formatNumber(pst.tokens) }}</td>
-                                                                    <td class="text-right px-6 py-3">{{ formatNumber(pst.total, true) }}</td>
-                                                                    <td class="text-center px-6 py-3">
-                                                                        <button @click.prevent="removePst(pst.id)" type="submit" class="inline-flex items-center p-1 border border-transparent shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed">
-                                                                            <img src="../assets/delete-24px.svg" />
-                                                                        </button>
-                                                                    </td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- End of PST Table -->
-                                    <div class="pl-6 pb-4 text-right">
-                                        <div class="text-right">
-                                            <span v-if="totalValue" class="px-6 py-3">
-                                                Total:
-                                                <span class="px-2 inline-flex text-lg leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                                    {{ formatNumber(totalValue, true) }} AR
-                                                </span>
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <div class="px-4 py-3 bg-gray-50 sm:px-6 flex items-center justify-between">
-                                        <button type="submit" @click.prevent="cancelCreate" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed">
-                                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
-                                            </svg>
-                                            <span class="pl-2">Cancel</span>
-                                        </button>
-                                        <button type="submit" @click.prevent="createVehicle" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
-                                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"></path>
-                                                <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z"></path>
-                                            </svg>
-                                            <span class="pl-2">Create Vehicle</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                        <!-- DAO -->
-                        <div class="space-y-6 lg:col-start-3 lg:col-span-1">
-                            <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
-                                <h2 id="timeline-title" class="text-lg font-medium text-gray-900">DAO Members</h2>
-                                <!-- DAO Members -->
-                                <div class="mt-6 flow-root">
-                                    <input type="text" v-model="memberWallet" placeholder="Wallet Address" class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
-                                </div>
-                                <div class="mt-6 flex flex-col inline-flex">
-                                    <button v-if="memberWallet!=''" @click.prevent="addDaoMember" type="button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
-                                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
-                                            <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
-                                        </svg>
-                                        <span class="pl-2">Add Member</span>
-                                    </button>
-                                </div>
-
-                                <!-- Table of DAO Members -->
-                                <div v-if="daoMembers.length" class="pt-1">
-                                    <div class="pt-2 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                                        <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-                                            <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                                                <table class="min-w-full divide-y divide-gray-200">
-                                                    <thead class="bg-gray-50">
-                                                        <tr>
-                                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Members ({{daoMembers.length}})</th>
-                                                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody class="bg-white divide-y divide-gray-200">
-                                                        <tr v-for="member in daoMembers" :key="member" class="hover:bg-gray-50">
-                                                            <td class="text-xs px-6 py-3">{{ member.substr(0, 10) + "..." }}</td>
-                                                            <td v-if="member != activeWallet" class="text-center px-6 py-3">
-                                                                <button @click.prevent="removeDaoMember(member)" type="submit" class="inline-flex items-center p-1 border border-transparent shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed">
-                                                                    <img src="../assets/delete-24px.svg" />
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- End of DAO Table -->
-                            </div>
-                        </div>
-                        <!-- DAO End -->
+                    <div class="relative pb-4">
+                        <img v-if="vehicleLogo" class="h-16 w-16 rounded-full" :src="vehicleLogo" alt="" />
+                        <span class="absolute inset-0 shadow-inner rounded-full" aria-hidden="true"></span>
                     </div>
                 </div>
-                <!--</div>-->
-                {{ vehicle }} {{ tickerValid }}
             </div>
-        </main>
-    </div>
+        </div>
+        <div v-if="pageStatus === 'in-progress'">
+        <!-- ***** Alert Messages ***** -->
+            <form-container>
+                <div class='bg-yellow-50 border-l-4 border-yellow-400 p-4'>
+                    <div class='animate-pulse flex'>
+                        <div class='flex-shrink-0'>
+                            <!--<ExclamationIcon class='h-5 w-5 text-yellow-400' aria-hidden='true' /> -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="#E49B0F">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class='ml-3'>
+                            <p class='text-sm text-aftrDarkGrey'>Your vehicle is being assembled...</p>
+                        </div>
+                    </div>
+                </div>
+            </form-container>
+        </div>
+        <div v-else-if="pageStatus === 'error'">
+            <form-container>
+                <div class='bg-red-50 border-l-4 border-red-400 p-4'>
+                    <div class='animate-pulse flex'>
+                        <div class='flex-shrink-0'>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="red">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class='ml-3'>
+                            <p class='text-sm text-aftrDarkGrey'>A problem occurred while creating your vehicle.</p>
+                        </div>
+                    </div>
+                </div>
+            </form-container>
+        </div>
+        <div v-if="pageStatus === ''">
+            <!-- Vehicle Info -->
+            <form-container>
+                <form action="#" method="POST">
+                    <h3 class="text-xl font-light leading-6">Vehicle Information</h3>
+                    <div class="bg-white sm:p-6">
+                        <div class="pt-2 grid grid-cols-2 gap-4">
+                            <label for="vehicleName" class="block text-sm font-medium text-gray-700">Vehicle Name</label>
+                            <label for="vehicleTicker" class="block text-sm font-medium text-gray-700">Ticker</label>
+                        </div>
+                        <div class="pt-2 grid grid-cols-2 gap-4">
+                            <input type="text" name="vehicleName" v-model="vehicle.name" ref="vehicleName" @input="nameValidate" :class="nameBox">
+                            <input type="text" name="vehicleTicker" v-model="vehicle.ticker" ref="vehicleTicker" @input="tickerValidate" :class="tickerBox" />
+                        </div>
+                        <div>
+                            <label for="vehicleDesc" class="pt-2 block text-sm font-medium text-gray-700">Description</label>
+                            <div class="mt-1">
+                                <textarea id="vehicleDesc" name="vehicleDesc" v-model="vehicle.desc" rows="3" class="shadow-sm focus:ring-aftrBlue focus:border-aftrBlue mt-1 block w-full sm:text-sm border-gray-300 rounded-md" placeholder="Describe your fund"></textarea>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="vehicleLogo" class="py-2 block text-sm font-medium text-gray-700">Logo</label>
+                            <div class="mt-2 sm:mt-0 sm:col-span-2">
+                                <div class="
+                                            max-w-lg flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                                    <div class="space-y-1 text-center">
+                                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                        <div class="flex text-sm text-gray-600">
+                                            <label for="vehicleLogo" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                                                <span>Upload a file</span>
+                                                <input @change="onFileChange" id="vehicleLogo" name="vehicleLogo" type="file" class="sr-only" />
+                                            </label>
+                                            <p class="pl-1"> or drag and drop</p>
+                                        </div>
+                                        <p class="text-xs text-gray-500">16 x 16 PNG, JPG, or GIF</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div v-if="leasingEnabled">
+                            <div class="pt-2">
+                                <label for="seats" class="block text-sm font-medium text-gray-700">Number of Seats Available</label>
+                                <div class="flex justify-start items-center">
+                                    <input type="number" v-model="seats" class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md" />
+                                    <label class="pl-4 block text-sm text-gray-700">~<span class="text-lg text-aftrBlue">{{ displaySeats }}</span> seats will be created</label>
+                                </div>
+                            </div>
+                            <div class="pt-2">
+                                <label for="seats" class="block text-sm font-medium text-gray-700">Vehicle Lock Period</label>
+                                <div class="flex justify-start items-center">
+                                    <input type="number" v-model="lockPeriod" @change="lockChange" class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md" />
+                                    <label class="pl-4 block text-sm text-gray-700">Months (~<span class="text-lg text-aftrBlue">{{ monthsInBlocks(lockPeriod) }}</span> Blocks)</label>
+                                </div>
+                            </div>
+                            <div class="pt-2">
+                                <label for="seats" class="block text-sm font-medium text-gray-700">Price per Seat</label>
+                                <div class="flex justify-start items-center">
+                                    <input type="number" v-model="vehicle.seatPrice" class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md" />
+                                    <label class="pl-4 block text-sm text-gray-700">AR</label>
+                                </div>
+                            </div>
+                            <div class="pt-2">
+                                <label for="leaseLength" class="block text-sm font-medium text-gray-700">Lease Length</label>
+                                <div class="flex justify-start items-center space-x-4">
+                                    <input type="number" placeholder="Min" v-model="minLease" class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md" />
+                                    <input type="number" placeholder="Max" v-model="maxLease" class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md" />
+                                    <label class="pl-4 block text-sm text-gray-700">
+                                        Months (~<span class="text-lg text-aftrBlue">{{ monthsInBlocks(minLease) }}</span> to <span class="text-lg text-aftrBlue">{{ monthsInBlocks(maxLease) }}</span> Blocks)
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h3 class="mt-4 border-t border-gray-200 pt-4 text-xl font-light leading-6">Add Tokens</h3>
+                    <div class="bg-white sm:p-2">
+                        <div v-if="arConnected" class="pt-6">
+                            <label class="block text-sm font-medium text-gray-700">
+                                Owner: <span class="font-bold text-aftrRed">{{ activeWallet }}</span>
+                            </label>
+                        </div>
+                        <div v-else class="pt-6 flex justify-start items-center">
+                            <button @click="arConnect" type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-aftrBlue hover:bg-aftrBlue-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                Login to ArConnect
+                            </button>
+                            <label class="pl-4 block text-sm text-gray-700">
+                                You must provide a wallet in order to create a vehicle
+                            </label>
+                        </div>
+                        <div v-if="arConnected" class="pt-6">
+                            <select v-model="selectedPstId" @change="pstChange" id="selectedPstId" name="selectedPstId" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                <option value="" disabled selected>
+                                    Select PST
+                                </option>
+                                <option v-for="pst in psts" :key="pst.id" :value="pst.id">
+                                    {{ pst.name }} ({{ pst.id }})
+                                </option>
+                            </select>
+                        </div>
+
+                        <div v-if="selectedPstId !== ''">
+                            <div class="pt-6 pb-4">
+                                <label class="block text-sm font-medium text-gray-700">
+                                    You have <span class="font-bold text-aftrBlue">{{ pstBalance }} {{ pstTicker }}</span><span> available to use in your vehicle.</span>
+                                </label>
+                            </div>
+                            <input type="number" placeholder="Amount" v-model="inputTokens" @input="calcPstPrice" :class="inputTokenBox" />
+                            <span v-if="inputTokens" class="pl-4 pr-6">@ {{ formatNumber( pricePerToken, true) }} AR {{ inputTokens ? " = " + formatNumber(pstValue, true) + " AR" : "" }}</span>
+                            <div class="pt-2">
+                                <button v-if="inputValid && inputTokens !== ''" @click.prevent="addPst" type="submit" class=" inline-flex justify-center py-2 px-4 border border-gray shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-transparent hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+                                    <img class="-ml-1 mr-2 h-5 w-5 text-current" src="../assets/add_circle-24px.svg" /> Add PST
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Table of PSTs -->
+                        <div v-if="vehiclePsts.length > 0" class="pt-1">
+                            <div class="pt-2 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                                <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                                    <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                                        <table class="min-w-full divide-y divide-gray-200">
+                                            <thead class="bg-gray-50">
+                                                <tr>
+                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profit Sharing Token</th>
+                                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Tokens</th>
+                                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Value (AR)</th>
+                                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="bg-white divide-y divide-gray-200">
+                                                <tr v-for="pst in vehiclePsts" :key="pst.id" class="hover:bg-gray-50">
+                                                    <td class="px-6 py-4 whitespace-nowrap">
+                                                        <div class="flex items-center">
+                                                            <div class="flex-shrink-0 h-10 w-10">
+                                                                <img class="h-10 w-10 rounded-full" :src="`https://arweave.net/` + pst.logo" alt="" />
+                                                            </div>
+                                                            <div class="ml-4">
+                                                                <div class="text-sm font-medium text-gray-900"> {{ pst.name + " (" + pst.ticker + ")" }} </div>
+                                                                <div class="text-sm text-gray-500"> {{ pst.id.substr(0, 5) + "..." }}</div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-right px-6 py-3">{{ formatNumber(pst.tokens) }}</td>
+                                                    <td class="text-right px-6 py-3">{{ formatNumber(pst.total, true) }}</td>
+                                                    <td class="text-center px-6 py-3">
+                                                        <button @click.prevent="removePst(pst.id)" type="submit" class="inline-flex items-center p-1 border border-transparent shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed">
+                                                            <img src="../assets/delete-24px.svg" />
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End of PST Table -->
+                    <div class="pl-6 pb-4 text-right">
+                        <div class="text-right">
+                            <span v-if="totalValue" class="px-6 py-3">
+                                Total:
+                                <span class="px-2 inline-flex text-lg leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                    {{ formatNumber(totalValue, true) }} AR
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- DAO -->
+                    <h3 class="mt-4 border-t border-gray-200 pt-4 text-xl font-light leading-6">DAO Members</h3>
+                    <!-- DAO Members -->
+                    <div class="bg-white sm:p-2">
+                        <div class="mt-6 flow-root">
+                            <input type="text" v-model="memberWallet" placeholder="Wallet Address" class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+                        </div>
+                        <div class="mt-6 flex flex-col inline-flex">
+                            <button v-if="memberWallet!=''" @click.prevent="addDaoMember" type="button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
+                                    <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
+                                </svg>
+                                <span class="pl-2">Add Member</span>
+                            </button>
+                        </div>
+
+                        <!-- Table of DAO Members -->
+                        <div v-if="daoMembers.length" class="pt-1">
+                            <div class="pt-2 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                                <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                                    <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                                        <table class="min-w-full divide-y divide-gray-200">
+                                            <thead class="bg-gray-50">
+                                                <tr>
+                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Members ({{daoMembers.length}})</th>
+                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">%</th>
+                                                    <th scope="col" class="px-6 py-3"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="bg-white divide-y divide-gray-200">
+                                                <tr v-for="member in daoMembers" :key="member" class="hover:bg-gray-50">
+                                                    <td class="text-xs px-6 py-3">{{ member.substr(0, 10) + "..." }}</td>
+                                                    <td class="text-xs px-6 py-3"> %</td>
+                                                    <td v-if="member != activeWallet" class="text-center px-6 py-3">
+                                                        <button @click.prevent="removeDaoMember(member)" type="submit" class="inline-flex items-center p-1 border border-transparent shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed">
+                                                            <img src="../assets/delete-24px.svg" />
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End of DAO Table -->
+                    <!-- End DAO -->
+
+                    <!-- Button Row --->
+                    <div class="px-4 py-3 bg-gray-50 sm:px-6 flex items-center justify-between">
+                        <button type="submit" @click.prevent="cancelCreate" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="pl-2">Cancel</span>
+                        </button>
+                        <button type="submit" @click.prevent="createVehicle" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"></path>
+                                <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z"></path>
+                            </svg>
+                            <span class="pl-2">Create Vehicle</span>
+                        </button>
+                    </div>
+                    <!--- End Button Row --->
+                </form>
+            </form-container>
+            <!-- End Vehicle Info -->
+            {{ vehicle }} {{ tickerValid }}
+        </div>
+    </main>
 </template>
 
 <script>
@@ -312,8 +305,10 @@ import Arweave from "arweave";
 import numeral from "numeral";
 import numberAbbreviate from "number-abbreviate";
 import smartweave from "smartweave";
+import FormContainer from "./layouts/FormContainer.vue";
 
 export default {
+    components: { FormContainer },
     data() {
         return {
             /** Smartweave variables */
@@ -347,8 +342,10 @@ export default {
             vehiclePsts: [], // Array of vehicle's PSTs
             vehicle: {}, // Created vehicle object
             psts: [],
-            daoMembers: [], // Array of DAO member wallets (to be added to balances on vehicle creation)
+            daoMembers: [], // Array of DAO member wallets (to be added to balances on vehicle creation) and number of tokens
+            daoBalance: 100000000,
             memberWallet: "", // Wallet address of DAO member being added to vehicle
+            memberAmount: 0,
             /****  TEST object
       psts: [
             { id: '46c0bdd1-56a9-4179-8a56-164b702a5cb8', ticker: 'AFTR', name: 'AFTR Market', price: 0.05 },
@@ -585,17 +582,26 @@ export default {
             this.updateVehicleTotal();
         },
         addDaoMember() {
+            // const member = {};
+            // if (!this.daoMembers[this.memberWallet]) {
+            //     member.wallet = this.memberWallet;
+            //     member.balance = this.memberAmount;
+            //     this.daoMembers.push(member);
+            // }
+            // this.daoBalance -= this.memberAmount;
             if (!this.daoMembers.includes(this.memberWallet)) {
                 this.daoMembers.push(this.memberWallet);
             }
             this.memberWallet = "";
+            //this.memberAmount = 0;
         },
         removeDaoMember(id) {
-            this.daoMembers.splice(
-                this.daoMembers.findIndex((item) => item === id),
-                1
-            );
+            this.daoMembers.splice(this.daoMembers.findIndex((item) => item === id), 1);
         },
+        // updateDaoBalance() {
+        //     //const daoBalance = Math.round(this.vehicleTokens / this.daoMembers.length);
+            
+        // },
         async createVehicle() {
             if (!this.nameValid) {
                 this.$refs.vehicleName.focus();
@@ -630,9 +636,13 @@ export default {
             this.vehicle.logo = this.vehicleLogo;
             this.vehicle.status = "stopped";
 
-            const daoBalance = Math.round(
-                this.vehicleTokens / this.daoMembers.length
-            );
+            // const daoBalance = Math.round(this.vehicleTokens / this.daoMembers.length);
+            // this.vehicle.balances = {};
+            // for (let member of this.daoMembers) {
+            //     this.vehicle.balances[member] = daoBalance;
+            // }
+
+            const daoBalance = Math.round(this.vehicleTokens / this.daoMembers.length);
             this.vehicle.balances = {};
             for (let member of this.daoMembers) {
                 this.vehicle.balances[member] = daoBalance;
