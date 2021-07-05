@@ -59,13 +59,15 @@
                 <form action="#" method="POST">
                     <h3 class="text-xl font-light leading-6">Vehicle Information</h3>
                     <div class="bg-white sm:p-6">
-                        <div class="pt-2 grid grid-cols-2 gap-4">
+                        <div class="pt-2 grid grid-cols-3 gap-4">
                             <label for="vehicleName" class="block text-sm font-medium text-gray-700">Vehicle Name</label>
                             <label for="vehicleTicker" class="block text-sm font-medium text-gray-700">Ticker</label>
+                            <label for="vehicleTicker" class="block text-sm font-medium text-gray-700">Vehicle Tokens</label>
                         </div>
-                        <div class="pt-2 grid grid-cols-2 gap-4">
-                            <input type="text" name="vehicleName" v-model="vehicle.name" ref="vehicleName" @input="nameValidate" :class="nameBox">
-                            <input type="text" name="vehicleTicker" v-model="vehicle.ticker" ref="vehicleTicker" @input="tickerValidate" :class="tickerBox" />
+                        <div class="pt-2 grid grid-cols-3 gap-4">
+                            <input type="text" name="vehicleName" v-model="vehicle.name" ref="vehicleName" @input="nameValidate" :class="inputBox(nameValid)">
+                            <input type="text" name="vehicleTicker" v-model="vehicle.ticker" ref="vehicleTicker" @input="tickerValidate" :class="inputBox(tickerValid)" />
+                            <input type="number" name="vehicleTokens" v-model="vehicleTokens" @input="onTokenChange" :class="inputBox(vehicleTokensValid)" />
                         </div>
                         <div>
                             <label for="vehicleDesc" class="pt-2 block text-sm font-medium text-gray-700">Description</label>
@@ -131,10 +133,10 @@
                     </div>
                     
                     <h3 class="mt-4 border-t border-gray-200 pt-4 text-xl font-light leading-6">Add Tokens</h3>
-                    <div class="bg-white sm:p-2">
+                    <div class="bg-white sm:p-6">
                         <div v-if="arConnected" class="pt-6">
                             <label class="block text-sm font-medium text-gray-700">
-                                Owner: <span class="font-bold text-aftrRed">{{ activeWallet }}</span>
+                                Creator: <span class="font-bold text-aftrBlue">{{ activeWallet }}</span>
                             </label>
                         </div>
                         <div v-else class="pt-6 flex justify-start items-center">
@@ -146,7 +148,7 @@
                             </label>
                         </div>
                         <div v-if="arConnected" class="pt-6">
-                            <select v-model="selectedPstId" @change="pstChange" id="selectedPstId" name="selectedPstId" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                            <select v-model="selectedPstId" @change="pstChange" id="selectedPstId" name="selectedPstId" class="mt-1 block w-1/2 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                                 <option value="" disabled selected>
                                     Select PST
                                 </option>
@@ -155,21 +157,21 @@
                                 </option>
                             </select>
                         </div>
-
                         <div v-if="selectedPstId !== ''">
                             <div class="pt-6 pb-4">
                                 <label class="block text-sm font-medium text-gray-700">
                                     You have <span class="font-bold text-aftrBlue">{{ pstBalance }} {{ pstTicker }}</span><span> available to use in your vehicle.</span>
                                 </label>
                             </div>
-                            <input type="number" placeholder="Amount" v-model="inputTokens" @input="calcPstPrice" :class="inputTokenBox" />
-                            <span v-if="inputTokens" class="pl-4 pr-6">@ {{ formatNumber( pricePerToken, true) }} AR {{ inputTokens ? " = " + formatNumber(pstValue, true) + " AR" : "" }}</span>
+                            <input type="number" placeholder="Amount" v-model="pstInputTokens" @input="calcPstPrice" :class="inputBox(pstInputValid)" />
+                            <span v-if="pstInputTokens" class="pl-4 pr-6">@ {{ formatNumber( pricePerToken, true) }} AR {{ pstInputTokens ? " = " + formatNumber(pstValue, true) + " AR" : "" }}</span>
                             <div class="pt-2">
-                                <button v-if="inputValid && inputTokens !== ''" @click.prevent="addPst" type="submit" class=" inline-flex justify-center py-2 px-4 border border-gray shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-transparent hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+                                <button v-if="pstInputValid && pstInputTokens" @click.prevent="addPst" type="submit" class=" inline-flex justify-center py-2 px-4 border border-gray shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-transparent hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
                                     <img class="-ml-1 mr-2 h-5 w-5 text-current" src="../assets/add_circle-24px.svg" /> Add PST
                                 </button>
                             </div>
                         </div>
+                            
                         <!-- Table of PSTs -->
                         <div v-if="vehiclePsts.length > 0" class="pt-1">
                             <div class="pt-2 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -178,7 +180,7 @@
                                         <table class="min-w-full divide-y divide-gray-200">
                                             <thead class="bg-gray-50">
                                                 <tr>
-                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profit Sharing Token</th>
+                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profit Sharing Token ({{ vehiclePsts.length }})</th>
                                                     <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Tokens</th>
                                                     <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Value (AR)</th>
                                                     <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
@@ -211,8 +213,8 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- End of PST Table -->
                     </div>
-                    <!-- End of PST Table -->
                     <div class="pl-6 pb-4 text-right">
                         <div class="text-right">
                             <span v-if="totalValue" class="px-6 py-3">
@@ -227,20 +229,27 @@
                     <!-- DAO -->
                     <h3 class="mt-4 border-t border-gray-200 pt-4 text-xl font-light leading-6">DAO Members</h3>
                     <!-- DAO Members -->
-                    <div class="bg-white sm:p-2">
-                        <div class="mt-6 flow-root">
-                            <input type="text" v-model="memberWallet" placeholder="Wallet Address" class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+                    <div class="bg-white sm:p-4">
+                        <div class="flex items-stretch">
+                            <div class="mt-6 flow-root">
+                                <input type="text" v-model="memberWallet" placeholder="Wallet Address" @input="onTokenChange" :class="inputBox(memberWalletValid)" class="w-96" />
+                            </div>
+                            <div class="mt-6 pl-4 flex flex-col inline-flex">
+                                <input type="number" placeholder="Tokens" v-model="memberAmount" @input="onTokenChange" :class="inputBox(memberAmountValid)" />
+                                <label class="pl-4 flex flex-col inline-flex block text-sm text-gray-700">
+                                    Available Balance: {{ formatNumber(availableTokens) }}
+                                </label>
+                            </div>
+                            <div class="mt-6 pl-4 flex flex-col inline-flex">
+                                <button v-if="memberWalletValid && memberAmountValid" @click.prevent="addDaoMember" type="button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
+                                        <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
+                                    </svg>
+                                    <span class="pl-2">Add Member</span>
+                                </button>
+                            </div>
                         </div>
-                        <div class="mt-6 flex flex-col inline-flex">
-                            <button v-if="memberWallet!=''" @click.prevent="addDaoMember" type="button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
-                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
-                                    <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
-                                </svg>
-                                <span class="pl-2">Add Member</span>
-                            </button>
-                        </div>
-
                         <!-- Table of DAO Members -->
                         <div v-if="daoMembers.length" class="pt-1">
                             <div class="pt-2 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -250,15 +259,29 @@
                                             <thead class="bg-gray-50">
                                                 <tr>
                                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Members ({{daoMembers.length}})</th>
-                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">%</th>
+                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Tokens</th>
+                                                    <th scope="col" class="py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Update Tokens</th>
                                                     <th scope="col" class="px-6 py-3"></th>
                                                 </tr>
                                             </thead>
                                             <tbody class="bg-white divide-y divide-gray-200">
-                                                <tr v-for="member in daoMembers" :key="member" class="hover:bg-gray-50">
-                                                    <td class="text-xs px-6 py-3">{{ member.substr(0, 10) + "..." }}</td>
-                                                    <td class="text-xs px-6 py-3"> %</td>
-                                                    <td v-if="member != activeWallet" class="text-center px-6 py-3">
+                                                <tr v-for="(member, index) in daoMembers" :key="index" class="hover:bg-gray-50">
+                                                    <td class="text-xs px-6 py-3">{{ member.wallet.substr(0, 10) + "..." }}</td>
+                                                    <td class="text-xs px-6 py-3">
+                                                        {{ member.balance }} 
+                                                    </td>
+                                                    <td class="">
+                                                        <input type="number" placeholder="New Value..." v-model="daoRowBalance[index]" class="mt-1 mb-1 mr-4 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md" />
+                                                        <button @click.prevent="daoRowChange(member.wallet)" type="submit" class="inline-flex items-center p-1 border border-transparent shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed">
+                                                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                                                <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"></path>
+                                                                <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"></path>
+                                                            </svg>
+                                                        </button>
+                                                    </td>
+                                                    <td v-if="member.wallet === activeWallet" class="text-center px-6 py-3">
+                                                    </td>
+                                                    <td v-else class="text-center px-6 py-3">
                                                         <button @click.prevent="removeDaoMember(member)" type="submit" class="inline-flex items-center p-1 border border-transparent shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed">
                                                             <img src="../assets/delete-24px.svg" />
                                                         </button>
@@ -272,6 +295,16 @@
                         </div>
                     </div>
                     <!-- End of DAO Table -->
+                    <div class="pl-6 pb-4 text-right">
+                        <div class="text-right">
+                            <span v-if="daoBalance" class="px-6 py-3">
+                                DAO Balance:
+                                <span class="px-2 inline-flex text-lg leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                    {{ formatNumber(daoBalance, false) }} {{ printTokens(daoBalance) }}
+                                </span>
+                            </span>
+                        </div>
+                    </div>
                     <!-- End DAO -->
 
                     <!-- Button Row --->
@@ -282,7 +315,7 @@
                             </svg>
                             <span class="pl-2">Cancel</span>
                         </button>
-                        <button type="submit" @click.prevent="createVehicle" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+                        <button v-if="isInputValid" type="submit" @click.prevent="createVehicle" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
                             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"></path>
                                 <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z"></path>
@@ -294,7 +327,14 @@
                 </form>
             </form-container>
             <!-- End Vehicle Info -->
-            {{ vehicle }} {{ tickerValid }}
+            {{ vehicle }} {{ daoMembers }} Member Amount: {{memberAmount}}, Available Tokens: {{availableTokens}}, DAO Balance: {{daoBalance}} <br/><br/>
+            nameValid {{nameValid}} <br/>
+            tickerValid {{tickerValid}} <br/>
+            vehicleTokensValid {{vehicleTokensValid}} <br/>
+            memberWalletValid {{memberWalletValid}} <br/>
+            memberAmountValid {{memberAmountValid}} <br/>
+            memberRowValid {{memberRowValid}} <br/>
+
         </div>
     </main>
 </template>
@@ -305,10 +345,14 @@ import Arweave from "arweave";
 import numeral from "numeral";
 import numberAbbreviate from "number-abbreviate";
 import smartweave from "smartweave";
+
+// @ts-expect-error
 import FormContainer from "./layouts/FormContainer.vue";
+// @ts-expect-error
+import ActionInput from "./layouts/ActionInput.vue";
 
 export default {
-    components: { FormContainer },
+    components: { FormContainer, ActionInput },
     data() {
         return {
             /** Smartweave variables */
@@ -316,36 +360,46 @@ export default {
             tagProtocol: "AFTR-Test",
             /** */
 
-            leasingEnabled: false, // Is vehicle leasing enabled?
-            arConnected: false, // Is user logged in through ArConnect?
-            pstSelected: false, // Boolean that shows when a PST is selected
-            vehicleTokens: 100000000, // Available tokens in vehicle
-            activeWallet: "", // Active wallet address on ArConnect
+            leasingEnabled: false,          // Is vehicle leasing enabled?
+            arConnected: false,             // Is user logged in through ArConnect?
+            pstSelected: false,             // Boolean that shows when a PST is selected
+            vehicleTokens: 100000000,       // Available tokens in vehicle
+            vehicleTokensValid: true,
+            activeWallet: "",               // Active wallet address on ArConnect
+            activeWalletAmount: 0,
+            activeWalletAmountValid: false,
 
-            createInProgress: false, // Boolean to toggle wait
+            createInProgress: false,        // Boolean to toggle wait
 
-            pageStatus: "", // Flag to format page based on status
+            pageStatus: "",                 // Flag to format page based on status
 
-            selectedPstId: "", // ID of selected PST
-            inputTokens: null, // Number of tokens of PST
-            vehicleLogo: null, // Logo for vehicle
-            lockPeriod: 0, // Period of time that the vehicle must exist
-            seats: 0, // Number of seats available on vehicle
-            minLease: 2, // Minimum seat lease length in months
-            maxLease: 24, // Maximum seat lease length in months
-            inputValid: false, // Boolean to show when amount goes over tokens held
-            nameValid: false, // Boolean for valid vehicle name
-            tickerValid: false, // Boolean for valid ticker name
-            pricePerToken: null, // Selected PST's price
-            pstValue: null, // pricePerShare * inputShares
-            totalValue: null, // Sum of all PST values in vehicle
-            vehiclePsts: [], // Array of vehicle's PSTs
-            vehicle: {}, // Created vehicle object
+            selectedPstId: "",              // ID of selected PST
+            inputTokens: null,              // Number of tokens of PST
+            vehicleLogo: null,              // Logo for vehicle
+            lockPeriod: 0,                  // Period of time that the vehicle must exist
+            seats: 0,                       // Number of seats available on vehicle
+            minLease: 2,                    // Minimum seat lease length in months
+            maxLease: 24,                   // Maximum seat lease length in months
+            inputValid: false,              // Boolean to show when any input field is invalid
+            pstInputValid: false,           // Boolean to show when amount goes over tokens held
+            nameValid: false,               // Boolean for valid vehicle name
+            tickerValid: false,             // Boolean for valid ticker name
+            pricePerToken: null,            // Selected PST's price
+            pstValue: null,                 // pricePerShare * inputShares
+            totalValue: null,               // Sum of all PST values in vehicle
+            vehiclePsts: [],                // Array of vehicle's PSTs
+            vehicle: {},                    // Created vehicle object
             psts: [],
-            daoMembers: [], // Array of DAO member wallets (to be added to balances on vehicle creation) and number of tokens
-            daoBalance: 100000000,
-            memberWallet: "", // Wallet address of DAO member being added to vehicle
-            memberAmount: 0,
+            daoMembers: [],                 // Array of DAO member wallets (to be added to balances on vehicle creation) and number of tokens
+            daoBalance: 0,
+            availableTokens: null,
+            memberWallet: "",               // Wallet address of DAO member being added to vehicle
+            memberWalletValid: false,
+            memberAmount: null,
+            memberAmountValid: false,
+            memberRowValid: false,
+            daoRowBalance: [],
+
             /****  TEST object
       psts: [
             { id: '46c0bdd1-56a9-4179-8a56-164b702a5cb8', ticker: 'AFTR', name: 'AFTR Market', price: 0.05 },
@@ -367,36 +421,32 @@ export default {
             return parseInt(value);
         },
         pstBalance() {
-            const currentPst = this.psts.find(
-                (item) => item.id === this.selectedPstId
-            );
+            const currentPst = this.psts.find((item) => item.id === this.selectedPstId);
             return this.formatNumber(currentPst.balance);
         },
         pstTicker() {
-            const currentPst = this.psts.find(
-                (item) => item.id === this.selectedPstId
-            );
+            const currentPst = this.psts.find((item) => item.id === this.selectedPstId);
             return currentPst.ticker;
         },
-        inputTokenBox() {
-            if (this.inputValid) {
+        vehicleTokenBox() {
+            if (this.vehicleTokensValid) {
                 return "mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md";
             } else {
                 return "mt-1 focus:ring-aftrRed focus:border-aftrRed shadow-sm sm:text-sm border-gray-300 rounded-md";
             }
         },
-        nameBox() {
-            if (!this.nameValid) {
+        memberTokenBox() {
+            if (this.availableTokens < 0) {
                 return "mt-1 focus:ring-aftrRed focus:border-aftrRed shadow-sm sm:text-sm border-gray-300 rounded-md";
             } else {
                 return "mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md";
             }
         },
-        tickerBox() {
-            if (!this.tickerValid) {
-                return "mt-1 focus:ring-aftrRed focus:border-aftrRed shadow-sm sm:text-sm border-gray-300 rounded-md";
+        isInputValid() {
+            if (this.nameValid && this.tickerValid && this.vehicleTokensValid && this.memberRowValid) {
+                return true;
             } else {
-                return "mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md";
+                return false;
             }
         },
         // Code to handle a checkbox in the table to check/uncheck all rows.
@@ -422,6 +472,20 @@ export default {
                 return numeral(num).format("0,0.0000");
             } else {
                 return numeral(num).format("0,0");
+            }
+        },
+        printTokens(value) {
+            if (Number(value) > 1) {
+                return "Tokens";
+            } else {
+                return "Token";
+            }
+        },
+        inputBox(valid) {
+            if (valid) {
+                return "mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md";
+            } else {
+                return "mt-1 focus:ring-aftrRed focus:border-aftrRed shadow-sm sm:text-sm border-gray-300 rounded-md";
             }
         },
         monthsInBlocks(value) {
@@ -451,6 +515,56 @@ export default {
                 this.tickerValid = true;
             }
         },
+        onTokenChange() {
+            // Evaluate flags and calculate any changes to these values because they all work together
+            const tokens = Number(this.vehicleTokens) ?? 0;
+            const dBal = Number(this.daoBalance) ?? 0;
+            const mAmount = Number(this.memberAmount) ?? 0;
+
+            this.availableTokens = this.vehicleTokens - dBal - mAmount;
+
+            // Evaluate flags
+            if (tokens == 0) {
+                this.vehicleTokensValid = false;
+            } else {
+                this.vehicleTokensValid = true;
+            }
+            if (mAmount == 0 || this.availableTokens < 0) {
+                this.memberAmountValid = false;
+            } else {
+                this.memberAmountValid = true;
+            }
+            if (this.memberWallet === '' || !this.memberWallet || this.memberWallet === this.activeWallet || this.memberWallet.length != 43)  {
+                this.memberWalletValid = false;
+            } else {
+                this.memberWalletValid = true;
+            }
+        },
+        daoRowChange(wallet) {
+            const arrayIndex = this.daoMembers.findIndex((item) => item.wallet === wallet);
+            const oldAmount = this.daoMembers[arrayIndex].balance;
+            const newAmount = Number(this.daoRowBalance[arrayIndex]);
+            const availTokens = this.availableTokens ?? this.vehicleTokens;
+
+            if (availTokens + oldAmount - newAmount < 0) {
+                this.memberRowValid = false;
+            } else {
+                this.memberRowValid = true;
+                this.daoMembers[arrayIndex].balance = newAmount;
+                this.daoRowBalance[arrayIndex] = '';
+                this.sumDaoAmounts();
+                this.onTokenChange();
+            }
+        },
+        sumDaoAmounts() {
+            let bal = 0;
+            let sum = 0;
+            for(let dao of this.daoMembers) {
+                bal = Number(dao.balance) ?? 0;
+                sum += bal;
+            }
+            this.daoBalance = sum;
+        },
         async arConnect() {
             try {
                 const promiseResult = await window.arweaveWallet.connect([
@@ -458,10 +572,12 @@ export default {
                     "ACCESS_ALL_ADDRESSES",
                     "SIGN_TRANSACTION",
                 ]);
-                this.activeWallet =
-                    await window.arweaveWallet.getActiveAddress();
+                this.activeWallet = await window.arweaveWallet.getActiveAddress();
                 this.arConnected = true;
-                this.daoMembers.push(this.activeWallet);
+                this.daoMembers.push({
+                    wallet: this.activeWallet,
+                    balance: 0
+                });
             } catch (error) {
                 console.log("ERROR during ArConnection: " + error);
             }
@@ -522,52 +638,48 @@ export default {
             this.pricePerToken = null;
         },
         calcPstPrice() {
-            const currentPst = this.psts.find(
-                (item) => item.id === this.selectedPstId
-            );
+            const currentPst = this.psts.find((item) => item.id === this.selectedPstId);
             this.pricePerToken = currentPst.price;
-            this.pstValue = currentPst.price * this.inputTokens;
-            this.updateInputValid(currentPst.balance);
+            this.pstValue = currentPst.price * this.pstInputTokens;
+            this.updatePstInputValid(currentPst.balance);
         },
-        updateInputValid(balance) {
-            if (Number(this.inputTokens) <= balance) {
-                this.inputValid = true;
+        // updateAvailableTokens() {
+        //     if (this.daoBalance && this.activeWalletAmount) {
+        //         this.availableTokens = this.vehicleTokens - this.daoBalance - this.activeWalletAmount;
+        //     } else if (this.daoBalance) {
+        //         this.availableTokens = this.vehicleTokens - this.daoBalance;
+        //     } else {
+        //         this.availableTokens = this.vehicleTokens;
+        //     }
+        // },
+        updatePstInputValid(balance) {
+            if (Number(this.pstInputTokens) <= balance) {
+                this.pstInputValid = true;
             } else {
-                this.inputValid = false;
+                this.pstInputValid = false;
             }
         },
         updateVehicleTotal() {
-            this.totalValue = this.vehiclePsts.reduce(
-                (acc, item) => acc + item.total,
-                0
-            );
+            this.totalValue = this.vehiclePsts.reduce((acc, item) => acc + item.total, 0);
         },
         addPst() {
             // Create temp object and add new keys
-            let currentPst = this.psts.find(
-                (item) => item.id === this.selectedPstId
-            );
-            let existingIndex = this.vehiclePsts.findIndex(
-                (item) => item.id === this.selectedPstId
-            );
+            let currentPst = this.psts.find((item) => item.id === this.selectedPstId);
+            let existingIndex = this.vehiclePsts.findIndex((item) => item.id === this.selectedPstId);
             if (existingIndex === -1) {
                 // Add new PST to vehicle
-                currentPst["tokens"] = parseInt(this.inputTokens);
+                currentPst["tokens"] = parseInt(this.pstInputTokens);
                 currentPst.total = this.pstValue;
                 this.vehiclePsts.push(currentPst);
             } else {
                 // Updated existing PST in vehicle
-                this.vehiclePsts[existingIndex]["tokens"] += parseInt(
-                    this.inputTokens
-                );
+                this.vehiclePsts[existingIndex]["tokens"] += parseInt(this.pstInputTokens);
                 this.vehiclePsts[existingIndex]["total"] += this.pstValue;
             }
             // Subtract tokens from wallet pst
-            existingIndex = this.psts.findIndex(
-                (item) => item.id === this.selectedPstId
-            );
-            this.psts[existingIndex]["balance"] -= parseInt(this.inputTokens);
-            this.updateInputValid(this.psts[existingIndex]["balance"]);
+            existingIndex = this.psts.findIndex((item) => item.id === this.selectedPstId);
+            this.psts[existingIndex]["balance"] -= parseInt(this.pstInputTokens);
+            this.updatePstInputValid(this.psts[existingIndex]["balance"]);
 
             /*** TODO:  SAVE WALLET UPDATES ON CREATE VEHICLE */
 
@@ -575,28 +687,38 @@ export default {
             this.updateVehicleTotal();
         },
         removePst(id) {
-            this.vehiclePsts.splice(
-                this.vehiclePsts.findIndex((item) => item.id === id),
-                1
-            );
+            const deleteIndex = this.vehiclePsts.findIndex((item) => item.id === id);
+            const idTokens = this.vehiclePsts[deleteIndex].tokens;
+            this.psts.find((item) => item.id === id).balance += idTokens;
+            this.vehiclePsts.splice(deleteIndex, 1);
             this.updateVehicleTotal();
         },
         addDaoMember() {
-            // const member = {};
-            // if (!this.daoMembers[this.memberWallet]) {
-            //     member.wallet = this.memberWallet;
-            //     member.balance = this.memberAmount;
-            //     this.daoMembers.push(member);
-            // }
-            // this.daoBalance -= this.memberAmount;
-            if (!this.daoMembers.includes(this.memberWallet)) {
-                this.daoMembers.push(this.memberWallet);
+            const member = {};
+            if (!this.daoMembers[this.memberWallet]) {
+                member.wallet = this.memberWallet;
+                member.balance = this.memberAmount;
+                this.daoMembers.push(member);
+                this.sumDaoAmounts();
             }
-            this.memberWallet = "";
-            //this.memberAmount = 0;
+            // if (this.daoBalance) {
+            //     this.daoBalance += this.memberAmount;
+            // } else {
+            //     this.daoBalance = this.memberAmount;
+            // }
+            
+            //this.updateAvailableTokens();
+            this.memberWallet = '';
+            this.memberAmount = null;
+            this.onTokenChange();
         },
         removeDaoMember(id) {
-            this.daoMembers.splice(this.daoMembers.findIndex((item) => item === id), 1);
+            const arrayIndex = this.daoMembers.findIndex((item) => item === id);
+            // this.daoBalance -= this.daoMembers[arrayIndex].balance;
+            this.sumDaoAmounts();
+            this.memberAmount = null;
+            this.daoMembers.splice(arrayIndex, 1);
+            //this.onTokenChange();
         },
         // updateDaoBalance() {
         //     //const daoBalance = Math.round(this.vehicleTokens / this.daoMembers.length);
@@ -642,11 +764,11 @@ export default {
             //     this.vehicle.balances[member] = daoBalance;
             // }
 
-            const daoBalance = Math.round(this.vehicleTokens / this.daoMembers.length);
-            this.vehicle.balances = {};
-            for (let member of this.daoMembers) {
-                this.vehicle.balances[member] = daoBalance;
-            }
+            //const daoBalance = Math.round(this.vehicleTokens / this.daoMembers.length);
+            // this.vehicle.balances = {};
+            // for (let member of this.daoMembers) {
+            //     this.vehicle.balances[member] = daoBalance;
+            // }
 
             const tmpPsts = this.vehiclePsts.map((item) => {
                 return {
