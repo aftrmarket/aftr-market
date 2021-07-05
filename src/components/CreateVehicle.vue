@@ -62,17 +62,18 @@
                         <div class="pt-2 grid grid-cols-3 gap-4">
                             <label for="vehicleName" class="block text-sm font-medium text-gray-700">Vehicle Name</label>
                             <label for="vehicleTicker" class="block text-sm font-medium text-gray-700">Ticker</label>
-                            <label for="vehicleTicker" class="block text-sm font-medium text-gray-700">Vehicle Tokens</label>
                         </div>
                         <div class="pt-2 grid grid-cols-3 gap-4">
                             <input type="text" name="vehicleName" v-model="vehicle.name" ref="vehicleName" @input="nameValidate" :class="inputBox(nameValid)">
                             <input type="text" name="vehicleTicker" v-model="vehicle.ticker" ref="vehicleTicker" @input="tickerValidate" :class="inputBox(tickerValid)" />
-                            <input type="number" name="vehicleTokens" v-model="vehicleTokens" @input="onTokenChange" :class="inputBox(vehicleTokensValid)" />
+                            
                         </div>
-                        <div>
-                            <label for="vehicleDesc" class="pt-2 block text-sm font-medium text-gray-700">Description</label>
-                            <div class="mt-1">
-                                <textarea id="vehicleDesc" name="vehicleDesc" v-model="vehicle.desc" rows="3" class="shadow-sm focus:ring-aftrBlue focus:border-aftrBlue mt-1 block w-full sm:text-sm border-gray-300 rounded-md" placeholder="Describe your fund"></textarea>
+                        <div class="pt-2 grid grid-cols-3 gap-4">
+                            <div class="col-span-2">
+                                <label for="vehicleDesc" class="pt-2 block text-sm font-medium text-gray-700">Description</label>
+                                <div class="mt-1">
+                                    <textarea id="vehicleDesc" name="vehicleDesc" v-model="vehicle.desc" rows="3" class="shadow-sm focus:ring-aftrBlue focus:border-aftrBlue mt-1 block w-full sm:text-sm border-gray-300 rounded-md" placeholder="Describe your fund"></textarea>
+                                </div>
                             </div>
                         </div>
                         <div>
@@ -132,6 +133,21 @@
                         </div>
                     </div>
                     
+                    <h3 class="mt-4 border-t border-gray-200 pt-4 text-xl font-light leading-6">Settings</h3>
+                    <div class="bg-white sm:p-6">
+                        <div class="pt-2 grid grid-cols-3 gap-4">
+                            <label class="block text-sm font-medium text-gray-700">Vehicle Tokens</label>
+                            <label class="block text-sm font-medium text-gray-700">Vehicle Ownership</label>
+                        </div>
+                        <div class="pt-2 grid grid-cols-3 gap-4 flex items-center">
+                            <input type="number" name="vehicleTokens" placeholder="# of Vehicle Tokens" v-model="vehicleTokens" @input="onTokenChange" :class="inputBox(vehicleTokensValid)" />
+                            <div class="col-span-2">
+                                <input type="radio" v-model="ownership" id="single" value="single" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">Single Owner</label>
+                                <input type="radio" v-model="ownership" id="dao" value="dao" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">DAO Owned</label>
+                            </div>
+                        </div>
+                    </div>
+
                     <h3 class="mt-4 border-t border-gray-200 pt-4 text-xl font-light leading-6">Add Tokens</h3>
                     <div class="bg-white sm:p-6">
                         <div v-if="arConnected" class="pt-6">
@@ -380,6 +396,7 @@ export default {
             seats: 0,                       // Number of seats available on vehicle
             minLease: 2,                    // Minimum seat lease length in months
             maxLease: 24,                   // Maximum seat lease length in months
+            ownership: "dao",
             inputValid: false,              // Boolean to show when any input field is invalid
             pstInputValid: false,           // Boolean to show when amount goes over tokens held
             nameValid: false,               // Boolean for valid vehicle name
@@ -756,6 +773,7 @@ export default {
             this.vehicle.minLease = this.minLease;
             this.vehicle.maxLease = this.maxLease;
             this.vehicle.logo = this.vehicleLogo;
+            this.vehicle.ownership = this.ownership;
             this.vehicle.status = "stopped";
 
             // const daoBalance = Math.round(this.vehicleTokens / this.daoMembers.length);
