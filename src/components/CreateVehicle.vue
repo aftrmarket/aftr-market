@@ -343,7 +343,7 @@
                 </form>
             </form-container>
             <!-- End Vehicle Info -->
-            {{ vehicle }} {{ daoMembers }} Member Amount: {{memberAmount}}, Available Tokens: {{availableTokens}}, DAO Balance: {{daoBalance}} <br/><br/>
+            {{ vehicle }} {{ vehiclePsts }} {{ daoMembers }} Member Amount: {{memberAmount}}, Available Tokens: {{availableTokens}}, DAO Balance: {{daoBalance}} <br/><br/>
             nameValid {{nameValid}} <br/>
             tickerValid {{tickerValid}} <br/>
             vehicleTokensValid {{vehicleTokensValid}} <br/>
@@ -360,7 +360,7 @@ import Arweave from "arweave";
 //import NumberInput from '/utils/NumberInput.vue';
 import numeral from "numeral";
 import numberAbbreviate from "number-abbreviate";
-import smartweave from "smartweave";
+import { createContractFromTx, interactWrite } from "smartweave";
 
 // @ts-expect-error
 import FormContainer from "./layouts/FormContainer.vue";
@@ -390,7 +390,7 @@ export default {
             pageStatus: "",                 // Flag to format page based on status
 
             selectedPstId: "",              // ID of selected PST
-            inputTokens: null,              // Number of tokens of PST
+            pstInputTokens: null,              // Number of tokens of PST
             vehicleLogo: null,              // Logo for vehicle
             lockPeriod: 0,                  // Period of time that the vehicle must exist
             seats: 0,                       // Number of seats available on vehicle
@@ -560,7 +560,7 @@ export default {
         daoRowChange(wallet) {
             const arrayIndex = this.daoMembers.findIndex((item) => item.wallet === wallet);
             const oldAmount = this.daoMembers[arrayIndex].balance;
-            const newAmount = Number(this.daoRowBalance[arrayIndex]);
+            const newAmount = parseInt(this.daoRowBalance[arrayIndex]);
             const availTokens = this.availableTokens ?? this.vehicleTokens;
 
             if (availTokens + oldAmount - newAmount < 0) {
@@ -651,7 +651,7 @@ export default {
             }
         },
         pstChange() {
-            this.inputTokens = null;
+            this.pstInputTokens = null;
             this.pricePerToken = null;
         },
         calcPstPrice() {
@@ -714,7 +714,7 @@ export default {
             const member = {};
             if (!this.daoMembers[this.memberWallet]) {
                 member.wallet = this.memberWallet;
-                member.balance = this.memberAmount;
+                member.balance = parseInt(this.memberAmount);
                 this.daoMembers.push(member);
                 this.sumDaoAmounts();
             }
@@ -753,40 +753,40 @@ export default {
                 
             this.pageStatus = "in-progress";
 
+            let arweave = {};
             try {
-                const client = Arweave.init({
+                arweave = await Arweave.init({
                     host: "arweave.net",
                     port: 443,
                     protocol: "https",
                     timeout: 20000,
-                    logging: false,
+                    logging: true,
                 });
             } catch (error) {
                 console.log("ERROR connecting to Arweave: " + error); // How can this ever happen? :)
                 this.pageStatus = "error";
+                return false;
             }
 
-            const tags = [{ name: "Protocol", value: this.tagProtocol }];
+            const initTags = [
+                { name: "App-Name", value: "SmartWeaveContract" },
+                { name: "App-Version", value: "0.3.0" },
+                { name: "Contract-Src", value: this.contractSourceId },
+                { name: "Content-Type", value: "application/json" },
+                { name: "Protocol", value: this.tagProtocol }
+            ];
             this.vehicle.creator = this.activeWallet;
             this.vehicle.seats = this.seats;
             this.vehicle.lockPeriod = this.lockPeriod;
             this.vehicle.minLease = this.minLease;
             this.vehicle.maxLease = this.maxLease;
-            this.vehicle.logo = this.vehicleLogo;
+            //this.vehicle.logo = this.vehicleLogo;
+            this.vehicle.logo = "9CYPS85KChE_zQxNLi2y5r2FLG-YE6HiphYYTlgtrtg";      // TEMP LOGO
             this.vehicle.ownership = this.ownership;
             this.vehicle.status = "stopped";
 
-            // const daoBalance = Math.round(this.vehicleTokens / this.daoMembers.length);
-            // this.vehicle.balances = {};
-            // for (let member of this.daoMembers) {
-            //     this.vehicle.balances[member] = daoBalance;
-            // }
-
-            //const daoBalance = Math.round(this.vehicleTokens / this.daoMembers.length);
-            // this.vehicle.balances = {};
-            // for (let member of this.daoMembers) {
-            //     this.vehicle.balances[member] = daoBalance;
-            // }
+            // Convert DAO Member array to dictionary
+            this.vehicle.balances = this.daoMembers.reduce((a, x) => ({ ...a, [x.wallet]: x.balance }), {});
 
             const tmpPsts = this.vehiclePsts.map((item) => {
                 return {
@@ -798,8 +798,62 @@ export default {
                 };
             });
             this.vehicle.psts = tmpPsts;
+            console.log("VEHICLE: " + JSON.stringify(this.vehicle));
 
-            //this.vehicle['id'] = await smartweave.createContractFromTx(client, "use-wallet", this.contractSourceId, JSON.stringify(this.vehicle), tags);
+/****/
+            const keyJoe = {}
+            const vehicleTest = {
+                "name": "Test Vehicle",
+                "ticker": "AFTR-Test-1",
+                //"creator": "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
+                //"seats": 0,
+                //"lockPeriod": 0,
+                //"minLease": 2,
+                //"maxLease": 24,
+                //"logo": "9CYPS85KChE_zQxNLi2y5r2FLG-YE6HiphYYTlgtrtg",
+                //"ownership": "dao",
+                //"status": "stopped",
+                "balances": {
+                    "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8": 12300,
+                    "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I": 1000
+                },
+                "vault" : {},
+                "votes" : [],
+                "roles" : {},
+                "settings" : [
+                    ["quorum", 0.5],
+                    ["voteLength", 2000],
+                    ["lockMinLength", 100],
+                    ["lockMaxLength", 10000]
+                ]
+            }
+ /***/
+
+            // Create SmartWeave contract
+            try {
+                console.log("arweave: " + JSON.stringify(arweave)); console.log("contractSourceId: " + this.contractSourceId);
+                console.log("vehicle: " + JSON.stringify(this.vehicle)); console.log("tags: " + JSON.stringify(initTags));
+                this.vehicle['id'] = await createContractFromTx(arweave, "use-wallet", this.contractSourceId, JSON.stringify(vehicleTest), initTags);
+                const initTx = await arweave.createTransaction({
+                    data: JSON.stringify(vehicleTest)
+                }, keyJoe);
+
+                // Add tags
+                for (let i = 0; i < initTags.length; i++) {
+                    initTx.addTag(initTags(i).name, initTags(i).value);
+                    console.log("Loop: " + i);
+                }
+
+                await arweave.transactions.sign(initTx, keyJoe);
+                await arweave.transactions.post(initTx);
+                this.vehicle['id'] = initTx.id;
+            } catch(error) {
+                console.log("ERROR creating SmartWeave contract: " + error);
+                this.pageStatus = "error";
+                return false;
+            }
+
+            console.log("ID = " + this.vehicle['id']);
 
             let transferInput = {};
             //const tags = [{ name: "Protocol", value: this.tagProtocol }];
@@ -814,13 +868,14 @@ export default {
                     };
 
                     console.log("TokenId: " + pst.id + " Name: " + pst.name + " Qty: " + pst.tokens);
-                    //SOMETHING = await smartweave.interactWrite(client, "use_wallet", pst.id, tags);
+                    //SOMETHING = await interactWrite(arweave, "use_wallet", pst.id, tags);
 
                     //router push to vehicleInfo
                 }
             } catch (error) {
                 console.log("ERROR transferring tokens: " + error);
                 this.pageStatus = "error";
+                return false;
             }
         },
         cancelCreate() {
