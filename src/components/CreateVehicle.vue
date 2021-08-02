@@ -769,10 +769,6 @@ export default {
             }
 
             const initTags = [
-                { name: "App-Name", value: "SmartWeaveContract" },
-                { name: "App-Version", value: "0.3.0" },
-                { name: "Contract-Src", value: this.contractSourceId },
-                { name: "Content-Type", value: "application/json" },
                 { name: "Protocol", value: this.tagProtocol }
             ];
             this.vehicle.creator = this.activeWallet;
@@ -801,7 +797,6 @@ export default {
             console.log("VEHICLE: " + JSON.stringify(this.vehicle));
 
 /****/
-            const keyJoe = {}
             const vehicleTest = {
                 "name": "Test Vehicle",
                 "ticker": "AFTR-Test-1",
@@ -817,9 +812,9 @@ export default {
                     "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8": 12300,
                     "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I": 1000
                 },
-                "vault" : {},
-                "votes" : [],
-                "roles" : {},
+                //"vault" : {},
+                //"votes" : [],
+                //"roles" : {},
                 "settings" : [
                     ["quorum", 0.5],
                     ["voteLength", 2000],
@@ -833,30 +828,15 @@ export default {
             try {
                 console.log("arweave: " + JSON.stringify(arweave)); console.log("contractSourceId: " + this.contractSourceId);
                 console.log("vehicle: " + JSON.stringify(this.vehicle)); console.log("tags: " + JSON.stringify(initTags));
-                this.vehicle['id'] = await createContractFromTx(arweave, "use-wallet", this.contractSourceId, JSON.stringify(vehicleTest), initTags);
-                const initTx = await arweave.createTransaction({
-                    data: JSON.stringify(vehicleTest)
-                }, keyJoe);
-
-                // Add tags
-                for (let i = 0; i < initTags.length; i++) {
-                    initTx.addTag(initTags(i).name, initTags(i).value);
-                    console.log("Loop: " + i);
-                }
-
-                await arweave.transactions.sign(initTx, keyJoe);
-                await arweave.transactions.post(initTx);
-                this.vehicle['id'] = initTx.id;
+                this.vehicle['id'] = await createContractFromTx(arweave, "use_wallet", this.contractSourceId, JSON.stringify(vehicleTest), initTags);
+                console.log("ID = " + this.vehicle['id']);
             } catch(error) {
                 console.log("ERROR creating SmartWeave contract: " + error);
                 this.pageStatus = "error";
                 return false;
             }
 
-            console.log("ID = " + this.vehicle['id']);
-
             let transferInput = {};
-            //const tags = [{ name: "Protocol", value: this.tagProtocol }];
 
             try {
                 // Loop through vehicle PSTs and perform transfers
@@ -868,7 +848,7 @@ export default {
                     };
 
                     console.log("TokenId: " + pst.id + " Name: " + pst.name + " Qty: " + pst.tokens);
-                    //SOMETHING = await interactWrite(arweave, "use_wallet", pst.id, tags);
+                    //SOMETHING = await interactWrite(arweave, "use_wallet", pst.id, initTags);
 
                     //router push to vehicleInfo
                 }
@@ -877,6 +857,8 @@ export default {
                 this.pageStatus = "error";
                 return false;
             }
+            
+            this.pageStatus = "";
         },
         cancelCreate() {
             this.$router.push("vehicles");
