@@ -850,7 +850,7 @@ export default {
                     console.log("TokenId: " + pst.id + " Name: " + pst.name + " Qty: " + pst.tokens);
                     //SOMETHING = await interactWrite(arweave, "use_wallet", pst.id, initTags);
 
-                    //router push to vehicleInfo
+                    this.$router.push( { name: 'vehicle', params: { vehicleId: this.vehicle.id } });
                 }
             } catch (error) {
                 console.log("ERROR transferring tokens: " + error);

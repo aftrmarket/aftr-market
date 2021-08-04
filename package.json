@@ -10,7 +10,7 @@
   "dependencies": {
     "@heroicons/vue": "^1.0.1",
     "@tailwindcss/forms": "^0.2.1",
-    "ar-gql": "^0.0.6",
+    "ar-gql": "0.0.6",
     "arweave": "^1.10.16",
     "install": "^0.13.0",
     "material-design-icons": "^3.0.1",

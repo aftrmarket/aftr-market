@@ -21,7 +21,7 @@
         <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6">
           <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <li v-for="vehicle in vehicles" :key="vehicle.id" class="col-span-1 bg-white rounded-lg shadow  divide-gray-200">
-              <router-link :to="{ name: 'vehicle-info', params: { vehicleId: vehicle.id } }">
+              <router-link :to="{ name: 'vehicle', params: { vehicleId: vehicle.id } }">
                 <div class="w-full flex items-center justify-between p-6 space-x-6">
                   <img class="w-20 h-20 bg-gray-300 rounded-full flex-shrink-0" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixqx=5Rgz8QuoBn&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=4&w=256&h=256&q=60" alt="">
                   <div class="flex-1 truncate">
@@ -116,7 +116,7 @@ export default {
       this.$router.push('create');
     },
     viewVehicle(vehicleId) {
-      this.$router.push({ name: 'vehicle-info', params: { vehicle: 'joe' } });
+      this.$router.push({ name: 'vehicle', params: { vehicle: 'joe' } });
     }
   },
   created() {
