@@ -5,12 +5,17 @@ module.exports = {
     extend: {
       colors: {
         aftrYellow: {
-          DEFAULT: '#FFDF6C'
+          //DEFAULT: '#FFDF6C'
+          DEFAULT: '#FFFC79'
         },
         aftrDarkGrey: {
-          light: '#707070',
-          DEFAULT: '#3F3F3F',
-          dark: '#202020'
+        //   light: '#707070',
+        //   DEFAULT: '#3F3F3F',
+        //   dark: '#202020'
+          light: '#8D98A3',
+          DEFAULT: '#484F55',
+          //DEFAULT: '#323B3D',
+          dark: '#323B3D'
         },
         aftrBlue: {
           DEFAULT: '#6C8CFF',
