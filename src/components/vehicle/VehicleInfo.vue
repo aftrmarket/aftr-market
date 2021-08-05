@@ -1,28 +1,25 @@
 <template>
-    <!-- Description list-->
-
-        <div class="bg-white shadow sm:rounded-lg">
-            <div class="flex items-center justify-between">
-                <div class="px-4 py-5 sm:px-6">
-                    <h2 id="applicant-information-title" class="text-lg leading-6 font-medium text-gray-900">
-                        {{ vehicle.name }}
-                    </h2>
-                    <p class="mt-1 max-w-2xl text-sm text-gray-500">
-                        <span class="text-lg text-black">{{ vehicle.ticker }}</span> Leased Seats
-                    </p>
-                </div>
-                <div class="pr-6">
-                    <p class="text-gray-900">Current Value: <span class="px-2 py-3 sm:px-6 inline-flex leading-5 font-semibold rounded-full bg-green-100 text-green-800">29,308,420.3323 AR</span></p>
-                </div>
+    <div class="pt-4">
+        <div class="flex items-center justify-between">
+            <div class="px-4 py-5 sm:px-6">
+                <h2 id="applicant-information-title" class="text-lg leading-6 font-medium text-gray-900">
+                    {{ vehicle.name }}
+                </h2>
+                <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                    <span class="text-lg text-black">{{ vehicle.ticker }}</span>
+                </p>
             </div>
-            <div class="px-4 sm:px-6 max-w-2xl text-sm text-gray-500">Performance</div>
-            <div class="flex items-center justify-between pb-4">
-                <div class="px-4 sm:px-6 text-semibold">1M: <span :class="vehicles[0].perf1m < 0 ? 'text-aftrRed' : 'text-green-600'">{{ vehicles[0].perf1m }}</span></div>
-                <div class="px-4 sm:px-6 text-semibold">3M: <span :class="vehicles[0].perf3m < 0 ? 'text-aftrRed' : 'text-green-600'">{{ vehicles[0].perf3m }}</span></div>
-                <div class="px-4 sm:px-6 text-semibold">Max: <span :class="vehicles[0].perfMax < 0 ? 'text-aftrRed' : 'text-green-600'">{{ vehicles[0].perfMax }}</span></div>
+            <div class="pr-6">
+                <p class="text-gray-900">Current Value: <span class="px-2 py-3 sm:px-6 inline-flex leading-5 font-semibold rounded-full bg-green-100 text-green-800">29,308,420.3323 AR</span></p>
             </div>
         </div>
-
+        <div class="px-4 sm:px-6 max-w-2xl text-sm text-gray-500">Performance</div>
+        <div class="flex items-center justify-between pb-4">
+            <div class="px-4 sm:px-6 text-semibold">1M: <span :class="vehicles[0].perf1m < 0 ? 'text-aftrRed' : 'text-green-600'">{{ vehicles[0].perf1m }}</span></div>
+            <div class="px-4 sm:px-6 text-semibold">3M: <span :class="vehicles[0].perf3m < 0 ? 'text-aftrRed' : 'text-green-600'">{{ vehicles[0].perf3m }}</span></div>
+            <div class="px-4 sm:px-6 text-semibold">Max: <span :class="vehicles[0].perfMax < 0 ? 'text-aftrRed' : 'text-green-600'">{{ vehicles[0].perfMax }}</span></div>
+        </div>
+    </div>
 </template>
 
 <script>

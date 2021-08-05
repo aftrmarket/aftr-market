@@ -40,134 +40,22 @@
                                     <div class="hidden sm:block">
                                     <div class="border-b border-gray-200">
                                         <nav class="-mb-px flex" aria-label="Tabs">
-                                        <a v-for="tab in tabs" :key="tab.name" :href="tab.href" :class="[tab.current ? 'border-aftrBlue text-aftrBlue' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300', 'w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm']" :aria-current="tab.current ? 'page' : undefined">
+                                        <a v-for="tab in tabs" :key="tab.name" :href="tab.href" @click="tabClick(tab.name)" :class="[tab.current ? 'border-aftrBlue text-aftrBlue' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300', 'w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm']" :aria-current="tab.current ? 'page' : undefined">
                                             {{ tab.name }}
                                         </a>
                                         </nav>
                                     </div>
                                 </div>
-                                <vehicle-info :vehicle="vehicle" :contractId="contractId"></vehicle-info>
+                                <vehicle-info v-if="activeTab === 'Info'" :vehicle="vehicle" :contractId="contractId"></vehicle-info>
+                                <vehicle-members v-else-if="activeTab === 'Members'" :members="vehicles[0].balances"></vehicle-members>
+                                <vehicle-tokens v-else-if="activeTab === 'Tokens'" :psts="vehicles[0].psts"></vehicle-tokens>
+                                <vehicle-leases v-else-if="activeTab === 'Leases'" :leases="vehicles[0].leases"></vehicle-leases>
+                                <vehicle-votes v-else-if="activeTab === 'Votes'"></vehicle-votes>
+
                             </div>
                         </section>
                         <!-- Tabs End -->
-                        
-                        <!-- Description list-->
-                        <section aria-labelledby="applicant-information-title">
-                            <div class="bg-white shadow sm:rounded-lg">
-                                <div class="flex items-center justify-between">
-                                    <div class="px-4 py-5 sm:px-6">
-                                        <h2 id="applicant-information-title" class="text-lg leading-6 font-medium text-gray-900">
-                                            {{ vehicles.name }}
-                                        </h2>
-                                        <p class="mt-1 max-w-2xl text-sm text-gray-500">
-                                            <span class="text-lg text-black">{{ vehicles[0].leasedSeats }}</span> Leased Seats
-                                        </p>
-                                    </div>
-                                    <div class="pr-6">
-                                        <p class="text-gray-900">Current Value: <span class="px-2 py-3 sm:px-6 inline-flex leading-5 font-semibold rounded-full bg-green-100 text-green-800">29,308,420.3323 AR</span></p>
-                                    </div>
-                                </div>
-                                <div class="px-4 sm:px-6 max-w-2xl text-sm text-gray-500">Performance</div>
-                                <div class="flex items-center justify-between pb-4">
-                                    <div class="px-4 sm:px-6 text-semibold">1M: <span :class="vehicles[0].perf1m < 0 ? 'text-aftrRed' : 'text-green-600'">{{ vehicles[0].perf1m }}</span></div>
-                                    <div class="px-4 sm:px-6 text-semibold">3M: <span :class="vehicles[0].perf3m < 0 ? 'text-aftrRed' : 'text-green-600'">{{ vehicles[0].perf3m }}</span></div>
-                                    <div class="px-4 sm:px-6 text-semibold">Max: <span :class="vehicles[0].perfMax < 0 ? 'text-aftrRed' : 'text-green-600'">{{ vehicles[0].perfMax }}</span></div>
-                                </div>
-                                <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
-                                    <!-- PST Table -->
-                                    <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                                        <table class="min-w-full divide-y divide-gray-200">
-                                            <thead class="bg-gray-50">
-                                                <tr>
-                                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                        Lessee
-                                                    </th>
-                                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                        Lease Date
-                                                    </th>
-                                                    <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                        Seats
-                                                    </th>
-                                                    <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                        PSTs Earned
-                                                    </th>
-                                                    <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                        Earnings (AR)
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody class="bg-white divide-y divide-gray-200">
-                                                <tr v-for="lessee in vehicles[0].lessees" :key="lessee.id" class="text-xs text-gray-500 hover:bg-gray-50">
-                                                    <td class="text-left px-4 py-2">
-                                                        {{ lessee.id.substr(1,5) + '...' }}
-                                                    </td>
-                                                    <td class="text-left px-4 py-2">
-                                                        {{ lessee.leasedDate }}
-                                                    </td>
-                                                    <td class="text-right px-4 py-2">
-                                                        {{ lessee.seats }}
-                                                    </td>
-                                                    <td class="text-right px-4 py-2">
-                                                        {{ lessee.pstsEarned }}
-                                                    </td>
-                                                    <td class="text-right px-4 py-2">
-                                                        {{ lessee.earnings }}
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-
-                                    </div>
-
-                                </div>
-                                <div>
-                                    <a href="#" class="block bg-gray-50 text-sm font-medium text-gray-500 text-center px-4 py-4 hover:text-gray-700 sm:rounded-b-lg">Load more...</a>
-                                </div>
-                            </div>
-                        </section>
                     </div>
-<!--
-                    <section aria-labelledby="timeline-title" class="lg:col-start-3 lg:col-span-1">
-                        <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
-                            <h2 id="timeline-title" class="text-lg font-medium text-gray-900">Current Tokens</h2>
--->
-                            <!-- PSTs in Vehicle -->
-<!--
-                            <div class="mt-6 flow-root">
-                                <ul class="-mb-8">
-                                    <li v-for="pst in vehicle.psts" :key="pst.id">
-                                        <div class="relative pb-8">
-                                            <div class="relative flex space-x-3">
-                                                <div class="flex items-center">
-                                                    <div class="flex-shrink-0 h-10 w-10">
-                                                        <img class="h-10 w-10 rounded-full" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixqx=5Rgz8QuoBn&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=4&w=256&h=256&q=60" alt="">
-                                                    </div>
-                                                    <div class="ml-4">
-                                                        <div class="text-sm font-medium text-gray-900">
-                                                            {{ pst.name + ' (' + pst.ticker + ')'}}
-                                                        </div>
-                                                        <div class="text-sm text-gray-500">
-                                                            {{ pst.id.substr(1,5) + '...' }}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="mt-6 flex flex-col inline-flex">
-                                <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
-                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
-                                        <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
-                                    </svg>
-                                    <span class="pl-2">LEASE SEAT</span>
-                                </button>
-                            </div>
-                        </div>
-                    </section>
--->
                 </div>
             </div>
         </main>
@@ -177,23 +65,25 @@
 
 <script>
 import { readContract } from 'smartweave';
-import VehicleInfo from './VehicleInfo.vue';
-
-const tabs = [
-    { name: 'Info', href: '#', current: true },
-    { name: 'Members', href: '#', current: false },
-    { name: 'Tokens', href: '#', current: false },
-    { name: 'Leases', href: '#', current: false },
-    { name: 'Votes', href: '#', current: false },
-];
-
+import VehicleInfo from './vehicle/VehicleInfo.vue';
+import VehicleMembers from './vehicle/VehicleMembers.vue';
+import VehicleTokens from './vehicle/VehicleTokens.vue';
+import VehicleLeases from './vehicle/VehicleLeases.vue';
+import VehicleVotes from './vehicle/VehicleVotes.vue';
 
 export default {
-    components: { VehicleInfo },
+    components: { VehicleInfo, VehicleMembers, VehicleTokens, VehicleLeases, VehicleVotes },
     props: ["vehicleId"],
     data() {
         return {
-            tabs,
+            tabs: [
+                { name: 'Info', href: '#', current: true },
+                { name: 'Members', href: '#', current: false },
+                { name: 'Tokens', href: '#', current: false },
+                { name: 'Leases', href: '#', current: false },
+                { name: 'Votes', href: '#', current: false },
+            ],
+            activeTab: "Info",
             pageStatus: "",
             contractId: this.vehicleId,
             vehicle: {},
@@ -213,6 +103,7 @@ export default {
                             id: "46c0bdd1-56a9-4179-8a56-164b702a5cb8",
                             ticker: "AFTR",
                             name: "AFTR Market",
+                            logo:  "DPUBd0RxE1itIfDcbuI2TroXautcvWQq41qKMM-QDrY",
                             price: 0.05,
                             tokens: 1000,
                             total: 50,
@@ -221,6 +112,7 @@ export default {
                             id: "f9fde4f9-89ec-404b-8a0a-1bc674b39676",
                             ticker: "XYZ",
                             name: "CommunityXYZ",
+                            logo:  "DPUBd0RxE1itIfDcbuI2TroXautcvWQq41qKMM-QDrY",
                             price: 0.098,
                             tokens: 2000,
                             total: 196,
@@ -229,12 +121,17 @@ export default {
                             id: "e6125855-8414-4ae1-b611-66aff71160a2",
                             ticker: "VRT",
                             name: "Verto Exchange",
+                            logo:  "9CYPS85KChE_zQxNLi2y5r2FLG-YE6HiphYYTlgtrtg",
                             price: 0.1,
                             tokens: 2500,
                             total: 250,
                         },
                     ],
-                    lessees: [
+                    balances: {
+                        "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8": 12300,
+                        "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I": 1000
+                    },
+                    leases: [
                         {
                             id: "b1898f1f-e1cd-4cdc-8797-56e4b91b7ed4",
                             leasedDate: "2021-03-28",
@@ -349,6 +246,13 @@ export default {
         viewVehicles() {
             console.log("View Clicked");
             this.$router.push("../vehicles");
+        },
+        tabClick(name) {
+            let activeTabIndex = this.tabs.findIndex(tab => tab.current == true);
+            this.tabs[activeTabIndex].current = false;
+            activeTabIndex = this.tabs.findIndex(tab => tab.name === name);
+            this.tabs[activeTabIndex].current = true;
+            this.activeTab = this.tabs[activeTabIndex].name;
         },
     },
     beforeRouteEnter(to, from, next) {

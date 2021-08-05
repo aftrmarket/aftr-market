@@ -8,7 +8,6 @@ import App from './App.vue';
 import VehicleList from './components/VehicleList.vue';
 import CreateVehicle from './components/CreateVehicle.vue';
 import Vehicle from './components/Vehicle.vue';
-import VehicleInfo from './components/VehicleInfo.vue';
 import UiTest from './components/UiTest.vue';
 
 const router = createRouter({
