@@ -152,7 +152,7 @@
                     <div class="bg-white sm:p-6">
                         <div v-if="arConnected" class="pt-6">
                             <label class="block text-sm font-medium text-gray-700">
-                                Creator: <span class="font-bold text-aftrBlue">{{ activeWallet }}</span>
+                                Creator: <span class="font-bold text-aftrBlue">{{ walletAddressSubstr($store.getters.getActiveAddress) }}</span>
                             </label>
                         </div>
                         <div v-else class="pt-6 flex justify-start items-center">
@@ -168,7 +168,7 @@
                                 <option value="" disabled selected>
                                     Select PST
                                 </option>
-                                <option v-for="pst in psts" :key="pst.id" :value="pst.id">
+                                <option v-for="pst in $store.getters.getActiveWallet.psts" :key="pst.id" :value="pst.id">
                                     {{ pst.name }} ({{ pst.id }})
                                 </option>
                             </select>
@@ -282,7 +282,7 @@
                                             </thead>
                                             <tbody class="bg-white divide-y divide-gray-200">
                                                 <tr v-for="(member, index) in daoMembers" :key="index" class="hover:bg-gray-50">
-                                                    <td class="text-xs px-6 py-3">{{ member.wallet.substr(0, 10) + "..." }}</td>
+                                                    <td class="text-xs px-6 py-3">{{ walletAddressSubstr(member.wallet) + "..." }}</td>
                                                     <td class="text-xs px-6 py-3">
                                                         {{ member.balance }} 
                                                     </td>
@@ -295,7 +295,7 @@
                                                             </svg>
                                                         </button>
                                                     </td>
-                                                    <td v-if="member.wallet === activeWallet" class="text-center px-6 py-3">
+                                                    <td v-if="member.wallet === $store.getters.getActiveAddress" class="text-center px-6 py-3">
                                                     </td>
                                                     <td v-else class="text-center px-6 py-3">
                                                         <button @click.prevent="removeDaoMember(member)" type="submit" class="inline-flex items-center p-1 border border-transparent shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed">
@@ -343,6 +343,8 @@
                 </form>
             </form-container>
             <!-- End Vehicle Info -->
+            <p>Store Contents:  {{ JSON.stringify($store.getters.getActiveWallet) }}</p>
+            <p>Connect? {{ arConnected }}</p>
             {{ vehicle }} {{ vehiclePsts }} {{ daoMembers }} Member Amount: {{memberAmount}}, Available Tokens: {{availableTokens}}, DAO Balance: {{daoBalance}} <br/><br/>
             nameValid {{nameValid}} <br/>
             tickerValid {{tickerValid}} <br/>
@@ -367,6 +369,8 @@ import FormContainer from "./layouts/FormContainer.vue";
 // @ts-expect-error
 import ActionInput from "./layouts/ActionInput.vue";
 
+import { mapGetters } from 'vuex';
+
 export default {
     components: { FormContainer, ActionInput },
     data() {
@@ -376,41 +380,41 @@ export default {
             tagProtocol: "AFTR-Test",
             /** */
 
-            leasingEnabled: false,          // Is vehicle leasing enabled?
-            arConnected: false,             // Is user logged in through ArConnect?
-            pstSelected: false,             // Boolean that shows when a PST is selected
-            vehicleTokens: 100000000,       // Available tokens in vehicle
+            leasingEnabled: false,                          // Is vehicle leasing enabled?
+            //arConnected: this.$store.getters.arConnected,   // Is user logged in through ArConnect?
+            pstSelected: false,                             // Boolean that shows when a PST is selected
+            vehicleTokens: 100000000,                       // Available tokens in vehicle
             vehicleTokensValid: true,
-            activeWallet: "",               // Active wallet address on ArConnect
+            //activeWallet: "",                             // Active wallet address on ArConnect
             activeWalletAmount: 0,
             activeWalletAmountValid: false,
 
-            createInProgress: false,        // Boolean to toggle wait
+            createInProgress: false,                        // Boolean to toggle wait
 
-            pageStatus: "",                 // Flag to format page based on status
+            pageStatus: "",                                 // Flag to format page based on status
 
-            selectedPstId: "",              // ID of selected PST
-            pstInputTokens: null,              // Number of tokens of PST
-            vehicleLogo: null,              // Logo for vehicle
-            lockPeriod: 0,                  // Period of time that the vehicle must exist
-            seats: 0,                       // Number of seats available on vehicle
-            minLease: 2,                    // Minimum seat lease length in months
-            maxLease: 24,                   // Maximum seat lease length in months
+            selectedPstId: "",                              // ID of selected PST
+            pstInputTokens: null,                           // Number of tokens of PST
+            vehicleLogo: null,                              // Logo for vehicle
+            lockPeriod: 0,                                  // Period of time that the vehicle must exist
+            seats: 0,                                       // Number of seats available on vehicle
+            minLease: 2,                                    // Minimum seat lease length in months
+            maxLease: 24,                                   // Maximum seat lease length in months
             ownership: "dao",
-            inputValid: false,              // Boolean to show when any input field is invalid
-            pstInputValid: false,           // Boolean to show when amount goes over tokens held
-            nameValid: false,               // Boolean for valid vehicle name
-            tickerValid: false,             // Boolean for valid ticker name
-            pricePerToken: null,            // Selected PST's price
-            pstValue: null,                 // pricePerShare * inputShares
-            totalValue: null,               // Sum of all PST values in vehicle
-            vehiclePsts: [],                // Array of vehicle's PSTs
-            vehicle: {},                    // Created vehicle object
-            psts: [],
-            daoMembers: [],                 // Array of DAO member wallets (to be added to balances on vehicle creation) and number of tokens
+            inputValid: false,                              // Boolean to show when any input field is invalid
+            pstInputValid: false,                           // Boolean to show when amount goes over tokens held
+            nameValid: false,                               // Boolean for valid vehicle name
+            tickerValid: false,                             // Boolean for valid ticker name
+            pricePerToken: null,                            // Selected PST's price
+            pstValue: null,                                 // pricePerShare * inputShares
+            totalValue: null,                               // Sum of all PST values in vehicle
+            vehiclePsts: [],                                // Array of vehicle's PSTs
+            vehicle: {},                                    // Created vehicle object
+            psts: this.$store.getters.getActiveWallet.psts,
+            daoMembers: [],                                 // Array of DAO member wallets (to be added to balances on vehicle creation) and number of tokens
             daoBalance: 0,
             availableTokens: null,
-            memberWallet: "",               // Wallet address of DAO member being added to vehicle
+            memberWallet: "",                               // Wallet address of DAO member being added to vehicle
             memberWalletValid: false,
             memberAmount: null,
             memberAmountValid: false,
@@ -438,11 +442,11 @@ export default {
             return parseInt(value);
         },
         pstBalance() {
-            const currentPst = this.psts.find((item) => item.id === this.selectedPstId);
+            const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.id === this.selectedPstId);
             return this.formatNumber(currentPst.balance);
         },
         pstTicker() {
-            const currentPst = this.psts.find((item) => item.id === this.selectedPstId);
+            const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.id === this.selectedPstId);
             return currentPst.ticker;
         },
         vehicleTokenBox() {
@@ -466,6 +470,7 @@ export default {
                 return false;
             }
         },
+        ...mapGetters(['arConnected']),
         // Code to handle a checkbox in the table to check/uncheck all rows.
         /******
       selectAll: {
@@ -483,7 +488,27 @@ export default {
       }
       ******/
     },
+    watch: {
+        arConnected(value) {
+            // Update DAO Members with creator address if user is already ArConnected
+            if (value) {
+                this.daoMembers.push({
+                    wallet: this.$store.getters.getActiveAddress,
+                    balance: 0
+                });
+            } else {
+                this.daoMembers = [];
+            }
+        }
+    },
     methods: {
+        walletAddressSubstr(addr, chars = 10) {
+            if (typeof addr === 'string') {
+                return addr.substr(0, chars) + '...';
+            } else {
+                return '';
+            }
+        },
         formatNumber(num, dec = false) {
             if (dec) {
                 return numeral(num).format("0,0.0000");
@@ -551,7 +576,7 @@ export default {
             } else {
                 this.memberAmountValid = true;
             }
-            if (this.memberWallet === '' || !this.memberWallet || this.memberWallet === this.activeWallet || this.memberWallet.length != 43)  {
+            if (this.memberWallet === '' || !this.memberWallet || this.memberWallet === this.$store.getters.getActiveAddress || this.memberWallet.length != 43)  {
                 this.memberWalletValid = false;
             } else {
                 this.memberWalletValid = true;
@@ -582,62 +607,8 @@ export default {
             }
             this.daoBalance = sum;
         },
-        async arConnect() {
-            try {
-                const promiseResult = await window.arweaveWallet.connect([
-                    "ACCESS_ADDRESS",
-                    "ACCESS_ALL_ADDRESSES",
-                    "SIGN_TRANSACTION",
-                ]);
-                this.activeWallet = await window.arweaveWallet.getActiveAddress();
-                this.arConnected = true;
-                this.daoMembers.push({
-                    wallet: this.activeWallet,
-                    balance: 0
-                });
-            } catch (error) {
-                console.log("ERROR during ArConnection: " + error);
-            }
-
-            try {
-                // Now query Verto to get all PSTs contained in Wallet
-                const response = await fetch(
-                    "http://v2.cache.verto.exchange/balance/" +
-                        this.activeWallet
-                );
-                this.psts = await response.json();
-                /**** RESPONSE RETURNS AS AN ARRAY OF KEY/VALUE PAIRS ****
-                 * [ {
-                 *  id: '',
-                 *  balance: '',
-                 *  name: '',
-                 *  ticker: '',
-                 *  logo: ''
-                 * } ]
-                 ****/
-            } catch (error) {
-                console.log("ERROR while fetching Verto balances: " + error);
-            }
-
-            try {
-                // Query Verto to get AR prices for each token
-                for (let pst of this.psts) {
-                    const response = await fetch(
-                        "http://v2.cache.verto.exchange/token/" +
-                            pst.id +
-                            "/price"
-                    );
-                    const jsonRes = await response.json();
-                    const i = this.psts.findIndex((item) => item.id === pst.id);
-                    this.psts[i]["price"] = jsonRes.price;
-                    this.psts[i]["total"] =
-                        jsonRes.price * this.psts[i]["balance"];
-                }
-            } catch (error) {
-                console.log(
-                    "ERROR while fetching AR prices from Verto: " + error
-                );
-            }
+        arConnect() {
+            this.$store.dispatch('arConnect');
         },
         togglePstFields() {
             this.pstSelected = !this.pstSelected;
@@ -655,7 +626,7 @@ export default {
             this.pricePerToken = null;
         },
         calcPstPrice() {
-            const currentPst = this.psts.find((item) => item.id === this.selectedPstId);
+            const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.id === this.selectedPstId);
             this.pricePerToken = currentPst.price;
             this.pstValue = currentPst.price * this.pstInputTokens;
             this.updatePstInputValid(currentPst.balance);
@@ -681,7 +652,7 @@ export default {
         },
         addPst() {
             // Create temp object and add new keys
-            let currentPst = this.psts.find((item) => item.id === this.selectedPstId);
+            let currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.id === this.selectedPstId);
             let existingIndex = this.vehiclePsts.findIndex((item) => item.id === this.selectedPstId);
             if (existingIndex === -1) {
                 // Add new PST to vehicle
@@ -694,9 +665,11 @@ export default {
                 this.vehiclePsts[existingIndex]["total"] += this.pstValue;
             }
             // Subtract tokens from wallet pst
-            existingIndex = this.psts.findIndex((item) => item.id === this.selectedPstId);
-            this.psts[existingIndex]["balance"] -= parseInt(this.pstInputTokens);
-            this.updatePstInputValid(this.psts[existingIndex]["balance"]);
+            existingIndex = this.$store.getters.getActiveWallet.psts.findIndex((item) => item.id === this.selectedPstId);
+
+            const newBal = this.$store.getters.getActiveWallet.psts[existingIndex]["balance"] - parseInt(this.pstInputTokens);
+            this.$store.commit('updateWalletPstBalance', { index: existingIndex, balance: newBal});
+            this.updatePstInputValid(newBal);
 
             /*** TODO:  SAVE WALLET UPDATES ON CREATE VEHICLE */
 
@@ -706,7 +679,9 @@ export default {
         removePst(id) {
             const deleteIndex = this.vehiclePsts.findIndex((item) => item.id === id);
             const idTokens = this.vehiclePsts[deleteIndex].tokens;
-            this.psts.find((item) => item.id === id).balance += idTokens;
+            const existingIndex = this.$store.getters.getActiveWallet.psts.findIndex((item) => item.id === id);
+            const newBal = this.$store.getters.getActiveWallet.psts[existingIndex].balance + idTokens;            
+            this.$store.commit('updateWalletPstBalance', { index: existingIndex, balance: newBal});
             this.vehiclePsts.splice(deleteIndex, 1);
             this.updateVehicleTotal();
         },
@@ -771,7 +746,7 @@ export default {
             const initTags = [
                 { name: "Protocol", value: this.tagProtocol }
             ];
-            this.vehicle.creator = this.activeWallet;
+            this.vehicle.creator = this.$store.getters.getActiveAddress;
             this.vehicle.seats = this.seats;
             this.vehicle.lockPeriod = this.lockPeriod;
             this.vehicle.minLease = this.minLease;
@@ -864,5 +839,14 @@ export default {
             this.$router.push("vehicles");
         },
     },
+    created() {
+        // Update DAO Members with creator address if user is already ArConnected
+        if (this.$store.getters.arConnected) {
+            this.daoMembers.push({
+                wallet: this.$store.getters.getActiveAddress,
+                balance: 0
+            });
+        }
+    }
 };
 </script>

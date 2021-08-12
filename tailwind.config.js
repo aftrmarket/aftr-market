@@ -23,6 +23,9 @@ module.exports = {
         },
         aftrRed: {
           DEFAULT: '#FF6C8C'
+        },
+        aftrGo: {
+            DEFAULT: '#00F900'
         }
       }
     },

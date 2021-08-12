@@ -5,6 +5,7 @@ import numeral from 'numeral';
 import './index.css';
 
 import App from './App.vue';
+import store from './store.js';
 import VehicleList from './components/VehicleList.vue';
 import CreateVehicle from './components/CreateVehicle.vue';
 import Vehicle from './components/Vehicle.vue';
@@ -25,6 +26,7 @@ const router = createRouter({
 });
 
 const app = createApp(App);
+app.use(store);
 app.use(router);
 //app.use(uuid);
 
