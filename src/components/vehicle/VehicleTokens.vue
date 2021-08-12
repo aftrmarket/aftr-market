@@ -64,7 +64,7 @@ export default {
     props: ["psts"],
     data() {
         return {
-
+            arConnected: false
         };
     },
     methods: {
