@@ -48,9 +48,10 @@
                                 </div>
                                 <vehicle-info v-if="activeTab === 'Info'" :vehicle="vehicle" :contractId="contractId"></vehicle-info>
                                 <vehicle-members v-else-if="activeTab === 'Members'" :members="vehicles[0].balances"></vehicle-members>
-                                <vehicle-tokens v-else-if="activeTab === 'Tokens'" :psts="vehicles[0].psts"></vehicle-tokens>
+                                <vehicle-tokens v-else-if="activeTab === 'Tokens'" :vehicle="vehicles[0]"></vehicle-tokens>
                                 <vehicle-leases v-else-if="activeTab === 'Leases'" :leases="vehicles[0].leases"></vehicle-leases>
                                 <vehicle-votes v-else-if="activeTab === 'Votes'"></vehicle-votes>
+                                <vehicle-activity v-else-if="activeTab === 'Activity'"></vehicle-activity>
 
                             </div>
                         </section>
@@ -70,10 +71,11 @@ import VehicleMembers from './vehicle/VehicleMembers.vue';
 import VehicleTokens from './vehicle/VehicleTokens.vue';
 import VehicleLeases from './vehicle/VehicleLeases.vue';
 import VehicleVotes from './vehicle/VehicleVotes.vue';
+import VehicleActivity from './vehicle/VehicleActivity.vue';
 
 export default {
-    components: { VehicleInfo, VehicleMembers, VehicleTokens, VehicleLeases, VehicleVotes },
-    props: ["vehicleId"],
+    components: { VehicleInfo, VehicleMembers, VehicleTokens, VehicleLeases, VehicleVotes, VehicleActivity },
+    props: ['vehicleId'],
     data() {
         return {
             tabs: [
@@ -82,6 +84,7 @@ export default {
                 { name: 'Tokens', href: '#', current: false },
                 { name: 'Leases', href: '#', current: false },
                 { name: 'Votes', href: '#', current: false },
+                { name: 'Activity', href: '#', current: false },
             ],
             activeTab: "Info",
             pageStatus: "",
