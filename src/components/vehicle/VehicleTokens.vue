@@ -1,5 +1,7 @@
 <template>
     <div class="pt-4 w-full">
+        Show:  {{ showAddTokens }}
+        <vehicle-tokens-add v-if="showAddTokens" :vehicle="vehicle" @close="closeModal"></vehicle-tokens-add>
         <!-- PSTs in Vehicle -->
         <div v-if="vehicle.psts.length > 0" class="pt-1">
             <div class="pt-2 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -52,7 +54,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
                 </svg>
-                <span class="pl-2">ADD TOKEN</span>
+                <span class="pl-2">ADD TOKENS</span>
             </button>
             <div v-else class="pt-6 flex justify-start items-center">
                 <button @click="arConnect" type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-aftrBlue hover:bg-aftrBlue-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
@@ -70,13 +72,16 @@
 <script>
 import numeral from "numeral";
 import { mapGetters } from 'vuex';
+import VehicleTokensAdd from './VehicleTokensAdd.vue';
 
 export default {
     props: ['vehicle'],
+    components: { VehicleTokensAdd },
     data() {
         return {
             allowAdd: false,
             allowTransfer: false,
+            showAddTokens: false,
         };
     },
     computed: {
@@ -117,6 +122,12 @@ export default {
             } else {
                 return numeral(num).format("0,0");
             }
+        },
+        addPst(){
+            this.showAddTokens = true;
+        },
+        closeModal() {
+            this.showAddTokens = false;
         },
     },
     created() {

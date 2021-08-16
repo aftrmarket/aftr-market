@@ -25,7 +25,12 @@ module.exports = {
           DEFAULT: '#FF6C8C'
         },
         aftrGo: {
-            DEFAULT: '#00F900'
+            light: 'rgba(0, 0, 0, 0.4)',
+            DEFAULT: '#00F900',
+            dark: 'rgba(0, 0, 0, 0.6)'
+        },
+        smoke: {
+            DEFAULT: 'rgba(0, 0, 0, 0.5)'
         }
       }
     },
