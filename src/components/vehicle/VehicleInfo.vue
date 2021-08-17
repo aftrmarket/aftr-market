@@ -30,41 +30,17 @@
                     </SwitchGroup>
                 </div>
             </div>
-            <div class="flex items-start justify-between">
-                <div>
-                    <div class="max-w-2xl text-sm text-gray-500">Editing</div>
-                    <div class="text-sm">
-                        <div class="flex items-center">
-                            <svg v-if="getActiveAddress === creatorAddress" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="#065F46">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                            </svg>
-                            <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="#991B1B">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                            </svg>
-                            Creator
-                        </div>
-                        <div class="flex items-center">
-                            <svg v-if="vehicle.status === 'stopped' || typeof vehicle.status === 'undefined'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="#065F46">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                            </svg>
-                            <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="#991B1B">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                            </svg>
-                            Status = Not Running
-                        </div>
-                        <div class="flex items-center">
-                            <svg v-if="vehicle.ownership === 'single'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="#065F46">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                            </svg>
-                            <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="#991B1B">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                            </svg>
-                            Single Ownership
-                        </div>
-                        <div :class="editText">{{ editMessage }}</div>
-                    </div>
-                </div>
-            </div>
+            <vehicle-status-text 
+                :headerText="'Editing'" 
+                :item1="'Creator'" 
+                :item1Status="getActiveAddress === creatorAddress ? true : false" 
+                :item2="'Status = Not Running'" 
+                :item2Status="vehicle.status === 'stopped' || typeof vehicle.status === 'undefined' ? true : false"
+                :item3="'Single Ownership'"
+                :item3Status="vehicle.ownership === 'single' ? true : false"
+                :footerMessage="allowVehicleEdits ? 'Edits allowed' : 'Votes must be passed to edit'"
+                :footerStatus="allowVehicleEdits ? true : false">
+            </vehicle-status-text>
         </div>
     </div>
 </template>
@@ -73,11 +49,12 @@
 import { ref } from 'vue'
 import { Switch, SwitchGroup, SwitchLabel } from '@headlessui/vue'
 import { mapGetters } from 'vuex';
+import VehicleStatusText from './VehicleStatusText.vue';
 
 
 export default {
     props: ['vehicle', 'contractId'],
-    components: { Switch, SwitchGroup, SwitchLabel },
+    components: { Switch, SwitchGroup, SwitchLabel, VehicleStatusText },
     data() {
         return {
             allowVehicleEdits: false,
@@ -116,20 +93,6 @@ export default {
                 return 'not running';
             } else {
                 return this.vehicle.status;
-            }
-        },
-        editMessage() {
-            if (this.allowVehicleEdits) {
-                return "Edits allowed";
-            } else {
-                return "Votes must be passed to edit";
-            }
-        },
-        editText() {
-            if (this.allowVehicleEdits) {
-                return "p-2 text-green-800";
-            } else {
-                return "p-2 text-red-800";
             }
         },
         creatorAddress() {
