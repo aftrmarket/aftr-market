@@ -1,6 +1,5 @@
 <template>
     <div class="pt-4 w-full">
-        Show:  {{ showAddTokens }}
         <vehicle-tokens-add v-if="showAddTokens" :vehicle="vehicle" @close="closeModal"></vehicle-tokens-add>
         <!-- PSTs in Vehicle -->
         <div v-if="vehicle.psts.length > 0" class="pt-1">
@@ -61,7 +60,7 @@
                     Login to ArConnect
                 </button>
                 <label class="pl-4 block text-sm text-gray-700">
-                    You must provide a wallet in order to create a vehicle
+                    You must provide a wallet in order to add tokens to a vehicle
                 </label>
             </div>
         </div>
