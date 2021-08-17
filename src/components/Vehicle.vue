@@ -47,7 +47,7 @@
                                     </div>
                                 </div>
                                 <vehicle-info v-if="activeTab === 'Info'" :vehicle="vehicle" :contractId="contractId"></vehicle-info>
-                                <vehicle-members v-else-if="activeTab === 'Members'" :members="vehicles[0].balances"></vehicle-members>
+                                <vehicle-members v-else-if="activeTab === 'Members'" :vehicle="vehicles[0]"></vehicle-members>
                                 <vehicle-tokens v-else-if="activeTab === 'Tokens'" :vehicle="vehicles[0]"></vehicle-tokens>
                                 <vehicle-leases v-else-if="activeTab === 'Leases'" :leases="vehicles[0].leases"></vehicle-leases>
                                 <vehicle-votes v-else-if="activeTab === 'Votes'"></vehicle-votes>
