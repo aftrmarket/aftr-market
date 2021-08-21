@@ -5,7 +5,8 @@
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview",
-    "build:contract": "tsc"
+    "build-contract" : "node ./scripts/build.js",
+    "contract-test": "node ./scripts/build.js && node ./build/vehicle/contract.js"
   },
   "dependencies": {
     "@headlessui/vue": "^1.4.0",
@@ -13,6 +14,7 @@
     "@tailwindcss/forms": "^0.2.1",
     "ar-gql": "0.0.6",
     "arweave": "^1.10.16",
+    "esbuild": "^0.12.20",
     "install": "^0.13.0",
     "material-design-icons": "^3.0.1",
     "npm": "^7.7.0",

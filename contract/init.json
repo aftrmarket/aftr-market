@@ -4,7 +4,8 @@
     "balances" : {
         "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I" : 100000
     },
-    "creator" : "",
+    "creator" : "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I",
+    "ownership" : "single",
     "seats" : 0,
     "lockPeriod" : 1,
     "pricePerSeat" : 1,
@@ -14,6 +15,9 @@
     "leases" : {
 
     },
+    "psts" : [
+        { }
+    ],
     "settings" : [
         [ "communityAppUrl", "https://aftr.market" ],
         [ "communityDiscussionLinks", "" ],
