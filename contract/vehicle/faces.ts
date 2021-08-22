@@ -75,6 +75,7 @@ export interface TokenInterface {
             source: string,
             deposits: [
                 {
+                    txId: string,
                     balance: number,
                     depositBlock: number,   // Stamp when added
                     holdLength?: number,    // Planning for temporary loaning of tokens to a vehicle

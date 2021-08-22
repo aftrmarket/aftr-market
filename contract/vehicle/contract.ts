@@ -1,3 +1,4 @@
+import { textChangeRangeIsUnchanged } from "typescript";
 import { StateInterface, ActionInterface, BalanceInterface, InputInterface } from "./faces";
 
 const mode = 'TEST';
@@ -111,7 +112,8 @@ export async function handle(state: StateInterface, action: ActionInterface) {
         
         // Confirm tx
         /*** TODO */
-        if (!input.txId) {
+        const txId = input.txId;
+        if (!txId) {
             ThrowError("The transaction is not valid.  Tokens were not transferred to vehicle.");
         }
 
@@ -144,6 +146,7 @@ export async function handle(state: StateInterface, action: ActionInterface) {
             if (foundSource) {
                 // Source was found, so add to the source's deposit array
                 const depositObj = {
+                    txId: txId,
                     balance: qty,
                     depositBlock: depositBlock,
                     holdLength: holdLength
@@ -155,6 +158,7 @@ export async function handle(state: StateInterface, action: ActionInterface) {
                     source: caller,
                     deposits: [
                         {
+                            txId: txId,
                             balance: qty,
                             depositBlock: depositBlock,
                             holdLength: holdLength
@@ -173,6 +177,7 @@ export async function handle(state: StateInterface, action: ActionInterface) {
                         source: caller,
                         deposits: [
                             {
+                                txId: txId,
                                 balance: qty,
                                 depositBlock: depositBlock,
                                 holdLength: holdLength
@@ -202,33 +207,61 @@ function isArweaveAddress(addy: string) {
 }
 
 async function test() {
+    // const state = {
+    //     "name": "Test Vehicle",
+    //     "ticker": "AFTR-Test-1",
+    //     "balances": {
+    //         "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8": 12300,
+    //         "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I": 1000
+    //     },
+    //     "creator": "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I",
+    //     "ownership": "single",
+    //     "settings": [
+    //         [
+    //             "quorum",
+    //             0.5
+    //         ],
+    //         [
+    //             "voteLength",
+    //             2000
+    //         ],
+    //         [
+    //             "lockMinLength",
+    //             100
+    //         ],
+    //         [
+    //             "lockMaxLength",
+    //             10000
+    //         ]
+    //     ]
+    // };
     const state = {
         "name": "Test Vehicle",
         "ticker": "AFTR-Test-1",
         "balances": {
-            "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8": 12300,
-            "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I": 1000
+        "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8": 12300,
+        "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I": 1000
         },
         "creator": "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I",
         "ownership": "single",
         "settings": [
-            [
-                "quorum",
-                0.5
-            ],
-            [
-                "voteLength",
-                2000
-            ],
-            [
-                "lockMinLength",
-                100
-            ],
-            [
-                "lockMaxLength",
-                10000
-            ]
-        ]
+            [ "quorum", 0.5 ],
+            [ "voteLength", 2000 ],
+            [ "lockMinLength", 100 ],
+            [ "lockMaxLength", 10000 ]
+        ],
+        "tokens": [{
+            "tokenId": "VRT",
+            "balances": [{
+                "source": "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
+                "deposits": [{
+                    "txId" : 'alsdkfjasdl;fjasa;lksdjfa;sl',
+                    "balance": 2500,
+                    "depositBlock": 123,
+                    "holdLength": -1
+                }]
+            }]
+        }]
     };
     const balAction = {
         input: { 

@@ -82,7 +82,8 @@ async function handle(state, action) {
   if (input.function === "withdrawal") {
   }
   if (input.function === "deposit") {
-    if (!input.txId) {
+    const txId = input.txId;
+    if (!txId) {
       ThrowError("The transaction is not valid.  Tokens were not transferred to vehicle.");
     }
     const target = input.target;
@@ -101,6 +102,7 @@ async function handle(state, action) {
       const foundSource = foundToken.balances.find((b) => b.source === caller);
       if (foundSource) {
         const depositObj = {
+          txId,
           balance: qty,
           depositBlock,
           holdLength
@@ -111,6 +113,7 @@ async function handle(state, action) {
           source: caller,
           deposits: [
             {
+              txId,
               balance: qty,
               depositBlock,
               holdLength
@@ -127,6 +130,7 @@ async function handle(state, action) {
             source: caller,
             deposits: [
               {
+                txId,
                 balance: qty,
                 depositBlock,
                 holdLength
@@ -158,23 +162,23 @@ async function test() {
     "creator": "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I",
     "ownership": "single",
     "settings": [
-      [
-        "quorum",
-        0.5
-      ],
-      [
-        "voteLength",
-        2e3
-      ],
-      [
-        "lockMinLength",
-        100
-      ],
-      [
-        "lockMaxLength",
-        1e4
-      ]
-    ]
+      ["quorum", 0.5],
+      ["voteLength", 2e3],
+      ["lockMinLength", 100],
+      ["lockMaxLength", 1e4]
+    ],
+    "tokens": [{
+      "tokenId": "VRT",
+      "balances": [{
+        "source": "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
+        "deposits": [{
+          "txId": "alsdkfjasdl;fjasa;lksdjfa;sl",
+          "balance": 2500,
+          "depositBlock": 123,
+          "holdLength": -1
+        }]
+      }]
+    }]
   };
   const balAction = {
     input: {
