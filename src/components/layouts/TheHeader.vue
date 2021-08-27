@@ -5,8 +5,11 @@
           <div class="border-b border-aftrYellow">
             <div class="flex items-center justify-between h-16 px-4 sm:px-0">
               <div class="flex items-center">
-                <div class="flex-shrink-0">
-                  <img class="w-10" src="../../assets/aftr-market-logo.png" alt="Logo">
+                <div class="flex-shrink-0 flex items-center space-x-2">
+                    <img class="w-10" src="../../assets/aftr-market-logo.png" alt="Logo">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-aftrDarkGrey-light text-aftrYellow">
+                        alpha
+                    </span>
                 </div>
                 <div class="hidden md:block">
                   <div class="ml-10 flex items-baseline space-x-4">
