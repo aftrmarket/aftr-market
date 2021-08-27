@@ -11,6 +11,7 @@ function ThrowError(msg: string) {
         throw new ContractError(msg);
     }
 }
+declare const SmartWeave: any;
 
 export async function handle(state: StateInterface, action: ActionInterface) {
     const balances = state.balances;
@@ -18,6 +19,17 @@ export async function handle(state: StateInterface, action: ActionInterface) {
     const input = action.input;
     const caller = action.caller;
 
+    // Handle tips to vehicle balance holders
+    /**** TODO */
+
+    
+    // Check for any unlocked tokens
+    if (state.tokens) {
+        const block = 130;  /**** GET BLOCK FROM SMARTWEAVE */
+        //const block = SmartWeave.block.height;
+        returnUnlockedTokens(state, block);
+    }
+    
     if (input.function === "balance") {
         // View balance
 
@@ -105,31 +117,48 @@ export async function handle(state: StateInterface, action: ActionInterface) {
 
     if (input.function === "withdrawal") {
         // Utilize Foreign Call Protocol
+
+
+
+        // Update deposits
     }
 
     if (input.function === 'deposit') {
         // Transfer tokens into vehicle
         
-        // Confirm tx
+        // Confirm tx by matching source, target, qty, tokenId, and lockLength
         /*** TODO */
         const txId = input.txId;
-        if (!txId) {
-            ThrowError("The transaction is not valid.  Tokens were not transferred to vehicle.");
-        }
 
-        // Add to psts object
-        /** No validation needed b/c the information will be in the tx */
-
-        /** TODO:  Change to obtain from Tx */
+        const source = caller;
         const target = input.target;
         const qty = input.qty;
         const tokenId = input.tokenId;
         const depositBlock = input.depositBlock;
-        let holdLength = -1;
-        if (input.holdLength) {
-            holdLength = input.holdLength;
+        let lockLength = -1;
+        if (input.lockLength) {
+            lockLength = input.lockLength;
         }
-        /** */
+
+        /*** UPDATE THIS when tx can be validated */
+        const txObj = {
+            txId: txId,
+            tokenId: tokenId,
+            source: source,
+            target: target,
+            balance: qty,
+            depositBlock: depositBlock,
+            lockLength: -1
+        };
+        if (input.lockLength) {
+            txObj.lockLength = input.lockLength;
+        }
+        /*** */
+
+        if (!txId) {
+            ThrowError("The transaction is not valid.  Tokens were not transferred to vehicle.");
+        }
+        // Add to psts object
 
         if (!state.tokens) {
             // tokens array is not in vehicle
@@ -137,58 +166,8 @@ export async function handle(state: StateInterface, action: ActionInterface) {
             state['tokens'] = [];
         }
 
-        const foundToken = state.tokens.find(token => token.tokenId === tokenId);
+        state.tokens.push(txObj);
 
-        if (foundToken) {
-            // Token was found, now look for source
-            const foundSource = foundToken.balances.find(b => b.source === caller);
-
-            if (foundSource) {
-                // Source was found, so add to the source's deposit array
-                const depositObj = {
-                    txId: txId,
-                    balance: qty,
-                    depositBlock: depositBlock,
-                    holdLength: holdLength
-                }
-                foundSource.deposits.push(depositObj);
-            } else {
-                // Source address not found, add new source to balances
-                const balanceObj = {
-                    source: caller,
-                    deposits: [
-                        {
-                            txId: txId,
-                            balance: qty,
-                            depositBlock: depositBlock,
-                            holdLength: holdLength
-                        }
-                    ]
-                };
-                // @ts-expect-error
-                foundToken.balances.push(balanceObj);
-            }
-        } else {
-            // Token is not already stored in vehicle
-            const tokenObj = {
-                tokenId: tokenId,
-                balances: [
-                    {
-                        source: caller,
-                        deposits: [
-                            {
-                                txId: txId,
-                                balance: qty,
-                                depositBlock: depositBlock,
-                                holdLength: holdLength
-                            }
-                        ]
-                    }
-                ]
-            };
-            // @ts-expect-error
-            state.tokens.push(tokenObj);
-        }
         return { state };
     }
 }
@@ -204,6 +183,20 @@ function isArweaveAddress(addy: string) {
     }
 
     return address;
+}
+
+function returnUnlockedTokens(vehicle, block) {
+    const unlockedTokens = vehicle.tokens.filter((token) => (token.lockLength !== -1 && token.depositBlock + token.lockLength >= block));
+    unlockedTokens.forEach(token => processWithdrawal(vehicle, token));
+}
+
+function processWithdrawal(vehicle, tokenObj) {
+    // Utilize the Foreign Call Protocol to return tokens to orginal source
+    /**** FOREIGN CALL PROTOCOL to call transfer function on token's smart contract */
+
+
+    // Update state by finding txId if Withdrawal was successful
+    vehicle.tokens = vehicle.tokens.filter(token => token.txId !== tokenObj.txId);
 }
 
 async function test() {
@@ -250,18 +243,32 @@ async function test() {
             [ "lockMinLength", 100 ],
             [ "lockMaxLength", 10000 ]
         ],
-        "tokens": [{
-            "tokenId": "VRT",
-            "balances": [{
+        "tokens": [
+            {
+                "tokenId": "VRT",
                 "source": "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
-                "deposits": [{
-                    "txId" : 'alsdkfjasdl;fjasa;lksdjfa;sl',
-                    "balance": 2500,
-                    "depositBlock": 123,
-                    "holdLength": -1
-                }]
-            }]
-        }]
+                "txId" : 'tx1fasdfoijeo0984',
+                "balance": 2500,
+                "depositBlock": 123,
+                "lockLength": 5
+            },
+            {
+                "tokenId": "VRT",
+                "source": "joe7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
+                "txId" : 'tx2fasdfoijeo8547',
+                "balance": 1000,
+                "depositBlock": 123,
+                "lockLength": 10
+            },
+            {
+                "tokenId": "XYZ",
+                "source": "joe7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
+                "txId" : 'tx3fasdfoijeo8547',
+                "balance": 3400,
+                "depositBlock": 123,
+                "lockLength": 5
+            }
+        ]
     };
     const balAction = {
         input: { 
@@ -280,7 +287,6 @@ async function test() {
         input: {
             function: 'deposit',
             txId: 'NOT IMPLEMENTED YET',
-            source: '',
             depositBlock: 123,
             tokenId: 'VRT',
             qty: 2500

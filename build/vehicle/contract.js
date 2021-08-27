@@ -12,6 +12,10 @@ async function handle(state, action) {
   const leases = state.leases;
   const input = action.input;
   const caller = action.caller;
+  if (state.tokens) {
+    const block = 130;
+    returnUnlockedTokens(state, block);
+  }
   if (input.function === "balance") {
     const target = isArweaveAddress(input.target || caller);
     if (typeof target !== "string") {
@@ -83,64 +87,34 @@ async function handle(state, action) {
   }
   if (input.function === "deposit") {
     const txId = input.txId;
-    if (!txId) {
-      ThrowError("The transaction is not valid.  Tokens were not transferred to vehicle.");
-    }
+    const source = caller;
     const target = input.target;
     const qty = input.qty;
     const tokenId = input.tokenId;
     const depositBlock = input.depositBlock;
-    let holdLength = -1;
-    if (input.holdLength) {
-      holdLength = input.holdLength;
+    let lockLength = -1;
+    if (input.lockLength) {
+      lockLength = input.lockLength;
+    }
+    const txObj = {
+      txId,
+      tokenId,
+      source,
+      target,
+      balance: qty,
+      depositBlock,
+      lockLength: -1
+    };
+    if (input.lockLength) {
+      txObj.lockLength = input.lockLength;
+    }
+    if (!txId) {
+      ThrowError("The transaction is not valid.  Tokens were not transferred to vehicle.");
     }
     if (!state.tokens) {
       state["tokens"] = [];
     }
-    const foundToken = state.tokens.find((token) => token.tokenId === tokenId);
-    if (foundToken) {
-      const foundSource = foundToken.balances.find((b) => b.source === caller);
-      if (foundSource) {
-        const depositObj = {
-          txId,
-          balance: qty,
-          depositBlock,
-          holdLength
-        };
-        foundSource.deposits.push(depositObj);
-      } else {
-        const balanceObj = {
-          source: caller,
-          deposits: [
-            {
-              txId,
-              balance: qty,
-              depositBlock,
-              holdLength
-            }
-          ]
-        };
-        foundToken.balances.push(balanceObj);
-      }
-    } else {
-      const tokenObj = {
-        tokenId,
-        balances: [
-          {
-            source: caller,
-            deposits: [
-              {
-                txId,
-                balance: qty,
-                depositBlock,
-                holdLength
-              }
-            ]
-          }
-        ]
-      };
-      state.tokens.push(tokenObj);
-    }
+    state.tokens.push(txObj);
     return { state };
   }
 }
@@ -150,6 +124,13 @@ function isArweaveAddress(addy) {
     ThrowError("Invalid Arweave address.");
   }
   return address;
+}
+function returnUnlockedTokens(vehicle, block) {
+  const unlockedTokens = vehicle.tokens.filter((token) => token.lockLength !== -1 && token.depositBlock + token.lockLength >= block);
+  unlockedTokens.forEach((token) => processWithdrawal(vehicle, token));
+}
+function processWithdrawal(vehicle, tokenObj) {
+  vehicle.tokens = vehicle.tokens.filter((token) => token.txId !== tokenObj.txId);
 }
 async function test() {
   const state = {
@@ -167,18 +148,32 @@ async function test() {
       ["lockMinLength", 100],
       ["lockMaxLength", 1e4]
     ],
-    "tokens": [{
-      "tokenId": "VRT",
-      "balances": [{
+    "tokens": [
+      {
+        "tokenId": "VRT",
         "source": "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
-        "deposits": [{
-          "txId": "alsdkfjasdl;fjasa;lksdjfa;sl",
-          "balance": 2500,
-          "depositBlock": 123,
-          "holdLength": -1
-        }]
-      }]
-    }]
+        "txId": "tx1fasdfoijeo0984",
+        "balance": 2500,
+        "depositBlock": 123,
+        "lockLength": 5
+      },
+      {
+        "tokenId": "VRT",
+        "source": "joe7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
+        "txId": "tx2fasdfoijeo8547",
+        "balance": 1e3,
+        "depositBlock": 123,
+        "lockLength": 10
+      },
+      {
+        "tokenId": "XYZ",
+        "source": "joe7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
+        "txId": "tx3fasdfoijeo8547",
+        "balance": 3400,
+        "depositBlock": 123,
+        "lockLength": 5
+      }
+    ]
   };
   const balAction = {
     input: {
@@ -198,7 +193,6 @@ async function test() {
     input: {
       function: "deposit",
       txId: "NOT IMPLEMENTED YET",
-      source: "",
       depositBlock: 123,
       tokenId: "VRT",
       qty: 2500

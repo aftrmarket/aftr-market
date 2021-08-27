@@ -54,13 +54,13 @@ export interface TransferInterface {
 export interface DepositInterface {
     function: 'deposit',
     txId: string,
-    // Won't need these when txId is working
+    //*** The following information is to confirm the tx */
     source?: string,
     depositBlock?: number,
     tokenId?: string,
     target?: string,
     qty?: number,
-    holdLength?: number,
+    lockLength?: number,
 }
 
 export interface StatusChangeInterface {
@@ -69,18 +69,11 @@ export interface StatusChangeInterface {
 }
 
 export interface TokenInterface {
+    txId: string,
     tokenId: string,
-    balances: [
-        {
-            source: string,
-            deposits: [
-                {
-                    txId: string,
-                    balance: number,
-                    depositBlock: number,   // Stamp when added
-                    holdLength?: number,    // Planning for temporary loaning of tokens to a vehicle
-                }
-            ]
-        }
-    ]
+    source: string,
+    balance: number,
+    depositBlock: number,   // Stamp when added
+    lockLength?: number,    // Planning for temporary loaning of tokens to a vehicle
+
 }
