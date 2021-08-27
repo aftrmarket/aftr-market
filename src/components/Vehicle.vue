@@ -94,6 +94,7 @@ export default {
                 {
                     id: "6adfd3a1-cb33-4970-8e88-c2d0defa66ec",
                     name: "Investment Bus",
+                    ticker: "IBUS",
                     desc: "",
                     profile: "",
                     leasedSeats: 143,
