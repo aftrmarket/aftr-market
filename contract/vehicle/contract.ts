@@ -15,14 +15,14 @@ declare const SmartWeave: any;
 
 export async function handle(state: StateInterface, action: ActionInterface) {
     const balances = state.balances;
-    const leases = state.leases;
+    //const leases = state.leases;      /*** Leasing seats from vehicle is a future enhancement / use case */
     const input = action.input;
     const caller = action.caller;
 
     // Handle tips to vehicle balance holders
     /**** TODO */
 
-    
+
     // Check for any unlocked tokens
     if (state.tokens) {
         const block = 130;  /**** GET BLOCK FROM SMARTWEAVE */
@@ -70,6 +70,7 @@ export async function handle(state: StateInterface, action: ActionInterface) {
     }
 
     if (input.function === "lease") {
+        /*** FUNCTIONALITY NOT YET IMPLEMENTED
         // Lease a seat, subtract balance from owner wallet, add to lessee
         const target = input.target;  // Address of lessee
         const qty = input.qty;        // Number of seats to lease
@@ -80,7 +81,7 @@ export async function handle(state: StateInterface, action: ActionInterface) {
         if (qty <= 0 || caller === target) {
             ThrowError("Invalid token lease.");
         }
-
+        ****/
         return { state };
     }
 
@@ -288,10 +289,10 @@ async function test() {
             function: 'deposit',
             txId: 'NOT IMPLEMENTED YET',
             depositBlock: 123,
-            tokenId: 'VRT',
-            qty: 2500
+            tokenId: 'T-SQUID',
+            qty: 10000
         },
-        caller: 'abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8'
+        caller: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I'
     };
 
     // @ts-expect-error
