@@ -19,14 +19,18 @@
         </div>
         <!-- List -->
         <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6">
-          <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            <li v-for="vehicle in vehicles" :key="vehicle.id" class="col-span-1 bg-white rounded-lg shadow  divide-gray-200">
-              <router-link :to="{ name: 'vehicle', params: { vehicleId: vehicle.id } }">
-                <vehicle-card :vehicle="vehicle"></vehicle-card>
-              </router-link>
+          <ul v-if="false" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <li v-for="vehicle in vehicles" :key="vehicle.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
+                <router-link :to="{ name: 'vehicle', params: { vehicleId: vehicle.id } }">
+                    <vehicle-card :vehicle="vehicle"></vehicle-card>
+                </router-link>
             </li>
           </ul>
-
+          <ul v-else class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <li v-for="index in 12" :key=index class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
+                <vehicle-card-placeholder :key="index"></vehicle-card-placeholder>
+            </li>
+          </ul>
         </div>
         <!-- /End replace -->
       </div>
@@ -36,9 +40,10 @@
 
 <script>
 import VehicleCard from './vehicle/VehicleCard.vue';
+import VehicleCardPlaceholder from './vehicle/VehicleCardPlaceholder.vue';
 
 export default {
-  components: { VehicleCard },
+  components: { VehicleCard, VehicleCardPlaceholder },
   data() {
     return {
       vehicles: [
