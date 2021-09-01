@@ -19,7 +19,7 @@
         </div>
         <!-- List -->
         <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6">
-          <ul v-if="false" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <ul v-if="!isLoading" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <li v-for="vehicle in vehicles" :key="vehicle.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
                 <router-link :to="{ name: 'vehicle', params: { vehicleId: vehicle.id } }">
                     <vehicle-card :vehicle="vehicle"></vehicle-card>
@@ -41,56 +41,73 @@
 <script>
 import VehicleCard from './vehicle/VehicleCard.vue';
 import VehicleCardPlaceholder from './vehicle/VehicleCardPlaceholder.vue';
+import { run, all } from 'ar-gql';
 
 export default {
   components: { VehicleCard, VehicleCardPlaceholder },
   data() {
     return {
-      vehicles: [
-        {
-          id: '6adfd3a1-cb33-4970-8e88-c2d0defa66ec',
-          name: 'Investment Bus',
-          ticker: 'IBUS',
-          status: 'stopped',
-          desc: '',
-          logo: '',
-          creator: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I',
-          ownership: 'single',
-          leasedSeats: 143,
-          perf1m: -2.43,
-          perf3m: 20.40,
-          perfMax: 140.29,
-          tips: 'A+',
-          balances: {
-                "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8": 12300,
-                "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I": 1000
-          },
-          tokens: [
+        isLoading: true,
+        query: `
+            query($cursor: String) {
+                transactions(
+                    tags: [ { name: "Protocol", values: "AFTR-Test" } ]
+                    after: $cursor
+                ) {
+                    pageInfo {
+                        hasNextPage
+                    }
+                    edges {
+                        cursor
+                        node { id } 
+                    }
+                }
+        }`,
+        vehicles: [
             {
-                "tokenId": "46c0bdd1-56a9-4179-8a56-164b702a5cb8",
-                "source": "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
-                "txId": "tx154545454",
-                "balance": 2500,
-                "depositBlock": 123,
-                "lockLength": 5
+            id: '6adfd3a1-cb33-4970-8e88-c2d0defa66ec',
+            name: 'Investment Bus',
+            ticker: 'IBUS',
+            status: 'stopped',
+            desc: '',
+            logo: '',
+            creator: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I',
+            ownership: 'single',
+            leasedSeats: 143,
+            perf1m: -2.43,
+            perf3m: 20.40,
+            perfMax: 140.29,
+            tips: 'A+',
+            balances: {
+                    "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8": 12300,
+                    "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I": 1000
             },
-            {
-                "tokenId": "VRT",
-                "source": "joe7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
-                "txId" : "tx2fasdfoijeo8547",
-                "balance": 1000,
-                "depositBlock": 123,
-                "lockLength": 10
-            },
-            {
-                "tokenId": "XYZ",
-                "source": "joe7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
-                "txId" : "tx3fasdfoijeo8547",
-                "balance": 3400,
-                "depositBlock": 123,
-                "lockLength": 5
-            }
-          ]
+            tokens: [
+                {
+                    "tokenId": "46c0bdd1-56a9-4179-8a56-164b702a5cb8",
+                    "source": "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
+                    "txId": "tx154545454",
+                    "balance": 2500,
+                    "depositBlock": 123,
+                    "lockLength": 5
+                },
+                {
+                    "tokenId": "VRT",
+                    "source": "joe7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
+                    "txId" : "tx2fasdfoijeo8547",
+                    "balance": 1000,
+                    "depositBlock": 123,
+                    "lockLength": 10
+                },
+                {
+                    "tokenId": "XYZ",
+                    "source": "joe7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
+                    "txId" : "tx3fasdfoijeo8547",
+                    "balance": 3400,
+                    "depositBlock": 123,
+                    "lockLength": 5
+                }
+            ]
         }
       ]
     }
@@ -101,12 +118,23 @@ export default {
     },
     viewVehicle(vehicleId) {
       this.$router.push({ name: 'vehicle', params: { vehicle: 'joe' } });
+    },
+    loadAllVehicles(contractId) {
+        console.log("Contract: " + contractId);
     }
   },
-  created() {
+  async created() {
+    this.isLoading = true;
+    
+    // Use GraphQL to find all vehicle contracts, then load all vehicles
+    const txs = await run(this.query);
+    txs.data.transactions.edges.forEach(edge => this.loadAllVehicles(edge.node.id));
     for (let index = 1; index < 12; index++) {
-      this.vehicles.push(this.vehicles[0]);
+        /*** FOR NOW JUST LOAD A FAKE SCREEN OF VEHICLES */
+        this.vehicles.push(this.vehicles[0]);
     }
+
+    this.isLoading = false;
   }
 }
 </script>
