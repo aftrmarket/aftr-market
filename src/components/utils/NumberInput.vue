@@ -1,27 +1,20 @@
 <template>
     <div>
-        <input type="text" v-model="displayValue" @blur="isInputActive = false" @focus="isInputActive = true"/> 
+        <input type="text" v-model="displayValue" @blur="isInputActive = false" @focus="isInputActive"/> 
     </div>
 </template>
 
 <script>
+
 export default {
-    props: {
-        value: {
-            type: Number,
-            required: true
-        },
-        decimalPlaces: {
-            type: Number,
-            default: 0
-        }
-    },
+    props: ['raw'],
     data() {
         return {
-            isInputActive: false
+            value: this.raw,
+            isInputActive: false,
         };
     },
-    computed : {
+    computed: {
         displayValue: {
             get: function() {
                 if (this.isInputActive) {
@@ -29,7 +22,7 @@ export default {
                     return this.value.toString()
                 } else {
                     // User is not modifying now. Format display value for user interface
-                    return this.value.toFixed(2).replace(/(\d)(?=(\d{3})+(?:\.\d+)?$)/g, "$1,")
+                    return this.value.toFixed(0).replace(/(\d)(?=(\d{3})+(?:\.\d+)?$)/g, "$1,");
                 }
             },
             set: function(modifiedValue) {
@@ -43,7 +36,7 @@ export default {
                 // $emit the event so that parent component gets it
                 this.$emit('input', newValue)
             }
-        }        
-    }
+        }
+    },
 };
 </script>
