@@ -8,7 +8,7 @@
             </div>
             <p class="mt-1 text-gray-500 text-sm truncate">
                 Treasury: 
-                <span class="text-base text-aftrDarkGrey font-bold">1,411,154</span> 
+                <span class="text-base text-aftrDarkGrey font-bold">{{ formatNumber(vehicle.treasury) }}</span> 
             </p>
             <p class="mt-1 text-gray-500 text-sm truncate">
                 Votes Opened: 
@@ -22,8 +22,8 @@
     <div>
         <p class="pl-2 t-1 text-gray-500 text-sm truncate">Performance</p>
         <div class="pb-3 grid grid-cols-2 items-center text-base">
-            <div class="pl-3 justify-self-start">Tips(AR): <span class="font-medium text-green-500">10,000</span></div>
-            <div class="pr-3 justify-self-end">Tips(Misc): <span class="font-medium text-green-500">142,545</span></div>
+            <div class="pl-3 justify-self-start">Tips(AR): <span class="font-medium text-green-500">{{ formatNumber(vehicle.tipsAr) }}</span></div>
+            <div class="pr-3 justify-self-end">Tips(Misc): <span class="font-medium text-green-500">{{ formatNumber(vehicle.tipsMisc) }}</span></div>
         </div>
     </div>
     <div>
@@ -53,6 +53,8 @@
 </template>
 
 <script>
+import numeral from "numeral";
+
 export default {
     props: ["vehicle"],
     data() {
@@ -73,6 +75,15 @@ export default {
                 return 'not running';
             } else {
                 return this.vehicle.status;
+            }
+        },
+    },
+    methods: {
+        formatNumber(num, dec = false) {
+            if (dec) {
+                return numeral(num).format("0,0.0000");
+            } else {
+                return numeral(num).format("0,0");
             }
         },
     }

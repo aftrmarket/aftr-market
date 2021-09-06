@@ -39,6 +39,7 @@
 </template>
 
 <script>
+import { readContract } from 'smartweave';
 import VehicleCard from './vehicle/VehicleCard.vue';
 import VehicleCardPlaceholder from './vehicle/VehicleCardPlaceholder.vue';
 import { run, all } from 'ar-gql';
@@ -63,53 +64,54 @@ export default {
                     }
                 }
         }`,
-        vehicles: [
-            {
-            id: '6adfd3a1-cb33-4970-8e88-c2d0defa66ec',
-            name: 'Investment Bus',
-            ticker: 'IBUS',
-            status: 'stopped',
-            desc: '',
-            logo: '',
-            creator: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I',
-            ownership: 'single',
-            leasedSeats: 143,
-            perf1m: -2.43,
-            perf3m: 20.40,
-            perfMax: 140.29,
-            tips: 'A+',
-            balances: {
-                    "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8": 12300,
-                    "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I": 1000
-            },
-            tokens: [
-                {
-                    "tokenId": "46c0bdd1-56a9-4179-8a56-164b702a5cb8",
-                    "source": "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
-                    "txId": "tx154545454",
-                    "balance": 2500,
-                    "depositBlock": 123,
-                    "lockLength": 5
-                },
-                {
-                    "tokenId": "VRT",
-                    "source": "joe7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
-                    "txId" : "tx2fasdfoijeo8547",
-                    "balance": 1000,
-                    "depositBlock": 123,
-                    "lockLength": 10
-                },
-                {
-                    "tokenId": "XYZ",
-                    "source": "joe7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
-                    "txId" : "tx3fasdfoijeo8547",
-                    "balance": 3400,
-                    "depositBlock": 123,
-                    "lockLength": 5
-                }
-            ]
-        }
-      ]
+        vehicles: [],
+    //     vehicles: [
+    //     {
+    //         id: '6adfd3a1-cb33-4970-8e88-c2d0defa66ec',
+    //         name: 'Investment Bus',
+    //         ticker: 'IBUS',
+    //         status: 'stopped',
+    //         desc: '',
+    //         logo: '',
+    //         creator: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I',
+    //         ownership: 'single',
+    //         leasedSeats: 143,
+    //         perf1m: -2.43,
+    //         perf3m: 20.40,
+    //         perfMax: 140.29,
+    //         tips: 'A+',
+    //         balances: {
+    //                 "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8": 12300,
+    //                 "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I": 1000
+    //         },
+    //         tokens: [
+    //             {
+    //                 "tokenId": "46c0bdd1-56a9-4179-8a56-164b702a5cb8",
+    //                 "source": "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
+    //                 "txId": "tx154545454",
+    //                 "balance": 2500,
+    //                 "depositBlock": 123,
+    //                 "lockLength": 5
+    //             },
+    //             {
+    //                 "tokenId": "VRT",
+    //                 "source": "joe7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
+    //                 "txId" : "tx2fasdfoijeo8547",
+    //                 "balance": 1000,
+    //                 "depositBlock": 123,
+    //                 "lockLength": 10
+    //             },
+    //             {
+    //                 "tokenId": "XYZ",
+    //                 "source": "joe7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
+    //                 "txId" : "tx3fasdfoijeo8547",
+    //                 "balance": 3400,
+    //                 "depositBlock": 123,
+    //                 "lockLength": 5
+    //             }
+    //         ]
+    //     }
+    //   ]
     }
   },
   methods: {
@@ -119,8 +121,56 @@ export default {
     viewVehicle(vehicleId) {
       this.$router.push({ name: 'vehicle', params: { vehicle: 'joe' } });
     },
-    loadAllVehicles(contractId) {
+    async loadAllVehicles(contractId) {
         console.log("Contract: " + contractId);
+        let arweave = {};
+        try {
+            arweave = await Arweave.init({
+                host: "arweave.net",
+                port: 443,
+                protocol: "https",
+                timeout: 20000,
+                logging: true,
+            });
+        } catch (error) {
+            console.log("ERROR connecting to Arweave: " + error);
+            return false;
+        }
+
+        try {
+            let vehicle = await readContract(arweave, contractId);
+            vehicle.id = contractId;
+            if (!vehicle.tokens || typeof vehicle.tokens !== 'undefined') {
+                vehicle.tokens = [];
+            }
+            // Treasury
+            let treasuryTotal = 0;
+            vehicle.tokens.forEach(token => {
+                const response = fetch("http://v2.cache.verto.exchange/token/" + token.tokenId + "/price");
+                const pricePerToken = response.price;
+                const tokenValue = pricePerToken * token.balance;
+                treasuryTotal += tokenValue;
+            });
+            vehicle.treasury = treasuryTotal;
+
+            // Tips (AR)
+            /*** HOW CAN THIS BE DETERMINED? */
+            vehicle.tipsAr = 10000;
+
+            // Tips (Misc)
+            /*** HOW CAN THIS BE DETERMINED? */
+            vehicle.tipsMisc = 142545
+
+            // Votes Opened
+            vehicle.votes = 0;
+
+
+            this.vehicles.push(vehicle);
+            this.isLoading = false;
+        } catch (error) {
+            console.log("ERROR calling SmartWeave: " + error);
+            return false;
+        }
     }
   },
   async created() {
@@ -129,12 +179,11 @@ export default {
     // Use GraphQL to find all vehicle contracts, then load all vehicles
     const txs = await run(this.query);
     txs.data.transactions.edges.forEach(edge => this.loadAllVehicles(edge.node.id));
-    for (let index = 1; index < 12; index++) {
-        /*** FOR NOW JUST LOAD A FAKE SCREEN OF VEHICLES */
-        this.vehicles.push(this.vehicles[0]);
-    }
 
-    this.isLoading = false;
+    // for (let index = 1; index < 12; index++) {
+    //     /*** FOR NOW JUST LOAD A FAKE SCREEN OF VEHICLES */
+    //     this.vehicles.push(this.vehicles[0]);
+    // }
   }
 }
 </script>

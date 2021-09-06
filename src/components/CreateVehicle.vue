@@ -128,7 +128,7 @@
                     <h3 class="mt-4 border-t border-gray-200 pt-4 text-xl font-light leading-6">Settings</h3>
                     <div class="bg-white sm:p-6">
                         <div class="pt-2 grid grid-cols-3 gap-4">
-                            <label class="block text-sm font-medium text-gray-700">Vehicle Tokens</label>
+                            <label class="block text-sm font-medium text-gray-700">Vehicle Tokens to Mint</label>
                             <label class="block text-sm font-medium text-gray-700">Vehicle Ownership</label>
                         </div>
                         <div class="pt-2 grid grid-cols-3 gap-4 flex items-center">
@@ -354,7 +354,6 @@
 
 <script>
 import Arweave from "arweave";
-//import NumberInput from '/utils/NumberInput.vue';
 import numeral from "numeral";
 import numberAbbreviate from "number-abbreviate";
 import { createContractFromTx, interactWrite } from "smartweave";
