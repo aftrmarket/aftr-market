@@ -10,7 +10,7 @@
                 </p>
             </div>
             <div class="pr-6">
-                <p class="text-gray-900">Current Value: <span class="px-2 py-3 sm:px-6 inline-flex leading-5 font-semibold rounded-full bg-green-100 text-green-800">29,308,420.3323 AR</span></p>
+                <p class="text-gray-900">Current Value: <span class="px-2 py-3 sm:px-6 inline-flex leading-5 font-semibold rounded-full bg-green-100 text-green-800">{{ formatNumber(vehicle.treasury, true) }} AR</span></p>
             </div>
         </div>
         <div class="flex items-start justify-between">
@@ -49,6 +49,7 @@
 import { ref } from 'vue'
 import { Switch, SwitchGroup, SwitchLabel } from '@headlessui/vue'
 import { mapGetters } from 'vuex';
+import numeral from "numeral";
 import VehicleStatusText from './VehicleStatusText.vue';
 
 
@@ -63,11 +64,7 @@ export default {
     watch: {
         arConnected(value) {
             // Allow edits if user is creator and vehicle is not running, otherwise changes must be via vote
-            if (value && this.getActiveAddress === this.creatorAddress && this.vehicle.status !== 'started') {
-                this.allowVehicleEdits = true;
-            } else {
-                this.allowVehicleEdits = false;
-            }
+            this.checkEditStatus();
         },
         statusSwitchEnabled() {
             // If vehicle is turned on, a vote must take place to turn it off (unless it's a single-owned vehicle)
@@ -89,7 +86,7 @@ export default {
             }
         },
         vehicleStatusText() {
-            if (typeof this.vehicle.status === 'undefined' || this.vehicle.status === '') {
+            if (typeof  this.vehicle.status === 'undefined' || this.vehicle.status === 'stopped' ||this.vehicle.status === '') {
                 return 'not running';
             } else {
                 return this.vehicle.status;
@@ -105,6 +102,13 @@ export default {
         ...mapGetters(['arConnected', 'getActiveAddress']),
     },
     methods: {
+        formatNumber(num, dec = false) {
+            if (dec) {
+                return numeral(num).format("0,0.0000");
+            } else {
+                return numeral(num).format("0,0");
+            }
+        },
         statusChange() {
             if (this.statusSwitchEnabled) {
                 this.vehicle.status = 'started';
@@ -121,13 +125,19 @@ export default {
                 return '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg>';
             }
         },
+        checkEditStatus() {
+            if (this.getActiveAddress === this.creatorAddress && (this.vehicle.status !== 'started' || this.vehicle.ownership === 'single')) {
+                this.allowVehicleEdits = true;
+            } else {
+                this.allowVehicleEdits = false;
+            }
+        },
     },
     created() {
-        if (this.getActiveAddress === this.creatorAddress && (this.vehicle.status !== 'started' || this.vehicle.ownership === 'single')) {
-            this.allowVehicleEdits = true;
-        } else {
-            this.allowVehicleEdits = false;
-        }
+        this.checkEditStatus();
+    },
+    updated() {
+        this.checkEditStatus();
     },
     setup() {
         const statusSwitchEnabled = ref(false)

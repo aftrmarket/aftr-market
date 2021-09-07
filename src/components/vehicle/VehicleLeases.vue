@@ -1,5 +1,9 @@
 <template>
-    <div class="pt-4 w-full">
+    <div v-if="true" class="pt-4 px-4 py-5 sm:px-6">
+        <h3 class="text-xl font-light leading-6">Coming Soon...</h3>
+    </div>
+
+    <div v-else class="pt-4 w-full">
         <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
             <!-- PST Table -->
             <table class="min-w-full divide-y divide-gray-200">
@@ -54,20 +58,20 @@
 import numeral from "numeral";
 
 export default {
-    props: ["leases"],
+    //props: ["leases"],
     data() {
         return {
 
         };
     },
-    methods: {
-        formatNumber(num, dec = false) {
-            if (dec) {
-                return numeral(num).format("0,0.0000");
-            } else {
-                return numeral(num).format("0,0");
-            }
-        },
-    },
+    // methods: {
+    //     formatNumber(num, dec = false) {
+    //         if (dec) {
+    //             return numeral(num).format("0,0.0000");
+    //         } else {
+    //             return numeral(num).format("0,0");
+    //         }
+    //     },
+    // },
 };
 </script>

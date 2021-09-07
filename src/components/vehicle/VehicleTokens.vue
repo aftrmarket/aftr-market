@@ -2,21 +2,22 @@
     <div class="pt-4 w-full">
         <vehicle-tokens-add v-if="showAddTokens" :vehicle="vehicle" @close="closeModal"></vehicle-tokens-add>
         <!-- PSTs in Vehicle -->
-        <div v-if="vehicle.psts.length > 0" class="pt-1">
+        <div v-if="vehicle.tokens.length > 0" class="pt-1">
             <div class="pt-2 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                 <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
                     <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profit Sharing Token ({{ vehicle.psts.length }})</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profit Sharing Token ({{ vehicle.tokens.length }})</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contributor</th>
                                     <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Tokens</th>
                                     <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Value (AR)</th>
                                     <th v-if="allowTransfer" scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Transfer</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-for="pst in vehicle.psts" :key="pst.id" class="hover:bg-gray-50">
+                                <tr v-for="pst in vehicle.tokens" :key="pst.id" class="hover:bg-gray-50">
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center">
                                             <div class="flex-shrink-0 h-10 w-10">
@@ -24,11 +25,12 @@
                                             </div>
                                             <div class="ml-4">
                                                 <div class="text-sm font-medium text-gray-900"> {{ pst.name + " (" + pst.ticker + ")" }} </div>
-                                                <div class="text-sm text-gray-500"> {{ pst.id }}</div>
+                                                <div class="text-sm text-gray-500"> {{ idSubstr(pst.id) }}</div>
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="text-right px-6 py-3 text-gray-500">{{ formatNumber(pst.tokens) }}</td>
+                                    <td class="text-sm px-6 py-3 text-gray-500">{{ idSubstr(pst.source) }}</td>
+                                    <td class="text-right px-6 py-3 text-gray-500">{{ formatNumber(pst.balance) }}</td>
                                     <td class="text-right px-6 py-3 text-gray-500">{{ formatNumber(pst.total, true) }}</td>
                                     <td class="text-center px-6 py-3">
                                         <button v-if="allowTransfer" @click.prevent="transferPst(pst.id)" type="submit" class="inline-flex items-center p-1 border border-transparent shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed">
@@ -127,6 +129,13 @@ export default {
         },
         closeModal() {
             this.showAddTokens = false;
+        },
+        idSubstr(addr, chars = 10) {
+            if (typeof addr === 'string') {
+                return addr.substr(0, chars) + '...';
+            } else {
+                return '';
+            }
         },
     },
     created() {

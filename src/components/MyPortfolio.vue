@@ -45,6 +45,7 @@ import VehicleCardPlaceholder from './vehicle/VehicleCardPlaceholder.vue';
 import { run, all } from 'ar-gql';
 
 export default {
+    props: [ "walletAddress" ],
   components: { VehicleCard, VehicleCardPlaceholder },
   data() {
     return {
@@ -147,13 +148,6 @@ export default {
             vehicle.settings.forEach(setting => {
                 if (setting[0] === 'communityLogo') {
                     vehicle.logo = setting[1];
-
-                    /*** For DEMO Purposes ONLY */
-                    /*** Fixing Chillin's logo */
-                    if (vehicle.id === "PFGb4J3IyeYFcNwtuHs94SDruqQOJ_6R3FywE0-PJkY") {
-                        vehicle.logo = "aM7YfRnd97mTGLn_3vjLfWp2TgtBKRyDsBnlDhA1e-s";
-                    }
-                    /*** */
                 }
             });
 
@@ -187,6 +181,7 @@ export default {
 
 
             this.vehicles.push(vehicle);
+            this.isLoading = false;
         } catch (error) {
             console.log("ERROR calling SmartWeave: " + error);
             return false;
@@ -198,13 +193,10 @@ export default {
     
     // Use GraphQL to find all vehicle contracts, then load all vehicles
     const txs = await run(this.query);
-    const totalVehicles = txs.data.transactions.edges.length;
 
     for(let edge of txs.data.transactions.edges) {
         await this.loadAllVehicles(edge.node.id);
     }
-
-    this.isLoading = false;
 
     // for (let index = 1; index < 12; index++) {
     //     /*** FOR NOW JUST LOAD A FAKE SCREEN OF VEHICLES */

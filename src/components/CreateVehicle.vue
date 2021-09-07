@@ -338,16 +338,6 @@
                 </form>
             </form-container>
             <!-- End Vehicle Info -->
-            <p>Store Contents:  {{ JSON.stringify($store.getters.getActiveWallet) }}</p>
-            <p>Connect? {{ arConnected }}</p>
-            {{ vehicle }} {{ vehiclePsts }} {{ daoMembers }} Member Amount: {{memberAmount}}, Available Tokens: {{availableTokens}}, DAO Balance: {{daoBalance}} <br/><br/>
-            nameValid {{nameValid}} <br/>
-            tickerValid {{tickerValid}} <br/>
-            vehicleTokensValid {{vehicleTokensValid}} <br/>
-            memberWalletValid {{memberWalletValid}} <br/>
-            memberAmountValid {{memberAmountValid}} <br/>
-            memberRowValid {{memberRowValid}} <br/>
-
         </div>
     </main>
 </template>
@@ -371,7 +361,7 @@ export default {
         return {
             /** Smartweave variables */
             contractSourceId: "BTxbGwMEyVv94ak2CDeuCAXLWnAhwLb_hK4qw8_a-JU", // Changes with every AFTR contract update
-            tagProtocol: "AFTR-Test",
+            tagProtocol: "AFTR-Demo-a101",
             /** */
 
             leasingEnabled: false,                          // Is vehicle leasing enabled?
@@ -762,35 +752,82 @@ export default {
                     tokens: item.tokens,
                 };
             });
-            this.vehicle.psts = tmpPsts;
+            this.vehicle.tokens = tmpPsts;
             console.log("VEHICLE: " + JSON.stringify(this.vehicle));
 
 /****/
             const vehicleTest = {
-                "name": "Test Vehicle",
-                "ticker": "AFTR-Test-1",
-                //"creator": "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
-                //"seats": 0,
-                //"lockPeriod": 0,
-                //"minLease": 2,
-                //"maxLease": 24,
-                //"logo": "9CYPS85KChE_zQxNLi2y5r2FLG-YE6HiphYYTlgtrtg",
-                //"ownership": "dao",
-                //"status": "stopped",
-                "balances": {
-                    "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8": 12300,
-                    "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I": 1000
-                },
-                //"vault" : {},
-                //"votes" : [],
-                //"roles" : {},
-                "settings" : [
-                    ["quorum", 0.5],
-                    ["voteLength", 2000],
-                    ["lockMinLength", 100],
-                    ["lockMaxLength", 10000]
-                ]
-            }
+    "name": "Chillin Treasury",
+    "ticker": "AFTR-CHILL",
+    "balances": {
+        "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8": 10000,
+        "KM66oKFLF60UrrOgSx5mb90gUd2v4i0T9RIcK9mfUiA": 2000,
+        "tv7gJr5TAys7oTpbfHI8dGO7t04jmacTNo20EfB0GJo": 1050,
+        "zVNaaPGR8yL5Dp5x4Jb-XPH4hlvB7ZoAvVFquw7J58w": 100,
+        "ffOomWmOgtmJ816U_l5hsMpmEFsx5DUDxUEAcoLOy7Q": 200,
+        "j12D8FZU-EBbIdCSkx6vO2shHlqbv5-5Ufl4jOuzGQw": 588,
+        "h-Bgr13OWUOkRGWrnMT0LuUKfJhRss5pfTdxHmNcXyw": 9970
+    },
+    "tokens": [
+        {
+            "id": "6eTVr8IKPNYbMHVcpHFXr-XNaL5hT6zRJXimcP-owmo",
+            "ticker": "OPENBITS",
+            "source": "UN8VLHqRGenuL3SCtbhHlJ_2ImgFVPIObyL921Wf6mo",
+            "txId" : "tx2fasdfoijeo8547",
+            "balance": 30000,
+            "depositBlock": 646429,
+            "lockLength": 10,
+            "logo": "4lU64igaeoMKC9RgLELKr7bXxnS9V3YZzqxN1UDMAYU"
+        },
+        {
+            "id": "usjm4PCxUd5mtaon7zc97-dt-3qf67yPyqgzLnLqk5A",
+            "ticker": "VRT",
+            "source": "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I",
+            "txId" : "tx3fasdfoijeo8547",
+            "balance": 15000,
+            "depositBlock": 646429,
+            "lockLength": 100,
+            "logo": "9CYPS85KChE_zQxNLi2y5r2FLG-YE6HiphYYTlgtrtg"
+        },
+        {
+            "id": "-8A6RexFkpfWwuyVO98wzSFZh0d6VJuI-buTJvlwOJQ",
+            "ticker": "ARDRIVE",
+            "source": "CH_52MZm60ewLdc-HGGM1DEk7hljT37Gf45JT5CoHUQ",
+            "txId" : "tx6fasdfoijeo8547",
+            "balance": 20000,
+            "depositBlock": 646429,
+            "lockLength": 10,
+            "logo": "tN4vheZxrAIjqCfbs3MDdWTXg8a_57JUNyoqA4uwr1k"
+        }
+    ],
+    "status": "started",
+    "tipsAr": 235,
+    "tipsMisc": 2549,
+    "creator" : "j12D8FZU-EBbIdCSkx6vO2shHlqbv5-5Ufl4jOuzGQw",
+    "ownership" : "single",
+    "settings": [
+        [
+            "quorum",
+            0.5
+        ],
+        [
+            "voteLength",
+            2000
+        ],
+        [
+            "lockMinLength",
+            100
+        ],
+        [
+            "lockMaxLength",
+            10000
+        ],
+        [
+            "communityLogo",
+            "KM66oKFLF60UrrOgSx5mb90gUd2v4i0T9RIcK9mfUiA"
+        ]
+    ]
+};
  /***/
 
             // Create SmartWeave contract
@@ -798,6 +835,7 @@ export default {
                 console.log("arweave: " + JSON.stringify(arweave)); console.log("contractSourceId: " + this.contractSourceId);
                 console.log("vehicle: " + JSON.stringify(this.vehicle)); console.log("tags: " + JSON.stringify(initTags));
                 this.vehicle['id'] = await createContractFromTx(arweave, "use_wallet", this.contractSourceId, JSON.stringify(vehicleTest), initTags);
+                //this.vehicle['id'] = await createContractFromTx(arweave, jwk, this.contractSourceId, JSON.stringify(vehicleTest), initTags);
                 console.log("ID = " + this.vehicle['id']);
             } catch(error) {
                 console.log("ERROR creating SmartWeave contract: " + error);
@@ -809,7 +847,7 @@ export default {
 
             try {
                 // Loop through vehicle PSTs and perform transfers
-                for (const pst of this.vehicle.psts) {
+                for (const pst of this.vehicle.tokens) {
                     transferInput = {
                         function: "transfer",
                         target: this.vehicle.id,
