@@ -49,6 +49,7 @@
                                 <vehicle-info v-if="activeTab === 'Info'" :vehicle="vehicle" :contractId="contractId"></vehicle-info>
                                 <vehicle-members v-else-if="activeTab === 'Members'" :vehicle="vehicle"></vehicle-members>
                                 <vehicle-tokens v-else-if="activeTab === 'Tokens'" :vehicle="vehicle"></vehicle-tokens>
+                                <vehicle-profits v-else-if="activeTab === 'Profits'"></vehicle-profits>
                                 <!--<vehicle-leases v-else-if="activeTab === 'Leases'" :leases="vehicles.leases"></vehicle-leases>-->
                                 <vehicle-leases v-else-if="activeTab === 'Leases'"></vehicle-leases>
                                 <vehicle-votes v-else-if="activeTab === 'Votes'"></vehicle-votes>
@@ -70,12 +71,13 @@ import { readContract } from 'smartweave';
 import VehicleInfo from './vehicle/VehicleInfo.vue';
 import VehicleMembers from './vehicle/VehicleMembers.vue';
 import VehicleTokens from './vehicle/VehicleTokens.vue';
+import VehicleProfits from './vehicle/VehicleProfits.vue';
 import VehicleLeases from './vehicle/VehicleLeases.vue';
 import VehicleVotes from './vehicle/VehicleVotes.vue';
 import VehicleActivity from './vehicle/VehicleActivity.vue';
 
 export default {
-    components: { VehicleInfo, VehicleMembers, VehicleTokens, VehicleLeases, VehicleVotes, VehicleActivity },
+    components: { VehicleInfo, VehicleMembers, VehicleTokens, VehicleProfits, VehicleLeases, VehicleVotes, VehicleActivity },
     props: ['vehicleId'],
     data() {
         return {
@@ -83,6 +85,7 @@ export default {
                 { name: 'Info', href: '#', current: true },
                 { name: 'Members', href: '#', current: false },
                 { name: 'Tokens', href: '#', current: false },
+                { name: 'Profits', href: '#', current: false },
                 { name: 'Leases', href: '#', current: false },
                 { name: 'Votes', href: '#', current: false },
                 { name: 'Activity', href: '#', current: false },
