@@ -21,7 +21,7 @@
                 </div>
                 <div v-else class="px-4 sm:px-6">
                     <SwitchGroup as="div" class="flex items-center">
-                        <Switch v-model="statusSwitchEnabled" @click="statusChange" :class="[statusSwitchEnabled ? 'bg-green-600' : 'bg-gray-200', 'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500']">
+                        <Switch v-model="statusSwitchEnabled" @click="statusChange" :class="[statusSwitchEnabled ? 'bg-green-600' : 'bg-gray-200', 'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2']">
                             <span aria-hidden="true" :class="[statusSwitchEnabled ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200']" />
                         </Switch>
                         <SwitchLabel as="span" class="ml-3">
@@ -59,6 +59,7 @@ export default {
     data() {
         return {
             allowVehicleEdits: false,
+            statusSwitchEnabled: false
         };
     },
     watch: {
@@ -128,6 +129,11 @@ export default {
         checkEditStatus() {
             if (this.getActiveAddress === this.creatorAddress && (this.vehicle.status !== 'started' || this.vehicle.ownership === 'single')) {
                 this.allowVehicleEdits = true;
+                if (this.vehicle.status === 'started') {
+                    this.statusSwitchEnabled = true;
+                } else {
+                    this.statusSwitchEnabled = false;
+                }
             } else {
                 this.allowVehicleEdits = false;
             }
@@ -140,9 +146,9 @@ export default {
         this.checkEditStatus();
     },
     setup() {
-        const statusSwitchEnabled = ref(false)
+        //const statusSwitchEnabled = ref(false)
 
-        return { statusSwitchEnabled, }
+        //return { statusSwitchEnabled, }
     },
 };
 </script>
