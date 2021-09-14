@@ -52,7 +52,7 @@
                                 <vehicle-profits v-else-if="activeTab === 'Profits'"></vehicle-profits>
                                 <!--<vehicle-leases v-else-if="activeTab === 'Leases'" :leases="vehicles.leases"></vehicle-leases>-->
                                 <vehicle-leases v-else-if="activeTab === 'Leases'"></vehicle-leases>
-                                <vehicle-votes v-else-if="activeTab === 'Votes'"></vehicle-votes>
+                                <vehicle-votes v-else-if="activeTab === 'Votes'" :vehicle="vehicle"></vehicle-votes>
                                 <vehicle-activity v-else-if="activeTab === 'Activity'"></vehicle-activity>
 
                             </div>
