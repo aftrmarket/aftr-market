@@ -34,7 +34,8 @@
                             <option v-for="key in stateKeys" :key=key.id :value=key.desc>
                                 {{ key.desc }}
                             </option>
-                        </select>                        
+                        </select>
+                        <input v-if="stateKey" type="text" v-model="stateValue" placeholder="Value" class="mt-1 w-3/4 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md" />
                     </div>
                   <div class="mt-2">
                     <p class="text-sm text-gray-500">
@@ -79,6 +80,8 @@ export default {
     data() {
         return {
             voteType: '',
+            stateKey: '',
+            stateValue: '',
             stateKeys: [
                 { id: "status", desc: "Status" },
                 { id: "name", desc: "Name" },
