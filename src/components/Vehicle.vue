@@ -1,5 +1,8 @@
 <template>
-    <div>
+    <div v-if="pageStatus === 'in-progress'">
+        <vehicle-placeholder></vehicle-placeholder>
+    </div>
+    <div v-else>
         <main class="-mt-32">
             <div class="max-w-7xl mx-auto pb-12 px-4 sm:px-6 lg:px-8">
                 <!-- Page header -->
@@ -75,9 +78,10 @@ import VehicleProfits from './vehicle/VehicleProfits.vue';
 import VehicleLeases from './vehicle/VehicleLeases.vue';
 import VehicleVotes from './vehicle/VehicleVotes.vue';
 import VehicleActivity from './vehicle/VehicleActivity.vue';
+import VehiclePlaceholder from './vehicle/VehiclePlaceholder.vue';
 
 export default {
-    components: { VehicleInfo, VehicleMembers, VehicleTokens, VehicleProfits, VehicleLeases, VehicleVotes, VehicleActivity },
+    components: { VehicleInfo, VehicleMembers, VehicleTokens, VehicleProfits, VehicleLeases, VehicleVotes, VehicleActivity, VehiclePlaceholder },
     props: ['vehicleId'],
     data() {
         return {
