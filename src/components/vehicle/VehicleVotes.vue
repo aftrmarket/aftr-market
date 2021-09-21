@@ -3,23 +3,23 @@
         <vehicle-votes-add v-if="showAddVotes" :vehicle="vehicle" @close="closeModal"></vehicle-votes-add>
     </div>
     <div class="flex flex-col">
-        <div class="grid grid-cols-2">
-            <div class="pb-2 text-sm text-gray-700">Current Block: {{ currentBlock }}</div>
+        <div class="flex justify-between">
+            <div class="mt-2 pb-3 text-sm text-gray-700">Current Block: {{ currentBlock }}</div>
             
-            <div class="grid justify-items-end pb-2">
-                <button v-if="allowAdd" @click.prevent="openModal" type="button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+            <div>
+                <button v-if="allowAdd" @click.prevent="openModal" type="button" class="inline-flex items-center px-4 py-2 mb-3 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
                     </svg>
                     <span class="pl-2">PROPOSE</span>
                 </button>
-                <div v-else-if="!arConnected" class="flex justify-start items-center">
-                    <label class="pl-4 block text-sm text-gray-700">
+                <div v-else-if="!arConnected">
+                    <label class="pl-4 mt-2 mb-3 block text-sm text-gray-700">
                         You must connect a wallet in order to propose a vote
                     </label>
                 </div>
-                <div v-else class="pt-6 flex justify-start items-center">
-                    <label class="pl-4 block text-sm text-gray-700">
+                <div v-else>
+                    <label class="pl-4 mt-2 mb-3 block text-sm text-gray-700">
                         Only Members are allowed to create a vote
                     </label>
                 </div>
