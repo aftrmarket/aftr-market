@@ -1,13 +1,14 @@
 <template>
     <div class="pt-4 w-full">
-        <vehicle-votes-add v-if="showAddVotes" :vehicle="vehicle" @close="closeModal"></vehicle-votes-add>
+        <vehicle-votes-add v-if="showAddVotes" :vehicle="vehicle" @close="closeModal('add')"></vehicle-votes-add>
+        <vehicle-votes-cast v-if="showCastVotes" :vehicle="vehicle" :voteId="voteId" @close="closeModal('cast')"></vehicle-votes-cast>
     </div>
     <div class="flex flex-col">
         <div class="flex justify-between">
             <div class="mt-2 pb-3 text-sm text-gray-700">Current Block: {{ currentBlock }}</div>
             
             <div>
-                <button v-if="allowAdd" @click.prevent="openModal" type="button" class="inline-flex items-center px-4 py-2 mb-3 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+                <button v-if="allowAdd" @click.prevent="openModal('add')" type="button" class="inline-flex items-center px-4 py-2 mb-3 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
                     </svg>
@@ -61,25 +62,31 @@
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <a v-if="arConnected && vote.status === 'in-progress'" href="#" class="text-aftrBlue hover:text-indigo-900">Vote</a>
+                    <button v-if="arConnected && vote.status === 'in-progress'" @click.prevent="openModal('cast', vote.id)" type="button" class="">
+                        Vote
+                    </button>
                 </td>
               </tr>
             </tbody>
-          </table>
+        </table>
     </div>
 </template>
 
 <script>
 
 import VehicleVotesAdd from './votes/VehicleVotesAdd.vue';
+import VehicleVotesCast from './votes/VehicleVotesCast.vue';
 import { mapGetters } from 'vuex';
 
 export default {
     props: ['vehicle'],
-    components: { VehicleVotesAdd },
+    components: { VehicleVotesAdd, VehicleVotesCast },
     data() {
         return {
             showAddVotes: false,
+            showCastVotes: false,
             allowAdd: false,
+            voteId: 0,
             currentBlock: 110,  // TEMP, GET CURRENT BLOCK
             votes: [
                 {
@@ -129,12 +136,21 @@ export default {
                 return "Ends @ " + (vote.voteEnd).toString();
             }
         },
-        openModal() {
-            this.showAddVotes = true;
+        openModal(modalType = 'add', id = 0) {
+            if (modalType === 'add') {
+                this.showAddVotes = true;
+            } else {
+                this.voteId = id;
+                this.showCastVotes = true;
+            }
         },
-        closeModal() {
-            this.showAddVotes = false;
-        }
+        closeModal(modalType = 'add') {
+            if (modalType === 'add') {
+                this.showAddVotes = false;
+            } else {
+                this.showCastVotes = false;
+            }
+        },
     },
     created() {
         this.setFlags();
