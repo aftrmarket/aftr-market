@@ -12,6 +12,14 @@ export interface StateInterface {
     maxLength?: number,                              // Maximum amount of blocks required to lease a seat (maximum can't exceed lockPeriod)
     ownership: 'single' | 'dao',
     status: 'stopped' | 'started' | 'expired',      // Vehicle status can be stopped (not accepting leases), started (running), or expired (lock period has expired without being renewed)
+    vault: {
+        [key: string]: [{
+            balance: number, // Positive integer
+            end: number, // At what block the lock ends.
+            start: number // At what block the lock starts.
+        }]
+    },
+    votes: VoteInterface[],
     tokens?: [
         TokenInterface,
     ],
@@ -77,3 +85,21 @@ export interface TokenInterface {
     lockLength?: number,    // Planning for temporary loaning of tokens to a vehicle
 
 }
+
+export interface VoteInterface {
+    status?: 'active' | 'quorumFailed' | 'passed' | 'failed';
+    type?: 'mint' | 'mintLocked' | 'burnVault' | 'indicative' | 'set';
+    id?: number;
+    totalWeight?: number;
+    recipient?: string;
+    target?: string;
+    qty?: number;
+    key?: string;
+    value?: any;
+    note?: string;
+    yays?: number;
+    nays?: number;
+    voted?: string[];
+    start?: number;
+    lockLength?: number;
+  }
