@@ -20,7 +20,7 @@
                     </label>
                 </div>
                 <div v-else>
-                    <label class="pl-4 mt-2 mb-3 block text-sm text-gray-700">
+                    <label class="pl-4 mt-2 mb-3 block text-sm text-gray-700 text-aftrRed">
                         Only Members are allowed to create a vote
                     </label>
                 </div>
@@ -41,8 +41,8 @@
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Result (Y / N)
                 </th>
-                <th scope="col" class="relative px-6 py-3">
-                  <span class="sr-only">Edit</span>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Action
                 </th>
               </tr>
             </thead>
@@ -60,11 +60,15 @@
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {{ vote.result }}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <a v-if="arConnected && vote.status === 'in-progress'" href="#" class="text-aftrBlue hover:text-indigo-900">Vote</a>
-                    <button v-if="arConnected && vote.status === 'in-progress'" @click.prevent="openModal('cast', vote.id)" type="button" class="">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-500">
+                    <button v-if="canVote(vote) && vote.status === 'in-progress'" @click.prevent="openModal('cast', vote.id)" type="button" class="text-aftrBlue hover:text-indigo-900">
                         Vote
                     </button>
+                    <div v-else-if="votedText(vote) === 'voted'" class="flex content-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="green">
+                                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg> Voted
+                    </div>
                 </td>
               </tr>
             </tbody>
@@ -94,7 +98,8 @@ export default {
                     proposal: "Change something",
                     voteStart: 100,
                     voteEnd: 150,
-                    result: "50 / 50"
+                    result: "50 / 50",
+                    voted: ["Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-"]
                 }
             ]
         };
@@ -134,6 +139,23 @@ export default {
             } else {
                 vote['status'] = 'in-progress';
                 return "Ends @ " + (vote.voteEnd).toString();
+            }
+        },
+        canVote(vote) {
+            // In order to vote, user must be a member of the vehicle AND must not have already voted
+            if (this.arConnected && this.getActiveAddress in this.vehicle.balances && !vote.voted.includes(this.getActiveAddress)) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+        votedText(vote) {
+            if (!this.arConnected) {
+                return 'na';
+            } else if (vote.voted.includes(this.getActiveAddress)) {
+                return 'voted'
+            } else if (this.getActiveAddress in this.vehicle.balances) {
+                return 'eligible'
             }
         },
         openModal(modalType = 'add', id = 0) {

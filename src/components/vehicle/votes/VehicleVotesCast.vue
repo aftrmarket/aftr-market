@@ -19,17 +19,25 @@
                 </div>
                 <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                     <DialogTitle as="h3" class="text-lg leading-6 font-medium text-gray-900">
-                        Cast Vote
+                        Cast Vote - {{ voteId }}
                     </DialogTitle>
-                    <div class="pt-6">
-                        VOTING INFO GOES HERE<br/>
-                        VOTE:  {{ voteId }}
-                        <input />
-                    </div>
-                    <div class="mt-2">
-                        <p class="text-sm text-gray-500">
-                            Are you sure you want to cast your vote? This action cannot be undone.
-                        </p>
+                    <div class="pt-6 text-sm font-medium">
+                        <dl>
+                            <dt class="text-gray-500">Proposal</dt>
+                            <dd class="mt-1 text-gray-900">{{ vote.proposal }}</dd>
+                        </dl>
+                        <div class="mt-4 mb-4 grid grid-cols-3 gap-x-4">
+                            <div class="text-gray-500">Starting Block</div>
+                            <div class="text-gray-500">Starting Block</div>
+                            <div class="text-gray-500">Current Block</div>
+                            <div class="text-gray-700">{{ vote.voteStart }}</div>
+                            <div class="text-gray-700">{{ vote.voteEnd }}</div>
+                            <div class="text-gray-700">{{ currentBlock }}</div>
+                        </div>
+                        <dl>
+                            <dt class="text-gray-500">Current Results</dt>
+                            <dd class="mt-1 text-gray-900">{{ vote.result }}</dd>
+                        </dl>
                     </div>
                 </div>
               </div>
@@ -38,6 +46,7 @@
               <button type="button" class="w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-green-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-0 sm:ml-3 sm:w-auto sm:text-sm" @click="recordVote(true)">
                 Yes
               </button>
+              <span class="px-4 py-2 text-sm text-aftrRed">This action cannot be undone</span>
               <button type="button" class="w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-aftrRed hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" @click="recordVote(false)">
                 No
               </button>
@@ -68,13 +77,15 @@ export default {
     },
     data() {
         return {
+            currentBlock: 110,  // TEMP, GET CURRENT BLOCK
             vote: 
                 {
                     id: 101,
                     proposal: "Change something",
                     voteStart: 100,
                     voteEnd: 150,
-                    result: "50 / 50"
+                    result: "50 / 50",
+                    voted: []
                 },
         }
     },
