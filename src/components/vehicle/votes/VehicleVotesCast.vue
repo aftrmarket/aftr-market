@@ -24,19 +24,19 @@
                     <div class="pt-6 text-sm font-medium">
                         <dl>
                             <dt class="text-gray-500">Proposal</dt>
-                            <dd class="mt-1 text-gray-900">{{ vote.proposal }}</dd>
+                            <dd class="mt-1 text-gray-900">{{ displayProposal(vote.type) }}</dd>
                         </dl>
                         <div class="mt-4 mb-4 grid grid-cols-3 gap-x-4">
                             <div class="text-gray-500">Starting Block</div>
-                            <div class="text-gray-500">Starting Block</div>
+                            <div class="text-gray-500">Ending Block</div>
                             <div class="text-gray-500">Current Block</div>
-                            <div class="text-gray-700">{{ vote.voteStart }}</div>
-                            <div class="text-gray-700">{{ vote.voteEnd }}</div>
+                            <div class="text-gray-700">{{ vote.start }}</div>
+                            <div class="text-gray-700">{{ vote.start + vote.lockLength }}</div>
                             <div class="text-gray-700">{{ currentBlock }}</div>
                         </div>
                         <dl>
-                            <dt class="text-gray-500">Current Results</dt>
-                            <dd class="mt-1 text-gray-900">{{ vote.result }}</dd>
+                            <dt class="text-gray-500">Current Results (Y - N)</dt>
+                            <dd class="mt-1 text-gray-900">{{ vote.yays }} - {{ vote.nays }}</dd>
                         </dl>
                     </div>
                 </div>
@@ -63,7 +63,8 @@ import { ref } from 'vue'
 import { Dialog, DialogOverlay, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { ExclamationIcon } from '@heroicons/vue/outline'
 import { mapGetters } from 'vuex';
-import numeral from "numeral";
+import numeral from 'numeral';
+import capitalize from '../../utils/shared.js';
 
 export default {
     props : ['vehicle', 'voteId'],
@@ -78,15 +79,19 @@ export default {
     data() {
         return {
             currentBlock: 110,  // TEMP, GET CURRENT BLOCK
-            vote: 
-                {
-                    id: 101,
-                    proposal: "Change something",
-                    voteStart: 100,
-                    voteEnd: 150,
-                    result: "50 / 50",
-                    voted: []
-                },
+            vote: {
+                id: 101,
+                status: "active",
+                type: "set",
+                note: "Change something",
+                key: "status",
+                value: "started",
+                start: 100,
+                lockLength: 50,
+                yays: 2,
+                nays: 1,
+                voted: ["Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-"]
+            }
         }
     },
     computed : {
@@ -108,6 +113,19 @@ export default {
                 return "mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md";
             } else {
                 return "mt-1 focus:ring-aftrRed focus:border-aftrRed shadow-sm sm:text-sm border-gray-300 rounded-md";
+            }
+        },
+        displayProposal(type) {
+            if (!type || type === '') {
+                return this.vote.note;
+            } else if (type=== 'set') {
+                return "Change " + capitalize(this.vote.key) + " to " + capitalize(this.vote.value);
+            } else if (type === 'mint') {
+                return "Mint " + this.vote.qty;
+            } else if (type === '?') {
+                return "?";
+            } else if (type === '???') {
+                return "???";
             }
         },
         recordVote(vote) {

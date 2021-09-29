@@ -39,7 +39,7 @@
                   Status
                 </th>
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Result (Y / N)
+                  Result (Y - N)
                 </th>
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Action
@@ -52,16 +52,16 @@
                   {{ vote.id }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ vote.proposal }}
+                  {{ displayProposal(vote) }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ calculateStatus(vote) }}
+                  {{ displayStatus(vote.status) }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ vote.result }}
+                  {{ vote.yays }} - {{ vote.nays }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-500">
-                    <button v-if="canVote(vote) && vote.status === 'in-progress'" @click.prevent="openModal('cast', vote.id)" type="button" class="text-aftrBlue hover:text-indigo-900">
+                    <button v-if="canVote(vote) && vote.status === 'active'" @click.prevent="openModal('cast', vote.id)" type="button" class="text-aftrBlue hover:text-indigo-900">
                         Vote
                     </button>
                     <div v-else-if="votedText(vote) === 'voted'" class="flex content-center">
@@ -81,6 +81,7 @@
 import VehicleVotesAdd from './votes/VehicleVotesAdd.vue';
 import VehicleVotesCast from './votes/VehicleVotesCast.vue';
 import { mapGetters } from 'vuex';
+import capitalize from '../utils/shared.js';
 
 export default {
     props: ['vehicle'],
@@ -95,10 +96,15 @@ export default {
             votes: [
                 {
                     id: 101,
-                    proposal: "Change something",
-                    voteStart: 100,
-                    voteEnd: 150,
-                    result: "50 / 50",
+                    status: "active",
+                    type: "set",
+                    note: "Change something",
+                    key: "Key Name",
+                    value: "Value",
+                    start: 100,
+                    lockLength: 50,
+                    yays: 2,
+                    nays: 1,
                     voted: ["Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-"]
                 }
             ]
@@ -127,6 +133,22 @@ export default {
         },
         arConnect() {
             this.$store.dispatch('arConnect');
+        },
+        displayStatus(status) {
+            return capitalize(status);
+        },
+        displayProposal(vote) {
+            if (!vote.type || vote.type === '') {
+                return vote.note;
+            } else if (vote.type=== 'set') {
+                return "Change " + capitalize(vote.key) + " to " + capitalize(vote.value);
+            } else if (vote.type === 'mint') {
+                return "Mint " + vote.qty;
+            } else if (vote.type === '?') {
+                return "?";
+            } else if (vote.type === '???') {
+                return "???";
+            }
         },
         calculateStatus(vote) {
             if (this.currentBlock >= vote.voteEnd) {

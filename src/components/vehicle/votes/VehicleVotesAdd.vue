@@ -22,22 +22,111 @@
                     New Vote
                   </DialogTitle>
                     <div class="pt-6">
-                        <select v-model="voteType" id="voteType" name="voteType" class="mt-1 block w-3/4 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        <select v-model="voteType" id="voteType" name="voteType" @change="changeVoteType" class="mt-1 block w-3/4 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                             <option value="" disabled selected>Vote Type</option>
-                            <option value="change">Change</option>
-                            <option value="approvals">Approvals</option>
+                            <option value="change">Change Vehicle</option>
+                            <option value="member">Member Management</option>
+                            <option value="token">Tokens Management</option>
                         </select>
                     </div>
                     <div v-if="voteType === 'change'">
-                        <select v-model="stateKey" id="stateKey" name="stateKey" class="mt-1 block w-3/4 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        <select v-model="stateKey" @change="changeKey" id="stateKey" name="stateKey" class="mt-1 block w-3/4 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                             <option value="" disabled selected>Key</option>
-                            <option v-for="key in stateKeys" :key=key.id :value=key.desc>
+                            <option v-for="key in stateKeys" :key=key.id :value=key.id>
                                 {{ key.desc }}
                             </option>
                         </select>
-                        <input v-if="stateKey" type="text" v-model="stateValue" placeholder="Value" class="mt-1 w-3/4 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md" />
+                        <div v-if="currentValue !== ''" class="pl-2 mb-2 text-xs text-aftrDarkGrey">
+                            <p>Current Value: 
+                                <span class="text-aftrBlue">{{ capitalizeText(currentValue) }}</span> 
+                            </p>
+                        </div>
+                        <div v-if="stateKey && !stateKeys.find(key => key.id === stateKey).valid">
+                            <input :type="computeStateValueType" v-model="stateValue" @keyup="recalcFields" placeholder="Value" :class="inputBox(dataValid)" />
+                            <div v-if="stateValue !== ''" class="pl-2 text-xs text-aftrDarkGrey">
+                                <p>
+                                    Change 
+                                    <span class="text-aftrBlue">{{ capitalizeText(stateKey) }}</span> 
+                                    to
+                                    <span class="text-aftrBlue">{{ stateValue }}</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div v-else-if="stateKey">
+                            <select v-model="stateValue" id="stateValue" name="stateValue" class="mt-1 block w-3/4 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                <option value="" disabled selected>Value</option>
+                                <option v-for="value in stateKeys.find(key => key.id === stateKey).valid.filter(value => value.toLowerCase() !== vehicle[stateKey.toLowerCase()].toLowerCase())" :key=value :value=value>
+                                    {{ capitalizeText(value) }}
+                                </option>
+                            </select>
+                            <div v-if="stateValue !== ''" class="pl-2 text-xs text-aftrDarkGrey">
+                                <p>
+                                    Change 
+                                    <span class="text-aftrBlue">{{ capitalizeText(stateKey) }}</span> 
+                                    to
+                                    <span class="text-aftrBlue">{{ capitalizeText(stateValue) }}</span>
+                                </p>
+                            </div>
+                        </div>
                     </div>
-                  <div class="mt-2">
+                    <div v-else-if="voteType === 'member'">
+                        <div class="col-span-2 mt-2 mb-2">
+                            <input type="radio" v-model="memberVoteType" @change="refreshMember" id="add" value="add" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">Add</label>
+                            <input type="radio" v-model="memberVoteType" @change="refreshMember" id="remove" value="remove" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">Remove</label>
+                        </div>
+                        <div v-if="memberVoteType === 'add'" class="flex flex-col">
+                            <input type="text" v-model="memberWallet" :placeholder="memberWalletText" @keyup="recalcFields" :class="inputBox(dataValid)" />
+                            <input type="number" v-model="memberQty" placeholder="# of Tokens to Mint" @keyup="recalcFields" :class="inputBox(dataValid)" />
+                        </div>
+                        <div v-else class="flex flex-col gap-y-2">
+                            <select v-model="memberWallet" @change="changeMember" id="memberWallet" name="memberWallet" class="mt-1 w-3/4 block pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                <option value="" disabled selected>Choose Member to Remove</option>
+                                <option v-for="(tokens, addr) in vehicle.balances" :key=addr :value=addr>
+                                    {{ addr }}
+                                </option>
+                            </select>
+                        </div>
+                        <div v-if="memberQty !== ''" class="pl-2 text-xs text-aftrDarkGrey">
+                            <p>
+                                {{ capitalizeText(memberVoteType) }} 
+                                <span class="text-aftrBlue">{{ walletAddressSubstr(memberWallet) }}</span>
+                            </p>
+                            <p>
+                                <span v-if="memberVoteType === 'add'">Mint </span> 
+                                <span v-else>Burn </span> 
+                                <span class="text-aftrBlue">{{ formatNumber(memberQty) }}</span> 
+                                tokens
+                            </p>
+                        </div>
+                    </div>
+                    <div v-else-if="voteType === 'token'">
+                        <div class="col-span-2 mt-2 mb-2">
+                            <input type="radio" v-model="tokenAction" @change="refreshMember" id="mint" value="mint" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">Mint</label>
+                            <input type="radio" v-model="tokenAction" @change="refreshMember" id="burn" value="burn" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">Burn</label>
+                        </div>
+                        <div class="flex flex-col">
+                            <select v-model="memberWallet" id="memberWallet" name="memberWallet" @change="changeMember" class="mt-1 w-3/4 block pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                <option value="" disabled selected>Apply to Member</option>
+                                <option v-for="(tokens, addr) in vehicle.balances" :key=addr :value=addr>
+                                    {{ addr }}
+                                </option>
+                            </select>
+                            <input type="number" v-model="memberQty" :placeholder="tokenQtyText" :class="inputBox(dataValid)" @keyup="recalcFields" />
+                            <div v-if="memberQty !== ''" class="pl-2 text-xs text-aftrDarkGrey">
+                                <p>
+                                    {{ capitalizeText(tokenAction) }}
+                                    <span class="text-aftrBlue">{{ formatNumber(memberQty) }}</span> 
+                                    tokens for 
+                                    <span class="text-aftrBlue">{{ walletAddressSubstr(memberWallet) }}</span>
+                                </p>
+                                <p>
+                                    New balance
+                                    <span class="text-aftrBlue">{{ proposedMemberBalance }}</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                  <div class="mt-8">
                     <p class="text-sm text-gray-500">
                       Are you sure you want to create a vote? This action cannot be undone.
                     </p>
@@ -46,11 +135,11 @@
               </div>
             </div>
             <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-              <button type="button" v-if="false" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm" @click="transferTokens">
-                Create Vote
-              </button>
               <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-aftrRed hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" @click="$emit('close')" ref="cancelButtonRef">
                 Cancel
+              </button>
+              <button v-if="dataValid" type="button" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-green-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm" @click="createVote">
+                Create Vote
               </button>
             </div>
           </div>
@@ -66,6 +155,7 @@ import { Dialog, DialogOverlay, DialogTitle, TransitionChild, TransitionRoot } f
 import { ExclamationIcon } from '@heroicons/vue/outline'
 import { mapGetters } from 'vuex';
 import numeral from "numeral";
+import capitalize from '../../utils/shared.js';
 
 export default {
     props : ['vehicle'],
@@ -82,23 +172,58 @@ export default {
             voteType: '',
             stateKey: '',
             stateValue: '',
+            currentValue: '',
+            memberVoteType: 'add',
+            memberWallet: '',
+            memberQty: '',
+            tokenAction: 'mint',
+            proposedMemberBalance: 0,
+            dataValid: false,
             stateKeys: [
-                { id: "status", desc: "Status" },
+                { id: "status", desc: "Status", valid: ['stopped', 'started', 'expired'] },
                 { id: "name", desc: "Name" },
-                { id: "ticker", desc: "Ticket" },
+                { id: "ticker", desc: "Ticker" },
                 { id: "creator", desc: "Creator" },
-                { id: "ownership", desc: "Ownership" },
-                { id: "quorum", desc: "Quorum" },
-                { id: "voteLength", desc: "Vote Length" },
-                { id: "lockMinLength", desc: "Minimum Lock Length" },
-                { id: "lockMaxLength", desc: "Maximum Lock Length" },
-                { id: "communityLogo", desc: "Community Logo" },
+                { id: "ownership", desc: "Ownership", valid: ['single', 'dao'] },
+                { id: "settings.quorum", desc: "Quorum", type: 'number' },
+                { id: "settings.voteLength", desc: "Vote Length", type: 'number' },
+                { id: "settings.lockMinLength", desc: "Minimum Lock Length", type: 'number' },
+                { id: "settings.lockMaxLength", desc: "Maximum Lock Length", type: 'number' },
+                { id: "settings.communityLogo", desc: "Community Logo" },
             ]
         }
     },
     computed : {
-        isInputValid() {
-
+        memberWalletText() {
+            if (this.memberVoteType === 'add') {
+                return "Member Wallet to Add";
+            } else {
+                return "Member Wallet to Remove";
+            }
+        },
+        computeStateValueType() {
+            const stateObj = this.stateKeys.find(key => key.id === this.stateKey);
+            if (stateObj.type) {
+                return stateObj.type;
+            } else {
+                return 'text';
+            }
+        },
+        tokenQtyText() {
+            if (this.tokenAction === 'mint') {
+                return "# of Tokens to Mint";
+            } else {
+                return "# of Tokens to Burn";
+            }
+        },
+        voteConfirmText() {
+            if (this.voteType === 'member') {
+                if (this.memberVoteType === 'add') {
+                    return "Voting to Add Member and Mint his/her Tokens";
+                } else {
+                    return "Voting to Remove Member and Burn his/her Tokens";
+                }
+            }
         },
         ...mapGetters(['arConnected', 'getActiveAddress']),
     },
@@ -110,12 +235,100 @@ export default {
                 return numeral(num).format("0,0");
             }
         },
+        capitalizeText(text) {
+            return capitalize(text);
+        },
+        walletAddressSubstr(addr, chars = 10) {
+            if (typeof addr === 'string') {
+                return addr.substr(0, chars) + '...';
+            } else {
+                return '';
+            }
+        },
         inputBox(valid) {
             if (valid) {
-                return "mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md";
+                return "mt-1 w-3/4 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md";
             } else {
-                return "mt-1 focus:ring-aftrRed focus:border-aftrRed shadow-sm sm:text-sm border-gray-300 rounded-md";
+                return "mt-1 w-3/4 focus:ring-aftrRed focus:border-aftrRed shadow-sm sm:text-sm border-gray-300 rounded-md";
             }
+        },
+        refreshMember() {
+            this.memberWallet = '';
+            this.memberQty = '';
+        },
+        changeKey() {
+            let keyString = this.stateKey;
+            let newValue;
+            if (keyString.substring(0, 9) === 'settings.') {
+                keyString = keyString.substring(9);
+                newValue = this.vehicle.settings.find(setting => setting[0] === keyString)[1];
+            } else if (typeof this.vehicle[keyString] !== 'undefined') {
+                newValue = this.vehicle[keyString];
+            } else {
+                newValue = '';
+            }
+            this.currentValue = newValue.toString();
+            this.stateValue = '';
+        },
+        isValidAddr(addr) {
+            if (addr.length != 43) {
+                return false;
+            } else {
+                return true;
+            }
+        },
+        changeVoteType() {
+            // Vote Type has changed, reset fields
+            this.dataValid = false;
+            if (this.voteType === 'change') {
+                this.stateKey = '';
+                this.stateValue = '';
+                this.currentValue = '';
+            }
+            else if (this.voteType === 'member' || this.voteType === 'token') {
+                this.memberVoteType = 'add';
+                this.tokenAction = 'mint';
+                this.memberWallet = '';
+                this.memberQty = '';
+            }
+        },
+        recalcFields() {
+            // Fields have changed, update totals and determine if data is invalid
+            this.dataValid = true;
+            if (this.voteType === 'change') {
+                if (this.stateKey === '' || this.stateValue === '' || this.stateValue == this.currentValue || (this.stateKey === 'creator' && !this.isValidAddr(this.stateValue))) {
+                    this.dataValid = false;
+                }
+            } else if (this.voteType === 'member') {
+                if (!this.isValidAddr(this.memberWallet)) {
+                    // Invalid Wallet
+                    this.dataValid = false;
+                } else if (this.memberQty <= 0 || this.memberQty.toString() === '') {
+                    // Invalid qty
+                    this.dataValid = false;
+                }
+            } else if (this.voteType === 'token') {
+                let newTotal = 0;
+                if (this.tokenAction === 'mint') {
+                    newTotal = Number(this.vehicle.balances[this.memberWallet]) + Number(this.memberQty);
+                } else {
+                    newTotal = Number(this.vehicle.balances[this.memberWallet]) - Number(this.memberQty);
+                    if (newTotal < 0) {
+                        // You can't burn more than a member has
+                        this.dataValid = false;
+                    }
+                }
+                if (this.memberQty <= 0 ) {
+                    // Invalid qty
+                    this.dataValid = false;
+                }
+                this.proposedMemberBalance = this.formatNumber(newTotal);
+            }
+        },
+        changeMember() {
+            // Lookup tokens for member
+            this.memberQty = this.vehicle.balances[this.memberWallet];
+            this.recalcFields();
         },
     },
     setup() {
