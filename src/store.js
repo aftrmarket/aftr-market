@@ -4,7 +4,14 @@ const store = createStore({
     state() {
         return {
             activeWallet: {},
-            arConnect: false
+            arConnect: false,
+            
+            /** Smartweave variables */
+            smartWeaveConfig: {
+                contractSourceId: "BTxbGwMEyVv94ak2CDeuCAXLWnAhwLb_hK4qw8_a-JU", // Changes with every AFTR contract update
+                tagProtocol: "AFTR-Demo-a101"
+            }
+            /** */
         };
     },
     getters: {
@@ -16,6 +23,9 @@ const store = createStore({
         },
         getActiveAddress(state) {
             return state.activeWallet.address;
+        },
+        getSmartWeaveConfig() {
+            return state.smartWeaveConfig;
         }
     },
     mutations: {
