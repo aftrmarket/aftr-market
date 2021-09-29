@@ -53,7 +53,7 @@
                             </div>
                         </div>
                         <div v-else-if="stateKey">
-                            <select v-model="stateValue" id="stateValue" name="stateValue" class="mt-1 block w-3/4 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                            <select v-model="stateValue" @change="recalcFields" id="stateValue" name="stateValue" class="mt-1 block w-3/4 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                                 <option value="" disabled selected>Value</option>
                                 <option v-for="value in stateKeys.find(key => key.id === stateKey).valid.filter(value => value.toLowerCase() !== vehicle[stateKey.toLowerCase()].toLowerCase())" :key=value :value=value>
                                     {{ capitalizeText(value) }}
@@ -126,11 +126,14 @@
                             </div>
                         </div>
                     </div>
-                  <div class="mt-8">
-                    <p class="text-sm text-gray-500">
-                      Are you sure you want to create a vote? This action cannot be undone.
-                    </p>
-                  </div>
+                    <div class="mt-8">
+                        <p v-if="dataValid" class="text-sm text-gray-500">
+                            Are you sure you want to create a vote? This action cannot be undone.
+                        </p>
+                        <p v-else class="text-sm text-aftrRed">
+                            Fill out vehicle settings to create a vote.
+                        </p>
+                    </div>
                 </div>
               </div>
             </div>
@@ -258,10 +261,12 @@ export default {
         },
         changeKey() {
             let keyString = this.stateKey;
+            const settings = new Map(this.vehicle.settings);
             let newValue;
+            this.dataValid = false;
             if (keyString.substring(0, 9) === 'settings.') {
                 keyString = keyString.substring(9);
-                newValue = this.vehicle.settings.find(setting => setting[0] === keyString)[1];
+                newValue = settings.get(keyString);
             } else if (typeof this.vehicle[keyString] !== 'undefined') {
                 newValue = this.vehicle[keyString];
             } else {
