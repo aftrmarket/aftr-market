@@ -128,21 +128,21 @@
                     </div>
                     <div class="mt-8">
                         <p v-if="dataValid" class="text-sm text-gray-500">
-                            Are you sure you want to create a vote? This action cannot be undone.
+                            Are you sure you want to propose a vote? This action cannot be undone.
                         </p>
                         <p v-else class="text-sm text-aftrRed">
-                            Fill out vehicle settings to create a vote.
+                            Fill out vehicle settings to propose a vote.
                         </p>
                     </div>
                 </div>
               </div>
             </div>
             <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-              <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-aftrRed hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" @click="$emit('close')" ref="cancelButtonRef">
+              <button type="button" @click="$emit('close')" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-aftrRed hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" ref="cancelButtonRef">
                 Cancel
               </button>
-              <button v-if="dataValid" type="button" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-green-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm" @click="createVote">
-                Create Vote
+              <button v-if="dataValid" @click="proposeVote" type="button" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-green-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
+                Propose Vote
               </button>
             </div>
           </div>
@@ -335,6 +335,26 @@ export default {
             this.memberQty = this.vehicle.balances[this.memberWallet];
             this.recalcFields();
         },
+        proposeVote() {
+            // Call the Propose function on the contract
+            /****
+            let arweave = {};
+            try {
+                arweave = await Arweave.init({
+                    host: "arweave.net",
+                    port: 443,
+                    protocol: "https",
+                    timeout: 20000,
+                    logging: true,
+                });
+            } catch (error) {
+                console.log("ERROR connecting to Arweave: " + error); // How can this ever happen? :)
+                this.pageStatus = "error";
+                return false;
+            }
+            ***/
+           console.log("CONTRACT:  " + this.vehicle.id);
+        }
     },
     setup() {
         const open = ref(true)
