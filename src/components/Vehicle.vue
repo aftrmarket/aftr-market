@@ -125,6 +125,9 @@ export default {
             this.activeTab = this.tabs[activeTabIndex].name;
         },
         async loadVehicle() {
+            // Add contractId to vehicle object
+            this.vehicle.id = this.contractId;
+
             // Logo
             this.vehicle.settings.forEach(setting => {
                 if (setting[0] === 'communityLogo') {
