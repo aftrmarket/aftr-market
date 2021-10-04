@@ -1,5 +1,5 @@
 import { textChangeRangeIsUnchanged } from "typescript";
-import { StateInterface, ActionInterface, BalanceInterface, InputInterface } from "./faces";
+import { StateInterface, ActionInterface, BalanceInterface, InputInterface, VoteInterface } from "./faces";
 
 const mode = 'TEST';
 
@@ -7,10 +7,10 @@ function ThrowError(msg: string) {
     if (mode === 'TEST') {
         throw('ERROR: ' + msg);
     } else {
-        // @ts-expect-error
         throw new ContractError(msg);
     }
 }
+declare const ContractError: any;
 declare const SmartWeave: any;
 
 export async function handle(state: StateInterface, action: ActionInterface) {
@@ -18,6 +18,26 @@ export async function handle(state: StateInterface, action: ActionInterface) {
     //const leases = state.leases;      /*** Leasing seats from vehicle is a future enhancement / use case */
     const input = action.input;
     const caller = action.caller;
+    const settings: Map<string, any> = new Map(state.settings);
+    const votes: VoteInterface[] = state.votes;
+
+    let block = 0;
+    if (mode === 'TEST') {
+        block = 130;  /**** GET BLOCK FROM SMARTWEAVE */
+    } else {
+        block = +SmartWeave.block.height;
+    }
+    
+    // Finalize any votes
+    let votingSystem = 'equal';
+    if (state.votingSystem) {
+        votingSystem = state.votingSystem;
+    }
+
+    const concludedVotes = votes.filter(vote => block >= ( vote.status === 'active' && vote.start + settings.get('voteLength')));
+    if (concludedVotes.length > 0) {
+        finalizeVotes(state, concludedVotes, settings.get('quorum'), settings.get('support'));
+    }
 
     // Handle tips to vehicle balance holders
     /**** TODO */
@@ -25,8 +45,6 @@ export async function handle(state: StateInterface, action: ActionInterface) {
 
     // Check for any unlocked tokens
     if (state.tokens) {
-        const block = 130;  /**** GET BLOCK FROM SMARTWEAVE */
-        //const block = SmartWeave.block.height;
         returnUnlockedTokens(state, block);
     }
     
@@ -84,6 +102,169 @@ export async function handle(state: StateInterface, action: ActionInterface) {
         ****/
         return { state };
     }
+
+    /******* BEGIN VOTING FUNCTIONS */
+    if (input.function === "propose") {
+        const voteType = input.type;
+        let note = input.note;
+        let target = input.target;
+        let qty = input.qty;
+        let key = input.key;
+        let value = input.value;
+        let yays = input.yays;
+        let nays = input.nays;
+        
+        // Check valid inputs, caller is member with balance
+        if (!(caller in balances) || !(balances[caller] > 0)) {
+            ThrowError("Caller is not allowed to vote.")
+        }
+
+        // Determine weight of a vote
+        // Default is equal weighting:  all votes counted equally
+        // If weighed system, vote counts as much as voter's balance
+        let votingSystem = 'equal';
+        let totalWeight = 0;
+        if (state.votingSystem) {
+            votingSystem = state.votingSystem;
+        }
+        if (votingSystem === 'equal') {
+            totalWeight = Object.keys(balances).length;
+        } else if (votingSystem === 'weighted') {
+            for (let member in balances) {
+                totalWeight += balances[member];
+            }
+        } else {
+            ThrowError("Invalid voting system.");
+        }     
+
+        // Validate input for member and token management
+        let recipient = '';
+        if (voteType === 'mint' || voteType === 'burn' || voteType === 'addMember' || voteType === 'removeMember') {
+            if (!input.recipient) {
+                ThrowError("Error in input.  Recipient not supplied.");
+            }
+            
+            if (!(qty) || !(qty > 0)) {
+                ThrowError("Error in input.  Quantity not supplied or is invalid.");
+            }
+
+            recipient = isArweaveAddress(input.recipient);
+
+            if (voteType === 'mint') {
+                note = "Mint " + String(qty) + " tokens for " + recipient;
+            } else if (voteType === 'burn') {
+                note = "Burn " + String(qty) + " tokens for " + recipient;
+            } else if (voteType === 'addMember') {
+                note = "Add new member, " + recipient + ", and mint " + String(qty) + " tokens";
+            } else if (voteType === 'removeMember') {
+                note = "Remove member, " + recipient + ", and burn their " + String(qty) + " tokens";
+            }
+        } else if (voteType === 'set') {
+            // Validate properties
+            if (!key || key === '') {
+                ThrowError("Invalid Key.");
+            }
+            if (!value || value === '') {
+                ThrowError("Invalid Value.");
+            }
+
+            // Get current value for key in state
+            let currentValue = String(getStateValue(state, key));
+
+            // Get state property that is being changed
+            key = getStateProperty(key);
+
+            note = "Change " + key + " from " + currentValue + " to " + String(value);
+        } else {
+            ThrowError("Vote Type not supported.");
+        }
+
+        // Get next ID
+        let voteId = 1000;
+        if (state.votes.length > 0) {
+            voteId += votes.length;
+        }
+
+        let vote: VoteInterface = {
+            status: 'active',
+            type: voteType,
+            id: voteId,
+            totalWeight: totalWeight,
+            voted: [],
+            start: block
+        }
+        if (recipient !== '') {
+            vote.recipient = recipient;
+        }
+        if (target && target !== '') {
+            vote.target = target;
+        }
+        if (!qty) {
+            vote.qty = qty;
+        }
+        if (key && key !== '') {
+            vote.key = key;
+        }
+        if (value && value !== '') {
+            vote.value = value;
+        }
+        if (note && note !== '') {
+            vote.note = note;
+        }
+
+        votes.push(vote);
+
+        return { state };
+    }
+
+    if (input.function === "vote") {
+        const voteId = input.voteId;
+        const cast = input.cast;
+
+        if (!Number.isInteger(voteId)) {
+            ThrowError("Invalid value for the Vote ID. Vote ID must be an integer.");
+        }
+        
+        const vote = votes.find(vote => vote.id === voteId);
+
+        if (typeof vote === 'undefined') {
+            ThrowError("Vote does not exist.");
+        }
+
+        // Is caller allowed to vote?
+        if (!(caller in balances)) {
+            ThrowError("Caller isn't a member of the vehicle and therefore isn't allowed to vote");
+        }
+
+        // Is vote over?
+        if (vote.status !== 'active') {
+            ThrowError("Vote is not active.");
+        }
+
+        // Has caller already voted?
+        if (vote.voted.includes(caller)) {
+            ThrowError("Caller has already voted.");
+        }
+
+        let weightedVote = 1;
+        // Determine weight of vote
+        if (state.votingSystem === 'weighted') {
+            weightedVote = balances[caller];
+        } 
+        
+        // Record vote
+        if (cast === 'yay') {
+            vote.yays += weightedVote;
+        } else if (cast === 'nay') {
+            vote.nays += weightedVote;
+        } else {
+            ThrowError('Invalid vote cast.');
+        }
+
+        vote.voted.push(caller);
+        return { state };
+    }
+    /******* END VOTING FUNCTIONS */
 
     if (input.function === "transfer") {
         const target = input.target;
@@ -191,6 +372,27 @@ function returnUnlockedTokens(vehicle, block) {
     unlockedTokens.forEach(token => processWithdrawal(vehicle, token));
 }
 
+function getStateProperty(key: string) {
+    if (key.substring(0, 9) === 'settings.') {
+        // Key is in Settings map
+        key = key.substring(9);
+    }
+    return key;
+}
+
+function getStateValue(vehicle: StateInterface, key) {
+    const settings: Map<string, any> = new Map(vehicle.settings);
+    let value = '';
+
+    if (key.substring(0, 9) === 'settings.') {
+        let setting = key.substring(9);
+        value = settings.get(setting);
+    } else {
+        value = vehicle[key];
+    }
+    return value;
+}
+
 function processWithdrawal(vehicle, tokenObj) {
     // Utilize the Foreign Call Protocol to return tokens to orginal source
     /**** FOREIGN CALL PROTOCOL to call transfer function on token's smart contract */
@@ -198,6 +400,28 @@ function processWithdrawal(vehicle, tokenObj) {
 
     // Update state by finding txId if Withdrawal was successful
     vehicle.tokens = vehicle.tokens.filter(token => token.txId !== tokenObj.txId);
+}
+
+function finalizeVotes(vehicle, concludedVotes, quorum, support) {
+    
+    concludedVotes.forEach( vote => {
+        // Must pass quorum
+        if (vote.totalWeight * quorum > vote.yays + vote.nays) {
+            vote.status = 'quorumFailed';
+        } else if (vote.yays / (vote.yays + vote.nays) > support) {
+            // Vote passed
+            vote.status = 'passed';
+
+            modifyVehicle(vehicle, vote);
+        } else {
+            // Vote failed
+            vote.status = 'failed';
+        }
+    });
+}
+
+function modifyVehicle(vehicle, vote) {
+
 }
 
 async function test() {
@@ -233,16 +457,30 @@ async function test() {
         "name": "Test Vehicle",
         "ticker": "AFTR-Test-1",
         "balances": {
-        "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8": 12300,
-        "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I": 1000
+            "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8": 12300,
+            "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I": 1000
         },
         "creator": "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I",
         "ownership": "single",
+        "votingSystem": "weighted",
         "settings": [
             [ "quorum", 0.5 ],
             [ "voteLength", 2000 ],
             [ "lockMinLength", 100 ],
             [ "lockMaxLength", 10000 ]
+        ],
+        "votes": [
+            {
+                "status": 'active',
+                "type": '',
+                "id": 1000,
+                "totalWeight": 13300,
+                //"totalWeight": 2,
+                "yays": 0,
+                "nays": 0,
+                "voted": [],
+                "start": 100
+            }
         ],
         "tokens": [
             {
@@ -295,8 +533,31 @@ async function test() {
         caller: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I'
     };
 
+    const voteCastAction = {
+        input: {
+            function: 'vote',
+            voteId: 101,
+            cast: 'yay'
+        },
+        caller: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I'
+    };
+
+    const proposeVoteAction = {
+        input: {
+            function: 'propose',
+            type: 'set',
+            recipient: '',
+            target: '',
+            qty: 0,
+            key: 'settings.quorum',
+            value: .01,
+            note: ''
+        },
+        caller: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I'
+    };
+
     // @ts-expect-error
-    let result = await handle(state, depAction);
+    let result = await handle(state, proposeVoteAction);
     console.log(result);
     console.log(JSON.stringify(result));
 }

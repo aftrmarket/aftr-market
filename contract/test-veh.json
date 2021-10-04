@@ -52,6 +52,10 @@
             0.5
         ],
         [
+            "support",
+            0.5
+        ],
+        [
             "voteLength",
             2000
         ],
@@ -120,6 +124,10 @@
     "settings": [
         [
             "quorum",
+            0.5
+        ],
+        [
+            "support",
             0.5
         ],
         [
@@ -193,6 +201,10 @@
     "settings": [
         [
             "quorum",
+            0.5
+        ],
+        [
+            "support",
             0.5
         ],
         [
