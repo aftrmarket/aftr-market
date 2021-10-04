@@ -127,15 +127,19 @@
                     
                     <h3 class="mt-4 border-t border-gray-200 pt-4 text-xl font-light leading-6">Settings</h3>
                     <div class="bg-white sm:p-6">
-                        <div class="pt-2 grid grid-cols-3 gap-4">
+                        <div class="pt-2 grid grid-cols-3 flex items-center gap-x-4">
                             <label class="block text-sm font-medium text-gray-700">Vehicle Tokens to Mint</label>
                             <label class="block text-sm font-medium text-gray-700">Vehicle Ownership</label>
-                        </div>
-                        <div class="pt-2 grid grid-cols-3 gap-4 flex items-center">
+                            <label class="block text-sm font-medium text-gray-700">Voting System </label>
+                            
                             <input type="number" name="vehicleTokens" placeholder="# of Vehicle Tokens" v-model="vehicleTokens" @input="onTokenChange" :class="inputBox(vehicleTokensValid)" />
-                            <div class="col-span-2">
+                            <div class="">
                                 <input type="radio" v-model="ownership" id="single" value="single" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">Single Owner</label>
                                 <input type="radio" v-model="ownership" id="dao" value="dao" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">DAO Owned</label>
+                            </div>
+                            <div class="">
+                                <input type="radio" v-model="votingSystem" id="even" value="even" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">Distributed Evenly</label>
+                                <input type="radio" v-model="votingSystem" id="weighted" value="weighted" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">Weighted</label>
                             </div>
                         </div>
                     </div>
@@ -384,7 +388,8 @@ export default {
             seats: 0,                                       // Number of seats available on vehicle
             minLease: 2,                                    // Minimum seat lease length in months
             maxLease: 24,                                   // Maximum seat lease length in months
-            ownership: "dao",
+            ownership: "dao",                               // Type of ownership for vehicle (single or dao)
+            votingSystem: "even",                           // Type of voting for vehicle (even or weighted)
             inputValid: false,                              // Boolean to show when any input field is invalid
             pstInputValid: false,                           // Boolean to show when amount goes over tokens held
             nameValid: false,                               // Boolean for valid vehicle name
@@ -738,6 +743,7 @@ export default {
             //this.vehicle.logo = this.vehicleLogo;
             this.vehicle.logo = "9CYPS85KChE_zQxNLi2y5r2FLG-YE6HiphYYTlgtrtg";      // TEMP LOGO
             this.vehicle.ownership = this.ownership;
+            this.vehicle.votingSystem = this.votingSystem;
             this.vehicle.status = "stopped";
 
             // Convert DAO Member array to dictionary
@@ -805,9 +811,14 @@ export default {
     "tipsMisc": 2549,
     "creator" : "j12D8FZU-EBbIdCSkx6vO2shHlqbv5-5Ufl4jOuzGQw",
     "ownership" : "single",
+    "votingSystem" : "equal",
     "settings": [
         [
             "quorum",
+            0.5
+        ],
+                [
+            "support",
             0.5
         ],
         [

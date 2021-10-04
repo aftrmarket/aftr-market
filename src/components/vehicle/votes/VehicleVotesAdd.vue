@@ -353,6 +353,9 @@ export default {
                 return false;
             }
             ***/
+           let input = {
+               function: 'propose',
+           }
            console.log("CONTRACT:  " + this.vehicle.id);
         }
     },
