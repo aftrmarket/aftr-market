@@ -34,9 +34,15 @@ export async function handle(state: StateInterface, action: ActionInterface) {
         votingSystem = state.votingSystem;
     }
 
-    const concludedVotes = votes.filter(vote => block >= ( vote.status === 'active' && vote.start + settings.get('voteLength')));
+    // Find concluded votes
+    /***
+     * Look for
+     * voteLength has passed OR single ownership vehicle (no voteLength required)
+     * AND status of vote == 'active'
+    ***/
+    const concludedVotes = votes.filter(vote => ((block >= vote.start + settings.get('voteLength') || state.ownership === 'single') && vote.status === 'active'));
     if (concludedVotes.length > 0) {
-        finalizeVotes(state, concludedVotes, settings.get('quorum'), settings.get('support'));
+        finalizeVotes(state, caller, concludedVotes, settings.get('quorum'), settings.get('support'));
     }
 
     // Handle tips to vehicle balance holders
@@ -114,9 +120,17 @@ export async function handle(state: StateInterface, action: ActionInterface) {
         let yays = input.yays;
         let nays = input.nays;
         
+        // Check if single ownership
+        if (state.ownership === 'single') {
+            // Single ownership, so caller must be creator
+            if (caller !== state.creator) {
+                ThrowError("Caller is not the creator of the vehicle.");
+            }
+        }
+
         // Check valid inputs, caller is member with balance
-        if (!(caller in balances) || !(balances[caller] > 0)) {
-            ThrowError("Caller is not allowed to vote.")
+        if (!(caller in balances) || !(balances[caller] > 0)) {    
+            ThrowError("Caller is not allowed to propose vote.")
         }
 
         // Determine weight of a vote
@@ -146,6 +160,34 @@ export async function handle(state: StateInterface, action: ActionInterface) {
             
             if (!(qty) || !(qty > 0)) {
                 ThrowError("Error in input.  Quantity not supplied or is invalid.");
+            }
+
+            // Check to see if qty is too big
+            if (voteType === 'mint' || voteType === 'addMember') {
+                let totalTokens = 0;
+                for (let wallet in balances) {
+                    totalTokens += balances[wallet];
+                }
+                if (totalTokens + qty > Number.MAX_SAFE_INTEGER) {
+                    ThrowError("Proposed quantity is too large.");
+                }
+            }
+
+            // Check to see if trying to burn more than possible
+            if (voteType === 'burn') {
+                if (!balances[recipient]) {
+                    ThrowError("Request to burn for recipient not in balances.");
+                }
+                if (qty > balances[recipient]) {
+                    ThrowError("Invalid quantity.  Can't burn more than recipient has.");
+                }
+            }
+
+            // Check for trying to remove creator
+            if (voteType === 'removeMember') {
+                if (recipient === state.creator) {
+                    ThrowError("Can't remove creator from balances.");
+                }
             }
 
             recipient = isArweaveAddress(input.recipient);
@@ -181,6 +223,7 @@ export async function handle(state: StateInterface, action: ActionInterface) {
 
         // Get next ID
         let voteId = 1000;
+        /******* TODO:  DON'T USE INTEGER FOR ID */
         if (state.votes.length > 0) {
             voteId += votes.length;
         }
@@ -402,16 +445,18 @@ function processWithdrawal(vehicle, tokenObj) {
     vehicle.tokens = vehicle.tokens.filter(token => token.txId !== tokenObj.txId);
 }
 
-function finalizeVotes(vehicle, concludedVotes, quorum, support) {
-    
+function finalizeVotes(vehicle, caller, concludedVotes, quorum, support) {
     concludedVotes.forEach( vote => {
-        // Must pass quorum
-        if (vote.totalWeight * quorum > vote.yays + vote.nays) {
+        // If single owned, modify
+        if (vehicle.ownership === 'single') {
+                vote.status = 'passed';
+                modifyVehicle(vehicle, vote);
+        } else if (vote.totalWeight * quorum > vote.yays + vote.nays) {
+            // Must pass quorum
             vote.status = 'quorumFailed';
         } else if (vote.yays / (vote.yays + vote.nays) > support) {
             // Vote passed
             vote.status = 'passed';
-
             modifyVehicle(vehicle, vote);
         } else {
             // Vote failed
@@ -421,7 +466,28 @@ function finalizeVotes(vehicle, concludedVotes, quorum, support) {
 }
 
 function modifyVehicle(vehicle, vote) {
-
+    if (vote.type === 'mint' || vote.type === 'addMember') {
+        if (vote.recipient in vehicle.balances) {
+            // Wallet already exists in state, add tokens
+            vehicle.balances[vote.recipient] += vote.qty;
+        } else {
+            // Wallet is new
+            vehicle.balances[vote.recipient] = vote.qty;
+        }
+    } else if (vote.type === 'burn') {
+        vehicle.balances[vote.recipient] -= vote.qty;
+    } else if (vote.type === 'removeMember') {
+        delete vehicle.balances[vote.recipient];
+    } else if (vote.type === 'set') {
+        if (vote.key.substring(0, 9) === 'settings.') {
+            // key is a setting
+            let key = getStateProperty(vote.key);
+            const settings: Map<string, any> = new Map(vehicle.settings);
+            settings.set(key, vote.value);
+        } else {
+            vehicle[vote.key] = vote.value;
+        }
+    }
 }
 
 async function test() {
