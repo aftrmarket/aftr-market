@@ -29,13 +29,7 @@ export async function handle(state: StateInterface, action: ActionInterface) {
         block = +SmartWeave.block.height;
     }
     
-    // Finalize any votes
-    let votingSystem = 'equal';
-    if (state.votingSystem) {
-        votingSystem = state.votingSystem;
-    }
-
-    // Find concluded votes
+    // Find concluded votes in order to finalize
     /***
      * Look for
      * voteLength has passed OR single ownership vehicle (no voteLength required)
