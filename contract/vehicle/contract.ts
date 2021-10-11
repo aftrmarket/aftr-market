@@ -43,7 +43,7 @@ export async function handle(state: StateInterface, action: ActionInterface) {
     ***/
     const concludedVotes = votes.filter(vote => ((block >= vote.start + settings.get('voteLength') || state.ownership === 'single') && vote.status === 'active'));
     if (concludedVotes.length > 0) {
-        finalizeVotes(state, caller, concludedVotes, settings.get('quorum'), settings.get('support'));
+        finalizeVotes(state, concludedVotes, settings.get('quorum'), settings.get('support'));
     }
 
     // Handle tips to vehicle balance holders
@@ -70,32 +70,33 @@ export async function handle(state: StateInterface, action: ActionInterface) {
         return { result: { target, balance } };
     }
 
-    if (input.function === "statusChange") {
-        const status = input.status;
-        if (!status) {
-            ThrowError("No status was supplied.");
-        } 
+    /*** NO LONGER NEED STATUS CHANGE B/C EVERY CHANGE WILL PROCESS THROUGH THE VOTING SYSTEM */
+    // if (input.function === "statusChange") {
+    //     const status = input.status;
+    //     if (!status) {
+    //         ThrowError("No status was supplied.");
+    //     } 
 
-        if (status !== 'stopped' && status !== 'started' && status !== 'expired') {
-            ThrowError("Invalid status");
-        }
+    //     if (status !== 'stopped' && status !== 'started' && status !== 'expired') {
+    //         ThrowError("Invalid status");
+    //     }
 
-        // Only creator on a single owned vehicle can change the status
-        if (caller !== state.creator || state.ownership !== 'single') {
-            ThrowError("The status can't be changed because either the creator is not initiating the change or the vehicle is not a single ownership vehicle.");
-        }
+    //     // Only creator on a single owned vehicle can change the status
+    //     if (caller !== state.creator || state.ownership !== 'single') {
+    //         ThrowError("The status can't be changed because either the creator is not initiating the change or the vehicle is not a single ownership vehicle.");
+    //     }
 
-        if (status === state.status) {
-            ThrowError("Invalid status change requested.");
-        }
+    //     if (status === state.status) {
+    //         ThrowError("Invalid status change requested.");
+    //     }
 
-        state.status = status;
+    //     state.status = status;
 
-        return { state };
-    }
+    //     return { state };
+    // }
 
+    /*** FUNCTIONALITY NOT YET IMPLEMENTED
     if (input.function === "lease") {
-        /*** FUNCTIONALITY NOT YET IMPLEMENTED
         // Lease a seat, subtract balance from owner wallet, add to lessee
         const target = input.target;  // Address of lessee
         const qty = input.qty;        // Number of seats to lease
@@ -106,9 +107,10 @@ export async function handle(state: StateInterface, action: ActionInterface) {
         if (qty <= 0 || caller === target) {
             ThrowError("Invalid token lease.");
         }
-        ****/
+        
         return { state };
     }
+    ****/
 
     /******* BEGIN VOTING FUNCTIONS */
     if (input.function === "propose") {
@@ -442,7 +444,7 @@ function processWithdrawal(vehicle, tokenObj) {
     vehicle.tokens = vehicle.tokens.filter(token => token.txId !== tokenObj.txId);
 }
 
-function finalizeVotes(vehicle, caller, concludedVotes, quorum, support) {
+function finalizeVotes(vehicle, concludedVotes, quorum, support) {
     concludedVotes.forEach( vote => {
         // If single owned, modify
         if (vehicle.ownership === 'single') {

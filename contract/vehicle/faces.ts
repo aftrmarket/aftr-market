@@ -72,10 +72,11 @@ export interface DepositInterface {
     lockLength?: number,
 }
 
-export interface StatusChangeInterface {
-    function: 'statusChange',
-    status: string,
-}
+/*** NO LONGER NEED STATUS CHANGE B/C EVERY CHANGE WILL PROCESS THROUGH THE VOTING SYSTEM */
+// export interface StatusChangeInterface {
+//     function: 'statusChange',
+//     status: string,
+// }
 
 export interface TokenInterface {
     txId: string,
