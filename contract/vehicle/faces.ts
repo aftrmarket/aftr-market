@@ -89,8 +89,8 @@ export interface TokenInterface {
 
 export interface VoteInterface {
     status?: 'active' | 'quorumFailed' | 'passed' | 'failed';
-    type?: 'mint' | 'burn' | 'indicative' | 'set' | 'addMember' | 'removeMember';
-    id?: number;
+    type?: 'mint' | 'burn' | 'indicative' | 'set' | 'addMember' | 'removeMember' | 'assetDirective';
+    id?: String;
     totalWeight?: number;
     recipient?: string;
     target?: string;

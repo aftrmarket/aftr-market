@@ -1,3 +1,4 @@
+import { smartweave } from "smartweave";
 import { textChangeRangeIsUnchanged } from "typescript";
 import { StateInterface, ActionInterface, BalanceInterface, InputInterface, VoteInterface } from "./faces";
 
@@ -217,16 +218,16 @@ export async function handle(state: StateInterface, action: ActionInterface) {
             key = getStateProperty(key);
 
             note = "Change " + key + " from " + currentValue + " to " + String(value);
+        } else if (voteType === 'assetDirective') {
+            // A vote to direct assets
+            /**** THINK ABOUT HOW THIS WOULD WORK */
+            
         } else {
             ThrowError("Vote Type not supported.");
         }
 
-        // Get next ID
-        let voteId = 1000;
-        /******* TODO:  DON'T USE INTEGER FOR ID */
-        if (state.votes.length > 0) {
-            voteId += votes.length;
-        }
+        // Create Vote ID
+        let voteId = String(SmartWeave.block.height) + SmartWeave.transaction.id;
 
         let vote: VoteInterface = {
             status: 'active',
@@ -263,10 +264,6 @@ export async function handle(state: StateInterface, action: ActionInterface) {
     if (input.function === "vote") {
         const voteId = input.voteId;
         const cast = input.cast;
-
-        if (!Number.isInteger(voteId)) {
-            ThrowError("Invalid value for the Vote ID. Vote ID must be an integer.");
-        }
         
         const vote = votes.find(vote => vote.id === voteId);
 
@@ -602,7 +599,7 @@ async function test() {
     const voteCastAction = {
         input: {
             function: 'vote',
-            voteId: 101,
+            voteId: '130tx12033012',
             cast: 'yay'
         },
         caller: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I'
