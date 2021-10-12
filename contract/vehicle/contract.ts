@@ -2,7 +2,7 @@ import { smartweave } from "smartweave";
 import { textChangeRangeIsUnchanged } from "typescript";
 import { StateInterface, ActionInterface, BalanceInterface, InputInterface, VoteInterface } from "./faces";
 
-const mode = 'TEST';
+const mode = 'TEST';    // If TEST, SmartWeave not used & messages print to console.
 
 function ThrowError(msg: string) {
     if (mode === 'TEST') {
@@ -15,6 +15,13 @@ declare const ContractError: any;
 declare const SmartWeave: any;
 
 export async function handle(state: StateInterface, action: ActionInterface) {
+    /*** Tip Constants */
+    const tipCreateVehicle = 0;
+    const tipProposeVote = 0;
+    const tipVote = 0;
+    const tipMemberMgmt = 0;
+    /*** */
+
     const balances = state.balances;
     //const leases = state.leases;      /*** Leasing seats from vehicle is a future enhancement / use case */
     const input = action.input;
@@ -24,7 +31,7 @@ export async function handle(state: StateInterface, action: ActionInterface) {
 
     let block = 0;
     if (mode === 'TEST') {
-        block = 130;  /**** GET BLOCK FROM SMARTWEAVE */
+        block = 130;
     } else {
         block = +SmartWeave.block.height;
     }
@@ -64,31 +71,6 @@ export async function handle(state: StateInterface, action: ActionInterface) {
         return { result: { target, balance } };
     }
 
-    /*** NO LONGER NEED STATUS CHANGE B/C EVERY CHANGE WILL PROCESS THROUGH THE VOTING SYSTEM */
-    // if (input.function === "statusChange") {
-    //     const status = input.status;
-    //     if (!status) {
-    //         ThrowError("No status was supplied.");
-    //     } 
-
-    //     if (status !== 'stopped' && status !== 'started' && status !== 'expired') {
-    //         ThrowError("Invalid status");
-    //     }
-
-    //     // Only creator on a single owned vehicle can change the status
-    //     if (caller !== state.creator || state.ownership !== 'single') {
-    //         ThrowError("The status can't be changed because either the creator is not initiating the change or the vehicle is not a single ownership vehicle.");
-    //     }
-
-    //     if (status === state.status) {
-    //         ThrowError("Invalid status change requested.");
-    //     }
-
-    //     state.status = status;
-
-    //     return { state };
-    // }
-
     /*** FUNCTIONALITY NOT YET IMPLEMENTED
     if (input.function === "lease") {
         // Lease a seat, subtract balance from owner wallet, add to lessee
@@ -114,8 +96,6 @@ export async function handle(state: StateInterface, action: ActionInterface) {
         let qty = input.qty;
         let key = input.key;
         let value = input.value;
-        let yays = input.yays;
-        let nays = input.nays;
         
         // Check if single ownership
         if (state.ownership === 'single') {
@@ -230,6 +210,8 @@ export async function handle(state: StateInterface, action: ActionInterface) {
             type: voteType,
             id: voteId,
             totalWeight: totalWeight,
+            yays: 0,
+            nays: 0,
             voted: [],
             start: block
         }
