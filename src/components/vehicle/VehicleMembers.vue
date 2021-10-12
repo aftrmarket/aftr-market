@@ -35,7 +35,7 @@
                 :item2Status="vehicle.status === 'stopped' || typeof vehicle.status === 'undefined' ? true : false"
                 :item3="'Single Ownership'"
                 :item3Status="vehicle.ownership === 'single' ? true : false"
-                :footerMessage="allowVehicleAdds ? 'Members may be added' : 'Votes must be passed to add members'"
+                :footerMessage="allowVehicleAdds ? 'Members may be added or removed' : 'Votes must be passed to add/remove members'"
                 :footerStatus="allowVehicleAdds ? true : false">
             </vehicle-status-text>
         </div>
@@ -102,16 +102,12 @@ export default {
             }
         },
         setFlags() {
-            // Allow member add if user is creator and vehicle is not running, otherwise changes must be via vote
-            if (this.getActiveAddress === this.creatorAddress && this.vehicle.status !== 'started') {
+            // Allow member add/remove if user is creator and (ownership is single or vehicle is not running), otherwise changes must be via vote
+            if (this.getActiveAddress === this.creatorAddress && (this.vehicle.ownership === 'single' || this.vehicle.status !== 'started')) {
                 this.allowVehicleAdds = true;
-            } else {
-                this.allowVehicleAdds = false;
-            }
-            // Allow removes only if this is a single owner vehicle
-            if (this.getActiveAddress === this.creatorAddress && this.vehicle.status !== 'started' && this.vehicle.ownership === 'single') {
                 this.allowVehicleRemoves = true;
             } else {
+                this.allowVehicleAdds = false;
                 this.allowVehicleRemoves = false;
             }
         },
