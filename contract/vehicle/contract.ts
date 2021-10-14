@@ -14,20 +14,36 @@ function ThrowError(msg: string) {
 declare const ContractError: any;
 declare const SmartWeave: any;
 
-export async function handle(state: StateInterface, action: ActionInterface) {
-    /*** Tip Constants */
-    const tipCreateVehicle = 0;
-    const tipProposeVote = 0;
-    const tipVote = 0;
-    const tipMemberMgmt = 0;
-    /*** */
+// Multi-interaction variables
+const multiLimit = 1000;
+let multiIteration = 0;
 
+/*** Tip Constants */
+const tipCreateVehicle = 0;
+const tipProposeVote = 0;
+const tipVote = 0;
+const tipMemberMgmt = 0;
+/*** */
+
+export async function handle(state: StateInterface, action: ActionInterface) {
     const balances = state.balances;
     //const leases = state.leases;      /*** Leasing seats from vehicle is a future enhancement / use case */
     const input = action.input;
     const caller = action.caller;
     const settings: Map<string, any> = new Map(state.settings);
     const votes: VoteInterface[] = state.votes;
+
+    /*** MULTI-INTERACTION */
+    /*** Multi-interactions allows for multiple contract interactions in a single transaction */
+    /*** If multi is set to true on the action input, then the call is a multi-interaction and therefore the following applies: */
+    /***    1. Tips should only be accrued once. */
+    /***    2. Because multi-interactions are recursive, a maximum limit is set to protect the contract (not sure if this is necessary, but just in case :) */
+    let multi = false;
+    if (input.multi) {
+        multi = input.multi;
+        multiIteration++;
+    }
+    /*** */
 
     let block = 0;
     if (mode === 'TEST') {
@@ -47,15 +63,18 @@ export async function handle(state: StateInterface, action: ActionInterface) {
         finalizeVotes(state, concludedVotes, settings.get('quorum'), settings.get('support'));
     }
 
-    // Handle tips to vehicle balance holders
-    /**** TODO */
+    if (multiIteration <= 1) {
+        // Only handle tips one time
+        // Handle tips to vehicle balance holders
+        /**** TODO */
 
 
-    // Check for any unlocked tokens
-    if (state.tokens) {
-        returnUnlockedTokens(state, block);
+        // Check for any unlocked tokens
+        if (state.tokens) {
+            returnUnlockedTokens(state, block);
+        }
     }
-    
+
     if (input.function === "balance") {
         // View balance
 

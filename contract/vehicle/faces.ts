@@ -52,6 +52,7 @@ export interface InputInterface {
     function: 'lease' | 'withdrawal',
     target?: string,
     qty?: number,
+    multi?: boolean
 }
 
 export interface TransferInterface {
