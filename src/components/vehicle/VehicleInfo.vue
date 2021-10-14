@@ -109,13 +109,13 @@
                         <input @change="formDirty" type="radio" v-model="newVotingSystem" id="equal" value="equal" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">Distributed Evenly</label>
                         <input @change="formDirty" type="radio" v-model="newVotingSystem" id="weighted" value="weighted" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">Weighted</label>
                     </div>
-                    <label class="pt-4 pb-2  block text-sm font-medium text-gray-700">Quorum</label>
-                    <label class="pt-4 pb-2  block text-sm font-medium text-gray-700">Vote Length</label>
+                    <label class="pt-4 pb-2  block text-sm font-medium text-gray-700">Quorum (between 0.01 - 0.99)</label>
+                    <label class="pt-4 pb-2  block text-sm font-medium text-gray-700">Vote Length (blocks)</label>
                     <div/>
                     <input @change="formDirty" v-model="newQuorum" class="w-3/4" type="number" name="newQuorum" />
                     <input @change="formDirty" v-model="newVoteLength" class="w-3/4" type="number" name="newVoteLength" />
                     <div/>
-                    <label class="pt-4 pb-2 grid col-span-2 block text-sm font-medium text-gray-700">Creator</label>
+                    <label class="pt-4 pb-2 grid col-span-2 block text-sm font-medium text-gray-700">Creator (be careful transferring ownership!)</label>
                     <div/>
                     <input @change="formDirty" v-model="newCreator" class="grid col-span-2 w-3/4" type="text" name="newCreator"/>
                 </div>
@@ -288,10 +288,12 @@ export default {
             if (!this.newTicker || this.newTicker === '') {
                 this.isFormValid = false;
             }
-            if (!this.newQuorum || this.newQuorum === '') {
+            if (!this.newQuorum || this.newQuorum === '' || +this.newQuorum < 0.01 || +this.newQuorum > 0.99) {
+                // Quarum needs to be in the following range:  0.01 - 0.99
                 this.isFormValid = false;
             }
-            if (!this.newVoteLength || this.newVoteLength === '') {
+            if (!this.newVoteLength || this.newVoteLength === '' || !Number.isInteger(+this.newVoteLength) || +this.newVoteLength < 0) {
+                // Is there a range that the vote needs to be in?
                 this.isFormValid = false;
             }
             if (!this.newCreator || this.newCreator.length != 43) {
