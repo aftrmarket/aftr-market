@@ -65,8 +65,8 @@
                     <label for="newTicker" class="block text-sm font-medium text-gray-700">Ticker</label>
                 </div>
                 <div class="pt-2 grid grid-cols-3 gap-4">
-                    <input @change="formDirty" type="text" name="newName" v-model="newName" />
-                    <input @change="formDirty" type="text" name="newTicker" v-model="newTicker" />
+                    <input @change="formDirty" type="text" name="newName" v-model="newName" :class="inputBox(newName !== '')" />
+                    <input @change="formDirty" type="text" name="newTicker" v-model="newTicker" :class="inputBox(newTicker !== '')" />
                     
                 </div>
                 <div class="pt-2 grid grid-cols-3 gap-4">
@@ -112,12 +112,12 @@
                     <label class="pt-4 pb-2  block text-sm font-medium text-gray-700">Quorum (between 0.01 - 0.99)</label>
                     <label class="pt-4 pb-2  block text-sm font-medium text-gray-700">Vote Length (blocks)</label>
                     <div/>
-                    <input @change="formDirty" v-model="newQuorum" class="w-3/4" type="number" name="newQuorum" />
-                    <input @change="formDirty" v-model="newVoteLength" class="w-3/4" type="number" name="newVoteLength" />
+                    <input @change="formDirty" v-model="newQuorum" class="w-3/4" type="number" name="newQuorum" :class="inputBox(quorumIsValid)" />
+                    <input @change="formDirty" v-model="newVoteLength" class="w-3/4" type="number" name="newVoteLength" :class="inputBox(voteLengthIsValid)" />
                     <div/>
-                    <label class="pt-4 pb-2 grid col-span-2 block text-sm font-medium text-gray-700">Creator (be careful transferring ownership!)</label>
+                    <label class="pt-4 pb-2 grid col-span-2 block text-sm font-medium text-gray-700">Creator (transferring ownership not recommended!)</label>
                     <div/>
-                    <input @change="formDirty" v-model="newCreator" class="grid col-span-2 w-3/4" type="text" name="newCreator"/>
+                    <input @change="formDirty" v-model="newCreator" class="grid col-span-2 w-3/4" type="text" name="newCreator" :class="inputBox(creatorIsValid)" />
                 </div>
             </div>
             <div class="flex justify-end">
@@ -161,7 +161,10 @@ export default {
             newVotingSystem: '',
             newVoteLength: 0,
             newQuorum: 0,
-            newCreator: ''
+            newCreator: '',
+            quorumIsValid: true,
+            voteLengthIsValid: true,
+            creatorIsValid: true
         };
     },
     watch: {
@@ -210,6 +213,13 @@ export default {
                 return numeral(num).format("0,0.0000");
             } else {
                 return numeral(num).format("0,0");
+            }
+        },
+        inputBox(valid) {
+            if (valid) {
+                return "mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md";
+            } else {
+                return "mt-1 focus:ring-aftrRed focus:border-aftrRed shadow-sm sm:text-sm border-aftrRed rounded-md";
             }
         },
         statusChange() {
@@ -280,6 +290,9 @@ export default {
         },
         formDirty() {
             this.isFormValid = true;
+            this.quorumIsValid = true;
+            this.voteLengthIsValid = true;
+            this.creatorIsValid = true;
 
             // Validate form
             if (!this.newName || this.newName === '') {
@@ -291,13 +304,16 @@ export default {
             if (!this.newQuorum || this.newQuorum === '' || +this.newQuorum < 0.01 || +this.newQuorum > 0.99) {
                 // Quarum needs to be in the following range:  0.01 - 0.99
                 this.isFormValid = false;
+                this.quorumIsValid = false;
             }
             if (!this.newVoteLength || this.newVoteLength === '' || !Number.isInteger(+this.newVoteLength) || +this.newVoteLength < 0) {
                 // Is there a range that the vote needs to be in?
                 this.isFormValid = false;
+                this.voteLengthIsValid = false;
             }
             if (!this.newCreator || this.newCreator.length != 43) {
                 this.isFormValid = false;
+                this.creatorIsValid = false;
             }
         },
         updateVehicle() {
