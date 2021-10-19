@@ -340,16 +340,17 @@ function modifyVehicle(vehicle, vote) {
     }
   }
 }
-function updateSetting(vehicle, setting, value) {
+function updateSetting(vehicle, key, value) {
   let found = false;
-  vehicle.settings.forEach((element) => {
-    if (element[0] === setting) {
-      element[1] = value;
+  for (let setting of vehicle.settings) {
+    if (setting[0] === key) {
+      setting[1] = value;
       found = true;
+      break;
     }
-  });
+  }
   if (!found) {
-    vehicle.settings.push([setting, value]);
+    vehicle.settings.push([key, value]);
   }
 }
 async function test() {

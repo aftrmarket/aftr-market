@@ -506,9 +506,6 @@ function modifyVehicle(vehicle, vote) {
         if (vote.key.substring(0, 9) === 'settings.') {
             // key is a setting
             let key = getStateProperty(vote.key);
-            //const settings: Map<string, any> = new Map(vehicle.settings);
-            //settings.set(key, vote.value);
-            //vehicle.settings = settings;
             updateSetting(vehicle, key, vote.value);
         } else {
             vehicle[vote.key] = vote.value;
@@ -516,16 +513,19 @@ function modifyVehicle(vehicle, vote) {
     }
 }
 
-function updateSetting(vehicle, setting, value) {
+function updateSetting(vehicle, key, value) {
     let found = false;
-    vehicle.settings.forEach(element => {
-        if (element[0] === setting) {
-            element[1] = value;
+    for (let setting of vehicle.settings) {
+        if (setting[0] === key) {
+            // Found, so update existing setting
+            setting[1] = value;
             found = true;
+            break;
         }
-    });
+    }
     if (!found) {
-        vehicle.settings.push([setting, value]);
+        // Not found, so add new setting
+        vehicle.settings.push([key, value]);
     }
 }
 
