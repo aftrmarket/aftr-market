@@ -1,5 +1,5 @@
 import { smartweave } from "smartweave";
-import { textChangeRangeIsUnchanged } from "typescript";
+import { collapseTextChangeRangesAcrossMultipleVersions, forEachChild, textChangeRangeIsUnchanged } from "typescript";
 import { StateInterface, ActionInterface, BalanceInterface, InputInterface, VoteInterface } from "./faces";
 
 const mode = 'TEST';    // If TEST, SmartWeave not used & messages print to console.
@@ -15,7 +15,7 @@ declare const ContractError: any;
 declare const SmartWeave: any;
 
 // Multi-interaction variables
-const multiLimit = 1000;
+const multiLimit = 1000;    // Limit recursive calls to 1000 (need to evaluate this)
 let multiIteration = 0;
 
 /*** Tip Constants */
@@ -38,10 +38,12 @@ export async function handle(state: StateInterface, action: ActionInterface) {
     /*** If multi is set to true on the action input, then the call is a multi-interaction and therefore the following applies: */
     /***    1. Tips should only be accrued once. */
     /***    2. Because multi-interactions are recursive, a maximum limit is set to protect the contract (not sure if this is necessary, but just in case :) */
-    let multi = false;
-    if (input.multi) {
-        multi = input.multi;
-        multiIteration++;
+    if (typeof input.iteration !== 'undefined') {
+        if (isNaN(input.iteration)) {
+            ThrowError("Invalid value for iteration.");
+        } else {
+            multiIteration = input.iteration;
+        }
     }
     /*** */
 
@@ -209,10 +211,7 @@ export async function handle(state: StateInterface, action: ActionInterface) {
             // Get current value for key in state
             let currentValue = String(getStateValue(state, key));
 
-            // Get state property that is being changed
-            key = getStateProperty(key);
-
-            note = "Change " + key + " from " + currentValue + " to " + String(value);
+            note = "Change " + getStateProperty(key) + " from " + currentValue + " to " + String(value);
         } else if (voteType === 'assetDirective') {
             // A vote to direct assets
             /**** THINK ABOUT HOW THIS WOULD WORK */
@@ -222,7 +221,10 @@ export async function handle(state: StateInterface, action: ActionInterface) {
         }
 
         // Create Vote ID
-        let voteId = String(SmartWeave.block.height) + SmartWeave.transaction.id;
+        let voteId = String(block) + 'txTEST';
+        if (mode !== 'TEST') {
+            voteId = String(SmartWeave.block.height) + SmartWeave.transaction.id;
+        }
 
         let vote: VoteInterface = {
             status: 'active',
@@ -319,7 +321,7 @@ export async function handle(state: StateInterface, action: ActionInterface) {
             ThrowError("Invalid token transfer.");
         }
         if (!(callerAddress in balances)) {
-            ThrowError("Caller doesn't own any DAO balance.");
+            ThrowError("Caller doesn't own a balance in the Vehicle.");
         }
         if (balances[callerAddress] < qty) {
             ThrowError(`Caller balance not high enough to send ${qty} token(s)!`);
@@ -389,6 +391,34 @@ export async function handle(state: StateInterface, action: ActionInterface) {
 
         return { state };
     }
+
+    if (input.function === 'multiInteraction') {
+        /*** A multi-interaction is being called.  
+         * This allows multiple changes to be proposed at once.
+         * It's a recursive call to the handle function.
+         * The function expects an object of proposed changes
+         * and will loop through calling the handle function recurrsively.
+        */
+
+        if (typeof input.actions === 'undefined') {
+            ThrowError("Invalid Multi-interaction input.");
+        }
+
+        const multiActions = input.actions;
+        
+        if (multiActions.length > multiLimit) {
+            ThrowError("The Multi-interactions call exceeds the maximum number of interations.");
+        }
+
+        let iteration = 1;
+        for(let nextAction of multiActions) {
+            nextAction.input.iteration = iteration;
+            let result = await handle(state, nextAction);
+            iteration++;
+        }
+
+        return { state };
+    }
 }
 
 // npm run build:contract
@@ -443,8 +473,8 @@ function finalizeVotes(vehicle, concludedVotes, quorum, support) {
     concludedVotes.forEach( vote => {
         // If single owned, modify
         if (vehicle.ownership === 'single') {
-                vote.status = 'passed';
                 modifyVehicle(vehicle, vote);
+                vote.status = 'passed';
         } else if (vote.totalWeight * quorum > vote.yays + vote.nays) {
             // Must pass quorum
             vote.status = 'quorumFailed';
@@ -476,11 +506,26 @@ function modifyVehicle(vehicle, vote) {
         if (vote.key.substring(0, 9) === 'settings.') {
             // key is a setting
             let key = getStateProperty(vote.key);
-            const settings: Map<string, any> = new Map(vehicle.settings);
-            settings.set(key, vote.value);
+            //const settings: Map<string, any> = new Map(vehicle.settings);
+            //settings.set(key, vote.value);
+            //vehicle.settings = settings;
+            updateSetting(vehicle, key, vote.value);
         } else {
             vehicle[vote.key] = vote.value;
         }
+    }
+}
+
+function updateSetting(vehicle, setting, value) {
+    let found = false;
+    vehicle.settings.forEach(element => {
+        if (element[0] === setting) {
+            element[1] = value;
+            found = true;
+        }
+    });
+    if (!found) {
+        vehicle.settings.push([setting, value]);
     }
 }
 
@@ -530,17 +575,17 @@ async function test() {
             [ "lockMaxLength", 10000 ]
         ],
         "votes": [
-            {
-                "status": 'active',
-                "type": '',
-                "id": 1000,
-                "totalWeight": 13300,
-                //"totalWeight": 2,
-                "yays": 0,
-                "nays": 0,
-                "voted": [],
-                "start": 100
-            }
+            // {
+            //     "status": 'active',
+            //     "type": '',
+            //     "id": 1000,
+            //     "totalWeight": 13300,
+            //     //"totalWeight": 2,
+            //     "yays": 0,
+            //     "nays": 0,
+            //     "voted": [],
+            //     "start": 100
+            // }
         ],
         "tokens": [
             {
@@ -616,10 +661,95 @@ async function test() {
         caller: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I'
     };
 
+const actions = [
+    {
+        input: {
+            function: 'propose',
+            type: 'set',
+            recipient: '',
+            target: '',
+            qty: 0,
+            key: 'name',
+            value: 'Alquip',
+            note: ''
+        },
+        caller: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I'
+    },
+    {
+        input: {
+            function: 'propose',
+            type: 'set',
+            recipient: '',
+            target: '',
+            qty: 0,
+            key: 'ticker',
+            value: 'AFTR-ALQP',
+            note: ''
+        },
+        caller: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I'
+    },
+    {
+        input: {
+            function: 'propose',
+            type: 'set',
+            recipient: '',
+            target: '',
+            qty: 0,
+            key: 'status',
+            value: 'started',
+            note: ''
+        },
+        caller: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I'
+    },
+    {
+        input: {
+            function: 'propose',
+            type: 'set',
+            recipient: '',
+            target: '',
+            qty: 0,
+            key: 'votingSystem',
+            value: 'equal',
+            note: ''
+        },
+        caller: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I'
+    },
+    {
+        input: {
+            function: 'propose',
+            type: 'set',
+            recipient: '',
+            target: '',
+            qty: 0,
+            key: 'settings.voteLength',
+            value: 200,
+            note: ''
+        },
+        caller: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I'
+    },
+]
+
+const multiAction = {
+    input: {
+        function: 'multiInteraction',
+        type: 'set',
+        recipient: '',
+        target: '',
+        qty: 0,
+        key: '',
+        value: .01,
+        note: '',
+        actions: actions
+    },
+    caller: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I'
+};
     // @ts-expect-error
-    let result = await handle(state, proposeVoteAction);
-    console.log(result);
-    console.log(JSON.stringify(result));
+    let result = await handle(state, multiAction);
+    // @ts-expect-error
+    let bal = await handle(state, balAction);
+    //console.log(result);
+    console.log(JSON.stringify(result, undefined, 2));
+    //console.log(JSON.stringify(result));
 }
 
 test();

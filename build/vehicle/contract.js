@@ -7,28 +7,35 @@ function ThrowError(msg) {
     throw new ContractError(msg);
   }
 }
+var multiLimit = 1e3;
+var multiIteration = 0;
 async function handle(state, action) {
   const balances = state.balances;
   const input = action.input;
   const caller = action.caller;
   const settings = new Map(state.settings);
   const votes = state.votes;
+  if (typeof input.iteration !== "undefined") {
+    if (isNaN(input.iteration)) {
+      ThrowError("Invalid value for iteration.");
+    } else {
+      multiIteration = input.iteration;
+    }
+  }
   let block = 0;
   if (mode === "TEST") {
     block = 130;
   } else {
     block = +SmartWeave.block.height;
   }
-  let votingSystem = "equal";
-  if (state.votingSystem) {
-    votingSystem = state.votingSystem;
-  }
-  const concludedVotes = votes.filter((vote) => block >= (vote.status === "active" && vote.start + settings.get("voteLength")));
+  const concludedVotes = votes.filter((vote) => (block >= vote.start + settings.get("voteLength") || state.ownership === "single") && vote.status === "active");
   if (concludedVotes.length > 0) {
     finalizeVotes(state, concludedVotes, settings.get("quorum"), settings.get("support"));
   }
-  if (state.tokens) {
-    returnUnlockedTokens(state, block);
+  if (multiIteration <= 1) {
+    if (state.tokens) {
+      returnUnlockedTokens(state, block);
+    }
   }
   if (input.function === "balance") {
     const target = isArweaveAddress(input.target || caller);
@@ -41,26 +48,6 @@ async function handle(state, action) {
     }
     return { result: { target, balance } };
   }
-  if (input.function === "statusChange") {
-    const status = input.status;
-    if (!status) {
-      ThrowError("No status was supplied.");
-    }
-    if (status !== "stopped" && status !== "started" && status !== "expired") {
-      ThrowError("Invalid status");
-    }
-    if (caller !== state.creator || state.ownership !== "single") {
-      ThrowError("The status can't be changed because either the creator is not initiating the change or the vehicle is not a single ownership vehicle.");
-    }
-    if (status === state.status) {
-      ThrowError("Invalid status change requested.");
-    }
-    state.status = status;
-    return { state };
-  }
-  if (input.function === "lease") {
-    return { state };
-  }
   if (input.function === "propose") {
     const voteType = input.type;
     let note = input.note;
@@ -68,19 +55,22 @@ async function handle(state, action) {
     let qty = input.qty;
     let key = input.key;
     let value = input.value;
-    let yays = input.yays;
-    let nays = input.nays;
-    if (!(caller in balances) || !(balances[caller] > 0)) {
-      ThrowError("Caller is not allowed to vote.");
+    if (state.ownership === "single") {
+      if (caller !== state.creator) {
+        ThrowError("Caller is not the creator of the vehicle.");
+      }
     }
-    let votingSystem2 = "equal";
+    if (!(caller in balances) || !(balances[caller] > 0)) {
+      ThrowError("Caller is not allowed to propose vote.");
+    }
+    let votingSystem = "equal";
     let totalWeight = 0;
     if (state.votingSystem) {
-      votingSystem2 = state.votingSystem;
+      votingSystem = state.votingSystem;
     }
-    if (votingSystem2 === "equal") {
+    if (votingSystem === "equal") {
       totalWeight = Object.keys(balances).length;
-    } else if (votingSystem2 === "weighted") {
+    } else if (votingSystem === "weighted") {
       for (let member in balances) {
         totalWeight += balances[member];
       }
@@ -94,6 +84,28 @@ async function handle(state, action) {
       }
       if (!qty || !(qty > 0)) {
         ThrowError("Error in input.  Quantity not supplied or is invalid.");
+      }
+      if (voteType === "mint" || voteType === "addMember") {
+        let totalTokens = 0;
+        for (let wallet in balances) {
+          totalTokens += balances[wallet];
+        }
+        if (totalTokens + qty > Number.MAX_SAFE_INTEGER) {
+          ThrowError("Proposed quantity is too large.");
+        }
+      }
+      if (voteType === "burn") {
+        if (!balances[recipient]) {
+          ThrowError("Request to burn for recipient not in balances.");
+        }
+        if (qty > balances[recipient]) {
+          ThrowError("Invalid quantity.  Can't burn more than recipient has.");
+        }
+      }
+      if (voteType === "removeMember") {
+        if (recipient === state.creator) {
+          ThrowError("Can't remove creator from balances.");
+        }
       }
       recipient = isArweaveAddress(input.recipient);
       if (voteType === "mint") {
@@ -113,20 +125,22 @@ async function handle(state, action) {
         ThrowError("Invalid Value.");
       }
       let currentValue = String(getStateValue(state, key));
-      key = getStateProperty(key);
-      note = "Change " + key + " from " + currentValue + " to " + String(value);
+      note = "Change " + getStateProperty(key) + " from " + currentValue + " to " + String(value);
+    } else if (voteType === "assetDirective") {
     } else {
       ThrowError("Vote Type not supported.");
     }
-    let voteId = 1e3;
-    if (state.votes.length > 0) {
-      voteId += votes.length;
+    let voteId = String(block) + "txTEST";
+    if (mode !== "TEST") {
+      voteId = String(SmartWeave.block.height) + SmartWeave.transaction.id;
     }
     let vote = {
       status: "active",
       type: voteType,
       id: voteId,
       totalWeight,
+      yays: 0,
+      nays: 0,
       voted: [],
       start: block
     };
@@ -154,9 +168,6 @@ async function handle(state, action) {
   if (input.function === "vote") {
     const voteId = input.voteId;
     const cast = input.cast;
-    if (!Number.isInteger(voteId)) {
-      ThrowError("Invalid value for the Vote ID. Vote ID must be an integer.");
-    }
     const vote = votes.find((vote2) => vote2.id === voteId);
     if (typeof vote === "undefined") {
       ThrowError("Vote does not exist.");
@@ -199,7 +210,7 @@ async function handle(state, action) {
       ThrowError("Invalid token transfer.");
     }
     if (!(callerAddress in balances)) {
-      ThrowError("Caller doesn't own any DAO balance.");
+      ThrowError("Caller doesn't own a balance in the Vehicle.");
     }
     if (balances[callerAddress] < qty) {
       ThrowError(`Caller balance not high enough to send ${qty} token(s)!`);
@@ -246,6 +257,22 @@ async function handle(state, action) {
     state.tokens.push(txObj);
     return { state };
   }
+  if (input.function === "multiInteraction") {
+    if (typeof input.actions === "undefined") {
+      ThrowError("Invalid Multi-interaction input.");
+    }
+    const multiActions = input.actions;
+    if (multiActions.length > multiLimit) {
+      ThrowError("The Multi-interactions call exceeds the maximum number of interations.");
+    }
+    let iteration = 1;
+    for (let nextAction of multiActions) {
+      nextAction.input.iteration = iteration;
+      let result = await handle(state, nextAction);
+      iteration++;
+    }
+    return { state };
+  }
 }
 function isArweaveAddress(addy) {
   const address = addy.toString().trim();
@@ -280,7 +307,10 @@ function processWithdrawal(vehicle, tokenObj) {
 }
 function finalizeVotes(vehicle, concludedVotes, quorum, support) {
   concludedVotes.forEach((vote) => {
-    if (vote.totalWeight * quorum > vote.yays + vote.nays) {
+    if (vehicle.ownership === "single") {
+      modifyVehicle(vehicle, vote);
+      vote.status = "passed";
+    } else if (vote.totalWeight * quorum > vote.yays + vote.nays) {
       vote.status = "quorumFailed";
     } else if (vote.yays / (vote.yays + vote.nays) > support) {
       vote.status = "passed";
@@ -291,6 +321,36 @@ function finalizeVotes(vehicle, concludedVotes, quorum, support) {
   });
 }
 function modifyVehicle(vehicle, vote) {
+  if (vote.type === "mint" || vote.type === "addMember") {
+    if (vote.recipient in vehicle.balances) {
+      vehicle.balances[vote.recipient] += vote.qty;
+    } else {
+      vehicle.balances[vote.recipient] = vote.qty;
+    }
+  } else if (vote.type === "burn") {
+    vehicle.balances[vote.recipient] -= vote.qty;
+  } else if (vote.type === "removeMember") {
+    delete vehicle.balances[vote.recipient];
+  } else if (vote.type === "set") {
+    if (vote.key.substring(0, 9) === "settings.") {
+      let key = getStateProperty(vote.key);
+      updateSetting(vehicle, key, vote.value);
+    } else {
+      vehicle[vote.key] = vote.value;
+    }
+  }
+}
+function updateSetting(vehicle, setting, value) {
+  let found = false;
+  vehicle.settings.forEach((element) => {
+    if (element[0] === setting) {
+      element[1] = value;
+      found = true;
+    }
+  });
+  if (!found) {
+    vehicle.settings.push([setting, value]);
+  }
 }
 async function test() {
   const state = {
@@ -309,18 +369,7 @@ async function test() {
       ["lockMinLength", 100],
       ["lockMaxLength", 1e4]
     ],
-    "votes": [
-      {
-        "status": "active",
-        "type": "",
-        "id": 1e3,
-        "totalWeight": 13300,
-        "yays": 0,
-        "nays": 0,
-        "voted": [],
-        "start": 100
-      }
-    ],
+    "votes": [],
     "tokens": [
       {
         "tokenId": "VRT",
@@ -375,7 +424,7 @@ async function test() {
   const voteCastAction = {
     input: {
       function: "vote",
-      voteId: 101,
+      voteId: "130tx12033012",
       cast: "yay"
     },
     caller: "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I"
@@ -393,8 +442,89 @@ async function test() {
     },
     caller: "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I"
   };
-  let result = await handle(state, proposeVoteAction);
-  console.log(result);
-  console.log(JSON.stringify(result));
+  const actions = [
+    {
+      input: {
+        function: "propose",
+        type: "set",
+        recipient: "",
+        target: "",
+        qty: 0,
+        key: "name",
+        value: "Alquip",
+        note: ""
+      },
+      caller: "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I"
+    },
+    {
+      input: {
+        function: "propose",
+        type: "set",
+        recipient: "",
+        target: "",
+        qty: 0,
+        key: "ticker",
+        value: "AFTR-ALQP",
+        note: ""
+      },
+      caller: "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I"
+    },
+    {
+      input: {
+        function: "propose",
+        type: "set",
+        recipient: "",
+        target: "",
+        qty: 0,
+        key: "status",
+        value: "started",
+        note: ""
+      },
+      caller: "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I"
+    },
+    {
+      input: {
+        function: "propose",
+        type: "set",
+        recipient: "",
+        target: "",
+        qty: 0,
+        key: "votingSystem",
+        value: "equal",
+        note: ""
+      },
+      caller: "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I"
+    },
+    {
+      input: {
+        function: "propose",
+        type: "set",
+        recipient: "",
+        target: "",
+        qty: 0,
+        key: "settings.voteLength",
+        value: 200,
+        note: ""
+      },
+      caller: "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I"
+    }
+  ];
+  const multiAction = {
+    input: {
+      function: "multiInteraction",
+      type: "set",
+      recipient: "",
+      target: "",
+      qty: 0,
+      key: "",
+      value: 0.01,
+      note: "",
+      actions
+    },
+    caller: "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I"
+  };
+  let result = await handle(state, multiAction);
+  let bal = await handle(state, balAction);
+  console.log(JSON.stringify(result, void 0, 2));
 }
 test();

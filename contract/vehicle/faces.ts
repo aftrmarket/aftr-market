@@ -32,8 +32,7 @@ export interface StateInterface {
             }
         ],
     },
-    settings: []
-    ,
+    settings: Map<string, any>
 }
 
 export interface BalanceInterface {
