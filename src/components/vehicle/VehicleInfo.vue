@@ -360,13 +360,53 @@ export default {
                 /*** TODO */
                 /**** */
 
-                // If more than one change, call multi-interaction
+                
+                let input = {
+                    function: '',
+                    type: 'set',
+                    recipient: '',
+                    target: '',
+                    qty: 0
+                };
+                
+                // If more than one change, build multi-interaction input
                 if (changeMap.size > 1) {
-                    // Call multi-interaction
-                    console.log("MULTI-INTERACTION");
+                    input.function = 'multiInteraction';
+                    input.key = 'multi';
+                    input.note = 'Multi-Interaction';
+                    
+                    let actions = [];
+                    for (let [key, value] of changeMap) {
+                        let multiAction = {
+                            input : {
+                                function: 'propose',
+                                type: 'set',
+                                key: key,
+                                value: value
+                            },
+                            caller: this.getActiveAddress
+                        }
+                        actions.push(multiAction);
+                    }
+                    input.actions = actions;
+                } else if (changeMap.size === 1) {
+                    input.function = 'propose';
+                    for (let [key, value] of changeMap) {
+                        input.key = key;
+                        input.value = value;
+                    }
                 } else {
-                    console.log("REGULAR CALL");
+                    // Invalid
+                    return;
                 }
+                const action = {
+                    input: input,
+                    caller: this.getActiveAddress
+                }
+                // Call Smartweave
+                console.log("CALL TO SMARTWEAVE");
+                console.log(JSON.stringify(action));
+                /**** */
             }
         }
     },
