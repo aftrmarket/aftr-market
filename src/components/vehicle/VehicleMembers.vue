@@ -2,7 +2,7 @@
     <div class="pt-4 w-full grid grid-cols-3 gap-4">
         <vehicle-members-add v-if="showAddModal" :vehicle="vehicle" @close="closeModal"></vehicle-members-add>
         <!-- Member Table -->
-        <div class="col-span-2 shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+        <div class="col-span-3 shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
@@ -91,6 +91,111 @@
         </div>
         -->
 
+        <!--- Update Information Start --->
+        <div v-if="numChanges > 0" class="col-span-2 shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+            <div v-if="Object.keys(memberUpdates).length > 0">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                
+                            </th>
+                            <th scope="col" class="px-4 py-3 col-span-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Proposed Updates
+                            </th>
+                            <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr v-for="(key, index) in Object.keys(memberUpdates)" :key="key" class="text-xs text-gray-500 hover:bg-gray-50">
+                            <td class="px-4 py-2">
+                                {{ index + 1 }}
+                            </td>
+                            <td class="px-4 py-2">
+                                {{ proposedText(key, memberUpdates[key], 'update') }}
+                            </td>
+                            <td class="px-4 py-2 text-center">
+                                <button @click.prevent="removeProposal(key, 'update')" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div v-if="memberAdds.length > 0">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                
+                            </th>
+                            <th scope="col" class="px-4 py-3 col-span-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Proposed Adds
+                            </th>
+                            <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr v-for="(member, index) in memberAdds" :key="member" class="text-xs text-gray-500 hover:bg-gray-50">
+                            <td class="px-4 py-2">
+                                {{ index + 1 }}
+                            </td>
+                            <td class="px-4 py-2">
+                                {{ proposedText(member.recipient, member.qty, 'add') }}
+                            </td>
+                            <td class="px-4 py-2 text-center">
+                                <button @click.prevent="removeProposal(member.recipient, 'add')" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div v-if="memberRemoves.length > 0">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                
+                            </th>
+                            <th scope="col" class="px-4 py-3 col-span-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Proposed Removes
+                            </th>
+                            <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr v-for="(member, index) in memberRemoves" :key="member" class="text-xs text-gray-500 hover:bg-gray-50">
+                            <td class="px-4 py-2">
+                                {{ index + 1 }}
+                            </td>
+                            <td class="px-4 py-2">
+                                {{ proposedText(member, vehicle.balances[member], 'remove') }}
+                            </td>
+                            <td class="px-4 py-2 text-center">
+                                <button @click.prevent="removeProposal(member, 'remove')" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+        <!--- Update Information End --->
+
         <div class="col-span-3 flex flex-col inline-flex">
             <div v-if="false && allowVehicleAdds && !arConnected" class="pt-6 flex justify-start items-center">
                 <button @click="arConnect" type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-aftrBlue hover:bg-aftrBlue-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
@@ -119,11 +224,6 @@
             </div>
         </div>
     </div>
-{{ numChanges }} <br>
-{{ memberRemoves.length }} + {{ memberAdds.length }} + {{ Object.keys(this.memberUpdates).length }} <br>
-memberUpdates {{ memberUpdates }} <br>
-memberRemoves {{ memberRemoves }} <br>
-memberAdds {{ memberAdds }}
 </template>
 
 <script>
@@ -196,6 +296,32 @@ export default {
         formatAddr(addr) {
             return addr.substring(0, 5) + '...' + addr.substring(addr.length - 5);
         },
+        proposedText(recipient, qty, type) {
+            if (type === 'update') {
+                //"Burn " + this.formatNumber(String(currentQty - qty)) + " for " + recipient;
+                const currentQty = this.vehicle.balances[recipient];
+                if (currentQty > +qty) {
+                    return "Burn " + this.formatNumber(String(currentQty - +qty)) + " for " + recipient;
+                } else if (currentQty < +qty) {
+                    return "Mint " + this.formatNumber(String(+qty - currentQty)) + " for " + recipient;
+                } else if (currentQty === +qty) {
+                    return "No change for " + recipient;
+                }
+            } else if (type === 'add') {
+                return "Add " + recipient + ", minting " + qty + " tokens";
+            } else if (type === 'remove') {
+                return "Remove " + recipient + ", burning " + qty + " tokens";
+            }
+        },
+        removeProposal(member, type) {
+            if (type === 'update') {
+                delete this.memberUpdates[member];
+            } else if (type === 'add') {
+                this.memberAdds = this.memberAdds.filter((el) => el.recipient !== member);
+            } else if (type === 'remove') {
+                this.memberRemoves = this.memberRemoves.filter((el) => el !== member);
+            }
+        },
         setFlags() {
             // Allow member add/remove if user is creator and (ownership is single or vehicle is not running), otherwise changes must be via vote
             if (this.getActiveAddress === this.creatorAddress && (this.vehicle.ownership === 'single' || this.vehicle.status !== 'started')) {
@@ -239,12 +365,12 @@ export default {
         arConnect() {
             this.$store.dispatch('arConnect');
         },
-        addMemberModal(){
-            this.showAddModal = true;
-        },
-        closeModal() {
-            this.showAddModal = false;
-        },
+        // addMemberModal(){
+        //     this.showAddModal = true;
+        // },
+        // closeModal() {
+        //     this.showAddModal = false;
+        // },
         buildInput(recipient, qty, type = 'tokenChange') {
             let input = {};
             let currentQty = +this.vehicle.balances[recipient];
@@ -345,10 +471,13 @@ export default {
             this.addRow = !this.addRow;
         },
         addMember() {
-            //this.vehicle.balances[this.newMember] = +this.newQty;
             this.memberAdds.push(
                 { recipient : this.newMember, qty: +this.newQty }
             );
+            this.addRow = false;
+            this.newMember = '';
+            this.newQty = ''
+
         },
         // removeMember() {
         //     let recipient = '';
