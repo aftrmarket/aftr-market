@@ -117,6 +117,7 @@ export async function handle(state: StateInterface, action: ActionInterface) {
         let qty = input.qty;
         let key = input.key;
         let value = input.value;
+        let caller = input.caller;
         
         // Check if single ownership
         if (state.ownership === 'single') {
@@ -254,6 +255,9 @@ export async function handle(state: StateInterface, action: ActionInterface) {
         if (note && note !== '') {
             vote.note = note;
         }
+        if (caller && caller !== '') {
+            vote.caller = caller;
+        }
 
         votes.push(vote);
 
@@ -272,7 +276,9 @@ export async function handle(state: StateInterface, action: ActionInterface) {
 
         // Is caller allowed to vote?
         if (!(caller in balances)) {
-            ThrowError("Caller isn't a member of the vehicle and therefore isn't allowed to vote");
+            ThrowError("Caller isn't a member of the vehicle and therefore isn't allowed to vote.");
+        } else if (state.ownership === 'single' && caller !== state.creator) {
+            ThrowError("Caller is not the owner of the vehicle.");
         }
 
         // Is vote over?
@@ -471,7 +477,7 @@ function processWithdrawal(vehicle, tokenObj) {
 
 function finalizeVotes(vehicle, concludedVotes, quorum, support) {
     concludedVotes.forEach( vote => {
-        // If single owned, modify
+        // If single owned
         if (vehicle.ownership === 'single') {
                 modifyVehicle(vehicle, vote);
                 vote.status = 'passed';

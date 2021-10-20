@@ -91,6 +91,7 @@ export interface TokenInterface {
 export interface VoteInterface {
     status?: 'active' | 'quorumFailed' | 'passed' | 'failed';
     type?: 'mint' | 'burn' | 'indicative' | 'set' | 'addMember' | 'removeMember' | 'assetDirective';
+    caller?: String;
     id?: String;
     totalWeight?: number;
     recipient?: string;
