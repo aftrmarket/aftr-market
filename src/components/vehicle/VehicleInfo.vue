@@ -6,7 +6,7 @@
                     <span aria-hidden="true" :class="[uiEditMode ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200']" />
                 </Switch>
                 <SwitchLabel as="span" class="ml-3">
-                    <span class="">Enable Editing</span>
+                    <span :class="editModeClass">Enable Editing</span>
                 </SwitchLabel>
             </SwitchGroup>
         </div>
@@ -134,8 +134,8 @@
 </template>
 
 <script>
-import { ref } from 'vue'
-import { Switch, SwitchGroup, SwitchLabel } from '@headlessui/vue'
+import { ref } from 'vue';
+import { Switch, SwitchGroup, SwitchLabel } from '@headlessui/vue';
 import { mapGetters } from 'vuex';
 import numeral from "numeral";
 import VehicleStatusText from './VehicleStatusText.vue';
@@ -182,6 +182,13 @@ export default {
         }
     },
     computed: {
+        editModeClass() {
+            if (this.uiEditMode) {
+                return "text-black text-sm";
+            } else {
+                return "text-gray-500 text-sm";
+            }
+        },
         vehicleStatusAlert() {
             if (typeof this.vehicle.status === 'undefined' || this.vehicle.status === 'stopped' || this.vehicle.status === '') {
                 return "capitalize px-2 sm:px-4 py-3 inline-flex leading-3 text-sm font-semibold rounded-full bg-red-100 text-red-800";
