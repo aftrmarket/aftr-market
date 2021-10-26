@@ -594,34 +594,6 @@ function updateSetting(vehicle, key, value) {
 }
 
 async function test() {
-    // const state = {
-    //     "name": "Test Vehicle",
-    //     "ticker": "AFTR-Test-1",
-    //     "balances": {
-    //         "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8": 12300,
-    //         "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I": 1000
-    //     },
-    //     "creator": "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I",
-    //     "ownership": "single",
-    //     "settings": [
-    //         [
-    //             "quorum",
-    //             0.5
-    //         ],
-    //         [
-    //             "voteLength",
-    //             2000
-    //         ],
-    //         [
-    //             "lockMinLength",
-    //             100
-    //         ],
-    //         [
-    //             "lockMaxLength",
-    //             10000
-    //         ]
-    //     ]
-    // };
     const state = {
         "name": "Test Vehicle",
         "ticker": "AFTR-Test-1",
