@@ -83,7 +83,7 @@ export interface TokenInterface {
     tokenId: string,
     source: string,
     balance: number,
-    depositBlock: number,   // Stamp when added
+    start: number,   // Stamp when added
     lockLength?: number,    // Planning for temporary loaning of tokens to a vehicle
 
 }

@@ -382,8 +382,8 @@ export async function handle(state: StateInterface, action: ActionInterface) {
         const target = input.target;
         const qty = input.qty;
         const tokenId = input.tokenId;
-        const depositBlock = input.depositBlock;
-        let lockLength = -1;
+        const start = input.start;
+        let lockLength = 0;
         if (input.lockLength) {
             lockLength = input.lockLength;
         }
@@ -395,12 +395,9 @@ export async function handle(state: StateInterface, action: ActionInterface) {
             source: source,
             target: target,
             balance: qty,
-            depositBlock: depositBlock,
-            lockLength: -1
+            start: start,
+            lockLength: lockLength
         };
-        if (input.lockLength) {
-            txObj.lockLength = input.lockLength;
-        }
         /*** */
 
         if (!txId) {
@@ -486,7 +483,7 @@ function scanVault(vehicle, block) {
 }
 
 function returnLoanedTokens(vehicle, block) {
-    const unlockedTokens = vehicle.tokens.filter((token) => (token.lockLength !== -1 && token.depositBlock + token.lockLength >= block));
+    const unlockedTokens = vehicle.tokens.filter((token) => (token.lockLength !== 0 && token.start + token.lockLength >= block));
     unlockedTokens.forEach(token => processWithdrawal(vehicle, token));
 }
 
@@ -660,7 +657,7 @@ async function test() {
                 "source": "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
                 "txId" : 'tx1fasdfoijeo0984',
                 "balance": 2500,
-                "depositBlock": 123,
+                "start": 123,
                 "lockLength": 5
             },
             {
@@ -668,7 +665,7 @@ async function test() {
                 "source": "joe7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
                 "txId" : 'tx2fasdfoijeo8547',
                 "balance": 1000,
-                "depositBlock": 123,
+                "start": 123,
                 "lockLength": 10
             },
             {
@@ -676,7 +673,7 @@ async function test() {
                 "source": "joe7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
                 "txId" : 'tx3fasdfoijeo8547',
                 "balance": 3400,
-                "depositBlock": 123,
+                "start": 123,
                 "lockLength": 5
             }
         ]
@@ -698,7 +695,7 @@ async function test() {
         input: {
             function: 'deposit',
             txId: 'NOT IMPLEMENTED YET',
-            depositBlock: 123,
+            start: 123,
             tokenId: 'T-SQUID',
             qty: 10000
         },
