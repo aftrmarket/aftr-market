@@ -49,7 +49,7 @@ export async function handle(state: StateInterface, action: ActionInterface) {
 
     let block = 0;
     if (mode === 'TEST') {
-        block = 130;
+        block = 210;
     } else {
         block = +SmartWeave.block.height;
     }
@@ -71,9 +71,14 @@ export async function handle(state: StateInterface, action: ActionInterface) {
         /**** TODO */
 
 
-        // Check for any unlocked tokens
+        // Unlock tokens in vault
+        if (state.vault) {
+            scanVault(state, block);
+        }
+
+        // Check for any expired loaned tokens
         if (state.tokens) {
-            returnUnlockedTokens(state, block);
+            returnLoanedTokens(state, block);
         }
     }
 
@@ -118,6 +123,8 @@ export async function handle(state: StateInterface, action: ActionInterface) {
         let key = input.key;
         let value = input.value;
         let caller = input.caller;
+        let lockLength = input.lockLength;
+        let start = input.start;
         
         // Check if single ownership
         if (state.ownership === 'single') {
@@ -152,7 +159,7 @@ export async function handle(state: StateInterface, action: ActionInterface) {
 
         // Validate input for member and token management
         let recipient = '';
-        if (voteType === 'mint' || voteType === 'burn' || voteType === 'addMember' || voteType === 'removeMember') {
+        if (voteType === 'mint' || voteType === 'burn' || voteType === 'mintLocked' || voteType === 'addMember' || voteType === 'removeMember') {
             if (!input.recipient) {
                 ThrowError("Error in input.  Recipient not supplied.");
             }
@@ -162,7 +169,7 @@ export async function handle(state: StateInterface, action: ActionInterface) {
             }
 
             // Check to see if qty is too big
-            if (voteType === 'mint' || voteType === 'addMember') {
+            if (voteType === 'mint' || voteType === 'addMember' || voteType === 'mintLocked') {
                 let totalTokens = 0;
                 for (let wallet in balances) {
                     totalTokens += balances[wallet];
@@ -189,10 +196,24 @@ export async function handle(state: StateInterface, action: ActionInterface) {
                 }
             }
 
+            if (!lockLength) {
+                lockLength = 0;
+            } else if (lockLength < settings.get('lockMinLength') || lockLength > settings.get('lockMaxLength')) {
+                ThrowError("Invalid Lock Length.");
+            }
+
+            if (!start) {
+                start = block;
+            } else if (start < 0) {
+                ThrowError("Invalid Start value.");
+            }
+
             recipient = isArweaveAddress(input.recipient);
 
             if (voteType === 'mint') {
                 note = "Mint " + String(qty) + " tokens for " + recipient;
+            } else if (voteType === 'mintLocked') {
+                note = "Mint and Lock " + String(qty) + " tokens for " + recipient;
             } else if (voteType === 'burn') {
                 note = "Burn " + String(qty) + " tokens for " + recipient;
             } else if (voteType === 'addMember') {
@@ -235,7 +256,7 @@ export async function handle(state: StateInterface, action: ActionInterface) {
             yays: 0,
             nays: 0,
             voted: [],
-            start: block
+            start: start
         }
         if (recipient !== '') {
             vote.recipient = recipient;
@@ -440,7 +461,31 @@ function isArweaveAddress(addy: string) {
     return address;
 }
 
-function returnUnlockedTokens(vehicle, block) {
+function scanVault(vehicle, block) {
+    for (const [key, arr] of Object.entries(vehicle.vault)) {
+        // @ts-expect-error
+        for(let i=0; i < arr.length; i++) {
+            if (arr[i].end <= block) {
+                // Transfer balance
+                if (key in vehicle.balances) {
+                    vehicle.balances[key] += arr[i].balance;
+                } else {
+                    vehicle.balances[key] = arr[i].balance;
+                }
+    
+                // Remove object
+                vehicle.vault[key].splice(i, 1);
+                i--;
+            }
+            // Clean up empty objects
+            if (vehicle.vault[key].length == 0) {
+                delete vehicle.vault[key];
+            }
+        }
+    }
+}
+
+function returnLoanedTokens(vehicle, block) {
     const unlockedTokens = vehicle.tokens.filter((token) => (token.lockLength !== -1 && token.depositBlock + token.lockLength >= block));
     unlockedTokens.forEach(token => processWithdrawal(vehicle, token));
 }
@@ -503,6 +548,19 @@ function modifyVehicle(vehicle, vote) {
         } else {
             // Wallet is new
             vehicle.balances[vote.recipient] = vote.qty;
+        }
+    } else if (vote.type === 'mintLocked') {
+        let vaultObj = {
+            balance: vote.qty,
+            start: vote.start,
+            end: vote.start + vote.lockLength
+        }
+        if (vote.recipient in vehicle.vault) {
+            // Add to existing
+            vehicle.vault[vote.recipient].push(vaultObj);
+        } else {
+            // Add new
+            vehicle.vault[vote.recipient] = [ vaultObj ];
         }
     } else if (vote.type === 'burn') {
         vehicle.balances[vote.recipient] -= vote.qty;
@@ -580,6 +638,37 @@ async function test() {
             [ "lockMinLength", 100 ],
             [ "lockMaxLength", 10000 ]
         ],
+        "vault" : {
+            "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I" : [
+                {
+                    "balance" : 20000,
+                    "end" : 150,
+                    "start" : 100
+                },
+                {
+                    "balance" : 20000,
+                    "end" : 200,
+                    "start" : 100
+                },
+                {
+                    "balance" : 20000,
+                    "end" : 250,
+                    "start" : 100
+                },
+            ],
+            "WNeEQzI24ZKWslZkQT573JZ8bhatwDVx6XVDrrGbUyk": [
+                  {
+                    "balance": 30000,
+                    "end": 150,
+                    "start": 100
+                  },
+                  {
+                    "balance": 2500000,
+                    "start": 100,
+                    "end": 200
+                  }
+                    ]
+        },
         "votes": [
             // {
             //     "status": 'active',
@@ -750,12 +839,11 @@ const multiAction = {
     caller: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I'
 };
     // @ts-expect-error
-    let result = await handle(state, multiAction);
-    // @ts-expect-error
-    let bal = await handle(state, balAction);
+    let result = await handle(state, depAction);
+    //let bal = await handle(state, balAction);
     //console.log(result);
-    console.log(JSON.stringify(result, undefined, 2));
-    //console.log(JSON.stringify(result));
+    //console.log(JSON.stringify(result, undefined, 2));
+    console.log(JSON.stringify(result));
 }
 
 test();

@@ -24,7 +24,7 @@ async function handle(state, action) {
   }
   let block = 0;
   if (mode === "TEST") {
-    block = 130;
+    block = 210;
   } else {
     block = +SmartWeave.block.height;
   }
@@ -33,8 +33,11 @@ async function handle(state, action) {
     finalizeVotes(state, concludedVotes, settings.get("quorum"), settings.get("support"));
   }
   if (multiIteration <= 1) {
+    if (state.vault) {
+      scanVault(state, block);
+    }
     if (state.tokens) {
-      returnUnlockedTokens(state, block);
+      returnLoanedTokens(state, block);
     }
   }
   if (input.function === "balance") {
@@ -55,12 +58,15 @@ async function handle(state, action) {
     let qty = input.qty;
     let key = input.key;
     let value = input.value;
+    let caller2 = input.caller;
+    let lockLength = input.lockLength;
+    let start = input.start;
     if (state.ownership === "single") {
-      if (caller !== state.creator) {
+      if (caller2 !== state.creator) {
         ThrowError("Caller is not the creator of the vehicle.");
       }
     }
-    if (!(caller in balances) || !(balances[caller] > 0)) {
+    if (!(caller2 in balances) || !(balances[caller2] > 0)) {
       ThrowError("Caller is not allowed to propose vote.");
     }
     let votingSystem = "equal";
@@ -78,14 +84,14 @@ async function handle(state, action) {
       ThrowError("Invalid voting system.");
     }
     let recipient = "";
-    if (voteType === "mint" || voteType === "burn" || voteType === "addMember" || voteType === "removeMember") {
+    if (voteType === "mint" || voteType === "burn" || voteType === "mintLocked" || voteType === "addMember" || voteType === "removeMember") {
       if (!input.recipient) {
         ThrowError("Error in input.  Recipient not supplied.");
       }
       if (!qty || !(qty > 0)) {
         ThrowError("Error in input.  Quantity not supplied or is invalid.");
       }
-      if (voteType === "mint" || voteType === "addMember") {
+      if (voteType === "mint" || voteType === "addMember" || voteType === "mintLocked") {
         let totalTokens = 0;
         for (let wallet in balances) {
           totalTokens += balances[wallet];
@@ -107,9 +113,21 @@ async function handle(state, action) {
           ThrowError("Can't remove creator from balances.");
         }
       }
+      if (!lockLength) {
+        lockLength = 0;
+      } else if (lockLength < settings.get("lockMinLength") || lockLength > settings.get("lockMaxLength")) {
+        ThrowError("Invalid Lock Length.");
+      }
+      if (!start) {
+        start = block;
+      } else if (start < 0) {
+        ThrowError("Invalid Start value.");
+      }
       recipient = isArweaveAddress(input.recipient);
       if (voteType === "mint") {
         note = "Mint " + String(qty) + " tokens for " + recipient;
+      } else if (voteType === "mintLocked") {
+        note = "Mint and Lock " + String(qty) + " tokens for " + recipient;
       } else if (voteType === "burn") {
         note = "Burn " + String(qty) + " tokens for " + recipient;
       } else if (voteType === "addMember") {
@@ -142,7 +160,7 @@ async function handle(state, action) {
       yays: 0,
       nays: 0,
       voted: [],
-      start: block
+      start
     };
     if (recipient !== "") {
       vote.recipient = recipient;
@@ -162,6 +180,9 @@ async function handle(state, action) {
     if (note && note !== "") {
       vote.note = note;
     }
+    if (caller2 && caller2 !== "") {
+      vote.caller = caller2;
+    }
     votes.push(vote);
     return { state };
   }
@@ -173,7 +194,9 @@ async function handle(state, action) {
       ThrowError("Vote does not exist.");
     }
     if (!(caller in balances)) {
-      ThrowError("Caller isn't a member of the vehicle and therefore isn't allowed to vote");
+      ThrowError("Caller isn't a member of the vehicle and therefore isn't allowed to vote.");
+    } else if (state.ownership === "single" && caller !== state.creator) {
+      ThrowError("Caller is not the owner of the vehicle.");
     }
     if (vote.status !== "active") {
       ThrowError("Vote is not active.");
@@ -281,7 +304,25 @@ function isArweaveAddress(addy) {
   }
   return address;
 }
-function returnUnlockedTokens(vehicle, block) {
+function scanVault(vehicle, block) {
+  for (const [key, arr] of Object.entries(vehicle.vault)) {
+    for (let i = 0; i < arr.length; i++) {
+      if (arr[i].end <= block) {
+        if (key in vehicle.balances) {
+          vehicle.balances[key] += arr[i].balance;
+        } else {
+          vehicle.balances[key] = arr[i].balance;
+        }
+        vehicle.vault[key].splice(i, 1);
+        i--;
+      }
+      if (vehicle.vault[key].length == 0) {
+        delete vehicle.vault[key];
+      }
+    }
+  }
+}
+function returnLoanedTokens(vehicle, block) {
   const unlockedTokens = vehicle.tokens.filter((token) => token.lockLength !== -1 && token.depositBlock + token.lockLength >= block);
   unlockedTokens.forEach((token) => processWithdrawal(vehicle, token));
 }
@@ -327,6 +368,17 @@ function modifyVehicle(vehicle, vote) {
     } else {
       vehicle.balances[vote.recipient] = vote.qty;
     }
+  } else if (vote.type === "mintLocked") {
+    let vaultObj = {
+      balance: vote.qty,
+      start: vote.start,
+      end: vote.start + vote.lockLength
+    };
+    if (vote.recipient in vehicle.vault) {
+      vehicle.vault[vote.recipient].push(vaultObj);
+    } else {
+      vehicle.vault[vote.recipient] = [vaultObj];
+    }
   } else if (vote.type === "burn") {
     vehicle.balances[vote.recipient] -= vote.qty;
   } else if (vote.type === "removeMember") {
@@ -370,6 +422,37 @@ async function test() {
       ["lockMinLength", 100],
       ["lockMaxLength", 1e4]
     ],
+    "vault": {
+      "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I": [
+        {
+          "balance": 2e4,
+          "end": 150,
+          "start": 100
+        },
+        {
+          "balance": 2e4,
+          "end": 200,
+          "start": 100
+        },
+        {
+          "balance": 2e4,
+          "end": 250,
+          "start": 100
+        }
+      ],
+      "WNeEQzI24ZKWslZkQT573JZ8bhatwDVx6XVDrrGbUyk": [
+        {
+          "balance": 3e4,
+          "end": 150,
+          "start": 100
+        },
+        {
+          "balance": 25e5,
+          "start": 100,
+          "end": 200
+        }
+      ]
+    },
     "votes": [],
     "tokens": [
       {
@@ -524,8 +607,7 @@ async function test() {
     },
     caller: "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I"
   };
-  let result = await handle(state, multiAction);
-  let bal = await handle(state, balAction);
-  console.log(JSON.stringify(result, void 0, 2));
+  let result = await handle(state, depAction);
+  console.log(JSON.stringify(result));
 }
 test();
