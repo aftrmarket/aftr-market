@@ -122,12 +122,11 @@ export async function handle(state: StateInterface, action: ActionInterface) {
         let qty = input.qty;
         let key = input.key;
         let value = input.value;
-        let caller = input.caller;
         let lockLength = input.lockLength;
         let start = input.start;
         
         // Check if single ownership
-        if (state.ownership === 'single') {
+        if (state.ownership === 'single') {  
             // Single ownership, so caller must be creator
             if (caller !== state.creator) {
                 ThrowError("Caller is not the creator of the vehicle.");
@@ -135,7 +134,7 @@ export async function handle(state: StateInterface, action: ActionInterface) {
         }
 
         // Check valid inputs, caller is member with balance
-        if (!(caller in balances) || !(balances[caller] > 0)) {    
+        if (!(caller in balances) || !(balances[caller] > 0)) { 
             ThrowError("Caller is not allowed to propose vote.")
         }
 
@@ -275,9 +274,6 @@ export async function handle(state: StateInterface, action: ActionInterface) {
         }
         if (note && note !== '') {
             vote.note = note;
-        }
-        if (caller && caller !== '') {
-            vote.caller = caller;
         }
 
         votes.push(vote);
@@ -716,12 +712,12 @@ async function test() {
         input: {
             function: 'propose',
             type: 'set',
-            recipient: '',
-            target: '',
-            qty: 0,
+            // recipient: '',
+            // target: '',
+            // qty: 0,
             key: 'settings.quorum',
-            value: .01,
-            note: ''
+            value: .01
+            // note: ''
         },
         caller: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I'
     };
@@ -808,8 +804,9 @@ const multiAction = {
     },
     caller: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I'
 };
+
     // @ts-expect-error
-    let result = await handle(state, depAction);
+    let result = await handle(state, proposeVoteAction);
     //let bal = await handle(state, balAction);
     //console.log(result);
     //console.log(JSON.stringify(result, undefined, 2));
