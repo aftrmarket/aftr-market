@@ -1,8 +1,8 @@
 # The AFTR Protocol Contract
 
-The AFTR state follows common practices established by early SmartWeave contracts such as CommunityXYZ.
+The AFTR state follows common practices established by early SmartWeave contracts such as CommunityXYZ. We call treasuries created using the protocol, AFTR vehicles. A vehicle's state is as follows:
 
-```
+```typescript
 {
     name: string,
     ticker: string,
@@ -28,10 +28,29 @@ The AFTR state follows common practices established by early SmartWeave contract
     settings: Map<string, any>
 }
 ```
+## Settings
+AFTR vehicles use the standard settings in SmartWeave contracts. Here are some of the standard ones:
+
+```typescript
+  settings: [   // Array of a Map<string, any>
+      ["quorum", number],                   // quorum is between 0.01 and 0.99
+      ["support", number],                  // Between 0.01-0.99, how much % yays for a proposal to be approved
+      ["voteLength", number],               // How many blocks to leave a proposal open
+      ["lockMinLength", number],            // Minimum lockLength allowed
+      ["lockMaxLength", number],            // Maximum lockLength allowed
+      ["communityAppUrl", string],
+      ["communityDiscussionLinks", string],
+      ["communityDescription", string],
+      ["communityLogo", string],
+      ["evolve", string]
+  ]
+```
+
+
 ## Interfaces
 
 ### Token Interface
-```
+```typescript
 TokenInterface {
     txId: string,
     tokenId: string,
@@ -45,12 +64,11 @@ TokenInterface {
 ### Vote Interface
 The VoteInterface is similar to the vote interface in CommunityXYZ with a few additions.
 
-```
+```typescript
 VoteInterface {
     status?: 'active' | 'quorumFailed' | 'passed' | 'failed';
     type?: 'mint' | 'burn' | 'indicative' | 'set' | 'addMember' | 'mintLocked' | 'removeMember' | 'assetDirective';
-    caller?: String;
-    id?: String;
+    id?: string;
     totalWeight?: number;
     recipient?: string;
     target?: string;
@@ -68,22 +86,66 @@ VoteInterface {
 
 All changes to the vehicle state with the exception of deposits are handled through the voting functions. When a vote is proposed, the contract checks to see if the vehicle is owned by a single member or a DAO. If the ownership is single, then the vote processes immediately without requiring passed votes. If the ownership is DAO, then the contract using the voting system settings (votingSystem, voteLength, and quorum) to process the vote. If the vote passes, then the contract makes the proposed change to the vehicle.
 
-## Functions
+## Functions in the AFTR Smart Contract
 
 ### Balance
+The balance function is used to view a balance of a vehicle member. If a target is not supplied in the input, then the balance of the caller is returned.
 
+#### Sample Balance Action
+```typescript
+const balAction = {
+    input: { 
+        function: 'balance',
+        target: 'abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8'
+    },
+    caller: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I'
+};
+```
 
 ### Transfer
+The transfer function works just like in other SmartWeave contracts; it transfers the balance from the caller to the target.
 
+#### Sample Transfer Action
+```typescript
+const txAction = {
+    input: {
+        function: 'transfer',
+        target: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I',
+        qty: 300
+    },
+    caller: 'abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8'
+};
+```
 
 ### Deposit
+The deposit function transfers Arweave assets into the vehicle. The caller must supply the Transaction ID in order for the AFTR contract to verify the token transfer. Once verified, the vehicle state is updated to show the assets in the token array of objects.
 
+**NOTE: This may change once tx validation is implemented.**
+
+#### Sample Deposit Action
+```typescript
+const depAction = {
+    input: {
+        function: 'deposit',
+        txId: 'BoRZeKy5kudTtI1TS2CMri8XNC4MPqMnBkCm2BV9i4F',
+        start: 123,
+        tokenId: 'T-SQUID',
+        qty: 10000
+    },
+    caller: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I'
+};
+```
 
 ### Withdrawal
+The withdrawal function utilizes the Foreign Call Protocol (FCP) to transfers tokens out of the vehicle. Arweave PSTs or assets must support the FCP in order for this to work.
 
+#### Sample Withdrawal Action
+```typescript
+TODO
+```
 
 ### Propose
-
+The propose function is how most changes to the vehicle are proposed. 
 
 ### Vote
 
@@ -96,8 +158,8 @@ Multi-interactions allows multiple contract actions to be bundled together in on
 - The contract limits the number of actions inside of a multi-interaction to 1000, which should be more than enough.
 - If a multi-interaction is called from a DAO owned vehicle, then the number of proposed votes will be equal to the number of actions bundled into the call.
 
-### Multi-Interaction Input
-```
+### Sample Multi-Interaction Action
+```typescript
 const actions = [
     {
         input: {
