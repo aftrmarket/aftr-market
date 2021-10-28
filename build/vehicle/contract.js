@@ -58,15 +58,14 @@ async function handle(state, action) {
     let qty = input.qty;
     let key = input.key;
     let value = input.value;
-    let caller2 = input.caller;
     let lockLength = input.lockLength;
     let start = input.start;
     if (state.ownership === "single") {
-      if (caller2 !== state.creator) {
+      if (caller !== state.creator) {
         ThrowError("Caller is not the creator of the vehicle.");
       }
     }
-    if (!(caller2 in balances) || !(balances[caller2] > 0)) {
+    if (!(caller in balances) || !(balances[caller] > 0)) {
       ThrowError("Caller is not allowed to propose vote.");
     }
     let votingSystem = "equal";
@@ -180,9 +179,6 @@ async function handle(state, action) {
     if (note && note !== "") {
       vote.note = note;
     }
-    if (caller2 && caller2 !== "") {
-      vote.caller = caller2;
-    }
     votes.push(vote);
     return { state };
   }
@@ -254,8 +250,8 @@ async function handle(state, action) {
     const target = input.target;
     const qty = input.qty;
     const tokenId = input.tokenId;
-    const depositBlock = input.depositBlock;
-    let lockLength = -1;
+    const start = input.start;
+    let lockLength = 0;
     if (input.lockLength) {
       lockLength = input.lockLength;
     }
@@ -265,12 +261,9 @@ async function handle(state, action) {
       source,
       target,
       balance: qty,
-      depositBlock,
-      lockLength: -1
+      start,
+      lockLength
     };
-    if (input.lockLength) {
-      txObj.lockLength = input.lockLength;
-    }
     if (!txId) {
       ThrowError("The transaction is not valid.  Tokens were not transferred to vehicle.");
     }
@@ -323,7 +316,7 @@ function scanVault(vehicle, block) {
   }
 }
 function returnLoanedTokens(vehicle, block) {
-  const unlockedTokens = vehicle.tokens.filter((token) => token.lockLength !== -1 && token.depositBlock + token.lockLength >= block);
+  const unlockedTokens = vehicle.tokens.filter((token) => token.lockLength !== 0 && token.start + token.lockLength >= block);
   unlockedTokens.forEach((token) => processWithdrawal(vehicle, token));
 }
 function getStateProperty(key) {
@@ -460,7 +453,7 @@ async function test() {
         "source": "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
         "txId": "tx1fasdfoijeo0984",
         "balance": 2500,
-        "depositBlock": 123,
+        "start": 123,
         "lockLength": 5
       },
       {
@@ -468,7 +461,7 @@ async function test() {
         "source": "joe7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
         "txId": "tx2fasdfoijeo8547",
         "balance": 1e3,
-        "depositBlock": 123,
+        "start": 123,
         "lockLength": 10
       },
       {
@@ -476,14 +469,15 @@ async function test() {
         "source": "joe7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
         "txId": "tx3fasdfoijeo8547",
         "balance": 3400,
-        "depositBlock": 123,
+        "start": 123,
         "lockLength": 5
       }
     ]
   };
   const balAction = {
     input: {
-      function: "balance"
+      function: "balance",
+      target: "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8"
     },
     caller: "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I"
   };
@@ -499,7 +493,7 @@ async function test() {
     input: {
       function: "deposit",
       txId: "NOT IMPLEMENTED YET",
-      depositBlock: 123,
+      start: 123,
       tokenId: "T-SQUID",
       qty: 1e4
     },
@@ -517,12 +511,8 @@ async function test() {
     input: {
       function: "propose",
       type: "set",
-      recipient: "",
-      target: "",
-      qty: 0,
       key: "settings.quorum",
-      value: 0.01,
-      note: ""
+      value: 0.01
     },
     caller: "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I"
   };
@@ -607,7 +597,7 @@ async function test() {
     },
     caller: "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I"
   };
-  let result = await handle(state, depAction);
+  let result = await handle(state, balAction);
   console.log(JSON.stringify(result));
 }
 test();

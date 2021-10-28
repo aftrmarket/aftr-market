@@ -677,7 +677,8 @@ async function test() {
     };
     const balAction = {
         input: { 
-            function: 'balance'
+            function: 'balance',
+            target: 'abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8'
         },
         caller: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I'
     };
@@ -806,7 +807,7 @@ const multiAction = {
 };
 
     // @ts-expect-error
-    let result = await handle(state, proposeVoteAction);
+    let result = await handle(state, balAction);
     //let bal = await handle(state, balAction);
     //console.log(result);
     //console.log(JSON.stringify(result, undefined, 2));
