@@ -145,10 +145,37 @@ TODO
 ```
 
 ### Propose
-The propose function is how most changes to the vehicle are proposed. 
+The propose function is how most changes to the vehicle are proposed. For single ownership vehicles, changes are sent to the contract as proposals, but then the proposals are passed during the next contract read event. By implementing changes to single ownership and DAO ownership vehicles the same way, consistency is maintained.
+
+When a proposal is submitted, the contract adds an VoteInterface object to the votes array in the state.  An unique ID is created using the block concatenated with the SmartWeave Transaction ID.
+
+#### Sample Propose Action
+```typescript
+const proposeVoteAction = {
+    input: {
+        function: 'propose',
+        type: 'set',
+        key: 'settings.quorum',
+        value: .01
+    },
+    caller: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I'
+};
+```
 
 ### Vote
+The vote function accepts the vote being cast. Using the votingSystem, the function determines if the votes needs to be weighted or not and then applies the amount to the yay or nay value. It also adds the caller's address to the voted array to track voting history.
 
+#### Sample Vote Action
+```typescript
+const voteCastAction = {
+    input: {
+        function: 'vote',
+        voteId: '130tx12033012',    // ID for the vote being cast
+        cast: 'yay'
+    },
+    caller: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I'
+};
+```
 
 ## Multi-Interaction
 
