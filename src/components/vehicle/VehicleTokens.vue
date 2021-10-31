@@ -9,6 +9,9 @@
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
+                                    <th v-if="allowTransfer" scope="col" class="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <input type="checkbox" v-model="selectAll" :class="checkboxClass" />
+                                    </th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profit Sharing Token ({{ vehicle.tokens.length }})</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contributor</th>
                                     <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Tokens</th>
@@ -18,6 +21,9 @@
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 <tr v-for="pst in vehicle.tokens" :key="pst.id" class="hover:bg-gray-50">
+                                    <td v-if="allowTransfer" class="text-center px-2 py-2">
+                                        <input type="checkbox" :value="pst.txId" v-model="tokenSelected" :class="checkboxClass" />
+                                    </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center">
                                             <div class="flex-shrink-0 h-10 w-10">
@@ -33,7 +39,7 @@
                                     <td class="text-right px-6 py-3 text-gray-500">{{ formatNumber(pst.balance) }}</td>
                                     <td class="text-right px-6 py-3 text-gray-500">{{ formatNumber(pst.total, true) }}</td>
                                     <td class="text-center px-6 py-3">
-                                        <button v-if="allowTransfer" @click.prevent="transferPst(pst.id)" type="submit" class="inline-flex items-center p-1 border border-transparent shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed">
+                                        <button v-if="allowTransfer" @click.prevent="transferPst(pst.txId)" type="submit" class="inline-flex items-center p-1 border border-transparent shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="#065F46">
                                                 <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
                                             </svg>
@@ -67,7 +73,7 @@
             </div>
         </div>
     </div>
-
+    {{ tokenSelected }}
 </template>
 
 <script>
@@ -83,9 +89,27 @@ export default {
             allowAdd: false,
             allowTransfer: false,
             showAddTokens: false,
+            tokenSelected: [],
         };
     },
     computed: {
+        selectAll: {
+            get() {
+                return this.vehicle.tokens ? this.tokenSelected.length == Object.keys(this.vehicle.tokens).length : false;
+            },
+            set(value) {
+                let selected = [];
+                if(value) {
+                    for(let token of this.vehicle.tokens) {
+                        selected.push(token.txId);
+                    }
+                }
+                this.tokenSelected = selected;
+            }
+        },
+        checkboxClass() {
+            return "focus:ring-aftrBlue h-4 w-4 text-aftrBlue border-gray-300 rounded";
+        },
         creatorAddress() {
             if (typeof this.vehicle.creator === 'undefined' || this.vehicle.creator === null || this.vehicle.creator === '') {
                 return '~NO ONE~';
@@ -108,7 +132,7 @@ export default {
                 this.allowAdd = false;
             }
             // For transfers, you must be the creator and the vehicle must have single owenership
-            if (this.getActiveAddress === this.creatorAddress && this.vehicle.ownership === 'single') {
+            if ((this.getActiveAddress === this.creatorAddress && this.vehicle.ownership === 'single') || (this.getActiveAddress in this.vehicle.balances && this.vehicle.ownership === 'dao')) {
                 this.allowTransfer = true;
             } else {
                 this.allowTransfer = false;
@@ -137,6 +161,13 @@ export default {
                 return '';
             }
         },
+        transferPst(txId) {
+            if (this.tokenSelected.includes(txId)) {
+                this.tokenSelected = this.tokenSelected.filter( (id) => id !== txId);
+            } else {
+                this.tokenSelected.push(txId);
+            }
+        }
     },
     created() {
         this.setFlags();
