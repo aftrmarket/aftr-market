@@ -52,10 +52,10 @@
                                 <vehicle-info v-if="activeTab === 'Info'" :vehicle="vehicle" :contractId="contractId"></vehicle-info>
                                 <vehicle-members v-else-if="activeTab === 'Members'" :vehicle="vehicle"></vehicle-members>
                                 <vehicle-tokens v-else-if="activeTab === 'Tokens'" :vehicle="vehicle"></vehicle-tokens>
-                                <vehicle-profits v-else-if="activeTab === 'Profits'"></vehicle-profits>
+                                <!--<vehicle-profits v-else-if="activeTab === 'Profits'"></vehicle-profits>-->
                                 <!--<vehicle-leases v-else-if="activeTab === 'Leases'" :leases="vehicles.leases"></vehicle-leases>-->
                                 <!--<vehicle-leases v-else-if="activeTab === 'Leases'"></vehicle-leases>-->
-                                <vehicle-fractions v-else-if="activeTab === 'Fractions'"></vehicle-fractions>
+                                <!--<vehicle-fractions v-else-if="activeTab === 'Fractions'"></vehicle-fractions>-->
                                 <vehicle-votes v-else-if="activeTab === 'Votes'" :vehicle="vehicle"></vehicle-votes>
                                 <vehicle-activity v-else-if="activeTab === 'Activity'"></vehicle-activity>
 
@@ -75,15 +75,15 @@ import { readContract } from 'smartweave';
 import VehicleInfo from './vehicle/VehicleInfo.vue';
 import VehicleMembers from './vehicle/VehicleMembers.vue';
 import VehicleTokens from './vehicle/VehicleTokens.vue';
-import VehicleProfits from './vehicle/VehicleProfits.vue';
+//import VehicleProfits from './vehicle/VehicleProfits.vue';
 //import VehicleLeases from './vehicle/VehicleLeases.vue';
-import VehicleFractions from './vehicle/VehicleFractions.vue';
+//import VehicleFractions from './vehicle/VehicleFractions.vue';
 import VehicleVotes from './vehicle/VehicleVotes.vue';
 import VehicleActivity from './vehicle/VehicleActivity.vue';
 import VehiclePlaceholder from './vehicle/VehiclePlaceholder.vue';
 
 export default {
-    components: { VehicleInfo, VehicleMembers, VehicleTokens, VehicleProfits, VehicleFractions, VehicleVotes, VehicleActivity, VehiclePlaceholder },
+    components: { VehicleInfo, VehicleMembers, VehicleTokens, VehicleVotes, VehicleActivity, VehiclePlaceholder },
     props: ['vehicleId'],
     data() {
         return {
@@ -91,8 +91,8 @@ export default {
                 { name: 'Info', href: '#', current: true },
                 { name: 'Members', href: '#', current: false },
                 { name: 'Tokens', href: '#', current: false },
-                { name: 'Profits', href: '#', current: false },
-                { name: 'Fractions', href: '#', current: false },
+                //{ name: 'Profits', href: '#', current: false },
+                //{ name: 'Fractions', href: '#', current: false },
                 //{ name: 'Leases', href: '#', current: false },
                 { name: 'Votes', href: '#', current: false },
                 { name: 'Activity', href: '#', current: false },
