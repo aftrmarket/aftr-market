@@ -29,6 +29,9 @@ module.exports = {
             DEFAULT: '#00F900',
             dark: 'rgba(0, 0, 0, 0.6)'
         },
+        aftrDarkGreen: {
+            DEFAULT: '#065F46'
+        },
         smoke: {
             DEFAULT: 'rgba(0, 0, 0, 0.5)'
         }
