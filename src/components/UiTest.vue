@@ -40,9 +40,10 @@
                                     <!-- PSTs in Vehicle -->
                                     <div class="pt-1">
                                         <div class="my-2 overflow-x-auto sm:-mx-6 lg:-mx">
-                                            <div class="py-2 align-middle inline-block w-3/4 sm:px-3 lg:px-6 ">
+                                            <!--<div :class="varClass('py-2 align-middle inline-block sm:px-3 lg:px-6')">-->
+                                            <div :class="varClass('py-2 w-3/4 align-middle inline-block sm:px-3 lg:px-6')"> 
                                                 <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                                                    <table :class="tableClass">
+                                                    <table class="w-full text-xs divide-y divide-gray-200">
                                                         <thead class="bg-gray-50">
                                                             <tr>
                                                                 <!--v-if-->
@@ -244,7 +245,7 @@
                                                                 <td class="text-right px-1 py-3 text-gray-500">55,000</td>
                                                                 <td class="text-right pr-3 py-3 text-gray-500">183.3333</td>
                                                                 <td class="pt-1"><input type="number" class="mt-1 mb-1 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md"></td>
-                                                                <td class="pt-4 flex items-center space-x-2"><input type="text" class="mt-1 mb-1 w-72 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md">
+                                                                <td class="pt-4 px-4 flex items-center space-x-2"><input type="text" class="mt-1 mb-1 w-72 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md">
                                                                     <!--v-if-->
                                                                 </td>
                                                                 <td class="pt-1"><button type="submit" class="p-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrDarkGreen bg-white hover:bg-aftrDarkGreen hover:text-white focus:outline-none"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -266,7 +267,7 @@
                                                                 <td class="text-right px-1 py-3 text-gray-500">1,000</td>
                                                                 <td class="text-right pr-3 py-3 text-gray-500">333.3333</td>
                                                                 <td class="pt-1"><input type="number" class="mt-1 mb-1 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md"></td>
-                                                                <td class="pt-4 flex items-center space-x-2"><input type="text" class="mt-1 mb-1 w-72 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md">
+                                                                <td class="pt-4 px-4 flex items-center space-x-2"><input type="text" class="mt-1 mb-1 w-72 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md">
                                                                     <!--v-if-->
                                                                 </td>
                                                                 <td class="pt-1"><button type="submit" class="p-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrDarkGreen bg-white hover:bg-aftrDarkGreen hover:text-white focus:outline-none"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -319,6 +320,13 @@ export default {
     methods: {
         switchTable() {
             this.arConnected = !this.arConnected;
+        },
+        varClass(classTxt) {
+            if (this.arConnected) {
+                return String(classTxt) + " w-full";
+            } else {
+                return String(classTxt) + " w-3/4";
+            }
         },
     },
 };

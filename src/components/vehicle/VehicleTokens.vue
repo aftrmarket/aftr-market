@@ -4,29 +4,29 @@
         <!-- PSTs in Vehicle -->
         <div v-if="vehicle.tokens.length > 0" class="pt-1">
             <div class="pt-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                <div class="py-2 align-middle inline-block min-w-full sm:px-3 lg:px-6">
+                <div :class="editClass">
                     <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
                         <table class="w-full text-xs divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th v-if="allowTransfer" scope="col" class="px-2 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">
+                                    <th v-if="allowTransfer" scope="col" class="pl-3 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">
                                         <input type="checkbox" v-model="selectAll" :class="checkboxClass" />
                                     </th>
-                                    <th scope="col" class="px-1 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Arweave Assets ({{ vehicle.tokens.length }})</th>
+                                    <th scope="col" class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Arweave Assets ({{ vehicle.tokens.length }})</th>
                                     <th scope="col" class="px-1 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Contributor</th>
                                     <th scope="col" class="px-1 py-3 text-right font-medium text-gray-500 uppercase tracking-wider">Tokens</th>
-                                    <th scope="col" class="px-1 py-3 text-right font-medium text-gray-500 uppercase tracking-wider">Value (AR)</th>
+                                    <th scope="col" class="px-6 py-3 text-right font-medium text-gray-500 uppercase tracking-wider">Value (AR)</th>
                                     <th v-if="allowTransfer" scope="col" class="py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Transfer Amount</th>
-                                    <th v-if="allowTransfer" scope="col" class="py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Transfer To Address</th>
+                                    <th v-if="allowTransfer" scope="col" class="px-4 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Transfer To Address</th>
                                     <th v-if="allowTransfer" scope="col" class="py-3 text-left font-medium text-gray-500 uppercase tracking-wider"> </th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 <tr v-for="(pst, index) in vehicle.tokens" :key="pst.id" class="hover:bg-gray-50">
-                                    <td v-if="allowTransfer" class="text-center px-2 py-2">
+                                    <td v-if="allowTransfer" class="text-center py-2 pl-3">
                                         <input type="checkbox" :value="pst.txId" v-model="tokenSelected" :class="checkboxClass" />
                                     </td>
-                                    <td class="px-1 py-4 whitespace-nowrap">
+                                    <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center">
                                             <div class="flex-shrink-0 h-10 w-10">
                                                 <img class="h-10 w-10 rounded-full" :src="`https://arweave.net/` + pst.logo" alt="" />
@@ -39,19 +39,19 @@
                                     </td>
                                     <td class="px-1 py-3 text-gray-500">{{ idSubstr(pst.source) }}</td>
                                     <td class="text-right px-1 py-3 text-gray-500">{{ formatNumber(pst.balance) }}</td>
-                                    <td class="text-right pr-3 py-3 text-gray-500">{{ formatNumber(pst.total, true) }}</td>
+                                    <td class="text-right px-6 py-3 text-gray-500">{{ formatNumber(pst.total, true) }}</td>
                                     <td v-if="allowTransfer" class="pt-1">
                                         <input type="number" v-model="transferAmounts[index]" class="mt-1 mb-1 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
                                     </td>
-                                    <td v-if="allowTransfer" class="pt-4 flex items-center space-x-2">
-                                        <input type="text" v-model="transferAddrs[index]" class="mt-1 mb-1 w-72 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
+                                    <td v-if="allowTransfer" class="pt-4 pl-4 pr-1 flex items-center space-x-2">
+                                        <input type="text" v-model="transferAddrs[index]" class="mt-1 mb-1 w-80 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
                                         <button v-if="index == 0" @click.prevent="onFillDownClick" type="button" class="p-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                                 <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                                             </svg>
-                                        </button>                            
+                                        </button>
                                     </td>
-                                    <td v-if="allowTransfer" class="pt-1">
+                                    <td v-if="allowTransfer" class="pt-1 px-3">
                                         <button @click.prevent="onTransferPstClick(pst.txId, index)" type="submit" class="p-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrDarkGreen bg-white hover:bg-aftrDarkGreen hover:text-white focus:outline-none">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                                 <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
@@ -98,33 +98,17 @@
                             Proposed Changes ({{ numChanges }})
                         </th>
                         <th scope="col" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Transfer To
-                        </th>
-                        <th v-if="numChanges > 1 && isAddrValid(transferAddrs[0])">
-
-                        </th>
-                        <th scope="col" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Cancel
                         </th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    <tr v-for="(txId, index) in tokenSelected" :key="txId" class="text-xs text-gray-500 hover:bg-gray-50">
+                    <tr v-for="(wd, index) in proposedChanges" :key="wd.txId" class="text-xs text-gray-500 hover:bg-gray-50">
                         <td class="px-4 py-2">
                             {{ index + 1 }}
                         </td>
                         <td class="px-4 py-2">
-                            <span v-html="proposedText(txId)"></span>
-                        </td>
-                        <td>
-                            <input type="text" @blur="onDirty" class="mt-1 mb-1 mr-4 w-72 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
-                        </td>
-                        <td v-if="numChanges > 1 && isAddrValid(transferAddrs[0])" class="text-left">
-                            <button v-if="index == 0" @click.prevent="onFillDownClick" type="button" class="px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
-                            </button>
+                            <span v-html="proposedText(wd)"></span>
                         </td>
                         <td class="px-4 py-2 text-center">
                             <button @click.prevent="onRemoveProposalClick(index)" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none">
@@ -138,7 +122,7 @@
             </table>
         </div>
         <div class="flex flex-col justify-center px-2 py-4 text-left text-xs text-gray-500 tracking-wider">
-            <p class="text-aftrRed uppercase">Please review the proposed changes</p>
+            <p class="text-aftrRed uppercase">Review the proposed changes</p>
             {{ statusMessage }}
         </div>
     </div>
@@ -161,9 +145,9 @@
 
 
 
-    {{ tokenSelected }}
-    Num Changes: {{ numChanges }}<br>
     {{ transferAddrs }}
+    Num Changes: {{ numChanges }}<br>
+    {{ proposedChanges }}
 </template>
 
 <script>
@@ -207,7 +191,14 @@ export default {
             return "focus:ring-aftrBlue h-4 w-4 text-aftrBlue border-gray-300 rounded";
         },
         numChanges() {
-            return this.tokenSelected.length;
+            return this.proposedChanges.length;
+        },
+        editClass() {
+            if (this.allowTransfer) {
+                return "py-2 align-middle inline-block w-full sm:px-3 lg:px-6";
+            } else {
+                return "py-2 align-middle inline-block w-3/4 sm:px-3 lg:px-6";
+            }
         },
         statusMessage() {
             if (this.getActiveAddress === this.creatorAddress && this.vehicle.ownership === 'single') {
@@ -275,15 +266,16 @@ export default {
             }
         },
         onTransferPstClick(txId, index) {
-            // Validate the amount
             const pst = this.vehicle.tokens.find( token => token.txId === txId);
-            if (this.transferAmounts[index] > 0 && this.transferAmounts[index] <= pst.balance) {
+
+            // Validate the amount
+            if (this.transferAmounts[index] > 0 && this.transferAmounts[index] <= pst.balance && this.isAddrValid(this.transferAddrs[index])) {
                 const foundIndex = this.proposedChanges.findIndex( tx => tx.txId === txId);
                 if (foundIndex === -1) {
                     this.proposedChanges.push(
                         {
                             txId: txId,
-                            target: '',
+                            target: this.transferAddrs[index],
                             qty: this.transferAmounts[index]
                         }
                     );
@@ -295,25 +287,23 @@ export default {
 
                 } else {
                     this.proposedChanges[foundIndex].qty = this.transferAmounts[index];
+                    this.proposedChanges[foundIndex].target = this.transferAddrs[index];
                 }
             }
         },
         onRemoveProposalClick(index) {
-            this.tokenSelected.splice(index, 1);
-            this.transferAddrs.splice(index, 1);
+            this.proposedChanges.splice(index, 1);
         },
-        proposedText(txId) {
-            const transObj = this.vehicle.tokens.find( trans =>  trans.txId === txId );
-
-            return "<span style='color:#FF6C8C'><b>Withdrawal</b></span> <b>" + this.formatNumber(transObj.balance) + "</b> " + transObj.name + " tokens and transfer to ";
-        },
-        onDirty() {
-
+        proposedText(withdrawal) {
+            const transObj = this.vehicle.tokens.find( trans =>  trans.txId === withdrawal.txId );
+            let rowText = "<span style='color:#FF6C8C'><b>Withdrawal</b></span> <b>" + this.formatNumber(withdrawal.qty) + "</b> " + transObj.name + " tokens and transfer to <b>" + withdrawal.target + "</b><br/>";
+            rowText += "Leaving a new balance of <b>" + this.formatNumber(transObj.balance - withdrawal.qty) + "</b> " + transObj.name + " tokens in the vehicle";
+            return rowText
         },
         onFillDownClick() {
             if (this.isAddrValid(this.transferAddrs[0])) {
                 this.transferAddrs.splice(1, this.transferAddrs.length);
-                for (let i = 1; i < this.numChanges; i++) {
+                for (let i = 1; i < this.vehicle.tokens.length; i++) {
                     if (this.transferAddrs[i]) {
                         this.transferAddrs[i] = this.transferAddrs[0];
                     } else {
