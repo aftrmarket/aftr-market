@@ -16,7 +16,7 @@
                         </div>
                         <div>
                             <h1 class="text-2xl font-bold text-white">{{ vehicle.name }}</h1>
-                            <p class="text-sm font-medium text-aftrYellow">{{ contractId }}</p>
+                            <p class="text-sm font-medium font-mono text-aftrYellow">{{ contractId }}</p>
                         </div>
                     </div>
                     <div class="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3">

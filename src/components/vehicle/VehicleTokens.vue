@@ -33,11 +33,11 @@
                                             </div>
                                             <div class="ml-4">
                                                 <div class="font-medium text-gray-900"> {{ pst.name + " (" + pst.ticker + ")" }} </div>
-                                                <div class="text-gray-500"> {{ idSubstr(pst.id) }}</div>
+                                                <div class="text-gray-500 font-mono"> {{ idSubstr(pst.id) }}</div>
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="px-1 py-3 text-gray-500">{{ idSubstr(pst.source) }}</td>
+                                    <td class="px-1 py-3 text-gray-500 font-mono">{{ idSubstr(pst.source) }}</td>
                                     <td class="text-right px-1 py-3 text-gray-500">{{ formatNumber(pst.balance) }}</td>
                                     <td class="text-right px-6 py-3 text-gray-500">{{ formatNumber(pst.total, true) }}</td>
                                     <td v-if="allowTransfer" class="pt-1">
@@ -260,7 +260,8 @@ export default {
         },
         idSubstr(addr, chars = 10) {
             if (typeof addr === 'string') {
-                return addr.substr(0, chars) + '...';
+                let len = parseInt(chars/2);
+                return addr.substr(0, len) + '...' + addr.substr(-len);
             } else {
                 return '';
             }
@@ -296,7 +297,7 @@ export default {
         },
         proposedText(withdrawal) {
             const transObj = this.vehicle.tokens.find( trans =>  trans.txId === withdrawal.txId );
-            let rowText = "<span style='color:#FF6C8C'><b>Withdrawal</b></span> <b>" + this.formatNumber(withdrawal.qty) + "</b> " + transObj.name + " tokens and transfer to <b>" + withdrawal.target + "</b><br/>";
+            let rowText = "<span style='color:#FF6C8C'><b>Withdrawal</b></span> <b>" + this.formatNumber(withdrawal.qty) + "</b> " + transObj.name + " tokens and transfer to <b><span class='font-mono'>" + withdrawal.target + "</span></b><br/>";
             rowText += "Leaving a new balance of <b>" + this.formatNumber(transObj.balance - withdrawal.qty) + "</b> " + transObj.name + " tokens in the vehicle";
             return rowText
         },

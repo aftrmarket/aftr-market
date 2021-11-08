@@ -37,7 +37,7 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     <tr v-for="(tokens, addr) in vehicle.balances" :key="addr" class="text-xs text-gray-500 hover:bg-gray-50">
-                        <td class="text-left px-4 py-2 font-mono">
+                        <td class="text-left px-4 py-2 font-mono tracking-wider">
                             {{ addr }}
                         </td>
                         <td class="text-right px-4 py-2">

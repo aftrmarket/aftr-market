@@ -493,7 +493,8 @@ export default {
     methods: {
         walletAddressSubstr(addr, chars = 10) {
             if (typeof addr === 'string') {
-                return addr.substr(0, chars) + '...';
+                let len = parseInt(chars/2);
+                return addr.substr(0, len) + '...' + addr.substr(-len);
             } else {
                 return '';
             }
