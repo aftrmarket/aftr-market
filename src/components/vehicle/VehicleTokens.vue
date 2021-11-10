@@ -313,6 +313,56 @@ export default {
                 }
             }
         },
+        buildInput(proposedChange) {
+            let input = {};
+            input.function = 'propose';
+            input.type = 'withdrawal';
+            input.id = proposedChange.txId;
+            input.target = proposedChange.target;
+            input.qty = proposedChange.qty;
+
+            const transObj = this.vehicle.tokens.find( trans =>  trans.txId === proposedChange.txId );
+            input.note = 'Withdrawal ' + this.formatNumber(proposedChange.qty) + ' ' + transObj.name + ' tokens and transfer to ' + proposedChange.target + ' leaving a new balance of ' + this.formatNumber(transObj.balance - proposedChange.qty) + ' ' + transObj.name + ' tokens in the vehicle';
+
+            return input;
+        },
+        submit() {
+            /*** 
+             * Need to propose a vote to call the Withdrawal function.
+             * type = withdrawal??
+             * id = Transaction ID of the token in state.tokens
+             * target = Arweave wallet address that the qty is being transferred to
+             * qty = Amount of tokens being transferred
+             * note = proposed change
+             *** */
+            let action = {
+                input: {},
+                caller: this.getActiveAddress
+            };
+            // Determine if multi-interaction is needed based on number of changes
+            if (this.numChanges === 1) {
+                // Single contract interaction
+                action.input = this.buildInput(this.proposedChanges[0]);
+            } else if (this.numChanges > 1) {
+                // Multi-interaction
+                action.input.function = 'multiInteraction';
+                action.input.key = 'multi';
+                action.input.note = 'Multi-Interaction';
+                action.input.actions = [];
+
+                for (let proposedChange of this.proposedChanges) {
+                    let multiAction = {
+                        input: {},
+                        caller: this.getActiveAddress
+                    };
+                    multiAction.input = this.buildInput(proposedChange);
+                    action.input.actions.push(multiAction);
+                }
+            }
+
+            /*** CALL SMARTWEAVE */
+            console.log(JSON.stringify(action));
+        },
     },
     created() {
         this.setFlags();
