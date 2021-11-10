@@ -336,8 +336,8 @@ export default {
              * note = proposed change
              *** */
             let action = {
-                input: {},
-                caller: this.getActiveAddress
+                input: {}
+                //caller: this.getActiveAddress
             };
             // Determine if multi-interaction is needed based on number of changes
             if (this.numChanges === 1) {
@@ -352,8 +352,8 @@ export default {
 
                 for (let proposedChange of this.proposedChanges) {
                     let multiAction = {
-                        input: {},
-                        caller: this.getActiveAddress
+                        input: {}
+                        //caller: this.getActiveAddress
                     };
                     multiAction.input = this.buildInput(proposedChange);
                     action.input.actions.push(multiAction);

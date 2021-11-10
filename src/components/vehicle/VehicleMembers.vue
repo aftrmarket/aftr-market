@@ -374,8 +374,8 @@ export default {
             let recipient = '';
             let qty = 0;
             let action = {
-                input: {},
-                caller: this.getActiveAddress
+                input: {}
+                //caller: this.getActiveAddress
             }
 
             if (count === 1) {
@@ -401,8 +401,8 @@ export default {
                 if (this.memberRemoves.length > 0) {
                     for(let member in this.memberRemoves) {
                         let multiAction = {
-                            input: {},
-                            caller: this.getActiveAddress
+                            input: {}
+                            //caller: this.getActiveAddress
                         };
                         recipient = member;
                         qty = +this.vehicle.balances[member];
@@ -414,8 +414,8 @@ export default {
                 if (this.memberAdds.length > 0) {
                     this.memberAdds.forEach(member => {
                         let multiAction = {
-                            input: {},
-                            caller: this.getActiveAddress
+                            input: {}
+                            //caller: this.getActiveAddress
                         };
                         recipient = member.recipient;
                         qty = +member.qty;
@@ -427,8 +427,8 @@ export default {
                 if (Object.keys(this.memberUpdates).length > 0) {
                     for(let member in this.memberUpdates) {
                         let multiAction = {
-                            input: {},
-                            caller: this.getActiveAddress
+                            input: {}
+                            //caller: this.getActiveAddress
                         };
                         recipient = member;
                         qty = +this.memberUpdates[member];
