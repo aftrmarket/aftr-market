@@ -284,6 +284,10 @@ async function handle(state, action) {
     let iteration = 1;
     for (let nextAction of multiActions) {
       nextAction.input.iteration = iteration;
+      console.log("multi: " + JSON.stringify(nextAction.input.function));
+      if (nextAction.input.function === "multiInteraction") {
+        ThrowError("Nested Multi-interactions are not allowed.");
+      }
       let result = await handle(state, nextAction);
       iteration++;
     }
@@ -597,7 +601,23 @@ async function test() {
     },
     caller: "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I"
   };
-  let result = await handle(state, balAction);
+  const recursiveMultiAction = {
+    input: {
+      function: "multiInteraction",
+      type: "set",
+      recipient: "",
+      target: "",
+      qty: 0,
+      key: "",
+      value: 0.01,
+      note: "",
+      actions: [
+        multiAction
+      ]
+    },
+    caller: "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I"
+  };
+  let result = await handle(state, recursiveMultiAction);
   console.log(JSON.stringify(result));
 }
 test();

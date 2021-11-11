@@ -433,6 +433,12 @@ export async function handle(state: StateInterface, action: ActionInterface) {
         let iteration = 1;
         for(let nextAction of multiActions) {
             nextAction.input.iteration = iteration;
+            
+            // Don't allow nested multiActions
+            if (nextAction.input.function === 'multiInteraction') {
+                ThrowError("Nested Multi-interactions are not allowed.");
+            }
+
             let result = await handle(state, nextAction);
             iteration++;
         }
@@ -806,8 +812,25 @@ const multiAction = {
     caller: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I'
 };
 
+const recursiveMultiAction = {
+    input: {
+        function: 'multiInteraction',
+        type: 'set',
+        recipient: '',
+        target: '',
+        qty: 0,
+        key: '',
+        value: .01,
+        note: '',
+        actions: [
+            multiAction
+        ]
+    },
+    caller: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I'
+};
+//console.log(JSON.stringify(recursiveMultiAction));
     // @ts-expect-error
-    let result = await handle(state, balAction);
+    let result = await handle(state, recursiveMultiAction);
     //let bal = await handle(state, balAction);
     //console.log(result);
     //console.log(JSON.stringify(result, undefined, 2));
