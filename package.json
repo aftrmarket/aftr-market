@@ -1,9 +1,9 @@
 {
   "name": "aftr",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build --mode development",
     "serve": "vite preview",
     "build-contract" : "node ./scripts/build.js",
     "contract-test": "node ./scripts/build.js && node ./build/vehicle/contract.js"

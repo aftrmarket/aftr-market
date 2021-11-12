@@ -57,6 +57,7 @@
         <div v-if="pageStatus === ''">
             <!-- Vehicle Info -->
             <form-container>
+                {{ modeTest }}
                 <form action="#" method="POST">
                     <h3 class="text-xl font-light leading-6">Vehicle Information</h3>
                     <div class="bg-white sm:p-6">
@@ -364,9 +365,13 @@ export default {
     data() {
         return {
             /** Smartweave variables */
-            contractSourceId: "BTxbGwMEyVv94ak2CDeuCAXLWnAhwLb_hK4qw8_a-JU", // Changes with every AFTR contract update
-            tagProtocol: "AFTR-Demo-a101",
+            contractSourceId: import.meta.env.VITE_SMARTWEAVE_CONTRACT_SOURCE_ID,
+            tagProtocol: import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL,
             /** */
+
+            arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
+            arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
+            arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
 
             leasingEnabled: false,                          // Is vehicle leasing enabled?
             //arConnected: this.$store.getters.arConnected,   // Is user logged in through ArConnect?
@@ -721,9 +726,9 @@ export default {
             let arweave = {};
             try {
                 arweave = await Arweave.init({
-                    host: "arweave.net",
-                    port: 443,
-                    protocol: "https",
+                    host: arweaveHost,
+                    port: arweavePort,
+                    protocol: arweaveProtocol,
                     timeout: 20000,
                     logging: true,
                 });
