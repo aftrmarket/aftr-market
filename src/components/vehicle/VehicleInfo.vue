@@ -12,6 +12,7 @@
         </div>
     </div>
     <div v-if="!uiEditMode" class="pt-2">
+        <vehicle-info-read :vehicle="vehicle"></vehicle-info-read>
         <div class="flex items-center justify-between">
             <div class="px-4 py-5 sm:px-6">
                 <h2 id="applicant-information-title" class="text-lg leading-6 font-medium text-gray-900">
@@ -131,6 +132,7 @@
             </div>
         </form>
     </div>
+    {{ vehicle }}
 </template>
 
 <script>
@@ -138,12 +140,13 @@ import { ref } from 'vue';
 import { Switch, SwitchGroup, SwitchLabel } from '@headlessui/vue';
 import { mapGetters } from 'vuex';
 import numeral from "numeral";
+import VehicleInfoRead from './VehicleInfoRead.vue';
 import VehicleStatusText from './VehicleStatusText.vue';
 
 
 export default {
     props: ['vehicle', 'contractId'],
-    components: { Switch, SwitchGroup, SwitchLabel, VehicleStatusText },
+    components: { Switch, SwitchGroup, SwitchLabel, VehicleInfoRead, VehicleStatusText },
     data() {
         return {
             allowVehicleEdits: false,
