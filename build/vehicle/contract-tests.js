@@ -1,4 +1,4 @@
-// contract/vehicle/contract.ts
+// contract/vehicle/contract-tests.ts
 var mode = "TEST";
 function ThrowError(msg) {
   if (mode === "TEST") {

@@ -2,10 +2,9 @@ import { smartweave } from "smartweave";
 import { collapseTextChangeRangesAcrossMultipleVersions, forEachChild, textChangeRangeIsUnchanged } from "typescript";
 import { StateInterface, ActionInterface, BalanceInterface, InputInterface, VoteInterface } from "./faces";
 
-const mode = 'PROD';    // If TEST, SmartWeave not used & messages print to console.
+const mode = 'TEST';    // If TEST, SmartWeave not used & messages print to console.
 
 function ThrowError(msg: string) {
-    // @ts-expect-error
     if (mode === 'TEST') {
         throw('ERROR: ' + msg);
     } else {
@@ -49,7 +48,6 @@ export async function handle(state: StateInterface, action: ActionInterface) {
     /*** */
 
     let block = 0;
-    // @ts-expect-error
     if (mode === 'TEST') {
         block = 210;
     } else {
@@ -245,7 +243,6 @@ export async function handle(state: StateInterface, action: ActionInterface) {
 
         // Create Vote ID
         let voteId = String(block) + 'txTEST';
-        // @ts-expect-error
         if (mode !== 'TEST') {
             voteId = String(SmartWeave.block.height) + SmartWeave.transaction.id;
         }
@@ -450,7 +447,6 @@ export async function handle(state: StateInterface, action: ActionInterface) {
     }
 }
 
-
 function isArweaveAddress(addy: string) {
     const address = addy.toString().trim();
     if (!/[a-z0-9_-]{43}/i.test(address)) {
@@ -592,3 +588,253 @@ function updateSetting(vehicle, key, value) {
         vehicle.settings.push([key, value]);
     }
 }
+
+async function test() {
+    const state = {
+        "name": "Test Vehicle",
+        "ticker": "AFTR-Test-1",
+        "balances": {
+            "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8": 12300,
+            "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I": 1000
+        },
+        "creator": "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I",
+        "ownership": "single",
+        "votingSystem": "weighted",
+        "settings": [
+            [ "quorum", 0.5 ],
+            [ "voteLength", 2000 ],
+            [ "lockMinLength", 100 ],
+            [ "lockMaxLength", 10000 ]
+        ],
+        "vault" : {
+            "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I" : [
+                {
+                    "balance" : 20000,
+                    "end" : 150,
+                    "start" : 100
+                },
+                {
+                    "balance" : 20000,
+                    "end" : 200,
+                    "start" : 100
+                },
+                {
+                    "balance" : 20000,
+                    "end" : 250,
+                    "start" : 100
+                },
+            ],
+            "WNeEQzI24ZKWslZkQT573JZ8bhatwDVx6XVDrrGbUyk": [
+                  {
+                    "balance": 30000,
+                    "end": 150,
+                    "start": 100
+                  },
+                  {
+                    "balance": 2500000,
+                    "start": 100,
+                    "end": 200
+                  }
+                    ]
+        },
+        "votes": [
+            // {
+            //     "status": 'active',
+            //     "type": '',
+            //     "id": 1000,
+            //     "totalWeight": 13300,
+            //     //"totalWeight": 2,
+            //     "yays": 0,
+            //     "nays": 0,
+            //     "voted": [],
+            //     "start": 100
+            // }
+        ],
+        "tokens": [
+            {
+                "tokenId": "VRT",
+                "source": "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
+                "txId" : 'tx1fasdfoijeo0984',
+                "balance": 2500,
+                "start": 123,
+                "lockLength": 5
+            },
+            {
+                "tokenId": "VRT",
+                "source": "joe7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
+                "txId" : 'tx2fasdfoijeo8547',
+                "balance": 1000,
+                "start": 123,
+                "lockLength": 10
+            },
+            {
+                "tokenId": "XYZ",
+                "source": "joe7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
+                "txId" : 'tx3fasdfoijeo8547',
+                "balance": 3400,
+                "start": 123,
+                "lockLength": 5
+            }
+        ]
+    };
+    const balAction = {
+        input: { 
+            function: 'balance',
+            target: 'abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8'
+        },
+        caller: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I'
+    };
+    const txAction = {
+        input: {
+            function: 'transfer',
+            target: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I',
+            qty: 300},
+        caller: 'abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8'
+    };
+    const depAction = {
+        input: {
+            function: 'deposit',
+            txId: 'NOT IMPLEMENTED YET',
+            start: 123,
+            tokenId: 'T-SQUID',
+            qty: 10000
+        },
+        caller: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I'
+    };
+
+    const voteCastAction = {
+        input: {
+            function: 'vote',
+            voteId: '130tx12033012',
+            cast: 'yay'
+        },
+        caller: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I'
+    };
+
+    const proposeVoteAction = {
+        input: {
+            function: 'propose',
+            type: 'set',
+            // recipient: '',
+            // target: '',
+            // qty: 0,
+            key: 'settings.quorum',
+            value: .01
+            // note: ''
+        },
+        caller: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I'
+    };
+
+const actions = [
+    {
+        input: {
+            function: 'propose',
+            type: 'set',
+            recipient: '',
+            target: '',
+            qty: 0,
+            key: 'name',
+            value: 'Alquip',
+            note: ''
+        },
+        caller: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I'
+    },
+    {
+        input: {
+            function: 'propose',
+            type: 'set',
+            recipient: '',
+            target: '',
+            qty: 0,
+            key: 'ticker',
+            value: 'AFTR-ALQP',
+            note: ''
+        },
+        caller: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I'
+    },
+    {
+        input: {
+            function: 'propose',
+            type: 'set',
+            recipient: '',
+            target: '',
+            qty: 0,
+            key: 'status',
+            value: 'started',
+            note: ''
+        },
+        caller: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I'
+    },
+    {
+        input: {
+            function: 'propose',
+            type: 'set',
+            recipient: '',
+            target: '',
+            qty: 0,
+            key: 'votingSystem',
+            value: 'equal',
+            note: ''
+        },
+        caller: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I'
+    },
+    {
+        input: {
+            function: 'propose',
+            type: 'set',
+            recipient: '',
+            target: '',
+            qty: 0,
+            key: 'settings.voteLength',
+            value: 200,
+            note: ''
+        },
+        caller: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I'
+    },
+]
+
+const multiAction = {
+    input: {
+        function: 'multiInteraction',
+        type: 'set',
+        recipient: '',
+        target: '',
+        qty: 0,
+        key: '',
+        value: .01,
+        note: '',
+        actions: actions
+    },
+    caller: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I'
+};
+
+const recursiveMultiAction = {
+    input: {
+        function: 'multiInteraction',
+        type: 'set',
+        recipient: '',
+        target: '',
+        qty: 0,
+        key: '',
+        value: .01,
+        note: '',
+        actions: [
+            multiAction
+        ]
+    },
+    caller: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I'
+};
+//console.log(JSON.stringify(recursiveMultiAction));
+    // @ts-expect-error
+    let result = await handle(state, recursiveMultiAction);
+    //let bal = await handle(state, balAction);
+    //console.log(result);
+    //console.log(JSON.stringify(result, undefined, 2));
+    console.log(JSON.stringify(result));
+}
+
+test();
+
+
+// npm run build:contract
+// smartweave create ./dist_contract/contract.js ./contract/init.json --key-file ./keyfile.json

@@ -6,7 +6,7 @@
     "build": "vite build --mode development",
     "serve": "vite preview",
     "build-contract" : "node ./scripts/build.js",
-    "contract-test": "node ./scripts/build.js && node ./build/vehicle/contract.js"
+    "contract-test": "node ./scripts/build.js && node ./build/vehicle/contract-tests.js"
   },
   "dependencies": {
     "@headlessui/vue": "^1.4.0",
