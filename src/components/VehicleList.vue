@@ -48,11 +48,22 @@ export default {
   components: { VehicleCard, VehicleCardPlaceholder },
   data() {
     return {
+        /** Smartweave variables */
+        contractSourceId: import.meta.env.VITE_SMARTWEAVE_CONTRACT_SOURCE_ID,
+        tagProtocol: import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL,
+        /** */
+
+        arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
+        arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
+        arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
+
+        initTags: [ { name: "Protocol", value: this.tagProtocol } ],
+
         isLoading: true,
         query: `
             query($cursor: String) {
                 transactions(
-                    tags: [ { name: "Protocol", values: "AFTR-Demo-a101" } ]
+                    tags: ${this.initTags}
                     after: $cursor
                 ) {
                     pageInfo {
@@ -126,9 +137,9 @@ export default {
         let arweave = {};
         try {
             arweave = await Arweave.init({
-                host: "arweave.net",
-                port: 443,
-                protocol: "https",
+                host: arweaveHost,
+                port: arweavePort,
+                protocol: arweaveProtocol,
                 timeout: 20000,
                 logging: true,
             });

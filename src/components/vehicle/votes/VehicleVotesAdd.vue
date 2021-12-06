@@ -172,6 +172,10 @@ export default {
     },
     data() {
         return {
+            arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
+            arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
+            arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
+            
             voteType: '',
             stateKey: '',
             stateValue: '',
@@ -341,9 +345,9 @@ export default {
             let arweave = {};
             try {
                 arweave = await Arweave.init({
-                    host: "arweave.net",
-                    port: 443,
-                    protocol: "https",
+                    host: arweaveHost,
+                    port: arweavePort,
+                    protocol: arweaveProtocol,
                     timeout: 20000,
                     logging: true,
                 });
