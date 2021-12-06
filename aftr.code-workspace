@@ -1,9 +1,15 @@
 {
 	"folders": [
-		{
-			"path": "."
-		}
-	],
+        {
+            "path": "."
+        },
+        {
+            "path": "../arlocal-dash"
+        },
+        {
+            "path": "../aftr-contracts"
+        }
+    ],
     "settings": {
         "vetur.format.options.tabSize": 4,
         "vetur.format.defaultFormatter.html": "js-beautify-html",
