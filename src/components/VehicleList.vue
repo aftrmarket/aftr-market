@@ -36,6 +36,7 @@
       </div>
     </main>
   </div>
+  query: {{ query }}
 </template>
 
 <script>
@@ -50,20 +51,17 @@ export default {
     return {
         /** Smartweave variables */
         contractSourceId: import.meta.env.VITE_SMARTWEAVE_CONTRACT_SOURCE_ID,
-        tagProtocol: import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL,
-        /** */
-
         arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
         arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
         arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
-
-        initTags: [ { name: "Protocol", value: this.tagProtocol } ],
+        initTags: [ { name: "Protocol", value: import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL } ],
+        /** */
 
         isLoading: true,
         query: `
             query($cursor: String) {
                 transactions(
-                    tags: ${this.initTags}
+                    tags: [ { name: "Protocol", values: ["${import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL}"] } ]
                     after: $cursor
                 ) {
                     pageInfo {
@@ -137,9 +135,9 @@ export default {
         let arweave = {};
         try {
             arweave = await Arweave.init({
-                host: arweaveHost,
-                port: arweavePort,
-                protocol: arweaveProtocol,
+                host: this.arweaveHost,
+                port: this.arweavePort,
+                protocol: this.arweaveProtocol,
                 timeout: 20000,
                 logging: true,
             });

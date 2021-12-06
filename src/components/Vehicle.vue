@@ -180,9 +180,9 @@ export default {
         let arweave = {};
         try {
             arweave = await Arweave.init({
-                host: arweaveHost,
-                port: arweavePort,
-                protocol: arweaveProtocol,
+                host: this.arweaveHost,
+                port: this.arweavePort,
+                protocol: this.arweaveProtocol,
                 timeout: 20000,
                 logging: true,
             });

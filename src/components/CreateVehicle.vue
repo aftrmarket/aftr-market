@@ -345,6 +345,8 @@
             <!-- End Vehicle Info -->
         </div>
     </main>
+    Protocol: {{ arweaveHost }}
+    tag: {{ tagProtocol }}
 </template>
 
 <script>
@@ -367,11 +369,10 @@ export default {
             /** Smartweave variables */
             contractSourceId: import.meta.env.VITE_SMARTWEAVE_CONTRACT_SOURCE_ID,
             tagProtocol: import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL,
-            /** */
-
             arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
             arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
             arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
+            /** */
 
             leasingEnabled: false,                          // Is vehicle leasing enabled?
             //arConnected: this.$store.getters.arConnected,   // Is user logged in through ArConnect?
@@ -726,9 +727,9 @@ export default {
             let arweave = {};
             try {
                 arweave = await Arweave.init({
-                    host: arweaveHost,
-                    port: arweavePort,
-                    protocol: arweaveProtocol,
+                    host: this.arweaveHost,
+                    port: this.arweavePort,
+                    protocol: this.arweaveProtocol,
                     timeout: 20000,
                     logging: true,
                 });
