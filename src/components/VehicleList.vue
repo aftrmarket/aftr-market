@@ -217,13 +217,6 @@ export default {
         console.log("ERROR while fetching from gateway: " + error);
     }
 
-    //const txs = await run(this.query);
-    //const totalVehicles = txs.data.transactions.edges.length;
-
-    // for(let edge of txs.data.transactions.edges) {
-    //     await this.loadAllVehicles(edge.node.id);
-    // }
-
     this.isLoading = false;
 
     // for (let index = 1; index < 12; index++) {
