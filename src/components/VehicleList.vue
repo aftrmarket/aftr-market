@@ -36,7 +36,6 @@
       </div>
     </main>
   </div>
-  query: {{ query }}
 </template>
 
 <script>
@@ -50,6 +49,7 @@ export default {
   data() {
     return {
         /** Smartweave variables */
+        arweave: {},
         contractSourceId: import.meta.env.VITE_SMARTWEAVE_CONTRACT_SOURCE_ID,
         arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
         arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
@@ -132,22 +132,8 @@ export default {
     },
     async loadAllVehicles(contractId) {
         console.log("Contract: " + contractId);
-        let arweave = {};
         try {
-            arweave = await Arweave.init({
-                host: this.arweaveHost,
-                port: this.arweavePort,
-                protocol: this.arweaveProtocol,
-                timeout: 20000,
-                logging: true,
-            });
-        } catch (error) {
-            console.log("ERROR connecting to Arweave: " + error);
-            return false;
-        }
-
-        try {
-            let vehicle = await readContract(arweave, contractId);
+            let vehicle = await readContract(this.arweave, contractId);
             vehicle.id = contractId;
             if (!vehicle.tokens) {
                 vehicle.tokens = [];
@@ -206,12 +192,37 @@ export default {
     this.isLoading = true;
     
     // Use GraphQL to find all vehicle contracts, then load all vehicles
-    const txs = await run(this.query);
-    const totalVehicles = txs.data.transactions.edges.length;
+    try {
+        this.arweave = await Arweave.init({
+            host: this.arweaveHost,
+            port: this.arweavePort,
+            protocol: this.arweaveProtocol,
+            timeout: 20000,
+            logging: true,
+        });
 
-    for(let edge of txs.data.transactions.edges) {
-        await this.loadAllVehicles(edge.node.id);
+        const response = await this.arweave.api.post('graphql', { query: this.query });
+
+        if (response.status !== 200) {
+            throw response.status + " - " + response.statusText;
+        }
+
+        const totalVehicles = response.data.data.transactions.edges.length;
+
+        for(let edge of response.data.data.transactions.edges) {
+            await this.loadAllVehicles(edge.node.id);
+        }
+
+    } catch (error) {
+        console.log("ERROR while fetching from gateway: " + error);
     }
+
+    //const txs = await run(this.query);
+    //const totalVehicles = txs.data.transactions.edges.length;
+
+    // for(let edge of txs.data.transactions.edges) {
+    //     await this.loadAllVehicles(edge.node.id);
+    // }
 
     this.isLoading = false;
 
