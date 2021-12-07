@@ -42,7 +42,6 @@
 import { readContract } from 'smartweave';
 import VehicleCard from './vehicle/VehicleCard.vue';
 import VehicleCardPlaceholder from './vehicle/VehicleCardPlaceholder.vue';
-import { run, all } from 'ar-gql';
 
 export default {
   components: { VehicleCard, VehicleCardPlaceholder },
