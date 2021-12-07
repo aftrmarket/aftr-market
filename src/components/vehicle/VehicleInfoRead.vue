@@ -119,15 +119,16 @@ export default {
             }
         },
         aggregateInfo() {
+            console.log(JSON.stringify(this.vehicle));
             if (typeof this.vehicle.balances !== 'undefined') {
                 this.counts.members.total = Object.keys(this.vehicle.balances).length;
             }
             if (typeof this.vehicle.vault !== 'undefined') {
-                this.vehicle.vault.forEach(addrs => {
-                    addrs.forEach( addr =>{
-                        this.counts.members.sumOfLocked += addr.balance;
+                for (const addr in this.vehicle.vault) {
+                    this.vehicle.vault[addr].forEach( vault => {
+                        this.counts.members.sumOfLocked += vault.balance;
                     });
-                });
+                }
                 this.counts.members.sumOfUnlocked = this.counts.members.total - this.counts.members.sumOfLocked;
             }
             if (typeof this.vehicle.tokens !== 'undefined') {
