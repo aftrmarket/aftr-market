@@ -148,19 +148,22 @@ export default {
             // Tokens
             // Treasury
             let treasuryTotal = 0;
-
-            for (let token of this.vehicle.tokens) {
-                try {
-                    const response = await fetch("http://v2.cache.verto.exchange/token/" + token.id + "/price");
-                    const responseObj = await response.json();
-                    const pricePerToken = responseObj.price;
-                    token.name = responseObj.name;
-                    token.total = pricePerToken * token.balance;
-                    treasuryTotal += token.total;
-                } catch(error) {
-                    console.log("ERROR calling Verto cache: " + error);
-                    return false;
+            if (this.vehicle.tokens) {
+                for (let token of this.vehicle.tokens) {
+                    try {
+                        const response = await fetch("http://v2.cache.verto.exchange/token/" + token.id + "/price");
+                        const responseObj = await response.json();
+                        const pricePerToken = responseObj.price;
+                        token.name = responseObj.name;
+                        token.total = pricePerToken * token.balance;
+                        treasuryTotal += token.total;
+                    } catch(error) {
+                        console.log("ERROR calling Verto cache: " + error);
+                        return false;
+                    }
                 }
+            } else {
+                this.vehicle.tokens = [];
             }
             this.vehicle.treasury = treasuryTotal;
         },
