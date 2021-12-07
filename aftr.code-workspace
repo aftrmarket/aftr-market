@@ -4,9 +4,6 @@
             "path": "."
         },
         {
-            "path": "../arlocal-dash"
-        },
-        {
             "path": "../aftr-contracts"
         }
     ],
