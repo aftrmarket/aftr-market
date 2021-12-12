@@ -1,19 +1,28 @@
 {
   "name": "aftr",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build --mode development",
     "serve": "vite preview"
   },
   "dependencies": {
+    "@headlessui/vue": "^1.4.0",
+    "@heroicons/vue": "^1.0.1",
     "@tailwindcss/forms": "^0.2.1",
+    "arweave": "^1.10.16",
+    "esbuild": "^0.12.20",
     "install": "^0.13.0",
     "material-design-icons": "^3.0.1",
     "npm": "^7.7.0",
+    "number-abbreviate": "^2.0.0",
+    "numeral": "^2.0.6",
+    "smartweave": "^0.4.29",
+    "typescript": "^4.2.4",
     "vue": "^3.0.5",
     "vue-router": "^4.0.5",
-    "vue-uuid": "^2.0.2"
+    "vue-uuid": "^2.0.2",
+    "vuex": "^4.0.2"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^1.1.5",

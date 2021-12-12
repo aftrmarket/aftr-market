@@ -42,18 +42,18 @@
 import { readContract } from 'smartweave';
 import VehicleCard from './vehicle/VehicleCard.vue';
 import VehicleCardPlaceholder from './vehicle/VehicleCardPlaceholder.vue';
+import { run, all } from 'ar-gql';
 
 export default {
+    props: [ "walletAddress" ],
   components: { VehicleCard, VehicleCardPlaceholder },
   data() {
     return {
         /** Smartweave variables */
-        arweave: {},
         contractSourceId: import.meta.env.VITE_SMARTWEAVE_CONTRACT_SOURCE_ID,
         arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
         arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
         arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
-        initTags: [ { name: "Protocol", value: import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL } ],
         /** */
 
         isLoading: true,
@@ -131,8 +131,22 @@ export default {
     },
     async loadAllVehicles(contractId) {
         console.log("Contract: " + contractId);
+        let arweave = {};
         try {
-            let vehicle = await readContract(this.arweave, contractId);
+            arweave = await Arweave.init({
+                host: this.arweaveHost,
+                port: this.arweavePort,
+                protocol: this.arweaveProtocol,
+                timeout: 20000,
+                logging: true,
+            });
+        } catch (error) {
+            console.log("ERROR connecting to Arweave: " + error);
+            return false;
+        }
+
+        try {
+            let vehicle = await readContract(arweave, contractId);
             vehicle.id = contractId;
             if (!vehicle.tokens) {
                 vehicle.tokens = [];
@@ -141,13 +155,6 @@ export default {
             vehicle.settings.forEach(setting => {
                 if (setting[0] === 'communityLogo') {
                     vehicle.logo = setting[1];
-
-                    /*** For DEMO Purposes ONLY */
-                    /*** Fixing Chillin's logo */
-                    if (vehicle.id === "PFGb4J3IyeYFcNwtuHs94SDruqQOJ_6R3FywE0-PJkY") {
-                        vehicle.logo = "aM7YfRnd97mTGLn_3vjLfWp2TgtBKRyDsBnlDhA1e-s";
-                    }
-                    /*** */
                 }
             });
 
@@ -181,6 +188,7 @@ export default {
 
 
             this.vehicles.push(vehicle);
+            this.isLoading = false;
         } catch (error) {
             console.log("ERROR calling SmartWeave: " + error);
             return false;
@@ -191,32 +199,11 @@ export default {
     this.isLoading = true;
     
     // Use GraphQL to find all vehicle contracts, then load all vehicles
-    try {
-        this.arweave = await Arweave.init({
-            host: this.arweaveHost,
-            port: this.arweavePort,
-            protocol: this.arweaveProtocol,
-            timeout: 20000,
-            logging: true,
-        });
+    const txs = await run(this.query);
 
-        const response = await this.arweave.api.post('graphql', { query: this.query });
-
-        if (response.status !== 200) {
-            throw response.status + " - " + response.statusText;
-        }
-
-        const totalVehicles = response.data.data.transactions.edges.length;
-
-        for(let edge of response.data.data.transactions.edges) {
-            await this.loadAllVehicles(edge.node.id);
-        }
-
-    } catch (error) {
-        console.log("ERROR while fetching from gateway: " + error);
+    for(let edge of txs.data.transactions.edges) {
+        await this.loadAllVehicles(edge.node.id);
     }
-
-    this.isLoading = false;
 
     // for (let index = 1; index < 12; index++) {
     //     /*** FOR NOW JUST LOAD A FAKE SCREEN OF VEHICLES */

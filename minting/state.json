@@ -1,0 +1,10 @@
+{
+    "ticker": "T-SQUID",
+    "owner": "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I",
+    "canEvolve": true,
+    "balances": {
+        "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I": 1000000
+    },
+    "title": "SQUID",
+    "description": "A test NFT"
+}
