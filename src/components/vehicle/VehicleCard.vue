@@ -1,4 +1,5 @@
 <template>
+
     <div class="w-full flex items-center justify-between p-6 space-x-6">
         <img class="w-20 h-20 bg-gray-300 rounded-full flex-shrink-0" :src="vehicleLogo" alt="">
         <div class="flex-1 truncate">
@@ -78,7 +79,14 @@ export default {
             }
         },
         vehicleLogo(){
-            const logoUrl = "https://arweave.net/" + this.vehicle.logo;
+            let logoUrl = "";
+
+            if (!this.vehicle.logo || this.vehicle.logo === '') {
+                logoUrl = "https://avatars.dicebear.com/api/pixel-art-neutral/:" + this.vehicle.ticker + ".svg";
+            } else {
+                logoUrl = "https://arweave.net/" + this.vehicle.logo;
+            }
+            
             return logoUrl;
         },
     },
