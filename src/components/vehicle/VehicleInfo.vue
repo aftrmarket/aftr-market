@@ -13,48 +13,6 @@
     </div>
     <div v-if="!uiEditMode" class="pt-2">
         <vehicle-info-read :vehicle="vehicle"></vehicle-info-read>
-        <div class="flex items-center justify-between">
-            <div class="px-4 py-5 sm:px-6">
-                <h2 id="applicant-information-title" class="text-lg leading-6 font-medium text-gray-900">
-                    {{ vehicle.name }}
-                </h2>
-                <p class="mt-1 max-w-2xl text-sm text-gray-500">
-                    <span class="text-lg text-black">{{ vehicle.ticker }}</span>
-                </p>
-            </div>
-            <div class="pr-6">
-                <p class="text-gray-900">Current Value: <span class="px-2 py-3 sm:px-6 inline-flex leading-5 font-semibold rounded-full bg-green-100 text-green-800">{{ formatNumber(vehicle.treasury, true) }} AR</span></p>
-            </div>
-        </div>
-        <div class="flex items-start justify-between">
-            <div>
-                <div class="px-4 sm:px-6 max-w-2xl text-sm text-gray-500">Status</div>
-                <div v-if="!allowVehicleEdits" class="flex items-center justify-between pb-4">
-                    <div class="px-4 sm:px-6"><span :class="vehicleStatusAlert">{{ vehicleStatusText }}</span></div>
-                </div>
-                <div v-else class="px-4 sm:px-6">
-                    <SwitchGroup as="div" class="flex items-center">
-                        <Switch v-model="statusSwitchEnabled" @click="statusChange" :class="[statusSwitchEnabled ? 'bg-green-600' : 'bg-gray-200', 'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2']">
-                            <span aria-hidden="true" :class="[statusSwitchEnabled ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200']" />
-                        </Switch>
-                        <SwitchLabel as="span" class="ml-3">
-                            <span :class="vehicleStatusAlert">{{ vehicleStatusText }}</span>
-                        </SwitchLabel>
-                    </SwitchGroup>
-                </div>
-            </div>
-            <vehicle-status-text 
-                :headerText="'Editing'" 
-                :item1="'Creator'" 
-                :item1Status="getActiveAddress === creatorAddress ? true : false" 
-                :item2="'Status = Not Running'" 
-                :item2Status="vehicle.status === 'stopped' || typeof vehicle.status === 'undefined' ? true : false"
-                :item3="'Single Ownership'"
-                :item3Status="vehicle.ownership === 'single' ? true : false"
-                :footerMessage="allowVehicleEdits ? 'Edits allowed' : 'Votes must be passed to edit'"
-                :footerStatus="allowVehicleEdits ? true : false">
-            </vehicle-status-text>
-        </div>
     </div>
     <!-- EDIT MODE -->
     <div v-else>
@@ -132,7 +90,6 @@
             </div>
         </form>
     </div>
-    {{ vehicle }}
 </template>
 
 <script>
