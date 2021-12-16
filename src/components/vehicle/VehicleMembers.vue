@@ -158,9 +158,6 @@
             </div>
         </div>
     </div>
-    {{ memberRemoves }}
-    {{ memberUpdates }}
-    {{ memberAdds }}
 </template>
 
 <script>

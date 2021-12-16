@@ -1,13 +1,11 @@
 <template>
     <div class="pt-2">
         <div class="flex items-center justify-between">
-            <div class="px-4 py-5 sm:px-6">
-                <h2 id="applicant-information-title" class="text-lg leading-6 font-medium text-gray-900">
-                    {{ vehicle.name }}
-                </h2>
-                <p class="mt-1 max-w-2xl text-sm text-gray-500">
-                    <span class="text-lg text-black">{{ vehicle.ticker }}</span>
-                </p>
+            <div class="px-4 py-6 sm:px-6 grid grid-cols-2 gap-x-4">
+                <label class="block text-md text-gray-700">Vehicle Name:</label>
+                <label class="block text-md text-gray-500 font-medium">{{ vehicle.name }}</label>
+                <label class="block text-md text-gray-700">Ticker:</label>
+                <label class="block text-md text-gray-500 font-medium">{{ vehicle.ticker }}</label>
             </div>
             <div class="pr-6">
                 <p class="text-gray-900">Current Value: <span class="px-2 py-3 sm:px-6 inline-flex leading-5 font-semibold rounded-full bg-green-100 text-green-800">{{ formatNumber(vehicle.treasury, true) }} AR</span></p>
@@ -53,30 +51,31 @@
                 </dl>
             </div>
         </div>
-        <div class="flex items-start justify-between">
+        <div class="pt-4 flex items-start justify-between">
             <div>
                 <div class="px-4 sm:px-6 max-w-2xl text-sm text-gray-500">Status</div>
                 <div class="flex items-center justify-between pb-4">
                     <div class="px-4 sm:px-6">
-                        <!--
-                        <span :class="vehicleStatusAlert">{{ vehicleStatusText }}</span>
-                        -->
+                        {{ getStatus }}
                     </div>
                 </div>
             </div>
-            <!--
-            <vehicle-status-text 
-                :headerText="'Editing'" 
-                :item1="'Creator'" 
-                :item1Status="getActiveAddress === creatorAddress ? true : false" 
-                :item2="'Status = Not Running'" 
-                :item2Status="vehicle.status === 'stopped' || typeof vehicle.status === 'undefined' ? true : false"
-                :item3="'Single Ownership'"
-                :item3Status="vehicle.ownership === 'single' ? true : false"
-                :footerMessage="allowVehicleEdits ? 'Edits allowed' : 'Votes must be passed to edit'"
-                :footerStatus="allowVehicleEdits ? true : false">
-            </vehicle-status-text>
-            -->
+            <div>
+                <div class="px-4 sm:px-6 max-w-2xl text-sm text-gray-500">Ownership</div>
+                <div class="flex items-center justify-between pb-4">
+                    <div class="px-4 sm:px-6">
+                        {{ getOwnership }}
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="px-4 sm:px-6 max-w-2xl text-sm text-gray-500">TODO</div>
+                <div class="flex items-center justify-between pb-4">
+                    <div class="px-4 sm:px-6">
+                        FINISH LAYOUT
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -108,7 +107,22 @@ export default {
         };
     },
     computed: {
-
+        getStatus() {
+            if (this.vehicle.status === 'started') {
+                return 'Started';
+            } else if (this.vehicle.status === 'stopped') {
+                return 'Not Running';
+            } else {
+                return 'Expired';
+            }
+        },
+        getOwnership() {
+            if (this.vehicle.ownership === 'single') {
+                return 'Owned by ' + this.vehicle.creator;
+            } else {
+                return 'DAO Owned'
+            }
+        }
     },
     methods: {
         formatNumber(num, dec = false) {

@@ -185,7 +185,7 @@ export default {
             console.log("ERROR calling SmartWeave: " + error);
             return false;
         }
-    }
+    },
   },
   async created() {
     this.isLoading = true;
