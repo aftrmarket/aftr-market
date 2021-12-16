@@ -57,7 +57,6 @@
         <div v-if="pageStatus === ''">
             <!-- Vehicle Info -->
             <form-container>
-                {{ modeTest }}
                 <form action="#" method="POST">
                     <h3 class="text-xl font-light leading-6">Vehicle Information</h3>
                     <div class="bg-white sm:p-6">
@@ -85,9 +84,10 @@
                                     <label for="vehicleLogo" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
                                         <span>Upload a file</span>
                                         <input @change="onFileChange" id="vehicleLogo" name="vehicleLogo" type="file" class="sr-only" />
-                                    </label>
+                                    </label> (UPLOADING TO ARWEAVE NOT YET IMPLEMENTED)
                                 </div>
                                 <p class="text-xs text-gray-500">200 x 200 PNG, JPG, or GIF</p>
+                                <p class="text-xs text-aftrRed">AR fees apply</p>
                             </div>
                         </div>
 
@@ -128,12 +128,12 @@
                     
                     <h3 class="mt-4 border-t border-gray-200 pt-4 text-xl font-light leading-6">Settings</h3>
                     <div class="bg-white sm:p-6">
-                        <div class="pt-2 grid grid-cols-3 flex items-center gap-x-4">
-                            <label class="block text-sm font-medium text-gray-700">Vehicle Tokens to Mint</label>
+                        <div class="pt-2 grid grid-cols-2 flex items-center gap-x-4">
+                            <!--<label class="block text-sm font-medium text-gray-700">Vehicle Tokens to Mint</label>-->
                             <label class="block text-sm font-medium text-gray-700">Vehicle Ownership</label>
                             <label class="block text-sm font-medium text-gray-700">Voting System </label>
                             
-                            <input type="number" name="vehicleTokens" placeholder="# of Vehicle Tokens" v-model="vehicleTokens" @input="onTokenChange" :class="inputBox(vehicleTokensValid)" />
+                            <!--<input type="number" name="vehicleTokens" placeholder="# of Vehicle Tokens" v-model="vehicleTokens" @input="onTokenChange" :class="inputBox(vehicleTokensValid)" />-->
                             <div class="">
                                 <input type="radio" v-model="ownership" id="single" value="single" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">Single Owner</label>
                                 <input type="radio" v-model="ownership" id="dao" value="dao" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">DAO Owned</label>
@@ -345,8 +345,6 @@
             <!-- End Vehicle Info -->
         </div>
     </main>
-    Protocol: {{ arweaveHost }}
-    tag: {{ tagProtocol }}
 </template>
 
 <script>
@@ -415,6 +413,7 @@ export default {
             memberAmountValid: false,
             memberRowValid: false,
             daoRowBalance: [],
+            fileInfo: '',
 
             /****  TEST object
       psts: [
@@ -537,7 +536,17 @@ export default {
         },
         onFileChange(e) {
             const file = e.target.files[0];
+            
+            if (this.vehicleLogo) {
+                // Release the memory of the old file
+                URL.revokeObjectURL(this.vehicleLogo);
+            }
             this.vehicleLogo = URL.createObjectURL(file);
+            this.fileInfo = file.size + ', ' + file.name + ', ' + file.type;
+
+            if (file.type.substring(0, 6) !== 'image/') {
+                console.log("FILE IS NOT IMAGE");
+            }
         },
         nameValidate() {
             if (this.vehicle.name === '') {
@@ -743,15 +752,40 @@ export default {
                 { name: "Protocol", value: this.tagProtocol }
             ];
             this.vehicle.creator = this.$store.getters.getActiveAddress;
-            this.vehicle.seats = this.seats;
+            //this.vehicle.seats = this.seats;  /*** NO LONGER USED */
             this.vehicle.lockPeriod = this.lockPeriod;
-            this.vehicle.minLease = this.minLease;
-            this.vehicle.maxLease = this.maxLease;
+            //this.vehicle.minLease = this.minLease;
+            //this.vehicle.maxLease = this.maxLease;
             //this.vehicle.logo = this.vehicleLogo;
-            this.vehicle.logo = "9CYPS85KChE_zQxNLi2y5r2FLG-YE6HiphYYTlgtrtg";      // TEMP LOGO
+            //this.vehicle.logo = "9CYPS85KChE_zQxNLi2y5r2FLG-YE6HiphYYTlgtrtg";      // TEMP LOGO
             this.vehicle.ownership = this.ownership;
             this.vehicle.votingSystem = this.votingSystem;
             this.vehicle.status = "stopped";
+
+            // Default Settings
+            /*** TODO: ADD LOGO (communityLogo) to settings when implemented */
+            this.vehicle.settings = [
+                [
+                    "quorum",
+                    0.5
+                ],
+                        [
+                    "support",
+                    0.5
+                ],
+                [
+                    "voteLength",
+                    2000
+                ],
+                [
+                    "lockMinLength",
+                    100
+                ],
+                [
+                    "lockMaxLength",
+                    10000
+                ]
+            ];
 
             // Convert DAO Member array to dictionary
             this.vehicle.balances = this.daoMembers.reduce((a, x) => ({ ...a, [x.wallet]: x.balance }), {});
