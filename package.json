@@ -2,7 +2,7 @@
   "name": "aftr",
   "version": "0.0.1",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --mode development",
     "build": "vite build --mode development",
     "serve": "vite preview"
   },
