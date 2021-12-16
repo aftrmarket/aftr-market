@@ -56,26 +56,26 @@
                 <div class="px-4 sm:px-6 max-w-2xl text-sm text-gray-500">Status</div>
                 <div class="flex items-center justify-between pb-4">
                     <div class="px-4 sm:px-6">
-                        TODO
-                        <!--
-                        <span :class="vehicleStatusAlert">{{ vehicleStatusText }}</span>
-                        -->
+                        {{ getStatus }}
                     </div>
                 </div>
             </div>
-            <!--
-            <vehicle-status-text 
-                :headerText="'Editing'" 
-                :item1="'Creator'" 
-                :item1Status="getActiveAddress === creatorAddress ? true : false" 
-                :item2="'Status = Not Running'" 
-                :item2Status="vehicle.status === 'stopped' || typeof vehicle.status === 'undefined' ? true : false"
-                :item3="'Single Ownership'"
-                :item3Status="vehicle.ownership === 'single' ? true : false"
-                :footerMessage="allowVehicleEdits ? 'Edits allowed' : 'Votes must be passed to edit'"
-                :footerStatus="allowVehicleEdits ? true : false">
-            </vehicle-status-text>
-            -->
+            <div>
+                <div class="px-4 sm:px-6 max-w-2xl text-sm text-gray-500">Ownership</div>
+                <div class="flex items-center justify-between pb-4">
+                    <div class="px-4 sm:px-6">
+                        {{ getOwnership }}
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="px-4 sm:px-6 max-w-2xl text-sm text-gray-500">TODO</div>
+                <div class="flex items-center justify-between pb-4">
+                    <div class="px-4 sm:px-6">
+                        FINISH LAYOUT
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -107,7 +107,22 @@ export default {
         };
     },
     computed: {
-
+        getStatus() {
+            if (this.vehicle.status === 'started') {
+                return 'Started';
+            } else if (this.vehicle.status === 'stopped') {
+                return 'Not Running';
+            } else {
+                return 'Expired';
+            }
+        },
+        getOwnership() {
+            if (this.vehicle.ownership === 'single') {
+                return 'Owned by ' + this.vehicle.creator;
+            } else {
+                return 'DAO Owned'
+            }
+        }
     },
     methods: {
         formatNumber(num, dec = false) {

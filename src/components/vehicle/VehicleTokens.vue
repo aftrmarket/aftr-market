@@ -141,13 +141,6 @@
             </div>
         </div>
     </div>
-
-
-
-
-    {{ transferAddrs }}
-    Num Changes: {{ numChanges }}<br>
-    {{ proposedChanges }}
 </template>
 
 <script>
