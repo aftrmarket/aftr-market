@@ -99,6 +99,7 @@ import { mapGetters } from 'vuex';
 import numeral from "numeral";
 import VehicleInfoRead from './VehicleInfoRead.vue';
 import VehicleStatusText from './VehicleStatusText.vue';
+import { interactWrite } from "smartweave";
 
 
 export default {
@@ -106,6 +107,13 @@ export default {
     components: { Switch, SwitchGroup, SwitchLabel, VehicleInfoRead, VehicleStatusText },
     data() {
         return {
+            /** Smartweave variables */
+            contractSourceId: import.meta.env.VITE_SMARTWEAVE_CONTRACT_SOURCE_ID,
+            tagProtocol: import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL,
+            arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
+            arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
+            arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
+            /** */
             allowVehicleEdits: false,
             statusSwitchEnabled: false,
             allowEdits: false,
@@ -283,7 +291,17 @@ export default {
                 this.creatorIsValid = false;
             }
         },
-        updateVehicle() {
+       async updateVehicle() {
+        let arweave = {};
+       
+        arweave = await Arweave.init({
+                  host: this.arweaveHost,
+                  port: this.arweavePort,
+                  protocol: this.arweaveProtocol,
+                  timeout: 20000,
+                  logging: true,
+                });
+
             if (this.isFormValid) {
                 // Determine what fields have changed
                 let changeMap = new Map();
@@ -373,6 +391,9 @@ export default {
                 // Call Smartweave
                 console.log("CALL TO SMARTWEAVE");
                 console.log(JSON.stringify(action));
+                
+                const txid = await interactWrite(arweave, "use_wallet", this.contractId, JSON.stringify(action));
+                this.$router.push("/vehicles");
                 /**** */
             }
         }
