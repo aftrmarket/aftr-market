@@ -99,7 +99,8 @@ import { mapGetters } from 'vuex';
 import numeral from "numeral";
 import VehicleInfoRead from './VehicleInfoRead.vue';
 import VehicleStatusText from './VehicleStatusText.vue';
-import { interactWrite } from "smartweave";
+import { interactWrite, smartweave } from "smartweave";
+import { A } from '../../../dist/assets/vendor.62e455b6';
 
 
 export default {
@@ -368,8 +369,7 @@ export default {
                                 type: 'set',
                                 key: key,
                                 value: value
-                            },
-                            caller: this.getActiveAddress
+                            }
                         }
                         actions.push(multiAction);
                     }
@@ -385,14 +385,28 @@ export default {
                     return;
                 }
                 const action = {
-                    input: input,
-                    caller: this.getActiveAddress
+                    input: input
                 }
                 // Call Smartweave
                 console.log("CALL TO SMARTWEAVE");
                 console.log(JSON.stringify(action));
+                console.log("Contract ID: " + this.contractId);
                 
-                const txid = await interactWrite(arweave, "use_wallet", this.contractId, JSON.stringify(action));
+                //const txid = await interactWrite(arweave, "use_wallet", this.contractId, JSON.stringify(action));
+                /**** INSTEAD OF USING "use_wallet", copy the information out of your keyfile.json file and hardcode it below until I can figure out what's going on with ArConnect. */
+                const wallet = { /*** PRAJAKTA - COPY YOUR KEYFILE CONTENTS HERE*/ };
+
+                /***** HARDCODE THE INPUT TO SEE IF THIS STILL CAUSES AN ISSUE. */            
+                const txid = await interactWrite(arweave, wallet, this.contractId, {
+                    function: 'propose',
+                    type: 'set',
+                    key: 'ownership',
+                    value: "dao"
+                });
+                console.log("TX: " + txid);
+
+                /**** IN ORDER FOR THIS TO PROCESS, YOU NEED TO RUN http://localhost:1984/mine in your browser */
+
                 this.$router.push("/vehicles");
                 /**** */
             }
