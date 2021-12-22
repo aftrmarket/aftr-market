@@ -352,7 +352,10 @@ export default {
                     type: 'set',
                     recipient: '',
                     target: '',
-                    qty: 0
+                    qty: 0,
+                    key: '',
+                    value: '',
+                    note: ''
                 };
                 
                 // If more than one change, build multi-interaction input
@@ -397,12 +400,18 @@ export default {
                 const wallet = { /*** PRAJAKTA - COPY YOUR KEYFILE CONTENTS HERE*/ };
 
                 /***** HARDCODE THE INPUT TO SEE IF THIS STILL CAUSES AN ISSUE. */            
-                const txid = await interactWrite(arweave, wallet, this.contractId, {
-                    function: 'propose',
-                    type: 'set',
-                    key: 'ownership',
-                    value: "dao"
-                });
+                // const txid = await interactWrite(arweave, wallet, this.contractId, {
+                //     function: 'propose',
+                //     type: 'set',
+                //     recipient: '',
+                //     target: '',
+                //     qty: 0,
+                //     key: 'ownership',
+                //     value: 'dao',
+                //     note: ''
+                // });
+
+                const txid = await interactWrite(arweave, wallet, this.contractId, JSON.stringify(action));
                 console.log("TX: " + txid);
 
                 /**** IN ORDER FOR THIS TO PROCESS, YOU NEED TO RUN http://localhost:1984/mine in your browser */
