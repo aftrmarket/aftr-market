@@ -761,6 +761,11 @@ export default {
             this.vehicle.ownership = this.ownership;
             this.vehicle.votingSystem = this.votingSystem;
             this.vehicle.status = "stopped";
+            this.vehicle.vault = {};
+            this.vehicle.votes = [];
+            this.vehicle.tipsAr = 0;
+            this.vehicle.tipsMisc = 0;
+            this.vehicle.treasury = 0;
 
             // Default Settings
             /*** TODO: ADD LOGO (communityLogo) to settings when implemented */

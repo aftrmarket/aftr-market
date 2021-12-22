@@ -99,6 +99,8 @@ import { mapGetters } from 'vuex';
 import numeral from "numeral";
 import VehicleInfoRead from './VehicleInfoRead.vue';
 import VehicleStatusText from './VehicleStatusText.vue';
+import { interactWrite, smartweave } from "smartweave";
+import { A } from '../../../dist/assets/vendor.62e455b6';
 
 
 export default {
@@ -106,6 +108,13 @@ export default {
     components: { Switch, SwitchGroup, SwitchLabel, VehicleInfoRead, VehicleStatusText },
     data() {
         return {
+            /** Smartweave variables */
+            contractSourceId: import.meta.env.VITE_SMARTWEAVE_CONTRACT_SOURCE_ID,
+            tagProtocol: import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL,
+            arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
+            arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
+            arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
+            /** */
             allowVehicleEdits: false,
             statusSwitchEnabled: false,
             allowEdits: false,
@@ -283,7 +292,17 @@ export default {
                 this.creatorIsValid = false;
             }
         },
-        updateVehicle() {
+       async updateVehicle() {
+        let arweave = {};
+       
+        arweave = await Arweave.init({
+                  host: this.arweaveHost,
+                  port: this.arweavePort,
+                  protocol: this.arweaveProtocol,
+                  timeout: 20000,
+                  logging: true,
+                });
+
             if (this.isFormValid) {
                 // Determine what fields have changed
                 let changeMap = new Map();
@@ -333,7 +352,10 @@ export default {
                     type: 'set',
                     recipient: '',
                     target: '',
-                    qty: 0
+                    qty: 0,
+                    key: '',
+                    value: '',
+                    note: ''
                 };
                 
                 // If more than one change, build multi-interaction input
@@ -350,8 +372,7 @@ export default {
                                 type: 'set',
                                 key: key,
                                 value: value
-                            },
-                            caller: this.getActiveAddress
+                            }
                         }
                         actions.push(multiAction);
                     }
@@ -367,12 +388,35 @@ export default {
                     return;
                 }
                 const action = {
-                    input: input,
-                    caller: this.getActiveAddress
+                    input: input
                 }
                 // Call Smartweave
                 console.log("CALL TO SMARTWEAVE");
                 console.log(JSON.stringify(action));
+                console.log("Contract ID: " + this.contractId);
+                
+                //const txid = await interactWrite(arweave, "use_wallet", this.contractId, JSON.stringify(action));
+                /**** INSTEAD OF USING "use_wallet", copy the information out of your keyfile.json file and hardcode it below until I can figure out what's going on with ArConnect. */
+                const wallet = { /*** PRAJAKTA - COPY YOUR KEYFILE CONTENTS HERE*/ };
+
+                /***** HARDCODE THE INPUT TO SEE IF THIS STILL CAUSES AN ISSUE. */            
+                // const txid = await interactWrite(arweave, wallet, this.contractId, {
+                //     function: 'propose',
+                //     type: 'set',
+                //     recipient: '',
+                //     target: '',
+                //     qty: 0,
+                //     key: 'ownership',
+                //     value: 'dao',
+                //     note: ''
+                // });
+
+                const txid = await interactWrite(arweave, wallet, this.contractId, JSON.stringify(action));
+                console.log("TX: " + txid);
+
+                /**** IN ORDER FOR THIS TO PROCESS, YOU NEED TO RUN http://localhost:1984/mine in your browser */
+
+                this.$router.push("/vehicles");
                 /**** */
             }
         }
