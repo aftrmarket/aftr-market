@@ -1,7 +1,7 @@
 <template>
     <div class="pt-4 w-full">
         <vehicle-votes-add v-if="showAddVotes" :vehicle="vehicle" @close="closeModal('add')"></vehicle-votes-add>
-        <vehicle-votes-cast v-if="showCastVotes" :vehicle="vehicle" :voteId="voteId" @close="closeModal('cast')"></vehicle-votes-cast>
+        <vehicle-votes-cast v-if="showCastVotes" :vehicle="vehicle" :voteId="voteId" :voteData="voteData" @close="closeModal('cast')"></vehicle-votes-cast>
     </div>
     <div class="flex flex-col">
         <div class="flex justify-between">
@@ -46,8 +46,8 @@
                 </th>
               </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="vote in votes" :key="vote.id">
+            <tbody class="bg-white divide-y divide-gray-200" v-for="vote in votes" :key="vote.id">
+              <tr v-if="vote.status === 'active'">
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {{ vote.id }}
                 </td>
@@ -61,7 +61,7 @@
                   {{ vote.yays }} - {{ vote.nays }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-500">
-                    <button v-if="canVote(vote) && vote.status === 'active'" @click.prevent="openModal('cast', vote.id)" type="button" class="text-aftrBlue hover:text-indigo-900">
+                    <button v-if="canVote(vote) && vote.status === 'active'" @click.prevent="openModal('cast', vote.id, vote)" type="button" class="text-aftrBlue hover:text-indigo-900">
                         Vote
                     </button>
                     <div v-else-if="votedText(vote) === 'voted'" class="flex content-center">
@@ -84,30 +84,18 @@ import { mapGetters } from 'vuex';
 import capitalize from '../utils/shared.js';
 
 export default {
-    props: ['vehicle'],
+    props: ['vehicle', 'contractId'],
     components: { VehicleVotesAdd, VehicleVotesCast },
     data() {
+        console.log("contractId",this.contractId)
         return {
             showAddVotes: false,
             showCastVotes: false,
             allowAdd: false,
             voteId: 0,
+            voteData : {},
             currentBlock: 110,  // TEMP, GET CURRENT BLOCK
-            votes: [
-                {
-                    id: 101,
-                    status: "active",
-                    type: "set",
-                    note: "Change something",
-                    key: "Key Name",
-                    value: "Value",
-                    start: 100,
-                    lockLength: 50,
-                    yays: 2,
-                    nays: 1,
-                    voted: ["Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-"]
-                }
-            ]
+            votes: this.vehicle.votes
         };
     },
     computed: {
@@ -180,11 +168,12 @@ export default {
                 return 'eligible'
             }
         },
-        openModal(modalType = 'add', id = 0) {
+        openModal(modalType = 'add', id = 0, vote ={}) {
             if (modalType === 'add') {
                 this.showAddVotes = true;
             } else {
                 this.voteId = id;
+                this.voteData = vote;
                 this.showCastVotes = true;
             }
         },

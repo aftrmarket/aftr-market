@@ -67,7 +67,7 @@ import numeral from 'numeral';
 import capitalize from '../../utils/shared.js';
 
 export default {
-    props : ['vehicle', 'voteId'],
+    props : ['vehicle', 'voteId', 'voteData'],
     components: {
         Dialog,
         DialogOverlay,
@@ -79,19 +79,7 @@ export default {
     data() {
         return {
             currentBlock: 110,  // TEMP, GET CURRENT BLOCK
-            vote: {
-                id: 101,
-                status: "active",
-                type: "set",
-                note: "Change something",
-                key: "status",
-                value: "started",
-                start: 100,
-                lockLength: 50,
-                yays: 2,
-                nays: 1,
-                voted: ["Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-"]
-            }
+            vote: this.voteData
         }
     },
     computed : {

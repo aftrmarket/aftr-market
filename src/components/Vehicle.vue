@@ -56,7 +56,7 @@
                                 <!--<vehicle-leases v-else-if="activeTab === 'Leases'" :leases="vehicles.leases"></vehicle-leases>-->
                                 <!--<vehicle-leases v-else-if="activeTab === 'Leases'"></vehicle-leases>-->
                                 <!--<vehicle-fractions v-else-if="activeTab === 'Fractions'"></vehicle-fractions>-->
-                                <vehicle-votes v-else-if="activeTab === 'Votes'" :vehicle="vehicle"></vehicle-votes>
+                                <vehicle-votes v-else-if="activeTab === 'Votes'" :vehicle="vehicle" :contractId="contractId"></vehicle-votes>
                                 <vehicle-activity v-else-if="activeTab === 'Activity'"></vehicle-activity>
 
                             </div>
