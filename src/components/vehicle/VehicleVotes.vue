@@ -49,7 +49,7 @@
             <tbody class="bg-white divide-y divide-gray-200" v-for="vote in votes" :key="vote.id">
               <tr v-if="vote.status === 'active'">
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {{ vote.id }}
+                  {{ walletAddressSubstr(vote.id) }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {{ displayProposal(vote) }}
@@ -106,6 +106,14 @@ export default {
         }
     },
     methods: {
+     walletAddressSubstr(addr, chars = 10) {
+            if (typeof addr === 'string') {
+                let len = parseInt(chars/2);
+                return addr.substr(0, len) + '...' + addr.substr(-len);
+            } else {
+                return '';
+            }
+        },
         setFlags() {
             /*** 
                 In order to create a vote, you must 
