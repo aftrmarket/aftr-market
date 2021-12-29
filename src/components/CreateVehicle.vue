@@ -359,6 +359,7 @@ import FormContainer from "./layouts/FormContainer.vue";
 import ActionInput from "./layouts/ActionInput.vue";
 
 import { mapGetters } from 'vuex';
+import { JWKInterface } from "arweave/web/lib/wallet";
 
 export default {
     components: { FormContainer, ActionInput },
@@ -414,8 +415,8 @@ export default {
             memberRowValid: false,
             daoRowBalance: [],
             fileInfo: '',
-
-            /****  TEST object
+            communityLogo: "",
+           
       psts: [
             { id: '46c0bdd1-56a9-4179-8a56-164b702a5cb8', ticker: 'AFTR', name: 'AFTR Market', price: 0.05 },
             { id: '8f1d6790-b885-4078-af9d-4e431ed74cf6', ticker: 'ARDRIVE', name: 'ArDrive', price: 0.078 },
@@ -425,7 +426,6 @@ export default {
             { id: '919ce858-2513-424a-9fdb-de146eee1417', ticker: 'OPENBITS', name: 'OpenBits', price: 0.06 },
             { id: 'e6125855-8414-4ae1-b611-66aff71160a2', ticker: 'VRT', name: 'Verto Exchange', price: 0.1 }
       ]
-      ****/
         };
     },
     computed: {
@@ -458,11 +458,11 @@ export default {
             }
         },
         isInputValid() {
-            if (this.nameValid && this.tickerValid && this.vehicleTokensValid && this.memberRowValid) {
+            //if (this.nameValid && this.tickerValid && this.vehicleTokensValid && this.memberRowValid) {
                 return true;
-            } else {
-                return false;
-            }
+           // } else {
+           //     return false;
+            //}
         },
         ...mapGetters(['arConnected']),
         // Code to handle a checkbox in the table to check/uncheck all rows.
@@ -534,20 +534,42 @@ export default {
                 return "0";
             }
         },
-        onFileChange(e) {
-            const file = e.target.files[0];
-            
-            if (this.vehicleLogo) {
-                // Release the memory of the old file
-                URL.revokeObjectURL(this.vehicleLogo);
-            }
-            this.vehicleLogo = URL.createObjectURL(file);
-            this.fileInfo = file.size + ', ' + file.name + ', ' + file.type;
+    async onFileChange(e) {
+      let wallet = {
+        /*Add wallet address*/
+      };
+      let arweave = {};
+      arweave = await Arweave.init({
+        host: this.arweaveHost,
+        port: this.arweavePort,
+        protocol: this.arweaveProtocol,
+        timeout: 20000,
+        logging: true,
+      });
+      const file = e.target.files[0];
 
-            if (file.type.substring(0, 6) !== 'image/') {
-                console.log("FILE IS NOT IMAGE");
-            }
-        },
+      if (this.vehicleLogo) {
+        // Release the memory of the old file
+        URL.revokeObjectURL(this.vehicleLogo);
+      }
+      this.vehicleLogo = URL.createObjectURL(file);
+      this.fileInfo = file.size + ", " + file.name + ", " + file.type;
+      const filename = file.name.replace(/ /g, "") + file.lastModified;
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(file);
+      fileReader.onload = async (event) => {
+        const data = new Uint8Array(event.target.result);
+
+        const tx = await arweave.createTransaction({ data }, wallet);
+        await arweave.transactions.sign(tx, wallet);
+        const txid = tx.id;
+        this.communityLogo = txid;
+      };
+
+      if (file.type.substring(0, 6) !== "image/") {
+        console.log("FILE IS NOT IMAGE");
+      }
+    },
         nameValidate() {
             if (this.vehicle.name === '') {
                 this.nameValid = false;
@@ -789,6 +811,10 @@ export default {
                 [
                     "lockMaxLength",
                     10000
+                ],
+                [
+                    "communityLogo",
+                    this.communityLogo
                 ]
             ];
 
@@ -881,7 +907,7 @@ export default {
         ],
         [
             "communityLogo",
-            "KM66oKFLF60UrrOgSx5mb90gUd2v4i0T9RIcK9mfUiA"
+            this.communityLogo
         ]
     ]
 };
@@ -889,9 +915,13 @@ export default {
 
             // Create SmartWeave contract
             try {
+            const use_wallet = {
+               /*Add wallet address*/
+            };
+
                 console.log("arweave: " + JSON.stringify(arweave)); console.log("contractSourceId: " + this.contractSourceId);
                 console.log("vehicle: " + JSON.stringify(this.vehicle)); console.log("tags: " + JSON.stringify(initTags));
-                this.vehicle['id'] = await createContractFromTx(arweave, "use_wallet", this.contractSourceId, JSON.stringify(vehicleTest), initTags);
+                this.vehicle['id'] = await createContractFromTx(arweave, use_wallet, this.contractSourceId, JSON.stringify(vehicleTest), initTags);
                 //this.vehicle['id'] = await createContractFromTx(arweave, jwk, this.contractSourceId, JSON.stringify(vehicleTest), initTags);
                 console.log("ID = " + this.vehicle['id']);
             } catch(error) {
