@@ -26,7 +26,7 @@
                 </div>
             </div>
         </div>
-        <table v-if="votes.length > 0" class="min-w-full divide-y divide-gray-200">
+        <table v-if="vehicle.votes.length > 0" class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -94,7 +94,6 @@ export default {
             voteId: 0,
             voteData : {},
             currentBlock: 110,  // TEMP, GET CURRENT BLOCK
-            votes: this.vehicle.votes
         };
     },
     computed: {
@@ -191,9 +190,16 @@ export default {
                 this.showCastVotes = false;
             }
         },
+        initVotes() {
+            if (!('votes' in this.vehicle)) {
+                this.vehicle.votes = [];
+            }
+
+        }
     },
     created() {
         this.setFlags();
+        this.initVotes();
     }
 };
 </script>
