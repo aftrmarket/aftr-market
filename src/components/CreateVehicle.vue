@@ -87,7 +87,8 @@
                                     </label> (UPLOADING TO ARWEAVE NOT YET IMPLEMENTED)
                                 </div>
                                 <p class="text-xs text-gray-500">200 x 200 PNG, JPG, or GIF</p>
-                                <p class="text-xs text-aftrRed">AR fees apply</p>
+                                <p class="text-xs text-aftrRed" v-if="totalSize == 0 && totalCost == 0">AR fees apply</p>
+                                <p class="text-xs text-aftrRed" v-if="totalSize != 0 && totalCost != 0">Total Cost : {{totalCost}}</p>
                             </div>
                         </div>
 
@@ -415,7 +416,14 @@ export default {
             memberRowValid: false,
             daoRowBalance: [],
             fileInfo: '',
-            communityLogo: "",
+            communityLogoValue: "",
+            totalSize: 0,
+            fee: 0,
+            address : "",
+            balance: "",
+            totalCost: 0,
+            files: [],
+            version: '1.0.0',
            
       psts: [
             { id: '46c0bdd1-56a9-4179-8a56-164b702a5cb8', ticker: 'AFTR', name: 'AFTR Market', price: 0.05 },
@@ -547,6 +555,7 @@ export default {
         logging: true,
       });
       const file = e.target.files[0];
+      this.files = file
 
       if (this.vehicleLogo) {
         // Release the memory of the old file
@@ -555,16 +564,30 @@ export default {
       this.vehicleLogo = URL.createObjectURL(file);
       this.fileInfo = file.size + ", " + file.name + ", " + file.type;
       const filename = file.name.replace(/ /g, "") + file.lastModified;
-      const fileReader = new FileReader();
-      fileReader.readAsDataURL(file);
-      fileReader.onload = async (event) => {
-        const data = new Uint8Array(event.target.result);
 
-        const tx = await arweave.createTransaction({ data }, wallet);
-        await arweave.transactions.sign(tx, wallet);
-        const txid = tx.id;
-        this.communityLogo = txid;
-      };
+      const {data: winston} = await arweave.api.get(`price/${file.size}`);
+      const ar = arweave.ar.winstonToAr(winston, {formatted: true, decimals: 5, trim: true});
+      
+      this.address = await arweave.wallets.jwkToAddress(wallet);
+      const bal = await arweave.wallets.getBalance(this.address);
+      this.balance = arweave.ar.winstonToAr(bal);
+
+       this.totalSize += file.size;
+       console.log("totalSize",this.totalSize, this.balance)
+
+            if(this.totalSize != 0){
+                const {data: winston} = await arweave.api.get(`price/${this.totalSize}`);
+                this.fee = (+winston) * 0.1;
+                const ar = arweave.ar.winstonToAr(winston);
+                const arFee = arweave.ar.winstonToAr(this.fee.toString());
+                const total = arweave.ar.winstonToAr(((+winston) + this.fee).toString());
+                console.log("total",total)
+                this.totalCost = total
+                if(total > this.balance) {
+                    return alert('You don\'t have enough balance!');
+                }
+
+            }
 
       if (file.type.substring(0, 6) !== "image/") {
         console.log("FILE IS NOT IMAGE");
@@ -741,8 +764,52 @@ export default {
         },
         // updateDaoBalance() {
         //     //const daoBalance = Math.round(this.vehicleTokens / this.daoMembers.length);
-            
         // },
+        async deployFile(file,arweave, wallet) {
+            const fileReader = new FileReader();
+            fileReader.readAsDataURL(file);
+            fileReader.onload = async (event) => {
+                const data = new Uint8Array(event.target.result);
+
+                const tx = await arweave.createTransaction({ data }, wallet);
+                
+                tx.addTag('Content-Type', file.type);
+                tx.addTag('User-Agent', `AFTR.Market/this.version`);
+
+                await arweave.transactions.sign(tx, wallet);
+                const txid = tx.id;
+                console.log("txid",txid)
+                this.communityLogoValue = txid;
+                console.log("communityLogoValue", this.communityLogoValue)
+                this.vehicle.settings = [
+                [
+                    "quorum",
+                    0.5
+                ],
+                        [
+                    "support",
+                    0.5
+                ],
+                [
+                    "voteLength",
+                    2000
+                ],
+                [
+                    "lockMinLength",
+                    100
+                ],
+                [
+                    "lockMaxLength",
+                    10000
+                ],
+                [
+                    "communityLogo",
+                    this.communityLogoValue
+                ]
+            ];
+                return;
+            };
+        },
         async createVehicle() {
             if (!this.nameValid) {
                 this.$refs.vehicleName.focus();
@@ -791,7 +858,13 @@ export default {
 
             // Default Settings
             /*** TODO: ADD LOGO (communityLogo) to settings when implemented */
-            this.vehicle.settings = [
+            
+            const dev_wallet = {
+                /*Add wallet address*/
+            };
+
+            await this.deployFile(this.files, arweave, dev_wallet)
+            /***this.vehicle.settings = [
                 [
                     "quorum",
                     0.5
@@ -814,9 +887,9 @@ export default {
                 ],
                 [
                     "communityLogo",
-                    this.communityLogo
+                    ""
                 ]
-            ];
+            ];*/
 
             // Convert DAO Member array to dictionary
             this.vehicle.balances = this.daoMembers.reduce((a, x) => ({ ...a, [x.wallet]: x.balance }), {});
@@ -904,10 +977,6 @@ export default {
         [
             "lockMaxLength",
             10000
-        ],
-        [
-            "communityLogo",
-            this.communityLogo
         ]
     ]
 };
@@ -915,13 +984,12 @@ export default {
 
             // Create SmartWeave contract
             try {
-            const use_wallet = {
-               /*Add wallet address*/
-            };
-
                 console.log("arweave: " + JSON.stringify(arweave)); console.log("contractSourceId: " + this.contractSourceId);
                 console.log("vehicle: " + JSON.stringify(this.vehicle)); console.log("tags: " + JSON.stringify(initTags));
-                this.vehicle['id'] = await createContractFromTx(arweave, use_wallet, this.contractSourceId, JSON.stringify(vehicleTest), initTags);
+                
+                this.vehicle['id'] = await createContractFromTx(arweave, dev_wallet, this.contractSourceId, JSON.stringify(vehicleTest), initTags);
+                //this.vehicle['id'] = await createContractFromTx(arweave, use_wallet, this.contractSourceId, JSON.stringify(vehicleTest), initTags);
+                
                 //this.vehicle['id'] = await createContractFromTx(arweave, jwk, this.contractSourceId, JSON.stringify(vehicleTest), initTags);
                 console.log("ID = " + this.vehicle['id']);
             } catch(error) {

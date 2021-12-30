@@ -100,7 +100,7 @@ import numeral from "numeral";
 import VehicleInfoRead from './VehicleInfoRead.vue';
 import VehicleStatusText from './VehicleStatusText.vue';
 import { interactWrite, smartweave } from "smartweave";
-import { A } from '../../../dist/assets/vendor.62e455b6';
+//import { A } from '../../../dist/assets/vendor.62e455b6';
 
 
 export default {
