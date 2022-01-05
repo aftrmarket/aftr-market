@@ -5,7 +5,7 @@
     </div>
     <div class="flex flex-col">
         <div class="flex justify-between">
-            <div class="mt-2 pb-3 text-sm text-gray-700">Current Block: {{ currentBlock }}</div>
+            <div class="mt-2 pb-3 text-sm text-gray-700">Current Block: {{ currentBlock.height  }}</div>
             
             <div>
                 <button v-if="allowAdd" @click.prevent="openModal('add')" type="button" class="inline-flex items-center px-4 py-2 mb-3 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
@@ -80,7 +80,7 @@
 
 import VehicleVotesAdd from './votes/VehicleVotesAdd.vue';
 import VehicleVotesCast from './votes/VehicleVotesCast.vue';
-import { mapGetters } from 'vuex';
+import { mapGetters,mapState } from 'vuex';
 import capitalize from '../utils/shared.js';
 
 export default {
@@ -93,11 +93,15 @@ export default {
             allowAdd: false,
             voteId: 0,
             voteData : {},
-            currentBlock: 110,  // TEMP, GET CURRENT BLOCK
+            //currentBlock: 110,  // TEMP, GET CURRENT BLOCK
         };
     },
     computed: {
-        ...mapGetters(['arConnected', 'getActiveAddress']),
+        ...mapGetters(['arConnected', 'getActiveAddress', 'getCurrentBlockValue']),
+         ...mapState(['currentBlock']),
+    },
+    mounted () {
+        this.$store.dispatch('loadCurrentBlock')
     },
     watch: {
         arConnected(value) {
@@ -105,6 +109,9 @@ export default {
         }
     },
     methods: {
+    arConnect() {
+        this.$store.dispatch('getCurrentBlockValue');
+    },
      walletAddressSubstr(addr, chars = 10) {
             if (typeof addr === 'string') {
                 let len = parseInt(chars/2);

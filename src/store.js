@@ -5,7 +5,7 @@ const store = createStore({
         return {
             activeWallet: {},
             arConnect: false,
-            
+            currentBlock: [],
             /** Smartweave variables */
             smartWeaveConfig: {
                 contractSourceId: "BTxbGwMEyVv94ak2CDeuCAXLWnAhwLb_hK4qw8_a-JU", // Changes with every AFTR contract update
@@ -26,9 +26,15 @@ const store = createStore({
         },
         getSmartWeaveConfig() {
             return state.smartWeaveConfig;
+        },
+        currentBlock: state => {
+            return state.currentBlock;
         }
     },
     mutations: {
+        setCurrentBlock (state, currentBlock) {
+            state.currentBlock = currentBlock
+        },
         arConnect(state, payload) {
             state.activeWallet = payload;
             state.arConnect = true;
@@ -49,6 +55,19 @@ const store = createStore({
         }
     },
     actions: {
+        async loadCurrentBlock ({ commit }) {
+            const url = import.meta.env.VITE_ARWEAVE_PROTOCOL+"://"+import.meta.env.VITE_ARWEAVE_HOST+":"+import.meta.env.VITE_ARWEAVE_PORT;
+            await fetch(url)
+            .then(response => response.json())
+            .then(data => {
+              console.log('Arweave network height is: ' + data);
+              commit('setCurrentBlock', data)
+            })
+            .catch(error => {
+              console.error(error);
+            });
+   
+    },
         async arConnect(context) {
             let wallet = {
                 address : '',
