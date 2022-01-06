@@ -266,9 +266,16 @@ export default {
         logging: true,
       });
 
-      const wallet = {
-       
-      };
+      let wallet;
+      if (import.meta.env.DEV) {
+        if(this.keyFile.length){
+            wallet =  this.keyFile[0]
+        } else {
+            alert("Please attach your keyfile")
+        }        
+      } else {
+        wallet = {}
+      }
 
       if (vote) {
         const input = {

@@ -397,7 +397,16 @@ export default {
                 
                 //const txid = await interactWrite(arweave, "use_wallet", this.contractId, JSON.stringify(action));
                 /**** INSTEAD OF USING "use_wallet", copy the information out of your keyfile.json file and hardcode it below until I can figure out what's going on with ArConnect. */
-                const wallet = { /*** PRAJAKTA - COPY YOUR KEYFILE CONTENTS HERE*/ };
+                let wallet;
+                if (import.meta.env.DEV) {
+                    if(this.keyFile.length){
+                        wallet =  this.keyFile[0]
+                    } else {
+                        alert("Please attach your keyfile")
+                    }        
+                } else {
+                    wallet = {}
+                }
 
                 /***** HARDCODE THE INPUT TO SEE IF THIS STILL CAUSES AN ISSUE. */            
                 // const txid = await interactWrite(arweave, wallet, this.contractId, {

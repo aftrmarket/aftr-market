@@ -34,9 +34,10 @@
                 </div>
                 <div v-else class="flex items-center">
                     <div class="text-aftrGo text-sm font-light">
-                        {{ walletAddressSubstr }}
-                    </div>
-                    <div>
+                    <input v-if="devMode" type="file" ref="doc" @change="readFile()" />
+                  {{ walletAddressSubstr }}
+                </div>
+                <div>
                         <button @click.prevent="arDisconnect" type="submit" class="inline-flex items-center p-1 border border-transparent shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed">
                             <img src="../../assets/arconnect-on-logo.png" alt="Login to ArConnect" width="24" />
                         </button>
@@ -59,12 +60,16 @@
 </template>
 
 <script>
+
 export default {
   data() {
     return {
-        arConnected: false,
-        profileDropdown: false,
-        psts: [],
+      arConnected: false,
+      profileDropdown: false,
+      psts: [],
+      devMode: import.meta.env.DEV,
+      file: null, 
+      content: {}
     };
   },
   computed: {
@@ -90,8 +95,20 @@ export default {
         this.$store.dispatch('arConnect');
     },
     arDisconnect() {
-        this.$store.dispatch('arDisconnect'); 
-    }
-  }
-}
+      this.$store.dispatch("arDisconnect");
+    },
+    readFile() {
+      this.file = this.$refs.doc.files[0];
+      const reader = new FileReader();
+        this.content = "check the console for file output";
+        reader.onload = (res) => {
+          console.log(res.target.result);
+          this.content = res.target.result
+          this.$store.commit("addKeyFile", this.content);
+        };
+        reader.onerror = (err) => console.log(err);
+        reader.readAsText(this.file);
+    },
+  },
+};
 </script>

@@ -472,7 +472,7 @@ export default {
            //     return false;
             //}
         },
-        ...mapGetters(['arConnected']),
+        ...mapGetters(['arConnected', 'keyFile']),
         // Code to handle a checkbox in the table to check/uncheck all rows.
         /******
       selectAll: {
@@ -543,9 +543,16 @@ export default {
             }
         },
     async onFileChange(e) {
-      let wallet = {
-        /*Add wallet address*/
-      };
+      let wallet;
+      if (import.meta.env.DEV) {
+        if(this.keyFile.length){
+            wallet =  this.keyFile[0]
+        } else {
+            alert("Please attach your keyfile")
+        }        
+      } else {
+        wallet = {}
+      }
       let arweave = {};
       arweave = await Arweave.init({
         host: this.arweaveHost,
@@ -858,10 +865,16 @@ export default {
 
             // Default Settings
             /*** TODO: ADD LOGO (communityLogo) to settings when implemented */
-            
-            const dev_wallet = {
-                /*Add wallet address*/
-            };
+            let dev_wallet;
+            if (import.meta.env.DEV) {
+                if(this.keyFile.length){
+                    dev_wallet =  this.keyFile[0]
+                } else {
+                    alert("Please attach your keyfile")
+                }        
+            } else {
+                use_wallet = {}
+            }
 
             await this.deployFile(this.files, arweave, dev_wallet)
             /***this.vehicle.settings = [
