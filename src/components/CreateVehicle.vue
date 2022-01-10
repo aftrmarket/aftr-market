@@ -395,7 +395,7 @@ export default {
             minLease: 2,                                    // Minimum seat lease length in months
             maxLease: 24,                                   // Maximum seat lease length in months
             ownership: "dao",                               // Type of ownership for vehicle (single or dao)
-            votingSystem: "even",                           // Type of voting for vehicle (even or weighted)
+            votingSystem: "equal",                           // Type of voting for vehicle (equal or weighted)
             inputValid: false,                              // Boolean to show when any input field is invalid
             pstInputValid: false,                           // Boolean to show when amount goes over tokens held
             nameValid: false,                               // Boolean for valid vehicle name
