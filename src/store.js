@@ -1,4 +1,5 @@
 import {createStore } from 'vuex';
+import { readContract } from 'smartweave';
 
 const store = createStore({
     state() {
@@ -76,88 +77,128 @@ const store = createStore({
             });
    
     },
-        async arConnect(context) {
-            let wallet = {
-                address : '',
-                psts : []
+    async arConnect(context) {
+        let wallet = {
+          address: "",
+          psts: [],
+        };
+        try {
+          if (import.meta.env.DEV) {
+            const promiseResult = await window.arweaveWallet.connect([
+              "ACCESS_ADDRESS",
+              "ACCESS_ALL_ADDRESSES",
+              "SIGN_TRANSACTION",
+            ]);
+            wallet.address = await window.arweaveWallet.getActiveAddress();
+            console.log("wallet.address",wallet.address);
+          } else {
+            const promiseResult = await window.arweaveWallet.connect([
+              "ACCESS_ADDRESS",
+              "ACCESS_ALL_ADDRESSES",
+              "SIGN_TRANSACTION",
+            ]);
+            wallet.address = await window.arweaveWallet.getActiveAddress();
+          }
+        } catch (error) {
+          console.log("ERROR during ArConnection: " + error);
+        }
+  
+        try {
+          if (import.meta.env.DEV) {
+            let query = {
+              query: `
+                      query($cursor: String) {
+                          transactions(
+                              tags: [{ name: "App-Name", values: ["SmartWeaveContract"] }]
+                              after: $cursor
+                          ) {
+                              pageInfo {
+                                  hasNextPage
+                              }
+                              edges {
+                                  cursor
+                                  node { id } 
+                              }
+                          }
+                  }`,
             };
-            try {
-                if (import.meta.env.DEV) {
-                    console.log("***Test***")
-                    const promiseResult = await window.arweaveWallet.connect([
-                        "ACCESS_ADDRESS",
-                        "ACCESS_ALL_ADDRESSES",
-                        "SIGN_TRANSACTION",
-                    ]);
-                    wallet.address = await window.arweaveWallet.getActiveAddress();
-                    console.log(wallet.address)
-                } else{
-                    const promiseResult = await window.arweaveWallet.connect([
-                        "ACCESS_ADDRESS",
-                        "ACCESS_ALL_ADDRESSES",
-                        "SIGN_TRANSACTION",
-                    ]);
-                    wallet.address = await window.arweaveWallet.getActiveAddress();
-                }   
-
-            } catch (error) {
-                console.log("ERROR during ArConnection: " + error);
-            }
-
-            try {
-                if ('development') {
-                    /***
-                        USE GRAPHQL to get all the PST.  To do this use the App-Name tag:
-                        tags: [{ name: "App-Name", values: ["SmartWeaveContract"] }]
             
-                        Next, loop through all the contract IDs that you find and build the pst object as
-                        defined below. You'll need to call the readContract function on each contract ID, 
-                        then see if the balance exists in the balances object on that state. If it does,
-                        then save its id, balance, name, ticker, and logo in the pst array for the wallet.
-                    */
-                } else {
-                    // Now query Verto to get all PSTs contained in Wallet
-                const response = await fetch(
-                    "http://v2.cache.verto.exchange/balance/" + wallet.address
-                );
-                wallet.psts = await response.json();
-                /**** RESPONSE RETURNS AS AN ARRAY OF KEY/VALUE PAIRS ****
-                 * [ {
-                 *  id: '',
-                 *  balance: '',
-                 *  name: '',
-                 *  ticker: '',
-                 *  logo: ''
-                 * } ]
-                 ****/
-                }
-                
-            } catch (error) {
-                console.log("ERROR while fetching Verto balances: " + error);
-            }
-
+            let arweave = {};
             try {
-                // Query Verto to get AR prices for each token
-                for (let pst of wallet.psts) {
-                    const response = await fetch(
-                        "http://v2.cache.verto.exchange/token/" + pst.id + "/price"
-                    );
-                    const jsonRes = await response.json();
-                    const i = wallet.psts.findIndex((item) => item.id === pst.id);
-                    wallet.psts[i]["price"] = jsonRes.price;
-                    wallet.psts[i]["total"] =
-                        jsonRes.price * wallet.psts[i]["balance"];
-                }
+                arweave = await Arweave.init({
+                    host: import.meta.env.VITE_ARWEAVE_HOST,
+                    port: import.meta.env.VITE_ARWEAVE_PORT,
+                    protocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
+                    timeout: 20000,
+                    logging: true,
+                });
             } catch (error) {
-                console.log(
-                    "ERROR while fetching AR prices from Verto: " + error
-                );
+                console.log("ERROR connecting to Arweave: " + error);
+                return false;
             }
+            const response = await arweave.api.post('graphql', { query: query.query });
 
-            if (wallet.address.length === 43) {
-                context.commit('arConnect', wallet);
+            for(let edge of response.data.data.transactions.edges) {
+              let vehicle = await readContract(arweave,edge.node.id);
+              if (vehicle && Object.keys(vehicle.balances).length != 0) {
+                
+                let data = {
+                  id: edge.node.id,
+                  balance: vehicle.balances,
+                  name: vehicle.name,
+                  ticker: vehicle.ticker,
+                  logo: ''
+                };
+
+                // Logo
+                vehicle.settings.forEach(setting => {
+                  if (setting[0] === 'communityLogo') {
+                    data.logo = setting[1];
+                  }
+                });
+                wallet.psts.push(data)
+              }   
+              // console.log("wallet.psts", wallet.psts)           
             }
-        },
+          } else {
+            // Now query Verto to get all PSTs contained in Wallet
+            const response = await fetch(
+              "http://v2.cache.verto.exchange/balance/" + wallet.address
+            );
+            wallet.psts = await response.json();
+            /**** RESPONSE RETURNS AS AN ARRAY OF KEY/VALUE PAIRS ****
+             * [ {
+             *  id: '',
+             *  balance: '',
+             *  name: '',
+             *  ticker: '',
+             *  logo: ''
+             * } ]
+             ****/
+          }
+        } catch (error) {
+          console.log("ERROR while fetching Verto balances: " + error);
+        }
+  
+        try {
+          // Query Verto to get AR prices for each token
+          for (let pst of wallet.psts) {
+            const response = await fetch(
+              "http://v2.cache.verto.exchange/token/" + pst.id + "/price"
+            );
+            const jsonRes = await response.json();
+            const i = wallet.psts.findIndex((item) => item.id === pst.id);
+            wallet.psts[i]["price"] = jsonRes.price;
+            wallet.psts[i]["total"] = jsonRes.price * wallet.psts[i]["balance"];
+          }
+        } catch (error) {
+          console.log("ERROR while fetching AR prices from Verto: " + error);
+        }
+  
+        if (wallet.address.length === 43) {
+          context.commit("arConnect", wallet);
+        }
+      },
         async arDisconnect(context) {
             try {
                 const promiseResult = await window.arweaveWallet.disconnect();

@@ -10,6 +10,7 @@
     "@headlessui/vue": "^1.4.0",
     "@heroicons/vue": "^1.0.1",
     "@tailwindcss/forms": "^0.2.1",
+    "ar-gql": "^0.0.6",
     "arweave": "^1.10.16",
     "esbuild": "^0.12.20",
     "install": "^0.13.0",

@@ -49,6 +49,7 @@ export default {
   components: { VehicleCard, VehicleCardPlaceholder },
   data() {
     return {
+    arweave: {},
         /** Smartweave variables */
         contractSourceId: import.meta.env.VITE_SMARTWEAVE_CONTRACT_SOURCE_ID,
         arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
@@ -199,16 +200,40 @@ export default {
     this.isLoading = true;
     
     // Use GraphQL to find all vehicle contracts, then load all vehicles
-    const txs = await run(this.query);
+    //const txs = await run(this.query);
 
-    for(let edge of txs.data.transactions.edges) {
-        await this.loadAllVehicles(edge.node.id);
-    }
+    //for(let edge of txs.data.transactions.edges) {
+    //    await this.loadAllVehicles(edge.node.id);
+    //}
 
     // for (let index = 1; index < 12; index++) {
     //     /*** FOR NOW JUST LOAD A FAKE SCREEN OF VEHICLES */
     //     this.vehicles.push(this.vehicles[0]);
     // }
+    try {
+        this.arweave = await Arweave.init({
+            host: this.arweaveHost,
+            port: this.arweavePort,
+            protocol: this.arweaveProtocol,
+            timeout: 20000,
+            logging: true,
+        });
+
+        const response = await this.arweave.api.post('graphql', { query: this.query });
+
+        if (response.status !== 200) {
+            throw response.status + " - " + response.statusText;
+        }
+
+        const totalVehicles = response.data.data.transactions.edges.length;
+
+        for(let edge of response.data.data.transactions.edges) {
+            await this.loadAllVehicles(edge.node.id);
+        }
+
+    } catch (error) {
+        console.log("ERROR while fetching from gateway: " + error);
+    }
   }
 }
 </script>

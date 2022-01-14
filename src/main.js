@@ -10,12 +10,14 @@ import VehicleList from './components/VehicleList.vue';
 import CreateVehicle from './components/CreateVehicle.vue';
 import Vehicle from './components/Vehicle.vue';
 import UiTest from './components/UiTest.vue';
+import MyPortfolio from './components/MyPortfolio.vue';
 
 const router = createRouter({
     history: createWebHistory(),
     routes: [
         //{ path: '/', redirect: '/vehicles'},
         { name: 'vehicles', path: '/vehicles', component: VehicleList, alias: '/', },
+        { name: 'myPortfolio', path: '/MyPortfolio', component: MyPortfolio},
         //{ name: 'vehicle-info', path: '/vehicles/:vehicleId', component: VehicleInfo, props: true },
         // { 
         //     name: 'vehicle', 

@@ -16,7 +16,9 @@
                     <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
                     <a href="#" @click="goHome" :class="homeClass">Home</a>
 
-                    <a href="#" class="text-gray-300 hover:bg-aftrYellow hover:text-aftrDarkGrey px-3 py-2 rounded-md text-sm font-medium">My Portfolio</a>
+                    <a href="#" @click="goMyPortfolio"
+                    class="text-gray-300 hover:bg-aftrYellow hover:text-aftrDarkGrey px-3 py-2 rounded-md text-sm font-medium"
+                    >My Portfolio</a>
 
                     <a href="#" class="text-gray-300 hover:bg-aftrYellow hover:text-aftrDarkGrey px-3 py-2 rounded-md text-sm font-medium">About</a>
                   </div>
@@ -87,6 +89,13 @@ export default {
   methods: {
     goHome() {
         this.$router.push("../vehicles");
+    },
+    goMyPortfolio() {
+      if(!this.$store.getters.arConnected){
+        alert("Please login to Aftr-Market")
+      } else {
+        this.$router.push("../MyPortfolio");
+      }
     },
     toggleProfileMenu() {
       this.profileDropdown = !this.profileDropdown;
