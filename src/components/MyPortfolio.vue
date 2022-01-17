@@ -49,7 +49,7 @@ export default {
   components: { VehicleCard, VehicleCardPlaceholder },
   data() {
     return {
-    arweave: {},
+        arweave: {},
         /** Smartweave variables */
         contractSourceId: import.meta.env.VITE_SMARTWEAVE_CONTRACT_SOURCE_ID,
         arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
@@ -187,8 +187,20 @@ export default {
             // Votes Opened
             vehicle.votes = 0;
 
-
-            this.vehicles.push(vehicle);
+            Object.keys(vehicle.balances).some(walletId=>{
+             if(walletId == this.$store.getters.getActiveAddress){
+                if(vehicle.balances[walletId] > 0 )
+                  this.vehicles.push(vehicle);
+             } else {
+              Object.keys(vehicle.vault).some(walletId=>{
+                if(walletId == this.$store.getters.getActiveAddress){
+                  if(vehicle.vault[walletId] > 0 )
+                  this.vehicles.push(vehicle);
+                }
+              })
+             }
+            })
+            
             this.isLoading = false;
         } catch (error) {
             console.log("ERROR calling SmartWeave: " + error);
@@ -198,6 +210,9 @@ export default {
   },
   async created() {
     this.isLoading = true;
+    if(!this.$store.getters.arConnected){
+        alert("Please login to Aftr-Market")
+    }
     
     // Use GraphQL to find all vehicle contracts, then load all vehicles
     //const txs = await run(this.query);
