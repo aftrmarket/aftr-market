@@ -546,12 +546,10 @@ export default {
       let wallet;
       if (import.meta.env.DEV) {
         if(this.keyFile.length){
-            wallet =  this.keyFile[0]
+            wallet =  JSON.parse(this.keyFile)
         } else {
             alert("Please attach your keyfile")
         }        
-      } else {
-        wallet = {}
       }
       let arweave = {};
       arweave = await Arweave.init({
@@ -574,8 +572,11 @@ export default {
 
       const {data: winston} = await arweave.api.get(`price/${file.size}`);
       const ar = arweave.ar.winstonToAr(winston, {formatted: true, decimals: 5, trim: true});
-      
-      this.address = await arweave.wallets.jwkToAddress(wallet);
+      if (import.meta.env.DEV) {
+        this.address = await arweave.wallets.jwkToAddress(wallet);
+      } else {
+      this.address = await arweave.wallets.jwkToAddress("use_wallet");
+      }
       const bal = await arweave.wallets.getBalance(this.address);
       this.balance = arweave.ar.winstonToAr(bal);
 
@@ -594,6 +595,11 @@ export default {
                     return alert('You don\'t have enough balance!');
                 }
 
+            if (import.meta.env.DEV) {
+                await this.deployFile(this.files, arweave, wallet);
+            } else {
+                await this.deployFile(this.files, arweave, "use_wallet");
+            }
             }
 
       if (file.type.substring(0, 6) !== "image/") {
@@ -816,225 +822,206 @@ export default {
             ];
                 return;
             };
+            return
         },
-        async createVehicle() {
-            if (!this.nameValid) {
-                this.$refs.vehicleName.focus();
-                return false;
-            }
-            if (!this.tickerValid) {
-                this.$refs.vehicleTicker.focus();
-                return false;
-            }
-                
-            this.pageStatus = "in-progress";
+async createVehicle() {
+      if (!this.nameValid) {
+        this.$refs.vehicleName.focus();
+        return false;
+      }
+      if (!this.tickerValid) {
+        this.$refs.vehicleTicker.focus();
+        return false;
+      }
 
-            let arweave = {};
-            try {
-                arweave = await Arweave.init({
-                    host: this.arweaveHost,
-                    port: this.arweavePort,
-                    protocol: this.arweaveProtocol,
-                    timeout: 20000,
-                    logging: true,
-                });
-            } catch (error) {
-                console.log("ERROR connecting to Arweave: " + error); // How can this ever happen? :)
-                this.pageStatus = "error";
-                return false;
-            }
+      this.pageStatus = "in-progress";
 
-            const initTags = [
-                { name: "Protocol", value: this.tagProtocol }
-            ];
-            this.vehicle.creator = this.$store.getters.getActiveAddress;
-            //this.vehicle.seats = this.seats;  /*** NO LONGER USED */
-            this.vehicle.lockPeriod = this.lockPeriod;
-            //this.vehicle.minLease = this.minLease;
-            //this.vehicle.maxLease = this.maxLease;
-            //this.vehicle.logo = this.vehicleLogo;
-            //this.vehicle.logo = "9CYPS85KChE_zQxNLi2y5r2FLG-YE6HiphYYTlgtrtg";      // TEMP LOGO
-            this.vehicle.ownership = this.ownership;
-            this.vehicle.votingSystem = this.votingSystem;
-            this.vehicle.status = "stopped";
-            this.vehicle.vault = {};
-            this.vehicle.votes = [];
-            this.vehicle.tipsAr = 0;
-            this.vehicle.tipsMisc = 0;
-            this.vehicle.treasury = 0;
+      let arweave = {};
+      try {
+        arweave = await Arweave.init({
+          host: this.arweaveHost,
+          port: this.arweavePort,
+          protocol: this.arweaveProtocol,
+          timeout: 20000,
+          logging: true,
+        });
+      } catch (error) {
+        console.log("ERROR connecting to Arweave: " + error); // How can this ever happen? :)
+        this.pageStatus = "error";
+        return false;
+      }
 
-            // Default Settings
-            /*** TODO: ADD LOGO (communityLogo) to settings when implemented */
-            let dev_wallet;
-            if (import.meta.env.DEV) {
-                if(this.keyFile.length){
-                    dev_wallet =  this.keyFile[0]
-                } else {
-                    alert("Please attach your keyfile")
-                }        
-            } else {
-                use_wallet = {}
-            }
+      const initTags = [{ name: "Protocol", value: this.tagProtocol }];
+      this.vehicle.creator = this.$store.getters.getActiveAddress;
+      //this.vehicle.seats = this.seats;  /*** NO LONGER USED */
+      this.vehicle.lockPeriod = this.lockPeriod;
+      //this.vehicle.minLease = this.minLease;
+      //this.vehicle.maxLease = this.maxLease;
+      //this.vehicle.logo = this.vehicleLogo;
+      //this.vehicle.logo = "9CYPS85KChE_zQxNLi2y5r2FLG-YE6HiphYYTlgtrtg";      // TEMP LOGO
+      this.vehicle.ownership = this.ownership;
+      this.vehicle.votingSystem = this.votingSystem;
+      this.vehicle.status = "stopped";
+      this.vehicle.vault = {};
+      this.vehicle.votes = [];
+      this.vehicle.tipsAr = 0;
+      this.vehicle.tipsMisc = 0;
+      this.vehicle.treasury = 0;
 
-            await this.deployFile(this.files, arweave, dev_wallet)
-            /***this.vehicle.settings = [
-                [
-                    "quorum",
-                    0.5
-                ],
-                        [
-                    "support",
-                    0.5
-                ],
-                [
-                    "voteLength",
-                    2000
-                ],
-                [
-                    "lockMinLength",
-                    100
-                ],
-                [
-                    "lockMaxLength",
-                    10000
-                ],
-                [
-                    "communityLogo",
-                    ""
-                ]
-            ];*/
-
-            // Convert DAO Member array to dictionary
-            this.vehicle.balances = this.daoMembers.reduce((a, x) => ({ ...a, [x.wallet]: x.balance }), {});
-
-            const tmpPsts = this.vehiclePsts.map((item) => {
-                return {
-                    id: item.id,
-                    name: item.name,
-                    ticker: item.ticker,
-                    logo: item.logo,
-                    tokens: item.tokens,
-                };
-            });
-            this.vehicle.tokens = tmpPsts;
-            console.log("VEHICLE: " + JSON.stringify(this.vehicle));
-
-/****/
-            const vehicleTest = {
-    "name": "Chillin Treasury",
-    "ticker": "AFTR-CHILL",
-    "balances": {
-        "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8": 10000,
-        "KM66oKFLF60UrrOgSx5mb90gUd2v4i0T9RIcK9mfUiA": 2000,
-        "tv7gJr5TAys7oTpbfHI8dGO7t04jmacTNo20EfB0GJo": 1050,
-        "zVNaaPGR8yL5Dp5x4Jb-XPH4hlvB7ZoAvVFquw7J58w": 100,
-        "ffOomWmOgtmJ816U_l5hsMpmEFsx5DUDxUEAcoLOy7Q": 200,
-        "j12D8FZU-EBbIdCSkx6vO2shHlqbv5-5Ufl4jOuzGQw": 588,
-        "h-Bgr13OWUOkRGWrnMT0LuUKfJhRss5pfTdxHmNcXyw": 9970
-    },
-    "tokens": [
-        {
-            "id": "6eTVr8IKPNYbMHVcpHFXr-XNaL5hT6zRJXimcP-owmo",
-            "ticker": "OPENBITS",
-            "source": "UN8VLHqRGenuL3SCtbhHlJ_2ImgFVPIObyL921Wf6mo",
-            "txId" : "tx2fasdfoijeo8547",
-            "balance": 30000,
-            "depositBlock": 646429,
-            "lockLength": 10,
-            "logo": "4lU64igaeoMKC9RgLELKr7bXxnS9V3YZzqxN1UDMAYU"
-        },
-        {
-            "id": "usjm4PCxUd5mtaon7zc97-dt-3qf67yPyqgzLnLqk5A",
-            "ticker": "VRT",
-            "source": "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I",
-            "txId" : "tx3fasdfoijeo8547",
-            "balance": 15000,
-            "depositBlock": 646429,
-            "lockLength": 100,
-            "logo": "9CYPS85KChE_zQxNLi2y5r2FLG-YE6HiphYYTlgtrtg"
-        },
-        {
-            "id": "-8A6RexFkpfWwuyVO98wzSFZh0d6VJuI-buTJvlwOJQ",
-            "ticker": "ARDRIVE",
-            "source": "CH_52MZm60ewLdc-HGGM1DEk7hljT37Gf45JT5CoHUQ",
-            "txId" : "tx6fasdfoijeo8547",
-            "balance": 20000,
-            "depositBlock": 646429,
-            "lockLength": 10,
-            "logo": "tN4vheZxrAIjqCfbs3MDdWTXg8a_57JUNyoqA4uwr1k"
+      // Default Settings
+      /*** TODO: ADD LOGO (communityLogo) to settings when implemented */
+      let use_wallet;
+      if (import.meta.env.DEV) {
+        if (this.keyFile.length) {
+          use_wallet = JSON.parse(this.keyFile);
+        } else {
+          alert("Please attach your keyfile");
         }
-    ],
-    "status": "started",
-    "tipsAr": 235,
-    "tipsMisc": 2549,
-    "creator" : "j12D8FZU-EBbIdCSkx6vO2shHlqbv5-5Ufl4jOuzGQw",
-    "ownership" : "single",
-    "votingSystem" : "equal",
-    "settings": [
-        [
-            "quorum",
-            0.5
-        ],
-                [
-            "support",
-            0.5
-        ],
-        [
-            "voteLength",
-            2000
-        ],
-        [
-            "lockMinLength",
-            100
-        ],
-        [
-            "lockMaxLength",
-            10000
-        ]
-    ]
-};
- /***/
+      } 
 
-            // Create SmartWeave contract
-            try {
-                console.log("arweave: " + JSON.stringify(arweave)); console.log("contractSourceId: " + this.contractSourceId);
-                console.log("vehicle: " + JSON.stringify(this.vehicle)); console.log("tags: " + JSON.stringify(initTags));
-                
-                this.vehicle['id'] = await createContractFromTx(arweave, dev_wallet, this.contractSourceId, JSON.stringify(vehicleTest), initTags);
-                //this.vehicle['id'] = await createContractFromTx(arweave, use_wallet, this.contractSourceId, JSON.stringify(vehicleTest), initTags);
-                
-                //this.vehicle['id'] = await createContractFromTx(arweave, jwk, this.contractSourceId, JSON.stringify(vehicleTest), initTags);
-                console.log("ID = " + this.vehicle['id']);
-            } catch(error) {
-                console.log("ERROR creating SmartWeave contract: " + error);
-                this.pageStatus = "error";
-                return false;
-            }
+      
+      //await this.deployFile(this.files, arweave, use_wallet);
 
-            let transferInput = {};
+      // Convert DAO Member array to dictionary
+      this.vehicle.balances = this.daoMembers.reduce(
+        (a, x) => ({ ...a, [x.wallet]: x.balance }),
+        {}
+      );
 
-            try {
-                // Loop through vehicle PSTs and perform transfers
-                for (const pst of this.vehicle.tokens) {
-                    transferInput = {
-                        function: "transfer",
-                        target: this.vehicle.id,
-                        qty: pst.tokens, // PST qty
-                    };
+      const tmpPsts = this.vehiclePsts.map((item) => {
+        return {
+          id: item.id,
+          name: item.name,
+          ticker: item.ticker,
+          logo: item.logo,
+          tokens: item.tokens,
+        };
+      });
+      console.log("tmpPsts",tmpPsts)
+      this.vehicle.tokens = tmpPsts;
+      console.log("VEHICLE: " + JSON.stringify(this.vehicle));
 
-                    console.log("TokenId: " + pst.id + " Name: " + pst.name + " Qty: " + pst.tokens);
-                    //SOMETHING = await interactWrite(arweave, "use_wallet", pst.id, initTags);
-
-                    this.$router.push( { name: 'vehicle', params: { vehicleId: this.vehicle.id } });
-                }
-            } catch (error) {
-                console.log("ERROR transferring tokens: " + error);
-                this.pageStatus = "error";
-                return false;
-            }
-            
-            this.pageStatus = "";
+      /****/
+      const vehicleTest = {
+        name: "Chillin Treasury",
+        ticker: "AFTR-CHILL",
+        balances: {
+          "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8": 10000,
+          KM66oKFLF60UrrOgSx5mb90gUd2v4i0T9RIcK9mfUiA: 2000,
+          tv7gJr5TAys7oTpbfHI8dGO7t04jmacTNo20EfB0GJo: 1050,
+          "zVNaaPGR8yL5Dp5x4Jb-XPH4hlvB7ZoAvVFquw7J58w": 100,
+          ffOomWmOgtmJ816U_l5hsMpmEFsx5DUDxUEAcoLOy7Q: 200,
+          "j12D8FZU-EBbIdCSkx6vO2shHlqbv5-5Ufl4jOuzGQw": 588,
+          "h-Bgr13OWUOkRGWrnMT0LuUKfJhRss5pfTdxHmNcXyw": 9970,
         },
+        tokens: [
+          {
+            id: "6eTVr8IKPNYbMHVcpHFXr-XNaL5hT6zRJXimcP-owmo",
+            ticker: "OPENBITS",
+            source: "UN8VLHqRGenuL3SCtbhHlJ_2ImgFVPIObyL921Wf6mo",
+            txId: "tx2fasdfoijeo8547",
+            balance: 30000,
+            depositBlock: 646429,
+            lockLength: 10,
+            logo: "4lU64igaeoMKC9RgLELKr7bXxnS9V3YZzqxN1UDMAYU",
+          },
+          {
+            id: "usjm4PCxUd5mtaon7zc97-dt-3qf67yPyqgzLnLqk5A",
+            ticker: "VRT",
+            source: "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I",
+            txId: "tx3fasdfoijeo8547",
+            balance: 15000,
+            depositBlock: 646429,
+            lockLength: 100,
+            logo: "9CYPS85KChE_zQxNLi2y5r2FLG-YE6HiphYYTlgtrtg",
+          },
+          {
+            id: "-8A6RexFkpfWwuyVO98wzSFZh0d6VJuI-buTJvlwOJQ",
+            ticker: "ARDRIVE",
+            source: "CH_52MZm60ewLdc-HGGM1DEk7hljT37Gf45JT5CoHUQ",
+            txId: "tx6fasdfoijeo8547",
+            balance: 20000,
+            depositBlock: 646429,
+            lockLength: 10,
+            logo: "tN4vheZxrAIjqCfbs3MDdWTXg8a_57JUNyoqA4uwr1k",
+          },
+        ],
+        status: "started",
+        tipsAr: 235,
+        tipsMisc: 2549,
+        creator: "j12D8FZU-EBbIdCSkx6vO2shHlqbv5-5Ufl4jOuzGQw",
+        ownership: "single",
+        votingSystem: "equal",
+        settings: [
+          ["quorum", 0.5],
+          ["support", 0.5],
+          ["voteLength", 2000],
+          ["lockMinLength", 100],
+          ["lockMaxLength", 10000],
+        ],
+      };
+      /***/
+
+      // Create SmartWeave contract
+      try {
+        //console.log("arweave: " + JSON.stringify(arweave)); console.log("contractSourceId: " + this.contractSourceId);
+        console.log("vehicle: " + JSON.stringify(this.vehicle));
+        console.log("tags: " + JSON.stringify(initTags));
+
+        if (import.meta.env.DEV) {
+         this.vehicle["id"] = await createContractFromTx(
+          arweave,
+          use_wallet,
+          this.contractSourceId,
+          JSON.stringify(this.vehicle),
+          initTags
+        );
+        } else {
+        this.vehicle["id"] = await createContractFromTx(
+          arweave,
+          "use_wallet",
+          this.contractSourceId,
+          JSON.stringify(this.vehicle),
+          initTags
+        );
+        }
+        //this.vehicle['id'] = await createContractFromTx(arweave, jwk, this.contractSourceId, JSON.stringify(vehicleTest), initTags);
+        console.log("ID = " + this.vehicle["id"]);
+      } catch (error) {
+        console.log("ERROR creating SmartWeave contract: " + error);
+        this.pageStatus = "error";
+        return false;
+      }
+
+      let transferInput = {};
+
+      try {
+        // Loop through vehicle PSTs and perform transfers
+        for (const pst of this.vehicle.tokens) {
+          transferInput = {
+            function: "transfer",
+            target: this.vehicle.id,
+            qty: pst.tokens, // PST qty
+          };
+
+          console.log(
+            "TokenId: " + pst.id + " Name: " + pst.name + " Qty: " + pst.tokens
+          );
+          //SOMETHING = await interactWrite(arweave, "use_wallet", pst.id, initTags);
+
+          this.$router.push({
+            name: "vehicle",
+            params: { vehicleId: this.vehicle.id },
+          });
+        }
+      } catch (error) {
+        console.log("ERROR transferring tokens: " + error);
+        this.pageStatus = "error";
+        return false;
+      }
+
+      this.pageStatus = "";
+    },
         cancelCreate() {
             this.$router.push("vehicles");
         },

@@ -404,9 +404,7 @@ export default {
                     } else {
                         alert("Please attach your keyfile")
                     }        
-                } else {
-                    wallet = {}
-                }
+                } 
 
                 /***** HARDCODE THE INPUT TO SEE IF THIS STILL CAUSES AN ISSUE. */            
                 // const txid = await interactWrite(arweave, wallet, this.contractId, {
@@ -419,10 +417,13 @@ export default {
                 //     value: 'dao',
                 //     note: ''
                 // });
-
-                const txid = await interactWrite(arweave, wallet, this.contractId, JSON.stringify(action));
-                console.log("TX: " + txid);
-
+                if (import.meta.env.DEV) {
+                    const txid = await interactWrite(arweave, wallet, this.contractId, JSON.stringify(action));
+                    console.log("TX: " + txid);
+                } else {
+                    const txid = await interactWrite(arweave, "use_wallet", this.contractId, JSON.stringify(action));
+                    console.log("TX: " + txid);
+                }
                 /**** IN ORDER FOR THIS TO PROCESS, YOU NEED TO RUN http://localhost:1984/mine in your browser */
 
                 this.$router.push("/vehicles");
