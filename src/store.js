@@ -144,11 +144,16 @@ const store = createStore({
                 
                 let data = {
                   id: edge.node.id,
-                  balance: vehicle.balances,
+                  balance: 0,
                   name: vehicle.name,
                   ticker: vehicle.ticker,
                   logo: ''
                 };
+
+                Object.keys(vehicle.balances).some(walletId=>{
+                  if(walletId == wallet.address){
+                    data.balance = vehicle.balances[wallet.address];
+                  }})
 
                 // Logo
                 vehicle.settings.forEach(setting => {

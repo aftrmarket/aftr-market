@@ -181,7 +181,7 @@ export default {
                 return this.vehicle.creator;
             }
         },
-        ...mapGetters(['arConnected', 'getActiveAddress']),
+        ...mapGetters(['arConnected', 'getActiveAddress', 'keyFile']),
     },
     methods: {
         formatNumber(num, dec = false) {
@@ -400,7 +400,7 @@ export default {
                 let wallet;
                 if (import.meta.env.DEV) {
                     if(this.keyFile.length){
-                        wallet =  this.keyFile[0]
+                        wallet =  JSON.parse(this.keyFile)
                     } else {
                         alert("Please attach your keyfile")
                     }        

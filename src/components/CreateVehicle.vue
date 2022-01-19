@@ -425,7 +425,7 @@ export default {
             files: [],
             version: '1.0.0',
            
-      psts: [
+      /**psts: [
             { id: '46c0bdd1-56a9-4179-8a56-164b702a5cb8', ticker: 'AFTR', name: 'AFTR Market', price: 0.05 },
             { id: '8f1d6790-b885-4078-af9d-4e431ed74cf6', ticker: 'ARDRIVE', name: 'ArDrive', price: 0.078 },
             { id: 'c9f7418c-2587-433e-a355-03d2c5a5c5b3', ticker: 'ARVERIFY', name: 'ArVerify', price: 0.035 },
@@ -433,7 +433,7 @@ export default {
             { id: 'af7997c3-36b3-42ea-b923-38c0e69c8802', ticker: 'KOI', name: 'Koi', price: 0.045 },
             { id: '919ce858-2513-424a-9fdb-de146eee1417', ticker: 'OPENBITS', name: 'OpenBits', price: 0.06 },
             { id: 'e6125855-8414-4ae1-b611-66aff71160a2', ticker: 'VRT', name: 'Verto Exchange', price: 0.1 }
-      ]
+      ]**/
         };
     },
     computed: {
@@ -445,10 +445,12 @@ export default {
         },
         pstBalance() {
             const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.id === this.selectedPstId);
+            console.log("currentPst",currentPst, currentPst.balance)
             return this.formatNumber(currentPst.balance);
         },
         pstTicker() {
             const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.id === this.selectedPstId);
+            console.log("pstTicker", currentPst)
             return currentPst.ticker;
         },
         vehicleTokenBox() {
