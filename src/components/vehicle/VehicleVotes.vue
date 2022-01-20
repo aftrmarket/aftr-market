@@ -93,6 +93,7 @@ export default {
             allowAdd: false,
             voteId: 0,
             voteData : {},
+            votes: this.vehicle.votes
             //currentBlock: 110,  // TEMP, GET CURRENT BLOCK
         };
     },

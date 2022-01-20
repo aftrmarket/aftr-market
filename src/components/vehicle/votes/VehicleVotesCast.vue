@@ -7,17 +7,7 @@
       @close="open = false"
     >
       <div
-        class="
-          flex
-          items-end
-          justify-center
-          min-h-screen
-          pt-4
-          px-4
-          pb-20
-          text-center
-          sm:block sm:p-0
-        "
+        class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
       >
         <TransitionChild
           as="template"
@@ -49,33 +39,12 @@
           leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
         >
           <div
-            class="
-              inline-block
-              align-bottom
-              bg-white
-              rounded-lg
-              text-left
-              overflow-hidden
-              shadow-xl
-              transform
-              transition-all
-              sm:my-8 sm:align-middle sm:max-w-lg sm:w-full
-            "
+            class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
           >
             <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
               <div class="sm:flex sm:items-start">
                 <div
-                  class="
-                    mx-auto
-                    flex-shrink-0 flex
-                    items-center
-                    justify-center
-                    h-12
-                    w-12
-                    rounded-full
-                    bg-green-100
-                    sm:mx-0 sm:h-10 sm:w-10
-                  "
+                  class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -129,24 +98,7 @@
             <div class="bg-gray-50 px-4 py-3 sm:px-6 flex justify-between">
               <button
                 type="button"
-                class="
-                  w-full
-                  rounded-md
-                  border border-gray-300
-                  shadow-sm
-                  px-4
-                  py-2
-                  bg-white
-                  text-base
-                  font-medium
-                  text-gray-700
-                  hover:bg-green-700 hover:text-white
-                  focus:outline-none
-                  focus:ring-2
-                  focus:ring-offset-2
-                  focus:ring-green-500
-                  sm:ml-0 sm:ml-3 sm:w-auto sm:text-sm
-                "
+                class="w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-green-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-0 sm:ml-3 sm:w-auto sm:text-sm"
                 @click="recordVote(true)"
               >
                 Yes
@@ -156,24 +108,7 @@
               >
               <button
                 type="button"
-                class="
-                  w-full
-                  rounded-md
-                  border border-gray-300
-                  shadow-sm
-                  px-4
-                  py-2
-                  bg-white
-                  text-base
-                  font-medium
-                  text-gray-700
-                  hover:bg-aftrRed hover:text-white
-                  focus:outline-none
-                  focus:ring-2
-                  focus:ring-offset-2
-                  focus:ring-aftrRed
-                  sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm
-                "
+                class="w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-aftrRed hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                 @click="recordVote(false)"
               >
                 No
@@ -220,7 +155,7 @@ export default {
   },
   computed: {
     isInputValid() {},
-    ...mapGetters(["arConnected", "getActiveAddress"]),
+    ...mapGetters(["arConnected", "getActiveAddress", "keyFile"]),
   },
   methods: {
     formatNumber(num, dec = false) {
@@ -268,44 +203,57 @@ export default {
 
       let wallet;
       if (import.meta.env.DEV) {
-        if(this.keyFile.length){
-            wallet =  this.keyFile[0]
+        if (this.keyFile.length) {
+          wallet = JSON.parse(this.keyFile);
         } else {
-            alert("Please attach your keyfile")
-        }        
-      } else {
-        wallet = {}
+          alert("Please attach your keyfile");
+        }
       }
 
       if (vote) {
         const input = {
           function: "vote",
-          type: "set",
-          key: "yays",
-          value: "1",
+          voteId: this.voteId,
+          cast: "yay",
         };
-        const txid = await interactWrite(
-          arweave,
-          wallet,
-          this.contractId,
-          input
-        );
-        console.log(txid);
+        if (import.meta.env.DEV) {
+          const txid = await interactWrite(
+            arweave,
+            wallet,
+            this.contractId,
+            input
+          );
+          console.log(txid);
+        } else {
+          const txid = await interactWrite(
+            arweave,
+            "use_wallet",
+            this.contractId,
+            input
+          );
+        }
       } else {
         // NO vote
         const input = {
           function: "vote",
-          type: "set",
-          key: "nays",
-          //value: '1'
+          voteId: this.voteId,
+          cast: "nay",
         };
-        const txid = await interactWrite(
-          arweave,
-          wallet,
-          this.contractId,
-          input
-        );
-        console.log(txid);
+        if (import.meta.env.DEV) {
+          const txid = await interactWrite(
+            arweave,
+            wallet,
+            this.contractId,
+            input
+          );
+        } else {
+          const txid = await interactWrite(
+            arweave,
+            "use_wallet",
+            this.contractId,
+            input
+          );
+        }
       }
       this.$emit("close");
     },
