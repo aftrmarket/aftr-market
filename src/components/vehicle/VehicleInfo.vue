@@ -99,7 +99,7 @@ import { mapGetters } from 'vuex';
 import numeral from "numeral";
 import VehicleInfoRead from './VehicleInfoRead.vue';
 import VehicleStatusText from './VehicleStatusText.vue';
-import { interactWrite, smartweave } from "smartweave";
+import { interactWrite } from "smartweave";
 //import { A } from '../../../dist/assets/vendor.62e455b6';
 
 
@@ -387,12 +387,10 @@ export default {
                     // Invalid
                     return;
                 }
-                const action = {
-                    input: input
-                }
+
                 // Call Smartweave
                 console.log("CALL TO SMARTWEAVE");
-                console.log(JSON.stringify(action));
+                console.log(JSON.stringify(input));
                 console.log("Contract ID: " + this.contractId);
                 
                 //const txid = await interactWrite(arweave, "use_wallet", this.contractId, JSON.stringify(action));
@@ -405,29 +403,19 @@ export default {
                         alert("Please attach your keyfile")
                     }        
                 } 
-
-                /***** HARDCODE THE INPUT TO SEE IF THIS STILL CAUSES AN ISSUE. */            
-                // const txid = await interactWrite(arweave, wallet, this.contractId, {
-                //     function: 'propose',
-                //     type: 'set',
-                //     recipient: '',
-                //     target: '',
-                //     qty: 0,
-                //     key: 'ownership',
-                //     value: 'dao',
-                //     note: ''
-                // });
                 if (import.meta.env.DEV) {
-                    const txid = await interactWrite(arweave, wallet, this.contractId, JSON.stringify(action));
+                    const txid = await interactWrite(arweave, wallet, this.contractId, input);
                     console.log("TX: " + txid);
+
+                    /**** IN ORDER FOR THIS TO PROCESS, YOU NEED TO RUN http://localhost:1984/mine */
+                    const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
+                    const response = await fetch(mineUrl);
                 } else {
-                    const txid = await interactWrite(arweave, "use_wallet", this.contractId, JSON.stringify(action));
+                    const txid = await interactWrite(arweave, "use_wallet", this.contractId, input);
                     console.log("TX: " + txid);
                 }
-                /**** IN ORDER FOR THIS TO PROCESS, YOU NEED TO RUN http://localhost:1984/mine in your browser */
 
                 this.$router.push("/vehicles");
-                /**** */
             }
         }
     },
