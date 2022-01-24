@@ -138,7 +138,7 @@ import { interactWrite } from "smartweave";
 import Arweave from "arweave";
 
 export default {
-  props: ["vehicle", "voteId", "voteData", "contractId"],
+  props: ["vehicle", "voteId", "voteData", "contractId", "currentBlock"],
   components: {
     Dialog,
     DialogOverlay,
@@ -149,8 +149,12 @@ export default {
   },
   data() {
     return {
-      currentBlock: 110, // TEMP, GET CURRENT BLOCK
       vote: this.voteData,
+      /** Smartweave variables */
+      arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
+      arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
+      arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
+      /** */
     };
   },
   computed: {
@@ -191,71 +195,63 @@ export default {
       }
     },
     async recordVote(vote) {
-      let arweave = {};
+        let arweave = {};
 
-      arweave = await Arweave.init({
+        arweave = await Arweave.init({
         host: this.arweaveHost,
         port: this.arweavePort,
         protocol: this.arweaveProtocol,
         timeout: 20000,
         logging: true,
-      });
+        });
 
-      let wallet;
-      if (import.meta.env.DEV) {
-        if (this.keyFile.length) {
-          wallet = JSON.parse(this.keyFile);
-        } else {
-          alert("Please attach your keyfile");
+        let wallet;
+        if (import.meta.env.DEV) {
+            if (this.keyFile.length) {
+                wallet = JSON.parse(this.keyFile);
+            } else {
+                alert("Please attach your keyfile");
+            }
         }
-      }
+        // Create input
+        let input = {};
+        let txId = "";
+        if (vote) {
+            input = {
+                function: "vote",
+                voteId: this.voteId,
+                cast: "yay",
+            };
+        } else {
+            // NO vote
+            input = {
+                function: "vote",
+                voteId: this.voteId,
+                cast: "nay",
+            };
+        }
+        // Call SmartWeave
+        if (import.meta.env.DEV) {
+            txId = await interactWrite(
+                arweave,
+                wallet,
+                this.contractId,
+                input
+            );
 
-      if (vote) {
-        const input = {
-          function: "vote",
-          voteId: this.voteId,
-          cast: "yay",
-        };
-        if (import.meta.env.DEV) {
-          const txid = await interactWrite(
-            arweave,
-            wallet,
-            this.contractId,
-            input
-          );
-          console.log(txid);
+            /**** IN ORDER FOR THIS TO PROCESS, YOU NEED TO RUN http://localhost:1984/mine */
+            const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
+            const response = await fetch(mineUrl);
         } else {
-          const txid = await interactWrite(
-            arweave,
-            "use_wallet",
-            this.contractId,
-            input
-          );
+            txId = await interactWrite(
+                arweave,
+                "use_wallet",
+                this.contractId,
+                input
+            );
         }
-      } else {
-        // NO vote
-        const input = {
-          function: "vote",
-          voteId: this.voteId,
-          cast: "nay",
-        };
-        if (import.meta.env.DEV) {
-          const txid = await interactWrite(
-            arweave,
-            wallet,
-            this.contractId,
-            input
-          );
-        } else {
-          const txid = await interactWrite(
-            arweave,
-            "use_wallet",
-            this.contractId,
-            input
-          );
-        }
-      }
-      this.$emit("close");
+        console.log(txId);
+        this.$emit("close");
     },
   },
   setup() {
