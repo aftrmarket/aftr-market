@@ -1,7 +1,7 @@
 <template>
     <div class="pt-4 w-full">
         <vehicle-votes-add v-if="showAddVotes" :vehicle="vehicle" @close="closeModal('add')"></vehicle-votes-add>
-        <vehicle-votes-cast v-if="showCastVotes" :vehicle="vehicle" :voteId="voteId" :voteData="voteData" :contractId="contractId" @close="closeModal('cast')"></vehicle-votes-cast>
+        <vehicle-votes-cast v-if="showCastVotes" :vehicle="vehicle" :voteId="voteId" :voteData="voteData" :contractId="contractId" :currentBlock="currentBlock.height"  @close="closeModal('cast')"></vehicle-votes-cast>
     </div>
     <div class="flex flex-col">
         <div class="flex justify-between">
