@@ -139,9 +139,8 @@ const store = createStore({
             const response = await arweave.api.post('graphql', { query: query.query });
 
             for(let edge of response.data.data.transactions.edges) {
-              let vehicle = await readContract(arweave,edge.node.id);
-              if (vehicle && Object.keys(vehicle.balances).length != 0) {
-                
+              let vehicle = await readContract(arweave, edge.node.id);
+              if (vehicle && Object.keys(vehicle.balances).length != 0 && vehicle.name) {
                 let data = {
                   id: edge.node.id,
                   balance: 0,
