@@ -49,7 +49,8 @@
               </div>
             </div>
             <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-              <button type="button" v-if="pstInputValid && pstInputTokens" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm" @click="transferTokens">
+              <button type="button" v-if="pstInputValid && pstInputTokens" 
+              class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm" @click="transferTokens">
                 Transfer
               </button>
               <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-aftrRed hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" @click="$emit('close')" ref="cancelButtonRef">
@@ -69,6 +70,8 @@ import { Dialog, DialogOverlay, DialogTitle, TransitionChild, TransitionRoot } f
 import { ExclamationIcon } from '@heroicons/vue/outline'
 import { mapGetters } from 'vuex';
 import numeral from "numeral";
+import Arweave from "arweave";
+import { interactWrite, readContract } from "smartweave";
 
 export default {
     props : ['vehicle'],
@@ -92,6 +95,11 @@ export default {
             pricePerToken: null,                            // Selected PST's price
             pstValue: null,                                 // pricePerShare * inputShares
             totalValue: null,
+            /** Smartweave variables */
+            arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
+            arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
+            arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
+            /** */
         }
     },
     computed : {
@@ -124,7 +132,7 @@ export default {
                 return false;
             }
         },
-        ...mapGetters(['arConnected', 'getActiveAddress']),
+        ...mapGetters(['arConnected', 'getActiveAddress', 'keyFile']),
     },
     methods: {
         formatNumber(num, dec = false) {
@@ -148,18 +156,114 @@ export default {
                 return "mt-1 focus:ring-aftrRed focus:border-aftrRed shadow-sm sm:text-sm border-gray-300 rounded-md";
             }
         },
-        transferTokens() {
-            console.log("TRANSFER");
-            this.$emit('close');
-        },
+    async transferTokens() {
+      let arweave = {};
+
+      arweave = await Arweave.init({
+        host: this.arweaveHost,
+        port: this.arweavePort,
+        protocol: this.arweaveProtocol,
+        timeout: 20000,
+        logging: true,
+      });
+
+      
+      const inputTransfer = {
+        function: "transfer",
+        target: this.vehicle.id,
+        qty: Number(this.pstInputTokens),
+      };
+      const currentPst = this.$store.getters.getActiveWallet.psts.find(
+        (item) => item.id === this.selectedPstId
+      );
+
+      let vertoTxId;
+      if (import.meta.env.DEV) {
+
+        let wallet = JSON.parse(this.keyFile);
+        const mineUrl =
+          import.meta.env.VITE_ARWEAVE_PROTOCOL +
+          "://" +
+          import.meta.env.VITE_ARWEAVE_HOST +
+          ":" +
+          import.meta.env.VITE_ARWEAVE_PORT +
+          "/mine";
+        let response = await fetch(mineUrl);
+
+         await interactWrite(
+          arweave,
+          wallet,
+          currentPst.id,
+          inputTransfer
+        ).then((vertoTxId) => {
+            vertoTxId = vertoTxId
+            console.log("Transfer Verto = " + JSON.stringify(vertoTxId));
+        })
+
+        await fetch(mineUrl);
+
+        const inputDeposit = {
+          function: "deposit",
+          tokenId: currentPst.id,
+          txId: vertoTxId,
+        };
+
+        let txId = await interactWrite(
+          arweave,
+          wallet,
+          this.vehicle.id,
+          inputDeposit
+        );
+        
+        await fetch(mineUrl);
+
+        let vehicle = await readContract(
+          arweave,
+          this.vehicle.id,
+          undefined,
+          true
+        );
+      } else {
+        vertoTxId = await interactWrite(
+          arweave,
+          "use_wallet",
+          currentPst.id,
+          inputTransfer
+        );
+        console.log("Transfer Verto = " + JSON.stringify(vertoTxId));
+
+         const inputDeposit = {
+          function: "deposit",
+          tokenId: currentPst.id,
+          txId: vertoTxId,
+        };
+
+        let txId = await interactWrite(
+          arweave,
+          "use_wallet",
+          this.vehicle.id,
+          inputDeposit
+        );
+        console.log(txId);
+
+        console.log("READ CONTRACT...");
+        let vehicle = await readContract(
+          arweave,
+          this.vehicle.id
+        );
+        console.log(JSON.stringify(vehicle));
+      }
+
+      this.$emit("close");
+    },
         pstChange() {
             this.pstInputTokens = null;
             this.pricePerToken = null;
         },
         calcPstPrice() {
             const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.id === this.selectedPstId);
-            this.pricePerToken = currentPst.price;
-            this.pstValue = currentPst.price * this.pstInputTokens;
+            this.pricePerToken = currentPst.balance;
+            this.pstValue = currentPst.balance * this.pstInputTokens;
             this.updatePstInputValid(currentPst.balance);
         },
         updatePstInputValid(balance) {
