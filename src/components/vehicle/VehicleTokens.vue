@@ -33,7 +33,7 @@
                                             </div>
                                             <div class="ml-4">
                                                 <div class="font-medium text-gray-900"> {{ pst.name + " (" + pst.ticker + ")" }} </div>
-                                                <div class="text-gray-500 font-mono"> {{ idSubstr(pst.id) }}</div>
+                                                <div class="text-gray-500 font-mono"> {{ idSubstr(pst.tokenId) }}</div>
                                             </div>
                                         </div>
                                     </td>
