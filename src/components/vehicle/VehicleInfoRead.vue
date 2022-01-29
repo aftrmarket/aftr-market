@@ -2,14 +2,18 @@
     <div class="pt-2">
         <div class="flex items-center justify-between">
             <div class="px-4 py-6 sm:px-6 grid grid-cols-2 gap-x-4">
-                <label class="block text-md text-gray-700">Vehicle Name:</label>
-                <label class="block text-md text-gray-500 font-medium">{{ vehicle.name }}</label>
-                <label class="block text-md text-gray-700">Ticker:</label>
-                <label class="block text-md text-gray-500 font-medium">{{ vehicle.ticker }}</label>
+                <label class="block text-lg text-gray-900">Vehicle Name:</label>
+                <label class="block text-lg text-gray-500 font-medium">{{ vehicle.name }}</label>
+                <label class="block text-lg text-gray-900">Ticker:</label>
+                <label class="block text-lg text-gray-500 font-medium">{{ vehicle.ticker }}</label>
             </div>
             <div class="pr-6">
                 <p class="text-gray-900">Current Value: <span class="px-2 py-3 sm:px-6 inline-flex leading-5 font-semibold rounded-full bg-green-100 text-green-800">{{ formatNumber(vehicle.treasury, true) }} AR</span></p>
             </div>
+        </div>
+        <div v-if="vehicle.desc !== '' && vehicle.desc !== undefined" class="px-4 py-4 sm:px-6">
+            <div class="block text-lg text-gray-900">Description</div>
+            <div class="block text-lg text-gray-500 font-medium">{{ vehicle.desc }}</div>
         </div>
         <div>
             <h3 class="text-lg leading-6 font-medium text-gray-900">
@@ -51,7 +55,7 @@
                 </dl>
             </div>
         </div>
-        <div class="pt-4 flex items-start justify-between">
+        <div class="pt-4 grid grid-cols-3">
             <div>
                 <div class="px-4 sm:px-6 max-w-2xl text-sm text-gray-500">Status</div>
                 <div class="flex items-center justify-between pb-4">
@@ -69,10 +73,34 @@
                 </div>
             </div>
             <div>
-                <div class="px-4 sm:px-6 max-w-2xl text-sm text-gray-500">TODO</div>
+                <div class="px-4 sm:px-6 max-w-2xl text-sm text-gray-500">Created By</div>
+                <div class="flex items-center justify-between pb-4">
+                    <div class="px-4 sm:px-6 text-left text-sm font-mono tracking-wider">
+                        {{ vehicle.creator }}
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="px-4 sm:px-6 max-w-2xl text-sm text-gray-500">Voting System</div>
                 <div class="flex items-center justify-between pb-4">
                     <div class="px-4 sm:px-6">
-                        FINISH LAYOUT
+                        {{ getVotingSystem }}
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="px-4 sm:px-6 max-w-2xl text-sm text-gray-500">Vote Length</div>
+                <div class="flex items-center justify-between pb-4">
+                    <div class="px-4 sm:px-6">
+                        {{ formatNumber(currentVehicleSettings.get('voteLength')) }}
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="px-4 sm:px-6 max-w-2xl text-sm text-gray-500">Quorum</div>
+                <div class="flex items-center justify-between pb-4">
+                    <div class="px-4 sm:px-6">
+                        {{ formatNumber(currentVehicleSettings.get('quorum'), true) }}
                     </div>
                 </div>
             </div>
@@ -88,6 +116,7 @@ export default {
     components: {},
     data() {
         return {
+            currentVehicleSettings: null,
             counts: {
                 members: {
                     total: 0,
@@ -122,6 +151,13 @@ export default {
             } else {
                 return 'DAO Owned'
             }
+        },
+        getVotingSystem() {
+            if (this.vehicle.votingSystem === 'equal') {
+                return 'Distributed Evenly';
+            } else {
+                return 'Weighted';
+            }
         }
     },
     methods: {
@@ -134,6 +170,14 @@ export default {
         },
         aggregateInfo() {
             console.log(JSON.stringify(this.vehicle));
+            
+            if (!this.vehicle.votingSystem || this.vehicle.votingSystem === '' || this.vehicle.votingSystem === 'undefined') {
+                this.vehicle.votingSystem = 'equal';
+            }
+
+            this.currentVehicleSettings = new Map(this.vehicle.settings);
+
+
             if (typeof this.vehicle.balances !== 'undefined') {
                 this.counts.members.total = Object.keys(this.vehicle.balances).length;
             }
