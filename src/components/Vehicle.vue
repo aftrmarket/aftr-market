@@ -151,15 +151,14 @@ export default {
             if (this.vehicle.tokens) {
                 for (let token of this.vehicle.tokens) {
                     try {
-                        const response = await fetch("http://v2.cache.verto.exchange/token/" + token.id + "/price");
+                        const response = await fetch("http://v2.cache.verto.exchange/token/" + token.tokenId + "/price");
                         const responseObj = await response.json();
                         const pricePerToken = responseObj.price;
                         token.name = responseObj.name;
                         token.total = pricePerToken * token.balance;
                         treasuryTotal += token.total;
                     } catch(error) {
-                        console.log("ERROR calling Verto cache: " + error);
-                        return false;
+                        console.log("ERROR calling Verto cache on " + token.name + ": " + error);
                     }
                 }
             } else {
