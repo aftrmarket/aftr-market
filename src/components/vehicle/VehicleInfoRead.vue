@@ -16,9 +16,6 @@
             <div class="block text-lg text-gray-500 font-medium">{{ vehicle.desc }}</div>
         </div>
         <div>
-            <h3 class="text-lg leading-6 font-medium text-gray-900">
-            Contained in Vehicle
-            </h3>
             <div class="grid grid-cols-3 gap-4">
                 <dl class="mt-5">
                     <div class="px-4 py-5 bg-white shadow rounded-lg overflow-hidden sm:p-6">
