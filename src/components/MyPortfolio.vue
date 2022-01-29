@@ -19,7 +19,7 @@
         </div>
         <!-- List -->
         <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6">
-          <ul v-if="!isLoading && vehicle.length > 0" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <ul v-if="!isLoading && vehicles.length > 0" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <li v-for="vehicle in vehicles" :key="vehicle.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
                 <router-link :to="{ name: 'vehicle', params: { vehicleId: vehicle.id } }">
                     <vehicle-card :vehicle="vehicle"></vehicle-card>
