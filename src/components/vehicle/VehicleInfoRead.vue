@@ -147,7 +147,7 @@ export default {
         },
         getOwnership() {
             if (this.vehicle.ownership === 'single') {
-                return 'Owned by ' + this.vehicle.creator;
+                return 'Owned by creator';
             } else {
                 return 'DAO Owned'
             }
