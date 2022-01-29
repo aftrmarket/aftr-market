@@ -76,7 +76,7 @@
                 <div class="px-4 sm:px-6 max-w-2xl text-sm text-gray-500">Created By</div>
                 <div class="flex items-center justify-between pb-4">
                     <div class="px-4 sm:px-6 text-left text-sm font-mono tracking-wider">
-                        {{ vehicle.creator }}
+                        {{ walletAddressSubstr(vehicle.creator) }}
                     </div>
                 </div>
             </div>
@@ -166,6 +166,14 @@ export default {
                 return numeral(num).format("0,0.0000");
             } else {
                 return numeral(num).format("0,0");
+            }
+        },
+        walletAddressSubstr(addr, chars = 10) {
+            if (typeof addr === 'string') {
+                let len = parseInt(chars/2);
+                return addr.substr(0, len) + '...' + addr.substr(-len);
+            } else {
+                return '';
             }
         },
         aggregateInfo() {
