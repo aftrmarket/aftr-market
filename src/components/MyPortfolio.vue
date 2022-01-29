@@ -77,53 +77,6 @@ export default {
                 }
         }`,
         vehicles: [],
-    //     vehicles: [
-    //     {
-    //         id: '6adfd3a1-cb33-4970-8e88-c2d0defa66ec',
-    //         name: 'Investment Bus',
-    //         ticker: 'IBUS',
-    //         status: 'stopped',
-    //         desc: '',
-    //         logo: '',
-    //         creator: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I',
-    //         ownership: 'single',
-    //         leasedSeats: 143,
-    //         perf1m: -2.43,
-    //         perf3m: 20.40,
-    //         perfMax: 140.29,
-    //         tips: 'A+',
-    //         balances: {
-    //                 "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8": 12300,
-    //                 "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I": 1000
-    //         },
-    //         tokens: [
-    //             {
-    //                 "tokenId": "46c0bdd1-56a9-4179-8a56-164b702a5cb8",
-    //                 "source": "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
-    //                 "txId": "tx154545454",
-    //                 "balance": 2500,
-    //                 "depositBlock": 123,
-    //                 "lockLength": 5
-    //             },
-    //             {
-    //                 "tokenId": "VRT",
-    //                 "source": "joe7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
-    //                 "txId" : "tx2fasdfoijeo8547",
-    //                 "balance": 1000,
-    //                 "depositBlock": 123,
-    //                 "lockLength": 10
-    //             },
-    //             {
-    //                 "tokenId": "XYZ",
-    //                 "source": "joe7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
-    //                 "txId" : "tx3fasdfoijeo8547",
-    //                 "balance": 3400,
-    //                 "depositBlock": 123,
-    //                 "lockLength": 5
-    //             }
-    //         ]
-    //     }
-    //   ]
     }
   },
   methods: {
@@ -170,13 +123,13 @@ export default {
 
             for (let token of vehicle.tokens) {
                 try {
-                    const response = await fetch("http://v2.cache.verto.exchange/token/" + token.id + "/price");
+                    const response = await fetch("http://v2.cache.verto.exchange/token/" + token.tokenId + "/price");
                     const responseObj = await response.json();
                     const pricePerToken = responseObj.price;
                     const tokenValue = pricePerToken * token.balance;
                     treasuryTotal += tokenValue;
                 } catch(error) {
-                    console.log("ERROR calling Verto cache: " + error);
+                    console.log("ERROR calling Verto cache on " + token.name + ": " + error);
                 }
             }
             vehicle.treasury = treasuryTotal;
@@ -190,9 +143,13 @@ export default {
             //vehicle.tipsMisc = 142545
 
             // Votes Opened
-            vehicle.votes = 0;
+            if (typeof vehicle.votes !== 'undefined' && vehicle.votes.length !== 0) {
+                const activeVotes = vehicle.votes.filter(vote => vote.status === 'active');
+                vehicle.totalActiveVotes = activeVotes.length;
+            } else {
+                vehicle.totalActiveVotes = 0;
+            }
             
-            this.isLoading = false;
         } catch (error) {
             console.log("ERROR calling SmartWeave: " + error);
         }
@@ -241,7 +198,7 @@ export default {
     for(let edge of response.data.data.transactions.edges) {
         await this.loadAllVehicles(edge.node.id);
     }
-
+    this.isLoading = false;
 
   }
 }
