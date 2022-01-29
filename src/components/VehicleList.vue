@@ -19,12 +19,15 @@
         </div>
         <!-- List -->
         <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6">
-          <ul v-if="!isLoading" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <ul v-if="!isLoading && vehicles.length > 0" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <li v-for="vehicle in vehicles" :key="vehicle.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
                 <router-link :to="{ name: 'vehicle', params: { vehicleId: vehicle.id } }">
                     <vehicle-card :vehicle="vehicle"></vehicle-card>
                 </router-link>
             </li>
+          </ul>
+          <ul v-else-if="!isLoading && vehicles.length == 0" class="">
+            No vehicles found...
           </ul>
           <ul v-else class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <li v-for="index in 12" :key=index class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
@@ -49,7 +52,6 @@ export default {
     return {
         /** Smartweave variables */
         arweave: {},
-        contractSourceId: import.meta.env.VITE_SMARTWEAVE_CONTRACT_SOURCE_ID,
         arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
         arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
         arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
@@ -130,9 +132,9 @@ export default {
       this.$router.push({ name: 'vehicle', params: { vehicle: 'joe' } });
     },
     async loadAllVehicles(contractId) {
-        console.log("Contract: " + contractId);
         try {
             let vehicle = await readContract(this.arweave, contractId);
+
             vehicle.id = contractId;
             if (!vehicle.tokens) {
                 vehicle.tokens = [];
@@ -163,7 +165,6 @@ export default {
                     treasuryTotal += tokenValue;
                 } catch(error) {
                     console.log("ERROR calling Verto cache: " + error);
-                    return false;
                 }
             }
             vehicle.treasury = treasuryTotal;
@@ -183,7 +184,6 @@ export default {
             this.vehicles.push(vehicle);
         } catch (error) {
             console.log("ERROR calling SmartWeave: " + error);
-            return false;
         }
     },
   },
@@ -191,6 +191,9 @@ export default {
     this.isLoading = true;
     
     // Use GraphQL to find all vehicle contracts, then load all vehicles
+
+    let response = {};
+    let totalVehicles = 0;
     try {
         this.arweave = await Arweave.init({
             host: this.arweaveHost,
@@ -200,22 +203,22 @@ export default {
             logging: true,
         });
 
-        const response = await this.arweave.api.post('graphql', { query: this.query });
+        response = await this.arweave.api.post('graphql', { query: this.query });
 
         if (response.status !== 200) {
             throw response.status + " - " + response.statusText;
         }
 
-        const totalVehicles = response.data.data.transactions.edges.length;
-
-        for(let edge of response.data.data.transactions.edges) {
-            await this.loadAllVehicles(edge.node.id);
-        }
+        totalVehicles = response.data.data.transactions.edges.length;
 
     } catch (error) {
         console.log("ERROR while fetching from gateway: " + error);
     }
 
+    // Load each Vehicle
+    for(let edge of response.data.data.transactions.edges) {
+        await this.loadAllVehicles(edge.node.id);
+    }
     this.isLoading = false;
 
     // for (let index = 1; index < 12; index++) {

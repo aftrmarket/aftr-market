@@ -19,12 +19,15 @@
         </div>
         <!-- List -->
         <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6">
-          <ul v-if="!isLoading" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <ul v-if="!isLoading && vehicle.length > 0" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <li v-for="vehicle in vehicles" :key="vehicle.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
                 <router-link :to="{ name: 'vehicle', params: { vehicleId: vehicle.id } }">
                     <vehicle-card :vehicle="vehicle"></vehicle-card>
                 </router-link>
             </li>
+          </ul>
+          <ul v-else-if="!isLoading && vehicles.length == 0" class="">
+            No vehicles found...
           </ul>
           <ul v-else class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <li v-for="index in 12" :key=index class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
@@ -131,24 +134,27 @@ export default {
       this.$router.push({ name: 'vehicle', params: { vehicle: 'joe' } });
     },
     async loadAllVehicles(contractId) {
-        console.log("Contract: " + contractId);
-        let arweave = {};
         try {
-            arweave = await Arweave.init({
-                host: this.arweaveHost,
-                port: this.arweavePort,
-                protocol: this.arweaveProtocol,
-                timeout: 20000,
-                logging: true,
-            });
-        } catch (error) {
-            console.log("ERROR connecting to Arweave: " + error);
-            return false;
-        }
-
-        try {
-            let vehicle = await readContract(arweave, contractId);
+            let vehicle = await readContract(this.arweave, contractId);
             vehicle.id = contractId;
+
+            // Filter for current wallet
+            Object.keys(vehicle.balances).some( walletId => {
+                if(walletId == this.$store.getters.getActiveAddress){
+                    if(vehicle.balances[walletId] > 0 ) {
+                        this.vehicles.push(vehicle);
+                    }
+                } else {
+                    Object.keys(vehicle.vault).some( walletId=> {
+                        if(walletId == this.$store.getters.getActiveAddress) {
+                            if(vehicle.vault[walletId] > 0 ) {
+                                this.vehicles.push(vehicle);
+                            }
+                        }
+                    });
+                }
+            });
+
             if (!vehicle.tokens) {
                 vehicle.tokens = [];
             }
@@ -171,7 +177,6 @@ export default {
                     treasuryTotal += tokenValue;
                 } catch(error) {
                     console.log("ERROR calling Verto cache: " + error);
-                    return false;
                 }
             }
             vehicle.treasury = treasuryTotal;
@@ -186,31 +191,16 @@ export default {
 
             // Votes Opened
             vehicle.votes = 0;
-
-            Object.keys(vehicle.balances).some(walletId=>{
-             if(walletId == this.$store.getters.getActiveAddress){
-                if(vehicle.balances[walletId] > 0 )
-                  this.vehicles.push(vehicle);
-             } else {
-              Object.keys(vehicle.vault).some(walletId=>{
-                if(walletId == this.$store.getters.getActiveAddress){
-                  if(vehicle.vault[walletId] > 0 )
-                  this.vehicles.push(vehicle);
-                }
-              })
-             }
-            })
             
             this.isLoading = false;
         } catch (error) {
             console.log("ERROR calling SmartWeave: " + error);
-            return false;
         }
     }
   },
   async created() {
     this.isLoading = true;
-    if(!this.$store.getters.arConnected){
+    if(!this.$store.getters.arConnected) {
         alert("Please login to Aftr-Market")
     }
     
@@ -225,6 +215,8 @@ export default {
     //     /*** FOR NOW JUST LOAD A FAKE SCREEN OF VEHICLES */
     //     this.vehicles.push(this.vehicles[0]);
     // }
+    let response = {};
+    let totalVehicles = 0;
     try {
         this.arweave = await Arweave.init({
             host: this.arweaveHost,
@@ -234,21 +226,23 @@ export default {
             logging: true,
         });
 
-        const response = await this.arweave.api.post('graphql', { query: this.query });
+        response = await this.arweave.api.post('graphql', { query: this.query });
 
         if (response.status !== 200) {
             throw response.status + " - " + response.statusText;
         }
 
-        const totalVehicles = response.data.data.transactions.edges.length;
-
-        for(let edge of response.data.data.transactions.edges) {
-            await this.loadAllVehicles(edge.node.id);
-        }
-
+        totalVehicles = response.data.data.transactions.edges.length;
     } catch (error) {
         console.log("ERROR while fetching from gateway: " + error);
     }
+
+    // Load each Vehicle
+    for(let edge of response.data.data.transactions.edges) {
+        await this.loadAllVehicles(edge.node.id);
+    }
+
+
   }
 }
 </script>
