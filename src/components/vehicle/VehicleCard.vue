@@ -13,7 +13,7 @@
             </p>
             <p class="mt-1 text-gray-500 text-sm truncate">
                 Votes Opened: 
-                <span class="text-base text-aftrDarkGrey font-bold">0</span>
+                <span class="text-base text-aftrDarkGrey font-bold">{{ formatNumber(vehicle.totalActiveVotes) }}</span>
             </p>
             <!---
             <p class="mt-1 text-gray-500 text-sm truncate"><span class="text-base text-aftrDarkGrey font-bold">{{ vehicle.leasedSeats }}</span> Leased Seats</p>
