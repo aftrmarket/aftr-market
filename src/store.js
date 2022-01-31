@@ -103,26 +103,25 @@ const store = createStore({
           console.log("ERROR during ArConnection: " + error);
         }
   
-        try {
-          if (import.meta.env.DEV) {
+        if (import.meta.env.DEV) {
             let query = {
-              query: `
-                      query($cursor: String) {
-                          transactions(
-                              tags: [{ name: "App-Name", values: ["SmartWeaveContract"] }]
-                              after: $cursor
-                          ) {
-                              pageInfo {
-                                  hasNextPage
-                              }
-                              edges {
-                                  cursor
-                                  node { id } 
-                              }
-                          }
-                  }`,
+            query: `
+                    query($cursor: String) {
+                        transactions(
+                            tags: [{ name: "App-Name", values: ["SmartWeaveContract"] }]
+                            after: $cursor
+                        ) {
+                            pageInfo {
+                                hasNextPage
+                            }
+                            edges {
+                                cursor
+                                node { id } 
+                            }
+                        }
+                }`,
             };
-            
+        
             let arweave = {};
             try {
                 arweave = await Arweave.init({
@@ -141,32 +140,36 @@ const store = createStore({
 
             for(let edge of response.data.data.transactions.edges) {
                 console.log("CONTRACT: " + edge.node.id);
-              let vehicle = await readContract(arweave, edge.node.id);
-              if (vehicle && Object.keys(vehicle.balances).length != 0 && vehicle.name) {
-                let data = {
-                  id: edge.node.id,
-                  balance: 0,
-                  name: vehicle.name,
-                  ticker: vehicle.ticker,
-                  logo: ''
-                };
+                try {
+                    let vehicle = await readContract(arweave, edge.node.id);
+                
+                    if (vehicle && Object.keys(vehicle.balances).length != 0 && vehicle.name) {
+                        let data = {
+                            id: edge.node.id,
+                            balance: 0,
+                            name: vehicle.name,
+                            ticker: vehicle.ticker,
+                            logo: ''
+                        };
 
-                Object.keys(vehicle.balances).some(walletId=>{
-                  if(walletId == wallet.address){
-                    data.balance = vehicle.balances[wallet.address];
-                  }})
+                        Object.keys(vehicle.balances).some(walletId=>{
+                            if(walletId == wallet.address){
+                                data.balance = vehicle.balances[wallet.address];
+                        }});
 
-                // Logo
-                vehicle.settings.forEach(setting => {
-                  if (setting[0] === 'communityLogo') {
-                    data.logo = setting[1];
-                  }
-                });
-                wallet.psts.push(data)
-              }   
-              //console.log("wallet.psts", wallet.psts);           
+                        // Logo
+                        vehicle.settings.forEach(setting => {
+                            if (setting[0] === 'communityLogo') {
+                                data.logo = setting[1];
+                            }
+                        });
+                        wallet.psts.push(data);
+                    }
+                } catch(e) {
+                    console.log("ERROR reading contract for " + edge.node.id + ": " + error);
+                }
             }
-          } else {
+        } else {
             // Now query Verto to get all PSTs contained in Wallet
             const response = await fetch(
                 import.meta.env.VITE_VERTO_CACHE_URL + "balance/" + wallet.address
@@ -181,17 +184,14 @@ const store = createStore({
              *  logo: ''
              * } ]
              ****/
-          }
-        } catch (error) {
-          console.log("ERROR while fetching Verto balances: " + error);
         }
   
-          // Query Verto to get AR prices for each token
+        // Query Verto to get AR prices for each token
         for (let pst of wallet.psts) {
             try {
                 const response = await fetch(
-                    "http://v2.cache.verto.exchange/token/" + pst.id + "/price"
-                    );
+                    import.meta.env.VITE_VERTO_CACHE_URL + "token/" + pst.id + "/price"
+                );
                 const jsonRes = await response.json();
                 const i = wallet.psts.findIndex((item) => item.id === pst.id);
                 wallet.psts[i]["price"] = jsonRes.price;
