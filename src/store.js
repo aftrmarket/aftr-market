@@ -136,9 +136,11 @@ const store = createStore({
                 console.log("ERROR connecting to Arweave: " + error);
                 return false;
             }
+
             const response = await arweave.api.post('graphql', { query: query.query });
 
             for(let edge of response.data.data.transactions.edges) {
+                console.log("CONTRACT: " + edge.node.id);
               let vehicle = await readContract(arweave, edge.node.id);
               if (vehicle && Object.keys(vehicle.balances).length != 0 && vehicle.name) {
                 let data = {
@@ -162,12 +164,12 @@ const store = createStore({
                 });
                 wallet.psts.push(data)
               }   
-              // console.log("wallet.psts", wallet.psts)           
+              //console.log("wallet.psts", wallet.psts);           
             }
           } else {
             // Now query Verto to get all PSTs contained in Wallet
             const response = await fetch(
-              "http://v2.cache.verto.exchange/balance/" + wallet.address
+                import.meta.env.VITE_VERTO_CACHE_URL + "balance/" + wallet.address
             );
             wallet.psts = await response.json();
             /**** RESPONSE RETURNS AS AN ARRAY OF KEY/VALUE PAIRS ****
@@ -184,23 +186,23 @@ const store = createStore({
           console.log("ERROR while fetching Verto balances: " + error);
         }
   
-        try {
           // Query Verto to get AR prices for each token
-          for (let pst of wallet.psts) {
-            const response = await fetch(
-              "http://v2.cache.verto.exchange/token/" + pst.id + "/price"
-            );
-            const jsonRes = await response.json();
-            const i = wallet.psts.findIndex((item) => item.id === pst.id);
-            wallet.psts[i]["price"] = jsonRes.price;
-            wallet.psts[i]["total"] = jsonRes.price * wallet.psts[i]["balance"];
-          }
-        } catch (error) {
-          console.log("ERROR while fetching AR prices from Verto: " + error);
-        }
+        for (let pst of wallet.psts) {
+            try {
+                const response = await fetch(
+                    "http://v2.cache.verto.exchange/token/" + pst.id + "/price"
+                    );
+                const jsonRes = await response.json();
+                const i = wallet.psts.findIndex((item) => item.id === pst.id);
+                wallet.psts[i]["price"] = jsonRes.price;
+                wallet.psts[i]["total"] = jsonRes.price * wallet.psts[i]["balance"];
+            } catch (error) {
+                console.log("ERROR while fetching AR prices of " + pst.name + " from Verto: " + error);
+            }
   
-        if (wallet.address.length === 43) {
-          context.commit("arConnect", wallet);
+            if (wallet.address.length === 43) {
+                context.commit("arConnect", wallet);
+            }
         }
       },
         async arDisconnect(context) {
