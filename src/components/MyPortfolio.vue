@@ -123,7 +123,7 @@ export default {
 
             for (let token of vehicle.tokens) {
                 try {
-                    const response = await fetch("http://v2.cache.verto.exchange/token/" + token.tokenId + "/price");
+                    const response = await fetch(import.meta.env.VITE_VERTO_CACHE_URL + "token/" + token.tokenId + "/price");
                     const responseObj = await response.json();
                     const pricePerToken = responseObj.price;
                     const tokenValue = pricePerToken * token.balance;

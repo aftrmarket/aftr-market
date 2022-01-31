@@ -971,21 +971,23 @@ async createVehicle() {
         console.log("tags: " + JSON.stringify(initTags));
 
         if (import.meta.env.DEV) {
-         this.vehicle["id"] = await createContractFromTx(
-          arweave,
-          use_wallet,
-          this.contractSourceId,
-          JSON.stringify(this.vehicle),
-          initTags
-        );
+            this.vehicle["id"] = await createContractFromTx(
+                arweave,
+                use_wallet,
+                this.contractSourceId,
+                JSON.stringify(this.vehicle),
+                initTags
+            );
+            const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
+            let response = await fetch(mineUrl);
         } else {
-        this.vehicle["id"] = await createContractFromTx(
-          arweave,
-          "use_wallet",
-          this.contractSourceId,
-          JSON.stringify(this.vehicle),
-          initTags
-        );
+            this.vehicle["id"] = await createContractFromTx(
+                arweave,
+                "use_wallet",
+                this.contractSourceId,
+                JSON.stringify(this.vehicle),
+                initTags
+            );
         }
         //this.vehicle['id'] = await createContractFromTx(arweave, jwk, this.contractSourceId, JSON.stringify(vehicleTest), initTags);
         console.log("ID = " + this.vehicle["id"]);
