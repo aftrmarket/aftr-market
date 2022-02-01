@@ -999,6 +999,9 @@ async createVehicle() {
 
       let transferInput = {};
 
+    /**** TRANSFER -> THEN DEPOSIT FUNCTIONS NEED TO BE CALLED
+     **** THE SAME CODE THAT WAS IMPLEMENTED FOR THE ADD TOKEN BUTTON
+     */
       try {
         // Loop through vehicle PSTs and perform transfers
         for (const pst of this.vehicle.tokens) {
