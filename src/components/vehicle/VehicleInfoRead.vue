@@ -52,7 +52,7 @@
                 </dl>
             </div>
         </div>
-        <div class="pt-4 grid grid-cols-3">
+        <div class="pt-4 grid grid-cols-4">
             <div>
                 <div class="px-4 sm:px-6 max-w-2xl text-sm text-gray-500">Status</div>
                 <div class="flex items-center justify-between pb-4">
@@ -77,6 +77,8 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="pt-4 grid grid-cols-4">    
             <div>
                 <div class="px-4 sm:px-6 max-w-2xl text-sm text-gray-500">Voting System</div>
                 <div class="flex items-center justify-between pb-4">
@@ -98,6 +100,14 @@
                 <div class="flex items-center justify-between pb-4">
                     <div class="px-4 sm:px-6">
                         {{ formatNumber(currentVehicleSettings.get('quorum'), true) }}
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="px-4 sm:px-6 max-w-2xl text-sm text-gray-500">Support</div>
+                <div class="flex items-center justify-between pb-4">
+                    <div class="px-4 sm:px-6">
+                        {{ formatNumber(currentVehicleSettings.get('Support'), true) }}
                     </div>
                 </div>
             </div>

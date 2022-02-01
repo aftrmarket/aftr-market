@@ -244,34 +244,44 @@ export default {
           console.log("THIS VEHICLE: " + this.vehicle.id);
         }
       } else {
-        vertoTxId = await interactWrite(
-          arweave,
-          "use_wallet",
-          currentPst.id,
-          inputTransfer
-        );
-        console.log("Transfer Verto = " + JSON.stringify(vertoTxId));
+        await interactWrite(arweave, wallet, currentPst.id, inputTransfer)
+          .then(async (id) => {
+            vertoTxId = id;
+            console.log("Transfer Verto = " + JSON.stringify(vertoTxId));
 
-        const inputDeposit = {
-          function: "deposit",
-          tokenId: currentPst.id,
-          txId: vertoTxId,
-        };
+            await fetch(mineUrl);
 
-        let txId = await interactWrite(
-          arweave,
-          "use_wallet",
-          this.vehicle.id,
-          inputDeposit
-        );
-        this.msg = "Deposit Successful : " + txId
-        console.log(txId);
+            const inputDeposit = {
+              function: "deposit",
+              tokenId: currentPst.id,
+              txId: vertoTxId,
+            };
+            console.log("INPUT DEP: " + JSON.stringify(inputDeposit));
+            await interactWrite(arweave, wallet, this.vehicle.id, inputDeposit)
+              .then(async (txId) => {
+                this.msg = "Deposit Successful : " + txId
+                await fetch(mineUrl);
+              })
+              .catch((error) => {
+                this.msg = error;
+              });
+          })
+          .catch((error) => {
+           this.msg = error;
+          });
 
         console.log("READ CONTRACT...");
-        let vehicle = await readContract(arweave, this.vehicle.id);
-        console.log(JSON.stringify(vehicle));
+        let vehicle = {};
+        try {
+          vehicle = await readContract(arweave, this.vehicle.id);
+          console.log("VEHICLE = " + JSON.stringify(vehicle));
+        } catch (e) {
+          console.log("ERROR reading contract: " + e);
+          console.log("VEHICLE: " + JSON.stringify(vehicle));
+          console.log("THIS VEHICLE: " + this.vehicle.id);
+        }
       }
-
+      window.location.reload();
       this.$emit("close");
     },
         pstChange() {
