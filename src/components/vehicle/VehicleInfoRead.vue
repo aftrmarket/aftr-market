@@ -107,7 +107,7 @@
                 <div class="px-4 sm:px-6 max-w-2xl text-sm text-gray-500">Support</div>
                 <div class="flex items-center justify-between pb-4">
                     <div class="px-4 sm:px-6">
-                        {{ formatNumber(currentVehicleSettings.get('Support'), true) }}
+                        {{ formatNumber(currentVehicleSettings.get('support'), true) }}
                     </div>
                 </div>
             </div>
