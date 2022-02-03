@@ -129,10 +129,12 @@
                     
                     <h3 class="mt-4 border-t border-gray-200 pt-4 text-xl font-light leading-6">Settings</h3>
                     <div class="bg-white sm:p-6">
-                        <div class="pt-2 grid grid-cols-2 flex items-center gap-x-4">
+                        <div class="pt-2 grid grid-cols-4 flex items-center gap-x-4">
                             <!--<label class="block text-sm font-medium text-gray-700">Vehicle Tokens to Mint</label>-->
                             <label class="block text-sm font-medium text-gray-700">Vehicle Ownership</label>
-                            <label class="block text-sm font-medium text-gray-700">Voting System </label>
+                            <label class="block text-sm font-medium text-gray-700">Voting System</label>
+                            <label class="block text-sm font-medium text-gray-700">Quorum</label>
+                            <label class="block text-sm font-medium text-gray-700">Support</label>
                             
                             <!--<input type="number" name="vehicleTokens" placeholder="# of Vehicle Tokens" v-model="vehicleTokens" @input="onTokenChange" :class="inputBox(vehicleTokensValid)" />-->
                             <div class="">
@@ -142,6 +144,12 @@
                             <div class="">
                                 <input type="radio" v-model="votingSystem" id="even" value="even" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">Distributed Evenly</label>
                                 <input type="radio" v-model="votingSystem" id="weighted" value="weighted" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">Weighted</label>
+                            </div>
+                            <div class="">
+                                <input type="number" :class="inputBox()" />
+                            </div>
+                            <div class="">
+                                <input type="number" :class="inputBox()"/>
                             </div>
                         </div>
                     </div>

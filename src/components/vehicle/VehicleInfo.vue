@@ -69,10 +69,13 @@
                         <input @change="formDirty" type="radio" v-model="newVotingSystem" id="weighted" value="weighted" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">Weighted</label>
                     </div>
                     <label class="pt-4 pb-2  block text-sm font-medium text-gray-700">Quorum (between 0.01 - 0.99)</label>
+                    <label class="pt-4 pb-2  block text-sm font-medium text-gray-700">Support (between 0.01 - 0.99)</label>
                     <label class="pt-4 pb-2  block text-sm font-medium text-gray-700">Vote Length (blocks)</label>
-                    <div/>
+                    
                     <input @change="formDirty" v-model="newQuorum" class="w-3/4" type="number" name="newQuorum" :class="inputBox(quorumIsValid)" />
+                    <input @change="formDirty" v-model="newSupport" class="w-3/4" type="number" name="newSupport" :class="inputBox(supportIsValid)" />
                     <input @change="formDirty" v-model="newVoteLength" class="w-3/4" type="number" name="newVoteLength" :class="inputBox(voteLengthIsValid)" />
+                    <div/>
                     <div/>
                     <label class="pt-4 pb-2 grid col-span-2 block text-sm font-medium text-gray-700">Creator (transferring ownership not recommended!)</label>
                     <div/>
@@ -130,8 +133,10 @@ export default {
             newVotingSystem: '',
             newVoteLength: 0,
             newQuorum: 0,
+            newSupport: 0,
             newCreator: '',
             quorumIsValid: true,
+            supportIsValid: true,
             voteLengthIsValid: true,
             creatorIsValid: true
         };
@@ -260,6 +265,7 @@ export default {
 
                 // Get the settings map values
                 this.newQuorum = this.currentVehicleSettings.get('quorum');
+                this.newSupport = this.currentVehicleSettings.get('support');
                 this.newVoteLength = this.currentVehicleSettings.get('voteLength');
                 this.newLogo = this.currentVehicleSettings.get('communityLogo');
             }
@@ -267,6 +273,7 @@ export default {
         formDirty() {
             this.isFormValid = true;
             this.quorumIsValid = true;
+            this.supportIsValid = true;
             this.voteLengthIsValid = true;
             this.creatorIsValid = true;
 
@@ -281,6 +288,11 @@ export default {
                 // Quarum needs to be in the following range:  0.01 - 0.99
                 this.isFormValid = false;
                 this.quorumIsValid = false;
+            }
+            if (!this.newSupport || this.newSupport === '' || +this.newSupport < 0.01 || +this.newSupport > 0.99) {
+                // Quarum needs to be in the following range:  0.01 - 0.99
+                this.isFormValid = false;
+                this.supportIsValid = false;
             }
             if (!this.newVoteLength || this.newVoteLength === '' || !Number.isInteger(+this.newVoteLength) || +this.newVoteLength < 0) {
                 // Is there a range that the vote needs to be in?
@@ -335,6 +347,9 @@ export default {
                 }
                 if (this.newQuorum !== this.currentVehicleSettings.get('quorum')) {
                     changeMap.set('settings.quorum', this.newQuorum);
+                }
+                if (this.newSupport !== this.currentVehicleSettings.get('support')) {
+                    changeMap.set('settings.quorum', this.newSupport);
                 }
                 if (this.newVoteLength !== this.currentVehicleSettings.get('voteLength')) {
                     changeMap.set('settings.voteLength', this.newVoteLength);
