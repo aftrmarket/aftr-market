@@ -133,8 +133,8 @@
                             <!--<label class="block text-sm font-medium text-gray-700">Vehicle Tokens to Mint</label>-->
                             <label class="block text-sm font-medium text-gray-700">Vehicle Ownership</label>
                             <label class="block text-sm font-medium text-gray-700">Voting System</label>
-                            <label class="block text-sm font-medium text-gray-700">Quorum</label>
-                            <label class="block text-sm font-medium text-gray-700">Support</label>
+                            <label class="block text-sm font-medium text-gray-700">Quorum (between 0.01 - 0.99)</label>
+                            <label class="block text-sm font-medium text-gray-700">Support(between 0.01 - 0.99)</label>
                             
                             <!--<input type="number" name="vehicleTokens" placeholder="# of Vehicle Tokens" v-model="vehicleTokens" @input="onTokenChange" :class="inputBox(vehicleTokensValid)" />-->
                             <div class="">
@@ -146,10 +146,10 @@
                                 <input type="radio" v-model="votingSystem" id="weighted" value="weighted" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">Weighted</label>
                             </div>
                             <div class="">
-                                <input type="number" :class="inputBox()" />
+                                <input v-model="newQuorum" name="newQuorum" type="number" :class="inputBox(quorumIsValid)" />
                             </div>
                             <div class="">
-                                <input type="number" :class="inputBox()"/>
+                                <input v-model="newSupport" name="newSupport" type="number" :class="inputBox(supportIsValid)"/>
                             </div>
                         </div>
                     </div>
@@ -432,7 +432,10 @@ export default {
             totalCost: 0,
             files: [],
             version: '1.0.0',
-           
+            quorumIsValid: true,
+            supportIsValid: true,
+            newQuorum: 0.5,
+            newSupport: 0.5,
       /**psts: [
             { id: '46c0bdd1-56a9-4179-8a56-164b702a5cb8', ticker: 'AFTR', name: 'AFTR Market', price: 0.05 },
             { id: '8f1d6790-b885-4078-af9d-4e431ed74cf6', ticker: 'ARDRIVE', name: 'ArDrive', price: 0.078 },
@@ -807,11 +810,11 @@ export default {
                 this.vehicle.settings = [
                 [
                     "quorum",
-                    0.5
+                    this.newQuorum
                 ],
                         [
                     "support",
-                    0.5
+                    this.newSupport
                 ],
                 [
                     "voteLength",
@@ -845,6 +848,33 @@ async createVehicle() {
       }
 
       this.pageStatus = "in-progress";
+
+    this.vehicle.settings = [
+                    [
+                        "quorum",
+                        this.newQuorum
+                    ],
+                    [
+                        "support",
+                        this.newSupport
+                    ],
+                    [
+                        "voteLength",
+                        2000
+                    ],
+                    [
+                        "lockMinLength",
+                        100
+                    ],
+                    [
+                        "lockMaxLength",
+                        10000
+                    ],
+                    [
+                        "communityLogo",
+                        this.communityLogoValue
+                    ]
+                ];
 
       let arweave = {};
       try {
