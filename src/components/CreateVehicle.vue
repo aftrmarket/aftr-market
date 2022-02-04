@@ -821,12 +821,8 @@ export default {
                     2000
                 ],
                 [
-                    "lockMinLength",
-                    100
-                ],
-                [
-                    "lockMaxLength",
-                    10000
+                    "communityDescription",
+                    this.vehicle.desc
                 ],
                 [
                     "communityLogo",
@@ -863,12 +859,8 @@ async createVehicle() {
                         2000
                     ],
                     [
-                        "lockMinLength",
-                        100
-                    ],
-                    [
-                        "lockMaxLength",
-                        10000
+                        "communityDescription",
+                        this.vehicle.desc
                     ],
                     [
                         "communityLogo",
