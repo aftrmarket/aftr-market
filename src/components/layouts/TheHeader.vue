@@ -24,8 +24,35 @@
                   </div>
                 </div>
               </div>
+
+                <!-- Network Selection Begin -->
+                <div class="flex items-center space-x-2">
+                    <div v-if="siteMode === 'DEV'" class="flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="red">
+                            <path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div v-else-if="siteMode === 'TEST'" class="flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="#FFFC79">
+                            <path fill-rule="evenodd" d="M7 2a1 1 0 00-.707 1.707L7 4.414v3.758a1 1 0 01-.293.707l-4 4C.817 14.769 2.156 18 4.828 18h10.343c2.673 0 4.012-3.231 2.122-5.121l-4-4A1 1 0 0113 8.172V4.414l.707-.707A1 1 0 0013 2H7zm2 6.172V4h2v4.172a3 3 0 00.879 2.12l1.027 1.028a4 4 0 00-2.171.102l-.47.156a4 4 0 01-2.53 0l-.563-.187a1.993 1.993 0 00-.114-.035l1.063-1.063A3 3 0 009 8.172z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div v-else-if="siteMode === 'PROD'" class="flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="lightgreen">
+                            <path fill-rule="evenodd" d="M17.778 8.222c-4.296-4.296-11.26-4.296-15.556 0A1 1 0 01.808 6.808c5.076-5.077 13.308-5.077 18.384 0a1 1 0 01-1.414 1.414zM14.95 11.05a7 7 0 00-9.9 0 1 1 0 01-1.414-1.414 9 9 0 0112.728 0 1 1 0 01-1.414 1.414zM12.12 13.88a3 3 0 00-4.242 0 1 1 0 01-1.415-1.415 5 5 0 017.072 0 1 1 0 01-1.415 1.415zM9 16a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                            <select v-model="siteMode" @change="switchMode" id="selectedSiteMode" name="selectedSiteMode" class="mt-1 text-white border-gray-300 bg-aftrDarkGrey focus:outline-none focus:ring-aftrYellow focus:border-aftrYellow sm:text-sm rounded-md">
+                                <option value="" selected disabled>{{ showSiteMode }}</option>
+                                <option v-show="siteMode !== 'PROD'" value="PROD">MAINNET</option>
+                                <option v-show="siteMode !== 'TEST'" value="TEST">TESTNET</option>
+                                <option v-show="siteMode !== 'DEV'" value="DEV">DEVNET</option>
+                            </select>
+                </div>
+                <!-- Network Selection End -->
+
               <!-- ArConnect Begin -->
-              <div class="">
+              <div>
                 <div v-if="!$store.getters.arConnected" class="flex items-center">
                     <div class="text-aftrDarkGrey-light text-sm font-light">
                         No Wallet Connected
@@ -70,6 +97,8 @@ export default {
       profileDropdown: false,
       psts: [],
       devMode: import.meta.env.DEV,
+      siteMode: import.meta.env.VITE_ENV,
+      //siteMode: "PROD",
       file: null, 
       content: {}
     };
@@ -81,6 +110,15 @@ export default {
       } else {
         return "text-gray-300 hover:bg-aftrYellow hover:text-aftrDarkGrey px-3 py-2 rounded-md text-sm font-medium"
       }
+    },
+    showSiteMode() {
+        if (this.siteMode === 'PROD') {
+            return "MAINNET";
+        } else if (this.siteMode === 'TEST') {
+            return "TESTNET";
+        } else {
+            return "DEVNET";
+        }
     },
     walletAddressSubstr() {
         return this.$store.getters.getActiveAddress.substr(0, 10) + '...';
@@ -105,6 +143,17 @@ export default {
     },
     arDisconnect() {
       this.$store.dispatch("arDisconnect");
+    },
+    switchMode() {
+        let url = "";
+        if (this.siteMode === 'PROD') {
+            url = import.meta.env.VITE_AFTR_PROD;
+        } else if (this.siteMode === 'TEST') {
+            url = import.meta.env.VITE_AFTR_TEST;
+        } else {
+            url = import.meta.env.VITE_AFTR_DEV;
+        }
+        window.location.href = url;
     },
     readFile() {
       this.file = this.$refs.doc.files[0];
