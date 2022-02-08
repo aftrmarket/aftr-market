@@ -805,6 +805,11 @@ export default {
                 await arweave.transactions.sign(tx, wallet);
                 const txid = tx.id;
                 console.log("txid",txid)
+
+    /********** WHY IS THIS BEING DONE HERE? You can't put set the default values for Settings in a place that might not be run.
+     *          If a user doesn't upload a logo, then these wouldn't get set.
+     *          There's already a place for setting the Settings defaults in the createVehicle function.
+     */
                 this.communityLogoValue = txid;
                 console.log("communityLogoValue", this.communityLogoValue)
                 this.vehicle.settings = [
@@ -818,7 +823,7 @@ export default {
                 ],
                 [
                     "voteLength",
-                    2000
+                    2000    // <-- Wrong default value.  Should be 2160.
                 ],
                 [
                     "communityDescription",
@@ -829,6 +834,7 @@ export default {
                     this.communityLogoValue
                 ]
             ];
+    /************************************ */
                 return;
             };
             return
@@ -845,13 +851,15 @@ async createVehicle() {
 
       this.pageStatus = "in-progress";
 
+/***** NEED TO MAKE SURE THAT NONE OF THESE ARE NULL */
       this.vehicle.settings = [
         ["quorum", this.newQuorum],
         ["support", this.newSupport],
-        ["voteLength", 2000],
+        ["voteLength", 2160],
         ["communityDescription", this.vehicle.desc],
         ["communityLogo", this.communityLogoValue],
       ];
+/*************** */
 
       let arweave = {};
       try {
@@ -896,7 +904,7 @@ async createVehicle() {
         }
       }
 
-      //await this.deployFile(this.files, arweave, use_wallet);
+      //await this.deployFile(this.files, arweave, use_wallet);     <---- IT LOOKS LIKE YOU HAVE IT IN THE RIGHT PLACE, BUT IT'S COMMENTED OUT (MAYBE B/C YOU WERE TROUBLESHOOTING)
 
       // Convert DAO Member array to dictionary
       this.vehicle.balances = this.daoMembers.reduce(
@@ -989,8 +997,7 @@ async createVehicle() {
             arweave,
             use_wallet,
             this.contractSourceId,
-            //JSON.stringify(this.vehicle),
-            JSON.stringify(vehicleTest),
+            JSON.stringify(this.vehicle),
             initTags
           );
           const mineUrl =
