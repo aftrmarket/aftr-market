@@ -142,7 +142,7 @@
                                 <input type="radio" v-model="ownership" id="dao" value="dao" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">DAO Owned</label>
                             </div>
                             <div class="">
-                                <input type="radio" v-model="votingSystem" id="even" value="even" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">Distributed Evenly</label>
+                                <input type="radio" v-model="votingSystem" id="equal" value="equal" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">Distributed Evenly</label>
                                 <input type="radio" v-model="votingSystem" id="weighted" value="weighted" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">Weighted</label>
                             </div>
                             <div class="">
@@ -402,7 +402,7 @@ export default {
             seats: 0,                                       // Number of seats available on vehicle
             minLease: 2,                                    // Minimum seat lease length in months
             maxLease: 24,                                   // Maximum seat lease length in months
-            ownership: "dao",                               // Type of ownership for vehicle (single or dao)
+            ownership: "single",                               // Type of ownership for vehicle (single or dao)
             votingSystem: "equal",                           // Type of voting for vehicle (equal or weighted)
             inputValid: false,                              // Boolean to show when any input field is invalid
             pstInputValid: false,                           // Boolean to show when amount goes over tokens held
@@ -919,47 +919,47 @@ async createVehicle() {
 
       /****/
       const vehicleTest = {
-        name: "Chillin Treasury",
-        ticker: "AFTR-CHILL",
+        name: "Test Check",
+        ticker: "CHECK",
         balances: {
           "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8": 10000,
-          KM66oKFLF60UrrOgSx5mb90gUd2v4i0T9RIcK9mfUiA: 2000,
-          tv7gJr5TAys7oTpbfHI8dGO7t04jmacTNo20EfB0GJo: 1050,
+          "KM66oKFLF60UrrOgSx5mb90gUd2v4i0T9RIcK9mfUiA": 2000,
+          "tv7gJr5TAys7oTpbfHI8dGO7t04jmacTNo20EfB0GJo": 1050,
           "zVNaaPGR8yL5Dp5x4Jb-XPH4hlvB7ZoAvVFquw7J58w": 100,
-          ffOomWmOgtmJ816U_l5hsMpmEFsx5DUDxUEAcoLOy7Q: 200,
+          "ffOomWmOgtmJ816U_l5hsMpmEFsx5DUDxUEAcoLOy7Q": 200,
           "j12D8FZU-EBbIdCSkx6vO2shHlqbv5-5Ufl4jOuzGQw": 588,
           "h-Bgr13OWUOkRGWrnMT0LuUKfJhRss5pfTdxHmNcXyw": 9970,
         },
         tokens: [
           {
-            id: "6eTVr8IKPNYbMHVcpHFXr-XNaL5hT6zRJXimcP-owmo",
-            ticker: "OPENBITS",
-            source: "UN8VLHqRGenuL3SCtbhHlJ_2ImgFVPIObyL921Wf6mo",
-            txId: "tx2fasdfoijeo8547",
-            balance: 30000,
-            depositBlock: 646429,
-            lockLength: 10,
-            logo: "4lU64igaeoMKC9RgLELKr7bXxnS9V3YZzqxN1UDMAYU",
-          },
-          {
-            id: "usjm4PCxUd5mtaon7zc97-dt-3qf67yPyqgzLnLqk5A",
-            ticker: "VRT",
-            source: "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I",
-            txId: "tx3fasdfoijeo8547",
-            balance: 15000,
-            depositBlock: 646429,
-            lockLength: 100,
-            logo: "9CYPS85KChE_zQxNLi2y5r2FLG-YE6HiphYYTlgtrtg",
-          },
-          {
-            id: "-8A6RexFkpfWwuyVO98wzSFZh0d6VJuI-buTJvlwOJQ",
-            ticker: "ARDRIVE",
-            source: "CH_52MZm60ewLdc-HGGM1DEk7hljT37Gf45JT5CoHUQ",
-            txId: "tx6fasdfoijeo8547",
-            balance: 20000,
-            depositBlock: 646429,
-            lockLength: 10,
-            logo: "tN4vheZxrAIjqCfbs3MDdWTXg8a_57JUNyoqA4uwr1k",
+        //     id: "6eTVr8IKPNYbMHVcpHFXr-XNaL5hT6zRJXimcP-owmo",
+        //     ticker: "OPENBITS",
+        //     source: "UN8VLHqRGenuL3SCtbhHlJ_2ImgFVPIObyL921Wf6mo",
+        //     txId: "tx2fasdfoijeo8547",
+        //     balance: 30000,
+        //     depositBlock: 646429,
+        //     lockLength: 10,
+        //     logo: "4lU64igaeoMKC9RgLELKr7bXxnS9V3YZzqxN1UDMAYU",
+        //   },
+        //   {
+        //     id: "usjm4PCxUd5mtaon7zc97-dt-3qf67yPyqgzLnLqk5A",
+        //     ticker: "VRT",
+        //     source: "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I",
+        //     txId: "tx3fasdfoijeo8547",
+        //     balance: 15000,
+        //     depositBlock: 646429,
+        //     lockLength: 100,
+        //     logo: "9CYPS85KChE_zQxNLi2y5r2FLG-YE6HiphYYTlgtrtg",
+        //   },
+        //   {
+        //     id: "-8A6RexFkpfWwuyVO98wzSFZh0d6VJuI-buTJvlwOJQ",
+        //     ticker: "ARDRIVE",
+        //     source: "CH_52MZm60ewLdc-HGGM1DEk7hljT37Gf45JT5CoHUQ",
+        //     txId: "tx6fasdfoijeo8547",
+        //     balance: 20000,
+        //     depositBlock: 646429,
+        //     lockLength: 10,
+        //     logo: "tN4vheZxrAIjqCfbs3MDdWTXg8a_57JUNyoqA4uwr1k",
           },
         ],
         status: "started",
@@ -989,7 +989,8 @@ async createVehicle() {
             arweave,
             use_wallet,
             this.contractSourceId,
-            JSON.stringify(this.vehicle),
+            //JSON.stringify(this.vehicle),
+            JSON.stringify(vehicleTest),
             initTags
           );
           const mineUrl =
