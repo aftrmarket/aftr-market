@@ -1,333 +1,303 @@
+<!-- This example requires Tailwind CSS v2.0+ -->
 <template>
+    <main class="-mt-32">
+        <div class="max-w-7xl mx-auto pb-12 px-4 sm:px-6 lg:px-8">
+            <!-- CONTENT BEGIN -->
+ <!--           
+            <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
+                <div class="py-16 bg-white overflow-hidden lg:py-24">
+                    <div class="relative max-w-xl mx-auto px-4 sm:px-6 lg:px-8 lg:max-w-7xl">
+                        <svg class="hidden lg:block absolute left-full transform -translate-x-1/2 -translate-y-1/4" width="404" height="784" fill="none" viewBox="0 0 404 784" aria-hidden="true">
+                            <defs>
+                                <pattern id="b1e6e422-73f8-40a6-b5d9-c8586e37e0e7" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                                    <rect x="0" y="0" width="4" height="4" class="text-gray-200" fill="currentColor" />
+                                </pattern>
+                            </defs>
+                            
+                        </svg>
 
-    <div>
-        <main class="-mt-32">
-            <div class="max-w-7xl mx-auto pb-12 px-4 sm:px-6 lg:px-8">
-                <!-- Page header -->
-                <div class="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
-                    <div class="flex items-center space-x-5">
-                        <div class="flex-shrink-0">
-                            <div class="relative"><img class="h-16 w-16 rounded-full" src="https://arweave.net/nZr8RcHYY2XXloKcxtgrbssBdpvz6C2ifM92QvkYkgg" alt=""><span class="absolute inset-0 shadow-inner rounded-full" aria-hidden="true"></span></div>
+                        <div class="relative">
+                            <h2 class="text-center text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">A better way to store Arweave assets</h2>
+                            <p class="mt-4 pb-4 max-w-3xl mx-auto text-center text-xl text-gray-500">
+                                AFTR Market provides treasury management and governance on-chain for Arweave assets.
+                            </p>
                         </div>
-                        <div>
-                            <h1 class="text-2xl font-bold text-white">Alquipa</h1>
-                            <p class="text-sm font-medium text-aftrYellow">1a5vEadpcwKBL6ioGVkSFfZ17V-Ku9FB3Q3tBiMqC5I</p>
-                        </div>
-                    </div>
-                    <div class="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3"><button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
-                            </svg><span class="pl-2">Vehicle List</span></button></div>
-                </div>
-                <div class="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
-                    <div class="space-y-6 lg:col-start-1 lg:col-span-3">
-                        <!-- Tabs -->
-                        <section class="lg:col-start-3 lg:col-span-1">
-                            <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
-                                <div class="sm:hidden"><label for="tabs" class="sr-only">Select a tab</label><select id="tabs" name="tabs" class="block w-full focus:ring-aftrBlue focus:border-aftrBlue border-gray-300 rounded-md">
-                                        <option>Info</option>
-                                        <option>Members</option>
-                                        <option>Tokens</option>
-                                        <option>Votes</option>
-                                        <option>Activity</option>
-                                    </select></div>
-                                <div class="hidden sm:block">
-                                    <div class="border-b">
-                                        <nav class="-mb-px flex" aria-label="Tabs"><a href="#" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm">Info</a><a href="#" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm">Members</a><a href="#" class="border-aftrBlue text-aftrBlue w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm" aria-current="page">Tokens</a><a href="#" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm">Votes</a><a href="#" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm">Activity</a></nav>
-                                    </div>
-                                </div>
-                                <div class="pt-4 w-full">
-                                    <!--v-if-->
-                                    <!-- PSTs in Vehicle -->
-                                    <div class="pt-1">
-                                        <div class="my-2 overflow-x-auto sm:-mx-6 lg:-mx">
-                                            <!--<div :class="varClass('py-2 align-middle inline-block sm:px-3 lg:px-6')">-->
-                                            <div :class="varClass('py-2 w-3/4 align-middle inline-block sm:px-3 lg:px-6')"> 
-                                                <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                                                    <table class="w-full text-xs divide-y divide-gray-200">
-                                                        <thead class="bg-gray-50">
-                                                            <tr>
-                                                                <!--v-if-->
-                                                                <th scope="col" class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Arweave Assets (3)</th>
-                                                                <th scope="col" class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Contributor</th>
-                                                                <th scope="col" class="px-6 py-3 text-right font-medium text-gray-500 uppercase tracking-wider">Tokens</th>
-                                                                <th scope="col" class="px-6 py-3 text-right font-medium text-gray-500 uppercase tracking-wider">Value (AR)</th>
-                                                                <!--v-if-->
-                                                                <!--v-if-->
-                                                                <!--v-if-->
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody class="bg-white divide-y divide-gray-200">
-                                                            <tr class="hover:bg-gray-50">
-                                                                <!--v-if-->
-                                                                <td class=" px-6 py-4 whitespace-nowrap">
-                                                                    <div class="flex items-center">
-                                                                        <div class="flex-shrink-0 h-10 w-10"><img class="h-10 w-10 rounded-full" src="https://arweave.net/9CYPS85KChE_zQxNLi2y5r2FLG-YE6HiphYYTlgtrtg" alt=""></div>
-                                                                        <div class="ml-4">
-                                                                            <div class="font-medium text-gray-900">Verto (VRT)</div>
-                                                                            <div class="text-gray-500">usjm4PCxUd...</div>
-                                                                        </div>
-                                                                    </div>
-                                                                </td>
-                                                                <td class="px-6 py-3 text-gray-500">OI_wj-AISE...</td>
-                                                                <td class="px-6 text-right py-3 text-gray-500">1,000</td>
-                                                                <td class="px-6 text-right py-3 text-gray-500">20.0000</td>
-                                                                <!--v-if-->
-                                                                <!--v-if-->
-                                                                <!--v-if-->
-                                                            </tr>
-                                                            <tr class="hover:bg-gray-50">
-                                                                <!--v-if-->
-                                                                <td class="px-1 py-4 whitespace-nowrap">
-                                                                    <div class="flex items-center">
-                                                                        <div class="flex-shrink-0 h-10 w-10"><img class="h-10 w-10 rounded-full" src="https://arweave.net/lhIkxHTm6H4zMyWJVugLUt3EJsQ7zeFyKMLCMToDt3s" alt=""></div>
-                                                                        <div class="ml-4">
-                                                                            <div class="font-medium text-gray-900">Decent Land (DLT)</div>
-                                                                            <div class="text-gray-500">sew_MAXZIg...</div>
-                                                                        </div>
-                                                                    </div>
-                                                                </td>
-                                                                <td class="px-1 py-3 text-gray-500">Fof_-BNkZN...</td>
-                                                                <td class="text-right px-1 py-3 text-gray-500">55,000</td>
-                                                                <td class="text-right pr-3 py-3 text-gray-500">183.3333</td>
-                                                                <!--v-if-->
-                                                                <!--v-if-->
-                                                                <!--v-if-->
-                                                            </tr>
-                                                            <tr class="hover:bg-gray-50">
-                                                                <!--v-if-->
-                                                                <td class="px-1 py-4 whitespace-nowrap">
-                                                                    <div class="flex items-center">
-                                                                        <div class="flex-shrink-0 h-10 w-10"><img class="h-10 w-10 rounded-full" src="https://arweave.net/tN4vheZxrAIjqCfbs3MDdWTXg8a_57JUNyoqA4uwr1k" alt=""></div>
-                                                                        <div class="ml-4">
-                                                                            <div class="font-medium text-gray-900">ArDrive (ARDRIVE)</div>
-                                                                            <div class="text-gray-500">-8A6RexFkp...</div>
-                                                                        </div>
-                                                                    </div>
-                                                                </td>
-                                                                <td class="px-1 py-3 text-gray-500">CH_52MZm60...</td>
-                                                                <td class="text-right px-1 py-3 text-gray-500">1,000</td>
-                                                                <td class="text-right pr-3 py-3 text-gray-500">333.3333</td>
-                                                                <!--v-if-->
-                                                                <!--v-if-->
-                                                                <!--v-if-->
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
+-->
+
+            <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
+                <div class="py-16 bg-white overflow-hidden lg:py-24">
+                    <div class="relative max-w-xl mx-auto px-4 sm:px-6 lg:px-8 lg:max-w-7xl">
+
+
+
+
+                        <div class="pt-10 bg-aftrDarkGrey sm:pt-16 lg:pt-8 lg:pb-14 lg:overflow-hidden">
+                            <div class="mx-auto max-w-7xl lg:px-8">
+                            <div class="lg:grid lg:grid-cols-2 lg:gap-8">
+                                <div class="mx-auto max-w-md px-4 sm:max-w-2xl sm:px-6 sm:text-center lg:px-0 lg:text-left lg:flex lg:items-center">
+                                <div class="lg:py-24">
+                                    <h1 class="mt-4 text-4xl tracking-tight font-bold text-white sm:mt-5 sm:text-6xl lg:mt-6 xl:text-5xl">
+                                    <span class="block">A better way to store</span>
+                                    <span class="block text-aftrYellow">Arweave assets</span>
+                                    </h1>
+                                    <p class="mt-3 text-base text-gray-300 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
+                                        AFTR Market provides treasury management and governance on-chain for <a href="https://arweave.org" target="_blank" style="color:#FFFC79;">Arweave</a> assets.
+                                    </p>
+                                    <div class="mt-10 sm:mt-12">
+                                    <form action="#" class="sm:max-w-xl sm:mx-auto lg:mx-0">
+                                        <div class="sm:flex">
+                                            <div class="mt-3 sm:mt-0 sm:ml-3">
+                                                <button type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Get Started</button>
                                             </div>
+                                        <div class="mt-3 sm:mt-0 sm:ml-3">
+                                            <button type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Live Demo</button>
                                         </div>
-                                    </div>
-                                    <div class="mt-6 flex flex-col inline-flex">
-                                        <div class="pt-6 flex justify-start items-center">
-                                            <button type="button" @click.prevent="switchTable" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-aftrBlue hover:bg-aftrBlue-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"> Switch </button>
                                         </div>
+                                    </form>
                                     </div>
                                 </div>
-                                <!--- Verify Proposal Start --->
-                                <!--v-if-->
-                                <!--- Verify Proposal End --->
-                                <div class="col-span-3 text-right">
-                                    <!--v-if-->
-                                </div> [] Num Changes: 0<br> []
+                                </div>
+                                <div class="mt-12 -mb-16 sm:-mb-48 lg:m-0 lg:relative">
+                                <div class="mx-auto max-w-md px-4 sm:max-w-2xl sm:px-6 lg:max-w-none lg:px-0">
+                                    <!-- Illustration taken from Lucid Illustrations: https://lucid.pixsellz.io/ -->
+                                    <img class="w-full lg:absolute lg:inset-y-0 lg:left-0 lg:h-full lg:w-auto lg:max-w-none" src="https://tailwindui.com/img/component-images/cloud-illustration-indigo-400.svg" alt="" />
+                                </div>
+                                </div>
                             </div>
-                        </section><!-- Tabs End -->
+                            </div>
+                        </div>
+
+
+
+
+
+                        <div class="relative mt-12 lg:mt-24 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-center">
+                            <div class="relative">
+                                <h3 class="text-2xl font-extrabold text-gray-900 tracking-tight sm:text-3xl">Treasury Management</h3>
+                                <p class="mt-3 text-lg text-gray-500">
+                                    Securely manage your Arweave assets on-chain.
+                                </p>
+
+                                <dl class="mt-10 space-y-10">
+                                    <div v-for="item in tmFeatures" :key="item.id" class="relative">
+                                        <dt>
+                                            <div class="absolute flex items-center justify-center h-12 w-12 rounded-md bg-aftrBlue text-white">
+                                                <component :is="item.icon" class="h-6 w-6" aria-hidden="true" />
+                                            </div>
+                                            <p class="ml-16 text-lg leading-6 font-medium text-gray-900">{{ item.name }}</p>
+                                        </dt>
+                                        <dd class="mt-2 ml-16 text-base text-gray-500">
+                                            {{ item.description }}
+                                        </dd>
+                                    </div>
+                                </dl>
+                            </div>
+
+                            <div class="mt-10 -mx-4 relative lg:mt-0" aria-hidden="true">
+                                <svg class="absolute left-1/2 transform -translate-x-1/2 translate-y-16 lg:hidden" width="784" height="404" fill="none" viewBox="0 0 784 404">
+                                    <defs>
+                                        <pattern id="ca9667ae-9f92-4be7-abcb-9e3d727f2941" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                                            <rect x="0" y="0" width="4" height="4" class="text-gray-200" fill="currentColor" />
+                                        </pattern>
+                                    </defs>
+                                    <rect width="784" height="404" fill="url(#ca9667ae-9f92-4be7-abcb-9e3d727f2941)" />
+                                </svg>
+                                <img class="relative mx-auto" width="490" src="https://tailwindui.com/img/features/feature-example-1.png" alt="" />
+                            </div>
+                        </div>
+
+                        <svg class="hidden lg:block absolute right-full transform translate-x-1/2 translate-y-12" width="404" height="784" fill="none" viewBox="0 0 404 784" aria-hidden="true">
+                            <defs>
+                                <pattern id="64e643ad-2176-4f86-b3d7-f2c5da3b6a6d" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                                    <rect x="0" y="0" width="4" height="4" class="text-gray-200" fill="currentColor" />
+                                </pattern>
+                            </defs>
+                            <!--<rect width="404" height="784" fill="url(#64e643ad-2176-4f86-b3d7-f2c5da3b6a6d)" />-->
+                        </svg>
+
+                        <div class="relative mt-12 sm:mt-16 lg:mt-24">
+                            <div class="lg:grid lg:grid-flow-row-dense lg:grid-cols-2 lg:gap-8 lg:items-center">
+                                <div class="lg:col-start-2">
+                                    <h3 class="text-2xl font-extrabold text-gray-900 tracking-tight sm:text-3xl">Direct Profit Streams</h3>
+                                    <p class="mt-3 text-lg text-gray-500">
+                                        Use an AFTR Vehicle to encapsulate your Arweave assets to direct your profit streams.
+                                    </p>
+
+                                    <dl class="mt-10 space-y-10">
+                                        <div v-for="item in groupingFeatures" :key="item.id" class="relative">
+                                            <dt>
+                                                <div class="absolute flex items-center justify-center h-12 w-12 rounded-md bg-aftrBlue text-white">
+                                                    <component :is="item.icon" class="h-6 w-6" aria-hidden="true" />
+                                                </div>
+                                                <p class="ml-16 text-lg leading-6 font-medium text-gray-900">{{ item.name }}</p>
+                                            </dt>
+                                            <dd class="mt-2 ml-16 text-base text-gray-500">
+                                                {{ item.description }}
+                                            </dd>
+                                        </div>
+                                    </dl>
+                                </div>
+
+                                <div class="mt-10 -mx-4 relative lg:mt-0 lg:col-start-1">
+                                    <svg class="absolute left-1/2 transform -translate-x-1/2 translate-y-16 lg:hidden" width="784" height="404" fill="none" viewBox="0 0 784 404" aria-hidden="true">
+                                        <defs>
+                                            <pattern id="e80155a9-dfde-425a-b5ea-1f6fadd20131" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                                                <rect x="0" y="0" width="4" height="4" class="text-gray-200" fill="currentColor" />
+                                            </pattern>
+                                        </defs>
+                                        <rect width="784" height="404" fill="url(#e80155a9-dfde-425a-b5ea-1f6fadd20131)" />
+                                    </svg>
+                                    <img class="relative mx-auto" width="490" src="https://tailwindui.com/img/features/feature-example-2.png" alt="" />
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="relative mt-12 lg:mt-24 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-center">
+                            <div class="relative">
+                                <h3 class="text-2xl font-extrabold text-gray-900 tracking-tight sm:text-3xl">Arweave Founders</h3>
+                                <p class="mt-3 text-lg text-gray-500">
+                                    Create your decentratlized commununites on AFTR Market.
+                                </p>
+
+                                <dl class="mt-10 space-y-10">
+                                    <div v-for="item in founderFeatures" :key="item.id" class="relative">
+                                        <dt>
+                                            <div class="absolute flex items-center justify-center h-12 w-12 rounded-md bg-aftrBlue text-white">
+                                                <component :is="item.icon" class="h-6 w-6" aria-hidden="true" />
+                                            </div>
+                                            <p class="ml-16 text-lg leading-6 font-medium text-gray-900">{{ item.name }}</p>
+                                        </dt>
+                                        <dd class="mt-2 ml-16 text-base text-gray-500">
+                                            {{ item.description }}
+                                        </dd>
+                                    </div>
+                                </dl>
+                            </div>
+
+                            <div class="mt-10 -mx-4 relative lg:mt-0" aria-hidden="true">
+                                <svg class="absolute left-1/2 transform -translate-x-1/2 translate-y-16 lg:hidden" width="784" height="404" fill="none" viewBox="0 0 784 404">
+                                    <defs>
+                                        <pattern id="ca9667ae-9f92-4be7-abcb-9e3d727f2941" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                                            <rect x="0" y="0" width="4" height="4" class="text-gray-200" fill="currentColor" />
+                                        </pattern>
+                                    </defs>
+                                    <rect width="784" height="404" fill="url(#ca9667ae-9f92-4be7-abcb-9e3d727f2941)" />
+                                </svg>
+                                <img class="relative mx-auto" width="490" src="https://tailwindui.com/img/features/feature-example-1.png" alt="" />
+                            </div>
+                        </div>
+
+
+
+
                     </div>
                 </div>
             </div>
-        </main>
-    </div>
-<br><br><br><br>
-    <!--- 2nd TABLE -->
-    <div>
-        <main class="-mt-32">
-            <div class="max-w-7xl mx-auto pb-12 px-4 sm:px-6 lg:px-8">
-                <!-- Page header -->
-                <div class="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
-                    <div class="flex items-center space-x-5">
-                        <div class="flex-shrink-0">
-                            <div class="relative"><img class="h-16 w-16 rounded-full" src="https://arweave.net/nZr8RcHYY2XXloKcxtgrbssBdpvz6C2ifM92QvkYkgg" alt=""><span class="absolute inset-0 shadow-inner rounded-full" aria-hidden="true"></span></div>
-                        </div>
-                        <div>
-                            <h1 class="text-2xl font-bold text-white">Alquipa</h1>
-                            <p class="text-sm font-medium text-aftrYellow">1a5vEadpcwKBL6ioGVkSFfZ17V-Ku9FB3Q3tBiMqC5I</p>
-                        </div>
-                    </div>
-                    <div class="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3"><button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
-                            </svg><span class="pl-2">Vehicle List</span></button></div>
-                </div>
-                <div class="mt-8 max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
-                    <div class="space-y-6 lg:col-start-1 lg:col-span-3">
-                        <!-- Tabs -->
-                        <section class="lg:col-start-3 lg:col-span-1">
-                            <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
-                                <div class="sm:hidden"><label for="tabs" class="sr-only">Select a tab</label><select id="tabs" name="tabs" class="block w-full focus:ring-aftrBlue focus:border-aftrBlue border-gray-300 rounded-md">
-                                        <option>Info</option>
-                                        <option>Members</option>
-                                        <option>Tokens</option>
-                                        <option>Votes</option>
-                                        <option>Activity</option>
-                                    </select></div>
-                                <div class="hidden sm:block">
-                                    <div class="border-b border-gray-200">
-                                        <nav class="-mb-px flex" aria-label="Tabs"><a href="#" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm">Info</a><a href="#" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm">Members</a><a href="#" class="border-aftrBlue text-aftrBlue w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm" aria-current="page">Tokens</a><a href="#" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm">Votes</a><a href="#" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm">Activity</a></nav>
-                                    </div>
-                                </div>
-                                <div class="pt-4 w-full">
-                                    <!--v-if-->
-                                    <!-- PSTs in Vehicle -->
-                                    <div class="pt-1">
-                                        <div class="pt-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                                            <div class="py-2 align-middle inline-block min-w-full sm:px-3 lg:px-6">
-                                                <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                                                    <table class="w-full text-xs divide-y divide-gray-200">
-                                                        <thead class="bg-gray-50">
-                                                            <tr>
-                                                                <th scope="col" class="px-2 py-3 text-center font-medium text-gray-500 uppercase tracking-wider w-12"><input type="checkbox" class="focus:ring-aftrBlue h-4 w-4 text-aftrBlue border-gray-300 rounded"></th>
-                                                                <th scope="col" class="px-1 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Arweave Assets (3)</th>
-                                                                <th scope="col" class="px-1 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Contributor</th>
-                                                                <th scope="col" class="px-1 py-3 text-right font-medium text-gray-500 uppercase tracking-wider">Tokens</th>
-                                                                <th scope="col" class="px-1 py-3 text-right font-medium text-gray-500 uppercase tracking-wider">Value (AR)</th>
-                                                                <th scope="col" class="py-3 text-right font-medium text-gray-500 uppercase tracking-wider">Transfer Amount</th>
-                                                                <th scope="col" class="px-4 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Transfer To Address</th>
-                                                                <th scope="col" class="py-3 text-left font-medium text-gray-500 uppercase tracking-wider w-16">WHE</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody class="bg-white divide-y divide-gray-200">
-                                                            <tr class="hover:bg-gray-50">
-                                                                <td class="text-center px-2 py-2"><input type="checkbox" value="tx2fasdfoijeo8547" class="focus:ring-aftrBlue h-4 w-4 text-aftrBlue border-gray-300 rounded"></td>
-                                                                <td class="px-1 py-4 whitespace-nowrap">
-                                                                    <div class="flex items-center">
-                                                                        <div class="flex-shrink-0 h-10 w-10"><img class="h-10 w-10 rounded-full" src="https://arweave.net/9CYPS85KChE_zQxNLi2y5r2FLG-YE6HiphYYTlgtrtg" alt=""></div>
-                                                                        <div class="ml-4">
-                                                                            <div class="font-medium text-gray-900">Verto (VRT)</div>
-                                                                            <div class="text-gray-500">usjm4PCxUd...</div>
-                                                                        </div>
-                                                                    </div>
-                                                                </td>
-                                                                <td class="px-1 py-3 text-gray-500">OI_wj-AISE...</td>
-                                                                <td class="text-right px-1 py-3 text-gray-500">1,000,000</td>
-                                                                <td class="text-right pr-3 py-3 text-gray-500">20,000,000.0000</td>
-                                                                <td class="pt-1 text-right">
-                                                                    <div class="flex items-center">
-                                                                        <input type="number" class="mt-1 mb-1 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md">
-
-                                                                    </div>
-                                                                </td>
-                                                                <td class="pt-4 px-4 flex items-center space-x-2">
-                                                                    <input type="text" class="mt-1 mb-1 w-80 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md">
-                                                                    <button type="button" class="p-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none">
-                                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-                                                                        </svg>
-                                                                    </button>
-                                                                </td>
-                                                                <td class="pt-1">
-                                                                    <button type="submit" class="p-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrDarkGreen bg-white hover:bg-aftrDarkGreen hover:text-white focus:outline-none">
-                                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                                            <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
-                                                                        </svg>
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                            <tr class="hover:bg-gray-50">
-                                                                <td class="text-center px-2 py-2"><input type="checkbox" value="tx3fasdfoijeo8547" class="focus:ring-aftrBlue h-4 w-4 text-aftrBlue border-gray-300 rounded"></td>
-                                                                <td class="px-1 py-4 whitespace-nowrap">
-                                                                    <div class="flex items-center">
-                                                                        <div class="flex-shrink-0 h-10 w-10"><img class="h-10 w-10 rounded-full" src="https://arweave.net/lhIkxHTm6H4zMyWJVugLUt3EJsQ7zeFyKMLCMToDt3s" alt=""></div>
-                                                                        <div class="ml-4">
-                                                                            <div class="font-medium text-gray-900">Decent Land (DLT)</div>
-                                                                            <div class="text-gray-500">sew_MAXZIg...</div>
-                                                                        </div>
-                                                                    </div>
-                                                                </td>
-                                                                <td class="px-1 py-3 text-gray-500">Fof_-BNkZN...</td>
-                                                                <td class="text-right px-1 py-3 text-gray-500">55,000</td>
-                                                                <td class="text-right pr-3 py-3 text-gray-500">183.3333</td>
-                                                                <td class="pt-1"><input type="number" class="mt-1 mb-1 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md"></td>
-                                                                <td class="pt-4 px-4 flex items-center space-x-2"><input type="text" class="mt-1 mb-1 w-72 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md">
-                                                                    <!--v-if-->
-                                                                </td>
-                                                                <td class="pt-1"><button type="submit" class="p-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrDarkGreen bg-white hover:bg-aftrDarkGreen hover:text-white focus:outline-none"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                                            <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
-                                                                        </svg></button></td>
-                                                            </tr>
-                                                            <tr class="hover:bg-gray-50">
-                                                                <td class="text-center px-2 py-2"><input type="checkbox" value="tx6fasdfoijeo8547" class="focus:ring-aftrBlue h-4 w-4 text-aftrBlue border-gray-300 rounded"></td>
-                                                                <td class="px-1 py-4 whitespace-nowrap">
-                                                                    <div class="flex items-center">
-                                                                        <div class="flex-shrink-0 h-10 w-10"><img class="h-10 w-10 rounded-full" src="https://arweave.net/tN4vheZxrAIjqCfbs3MDdWTXg8a_57JUNyoqA4uwr1k" alt=""></div>
-                                                                        <div class="ml-4">
-                                                                            <div class="font-medium text-gray-900">ArDrive (ARDRIVE)</div>
-                                                                            <div class="text-gray-500">-8A6RexFkp...</div>
-                                                                        </div>
-                                                                    </div>
-                                                                </td>
-                                                                <td class="px-1 py-3 text-gray-500">CH_52MZm60...</td>
-                                                                <td class="text-right px-1 py-3 text-gray-500">1,000</td>
-                                                                <td class="text-right pr-3 py-3 text-gray-500">333.3333</td>
-                                                                <td class="pt-1"><input type="number" class="mt-1 mb-1 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md"></td>
-                                                                <td class="pt-4 px-4 flex items-center space-x-2"><input type="text" class="mt-1 mb-1 w-72 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md">
-                                                                    <!--v-if-->
-                                                                </td>
-                                                                <td class="pt-1"><button type="submit" class="p-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrDarkGreen bg-white hover:bg-aftrDarkGreen hover:text-white focus:outline-none"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                                            <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
-                                                                        </svg></button></td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="mt-6 flex flex-col inline-flex"><button type="button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd"></path>
-                                            </svg><span class="pl-2">ADD TOKENS</span></button></div>
-                                </div>
-                                <!--- Verify Proposal Start --->
-                                <!--v-if-->
-                                <!--- Verify Proposal End --->
-                                <div class="col-span-3 text-right">
-                                    <!--v-if-->
-                                </div> [] Num Changes: 0<br> []
-                            </div>
-                        </section><!-- Tabs End -->
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-
+            <!-- CONTENT BEGIN -->
+        </div>
+        ROUTE:     {{ $route.name }}
+    </main>
 </template>
 
 <script>
+import {
+    ChartPieIcon,
+    LockClosedIcon,
+    SpeakerphoneIcon,
+    ChartBarIcon,
+    ReceiptRefundIcon,
+    UserGroupIcon,
+    ClipboardListIcon,
+    CurrencyDollarIcon,
+    TrendingUpIcon,
+    GlobeAltIcon,
+} from "@heroicons/vue/outline";
+
+const tmFeatures = [
+    {
+        id: 1,
+        name: "Security",
+        description:
+            "Stores assets on-chain",
+        icon: LockClosedIcon,
+    },
+    {
+        id: 2,
+        name: "Multi-signature",
+        description:
+            "Create DAO or signally owned vehicles to manage your Arweave assets.",
+        icon: UserGroupIcon,
+    },
+    {
+        id: 3,
+        name: "Built-in Governance",
+        description:
+            "Make changes to your vehicle and let AFTR Market determine if votes need to be cast.",
+        icon: ClipboardListIcon,
+    },
+    {
+        id: 4,
+        name: "Governance Notifications (COMING SOON)",
+        description:
+            "Automatically notify DAO members of proposed changes to your vehicle through the ArConnect wallet.",
+        icon: SpeakerphoneIcon,
+    },
+];
+const groupingFeatures = [
+    {
+        id: 1,
+        name: "Token Fractionalization",
+        description:
+            "Add members to your AFTR Vehicle to fractionalize the profit streams of your tokens.",
+        icon: ChartPieIcon,
+    },
+    {
+        id: 2,
+        name: "Indexing",
+        description:
+            "Group tokens together to form indexes of your Arweave assets.",
+        icon: ChartBarIcon,
+    },
+    {
+        id: 3,
+        name: "Loaning Assets (COMING SOON)",
+        description:
+            "Temporarily loan assets to an AFTR Vehicle.",
+        icon: ReceiptRefundIcon,
+    },
+];
+const founderFeatures = [
+    {
+        id: 1,
+        name: "Create Your PSTs",
+        description:
+            "Mint your PSTs to be securely saved until you're ready to deploy your treasuries.",
+        icon: CurrencyDollarIcon,
+    },
+    {
+        id: 3,
+        name: "Evolve",
+        description:
+            "The Evolve protocol is supported to allow your PSTs to adapt to changes in the ecosystem.",
+        icon: GlobeAltIcon,
+    },
+    {
+        id: 2,
+        name: "Earn AFTR Tokens (COMING SOON)",
+        description:
+            "Earn additional profit streams by utilizing AFTR. 10% of AFTR's token supply is dedicated to its Partner Program.  An AFTR library is on the roapmap to incentivize adoption.",
+        icon: TrendingUpIcon,
+    },
+];
+
 export default {
-    data() {
+    setup() {
         return {
-            allowTransfer: false,
-            arConnected: false,
+            tmFeatures,
+            groupingFeatures,
+            founderFeatures,
         };
-    },
-    computed: {
-        tableClass() {
-            if (this.arConnected) {
-                return "w-full text-xs divide-y divide-gray-200";
-            } else {
-                return "w-3/4 text-xs divide-y divide-gray-200";
-            }
-        },
-    },
-    methods: {
-        switchTable() {
-            this.arConnected = !this.arConnected;
-        },
-        varClass(classTxt) {
-            if (this.arConnected) {
-                return String(classTxt) + " w-full";
-            } else {
-                return String(classTxt) + " w-3/4";
-            }
-        },
     },
 };
 </script>

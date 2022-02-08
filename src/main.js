@@ -10,6 +10,7 @@ import VehicleList from './components/VehicleList.vue';
 import CreateVehicle from './components/CreateVehicle.vue';
 import Vehicle from './components/Vehicle.vue';
 import UiTest from './components/UiTest.vue';
+import Overview from './components/Overview.vue';
 import MyPortfolio from './components/MyPortfolio.vue';
 
 const router = createRouter({
@@ -31,6 +32,7 @@ const router = createRouter({
         { name: 'vehicle', path: '/vehicles/:vehicleId', component: Vehicle, props: true },
         { name: 'create', path: '/create', component: CreateVehicle },
         { name: 'ui-test', path: '/ui-test', component: UiTest },
+        { name: 'overview', path: '/overview', component: Overview, props: true },
         { path: '/:notFound(.*)', redirect: '/' }
     ],
     linkActiveClass: 'active'
