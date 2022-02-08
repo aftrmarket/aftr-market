@@ -244,12 +244,10 @@ export default {
           console.log("THIS VEHICLE: " + this.vehicle.id);
         }
       } else {
-        await interactWrite(arweave, wallet, currentPst.id, inputTransfer)
+        await interactWrite(arweave, "use_wallet", currentPst.id, inputTransfer)
           .then(async (id) => {
             vertoTxId = id;
             console.log("Transfer Verto = " + JSON.stringify(vertoTxId));
-
-            await fetch(mineUrl);
 
             const inputDeposit = {
               function: "deposit",
@@ -257,10 +255,9 @@ export default {
               txId: vertoTxId,
             };
             console.log("INPUT DEP: " + JSON.stringify(inputDeposit));
-            await interactWrite(arweave, wallet, this.vehicle.id, inputDeposit)
+            await interactWrite(arweave, "use_wallet", this.vehicle.id, inputDeposit)
               .then(async (txId) => {
                 this.msg = "Deposit Successful : " + txId
-                await fetch(mineUrl);
               })
               .catch((error) => {
                 this.msg = error;

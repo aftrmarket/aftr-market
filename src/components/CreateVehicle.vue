@@ -360,7 +360,7 @@
 import Arweave from "arweave";
 import numeral from "numeral";
 import numberAbbreviate from "number-abbreviate";
-import { createContractFromTx, interactWrite } from "smartweave";
+import { createContractFromTx, interactWrite, readContract } from "smartweave";
 
 // @ts-expect-error
 import FormContainer from "./layouts/FormContainer.vue";
@@ -845,28 +845,13 @@ async createVehicle() {
 
       this.pageStatus = "in-progress";
 
-    this.vehicle.settings = [
-                    [
-                        "quorum",
-                        this.newQuorum
-                    ],
-                    [
-                        "support",
-                        this.newSupport
-                    ],
-                    [
-                        "voteLength",
-                        2000
-                    ],
-                    [
-                        "communityDescription",
-                        this.vehicle.desc
-                    ],
-                    [
-                        "communityLogo",
-                        this.communityLogoValue
-                    ]
-                ];
+      this.vehicle.settings = [
+        ["quorum", this.newQuorum],
+        ["support", this.newSupport],
+        ["voteLength", 2000],
+        ["communityDescription", this.vehicle.desc],
+        ["communityLogo", this.communityLogoValue],
+      ];
 
       let arweave = {};
       try {
@@ -909,9 +894,8 @@ async createVehicle() {
         } else {
           alert("Please attach your keyfile");
         }
-      } 
+      }
 
-      
       //await this.deployFile(this.files, arweave, use_wallet);
 
       // Convert DAO Member array to dictionary
@@ -929,7 +913,7 @@ async createVehicle() {
           tokens: item.tokens,
         };
       });
-      console.log("tmpPsts",tmpPsts)
+      console.log("tmpPsts", tmpPsts);
       this.vehicle.tokens = tmpPsts;
       console.log("VEHICLE: " + JSON.stringify(this.vehicle));
 
@@ -1001,23 +985,29 @@ async createVehicle() {
         console.log("tags: " + JSON.stringify(initTags));
 
         if (import.meta.env.DEV) {
-            this.vehicle["id"] = await createContractFromTx(
-                arweave,
-                use_wallet,
-                this.contractSourceId,
-                JSON.stringify(this.vehicle),
-                initTags
-            );
-            const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
-            let response = await fetch(mineUrl);
+          this.vehicle["id"] = await createContractFromTx(
+            arweave,
+            use_wallet,
+            this.contractSourceId,
+            JSON.stringify(this.vehicle),
+            initTags
+          );
+          const mineUrl =
+            import.meta.env.VITE_ARWEAVE_PROTOCOL +
+            "://" +
+            import.meta.env.VITE_ARWEAVE_HOST +
+            ":" +
+            import.meta.env.VITE_ARWEAVE_PORT +
+            "/mine";
+          let response = await fetch(mineUrl);
         } else {
-            this.vehicle["id"] = await createContractFromTx(
-                arweave,
-                "use_wallet",
-                this.contractSourceId,
-                JSON.stringify(this.vehicle),
-                initTags
-            );
+          this.vehicle["id"] = await createContractFromTx(
+            arweave,
+            "use_wallet",
+            this.contractSourceId,
+            JSON.stringify(this.vehicle),
+            initTags
+          );
         }
         //this.vehicle['id'] = await createContractFromTx(arweave, jwk, this.contractSourceId, JSON.stringify(vehicleTest), initTags);
         console.log("ID = " + this.vehicle["id"]);
@@ -1029,9 +1019,9 @@ async createVehicle() {
 
       let transferInput = {};
 
-    /**** TRANSFER -> THEN DEPOSIT FUNCTIONS NEED TO BE CALLED
-     **** THE SAME CODE THAT WAS IMPLEMENTED FOR THE ADD TOKEN BUTTON
-     */
+      /**** TRANSFER -> THEN DEPOSIT FUNCTIONS NEED TO BE CALLED
+       **** THE SAME CODE THAT WAS IMPLEMENTED FOR THE ADD TOKEN BUTTON
+       */
       try {
         // Loop through vehicle PSTs and perform transfers
         for (const pst of this.vehicle.tokens) {
@@ -1040,6 +1030,56 @@ async createVehicle() {
             target: this.vehicle.id,
             qty: pst.tokens, // PST qty
           };
+          if (import.meta.env.DEV) {
+            let wallet = JSON.parse(this.keyFile);
+            const mineUrl =
+              import.meta.env.VITE_ARWEAVE_PROTOCOL +
+              "://" +
+              import.meta.env.VITE_ARWEAVE_HOST +
+              ":" +
+              import.meta.env.VITE_ARWEAVE_PORT +
+              "/mine";
+            let response = await fetch(mineUrl);
+            
+            let vertoTxId = await interactWrite(arweave, wallet, pst.id, transferInput);
+            console.log("Transfer Verto = " + JSON.stringify(vertoTxId));
+
+            await fetch(mineUrl);
+
+             const inputDeposit = {
+                function: 'deposit',
+                tokenId: pst.id,
+                txId: vertoTxId
+            };
+
+            let txId = await interactWrite(arweave, wallet, this.vehicle.id, inputDeposit);
+            console.log(txId);
+
+            await fetch(mineUrl);
+
+            console.log("READ CONTRACT...");
+            let vehicle = await readContract(arweave, this.vehicle.id, undefined, true);
+            console.log(JSON.stringify(vehicle));
+
+            } else {
+            let vertoTxId = await interactWrite(arweave, "use_wallet", pst.id, transferInput);
+            console.log("Transfer Verto = " + JSON.stringify(vertoTxId));
+
+
+             const inputDeposit = {
+                function: 'deposit',
+                tokenId: pst.id,
+                txId: vertoTxId
+            };
+
+            let txId = await interactWrite(arweave, wallet, this.vehicle.id, inputDeposit);
+            console.log(txId);
+
+            console.log("READ CONTRACT...");
+            let vehicle = await readContract(arweave, this.vehicle.id, undefined, true);
+            console.log(JSON.stringify(vehicle));
+
+          }
 
           console.log(
             "TokenId: " + pst.id + " Name: " + pst.name + " Qty: " + pst.tokens
@@ -1059,9 +1099,9 @@ async createVehicle() {
 
       this.pageStatus = "";
     },
-        cancelCreate() {
-            this.$router.push("vehicles");
-        },
+    cancelCreate() {
+        this.$router.push("vehicles");
+    },
     },
     created() {
         // Update DAO Members with creator address if user is already ArConnected
