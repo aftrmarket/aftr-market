@@ -28,7 +28,7 @@
                 <!-- Network Selection Begin -->
                 <div class="flex items-center space-x-2">
                     <div v-if="siteMode === 'DEV'" class="flex items-center space-x-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="red">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="#FFFC79">
                             <path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
                         </svg>
                     </div>
@@ -85,9 +85,12 @@
       </nav>
       <header class="py-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!--<span class="text-lg text-white">welcome to</span>-->
+            <img src="../../assets/aftr-market-text.svg" width="500" />
+            <!--
           <h1 class="text-5xl font-bold text-white font-sans tracking-wider">
             AFTR Market
-          </h1>
+          </h1>-->
         </div>
       </header>
     </div>
