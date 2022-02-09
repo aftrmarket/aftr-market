@@ -29,8 +29,7 @@
                     </div>
                     <div class="mt-12 -mb-16 sm:-mb-48 lg:m-0 lg:relative">
                         <div class="mx-auto max-w-md px-4 sm:max-w-2xl sm:px-6 lg:max-w-none lg:px-0">
-                            <!-- Illustration taken from Lucid Illustrations: https://lucid.pixsellz.io/ -->
-                            <img class="w-full lg:absolute lg:inset-y-0 lg:left-0 lg:h-full lg:w-auto lg:max-w-none" src="https://tailwindui.com/img/component-images/cloud-illustration-indigo-400.svg" alt="" />
+                            <img class="w-full lg:absolute lg:inset-y-0 lg:left-0 lg:h-full lg:w-auto lg:max-w-none" src="../../assets/overview-3d-illustration.svg" alt="" />
                         </div>
                     </div>
                 </div>
@@ -71,7 +70,7 @@
                             </defs>
                             <rect width="784" height="404" fill="url(#ca9667ae-9f92-4be7-abcb-9e3d727f2941)" />
                         </svg>
-                        <img class="relative mx-auto" width="490" src="https://tailwindui.com/img/features/feature-example-1.png" alt="" />
+                        <img class="relative mx-auto" width="490" src="../../assets/overview_dao_mgmt.svg" alt="" />
                     </div>
                 </div>
 
@@ -81,7 +80,6 @@
                             <rect x="0" y="0" width="4" height="4" class="text-gray-200" fill="currentColor" />
                         </pattern>
                     </defs>
-                    <!--<rect width="404" height="784" fill="url(#64e643ad-2176-4f86-b3d7-f2c5da3b6a6d)" />-->
                 </svg>
 
                 <div class="relative mt-12 sm:mt-16 lg:mt-24">
@@ -116,7 +114,7 @@
                                 </defs>
                                 <rect width="784" height="404" fill="url(#e80155a9-dfde-425a-b5ea-1f6fadd20131)" />
                             </svg>
-                            <img class="relative mx-auto" width="490" src="https://tailwindui.com/img/features/feature-example-2.png" alt="" />
+                            <img class="relative mx-auto" width="490" src="../../assets/overview_profit.svg" alt="" />
                         </div>
                     </div>
                 </div>
@@ -152,7 +150,7 @@
                             </defs>
                             <rect width="784" height="404" fill="url(#ca9667ae-9f92-4be7-abcb-9e3d727f2941)" />
                         </svg>
-                        <img class="relative mx-auto" width="490" src="https://tailwindui.com/img/features/feature-example-1.png" alt="" />
+                        <img class="relative mx-auto" width="490" src="../../assets/overview-create.svg" alt="" />
                     </div>
                 </div>
 
