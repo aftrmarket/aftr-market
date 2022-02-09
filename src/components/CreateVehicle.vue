@@ -608,11 +608,11 @@ export default {
                     return alert('You don\'t have enough balance!');
                 }
 
-            if (import.meta.env.DEV) {
-                await this.deployFile(this.files, arweave, wallet);
-            } else {
-                await this.deployFile(this.files, arweave, "use_wallet");
-            }
+            //if (import.meta.env.DEV) {
+            //    await this.deployFile(this.files, arweave, wallet);
+            //} else {
+            //    await this.deployFile(this.files, arweave, "use_wallet");
+            //}
             }
 
       if (file.type.substring(0, 6) !== "image/") {
@@ -791,54 +791,36 @@ export default {
         // updateDaoBalance() {
         //     //const daoBalance = Math.round(this.vehicleTokens / this.daoMembers.length);
         // },
-        async deployFile(file,arweave, wallet) {
-            const fileReader = new FileReader();
-            fileReader.readAsDataURL(file);
-            fileReader.onload = async (event) => {
-                const data = new Uint8Array(event.target.result);
+async deployFile(file, arweave, wallet) {
+      
+        return new Promise((resolve, reject) => {
+          const fileReader = new FileReader();
+          fileReader.readAsDataURL(file);
+          fileReader.onload = async (event) => {
+            const data = new Uint8Array(event.target.result);
 
-                const tx = await arweave.createTransaction({ data }, wallet);
-                
-                tx.addTag('Content-Type', file.type);
-                tx.addTag('User-Agent', `AFTR.Market/this.version`);
+            const tx = await arweave.createTransaction({ data }, wallet);
 
-                await arweave.transactions.sign(tx, wallet);
-                const txid = tx.id;
-                console.log("txid",txid)
+            tx.addTag("Content-Type", file.type);
+            tx.addTag("User-Agent", `AFTR.Market/this.version`);
 
-    /********** WHY IS THIS BEING DONE HERE? You can't put set the default values for Settings in a place that might not be run.
-     *          If a user doesn't upload a logo, then these wouldn't get set.
-     *          There's already a place for setting the Settings defaults in the createVehicle function.
-     */
-                this.communityLogoValue = txid;
-                console.log("communityLogoValue", this.communityLogoValue)
-                this.vehicle.settings = [
-                [
-                    "quorum",
-                    this.newQuorum
-                ],
-                        [
-                    "support",
-                    this.newSupport
-                ],
-                [
-                    "voteLength",
-                    2000    // <-- Wrong default value.  Should be 2160.
-                ],
-                [
-                    "communityDescription",
-                    this.vehicle.desc
-                ],
-                [
-                    "communityLogo",
-                    this.communityLogoValue
-                ]
+            await arweave.transactions.sign(tx, wallet);
+            const txid = tx.id;
+            console.log("txid", txid);
+
+            this.communityLogoValue = txid;
+            console.log("communityLogoValue", this.communityLogoValue);
+            this.vehicle.settings = [
+              ["quorum", this.newQuorum],
+              ["support", this.newSupport],
+              ["voteLength", 2160],
+              ["communityDescription", this.vehicle.desc],
+              ["communityLogo", this.communityLogoValue],
             ];
-    /************************************ */
-                return;
-            };
-            return
-        },
+            resolve();
+          };
+        });
+    },
 async createVehicle() {
       if (!this.nameValid) {
         this.$refs.vehicleName.focus();
@@ -903,7 +885,11 @@ async createVehicle() {
           alert("Please attach your keyfile");
         }
       }
-
+        if (import.meta.env.DEV) {
+            await this.deployFile(this.files, arweave, use_wallet);
+        } else {
+            await this.deployFile(this.files, arweave, "use_wallet");
+        }
       //await this.deployFile(this.files, arweave, use_wallet);     <---- IT LOOKS LIKE YOU HAVE IT IN THE RIGHT PLACE, BUT IT'S COMMENTED OUT (MAYBE B/C YOU WERE TROUBLESHOOTING)
 
       // Convert DAO Member array to dictionary
@@ -979,7 +965,7 @@ async createVehicle() {
         settings: [
           ["quorum", 0.5],
           ["support", 0.5],
-          ["voteLength", 2000],
+          ["voteLength", 2160],
           ["lockMinLength", 100],
           ["lockMaxLength", 10000],
         ],
