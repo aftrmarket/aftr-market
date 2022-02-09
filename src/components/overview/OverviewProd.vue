@@ -123,7 +123,7 @@
                     <div class="relative">
                         <h3 class="text-2xl font-extrabold text-gray-900 tracking-tight sm:text-3xl">Arweave Founders</h3>
                         <p class="mt-3 text-lg text-gray-500">
-                            Create your decentratlized commununites on AFTR Market.
+                            Create your decentratlized communities on AFTR Market.
                         </p>
 
                         <dl class="mt-10 space-y-10">
@@ -178,7 +178,7 @@ const tmFeatures = [
     {
         id: 1,
         name: "Security",
-        description: "Stores assets on-chain",
+        description: "Stores assets on-chain.",
         icon: LockClosedIcon,
     },
     {
@@ -244,7 +244,7 @@ const founderFeatures = [
         id: 2,
         name: "Earn AFTR Tokens (COMING SOON)",
         description:
-            "Earn additional profit streams by utilizing AFTR. 10% of AFTR's token supply is dedicated to its Partner Program.  An AFTR library is on the roapmap to incentivize adoption.",
+            "Earn additional profit streams by utilizing AFTR. 10% of AFTR's token supply is dedicated to its Partner Program.  An AFTR library is on the roadmap to incentivize adoption.",
         icon: TrendingUpIcon,
     },
 ];
