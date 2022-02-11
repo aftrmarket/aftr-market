@@ -261,11 +261,15 @@
                             </div>
                             <div class="mt-6 pl-4 flex flex-col inline-flex">
                                 <input type="number" placeholder="Tokens" v-model="memberAmount" @input="onTokenChange" :class="inputBox(memberAmountValid)" />
-                                <label class="pl-4 flex flex-col inline-flex block text-sm text-gray-700">
-                                    Available Balance: {{ formatNumber(availableTokens) }}
-                                </label>
                             </div>
                             <div class="mt-6 pl-4 flex flex-col inline-flex">
+                                <div v-if="!memberAmountValid">
+                                 <label class="pl-4 flex flex-col inline-flex block text-sm text-aftrRed">
+                                    The Creator is assumed be a DAO member.
+                                    <br/>
+                                    Be Sure to update token balance below.
+                                </label>
+                                </div>
                                 <button v-if="memberWalletValid && memberAmountValid" @click.prevent="addDaoMember" type="button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
                                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
