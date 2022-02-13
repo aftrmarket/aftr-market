@@ -12,6 +12,7 @@ import Vehicle from './components/Vehicle.vue';
 import UiTest from './components/UiTest.vue';
 import Overview from './components/Overview.vue';
 import MyPortfolio from './components/MyPortfolio.vue';
+import Chat from './components/utils/Chat.vue';
 
 const router = createRouter({
     history: createWebHistory(),
@@ -33,6 +34,13 @@ const router = createRouter({
         { name: 'create', path: '/create', component: CreateVehicle },
         { name: 'ui-test', path: '/ui-test', component: UiTest },
         { name: 'overview', path: '/overview', component: Overview, props: true },
+        { 
+            path: '/chat',
+            component: Chat,
+            beforeEnter(to, from, next) {
+                window.location.href = 'https://discord.gg/YEy8VpuNXR'
+            }
+        },
         { path: '/:notFound(.*)', redirect: '/' }
     ],
     linkActiveClass: 'active'
