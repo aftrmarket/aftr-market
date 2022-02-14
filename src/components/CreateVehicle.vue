@@ -878,6 +878,8 @@ async createVehicle() {
       this.vehicle.tipsAr = 0;
       this.vehicle.tipsMisc = 0;
       this.vehicle.treasury = 0;
+      this.vehicle.invocations = [];
+      this.vehicle.foreignCalls = [];
 
       // Default Settings
       /*** TODO: ADD LOGO (communityLogo) to settings when implemented */
