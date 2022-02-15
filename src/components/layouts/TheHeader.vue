@@ -14,13 +14,11 @@
                 <div class="hidden md:block">
                   <div class="ml-10 flex items-baseline space-x-4">
                     <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
-                    <a href="#" @click="goHome" :class="homeClass">Home</a>
+                    <a href="#" @click="goTo('overview')" :class="homeClass">Welcome</a>
 
-                    <a href="#" @click="goMyPortfolio"
-                    class="text-gray-300 hover:bg-aftrYellow hover:text-aftrDarkGrey px-3 py-2 rounded-md text-sm font-medium"
-                    >My Portfolio</a>
+                    <a href="#" @click="goTo('vehicles')" :class="vehiclesClass">Vehicles</a>
 
-                    <a href="#" class="text-gray-300 hover:bg-aftrYellow hover:text-aftrDarkGrey px-3 py-2 rounded-md text-sm font-medium">About</a>
+                    <!--<a href="#" class="text-gray-300 hover:bg-aftrYellow hover:text-aftrDarkGrey px-3 py-2 rounded-md text-sm font-medium">About</a>-->
                   </div>
                 </div>
               </div>
@@ -112,7 +110,14 @@ export default {
   },
   computed: {
     homeClass() {
-      if (this.$route.path === '/' ||  this.$route.path === '/vehicles') {
+      if (this.$route.path === '/' ||  this.$route.path === '/overview') {
+        return "bg-aftrYellow text-aftrDarkGrey px-3 py-2 rounded-md text-sm font-medium"
+      } else {
+        return "text-gray-300 hover:bg-aftrYellow hover:text-aftrDarkGrey px-3 py-2 rounded-md text-sm font-medium"
+      }
+    },
+    vehiclesClass() {
+      if (this.$route.path === '/vehicles') {
         return "bg-aftrYellow text-aftrDarkGrey px-3 py-2 rounded-md text-sm font-medium"
       } else {
         return "text-gray-300 hover:bg-aftrYellow hover:text-aftrDarkGrey px-3 py-2 rounded-md text-sm font-medium"
@@ -141,6 +146,10 @@ export default {
       } else {
         this.$router.push("../MyPortfolio");
       }
+    },
+    goTo(route) {
+        let url = "../" + route;
+        this.$router.push(route);
     },
     toggleProfileMenu() {
       this.profileDropdown = !this.profileDropdown;
