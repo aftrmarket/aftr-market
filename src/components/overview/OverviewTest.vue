@@ -6,20 +6,21 @@
                     <div class="mx-auto max-w-md px-4 sm:max-w-2xl sm:px-6 sm:text-center lg:px-0 lg:text-left lg:flex lg:items-center">
                         <div class="lg:py-24">
                             <h1 class="mt-4 text-4xl tracking-tight font-bold text-white sm:mt-5 sm:text-6xl lg:mt-6 xl:text-5xl">
-                                <span class="block">A better way to store</span>
-                                <span class="block text-aftrYellow">Arweave assets</span>
+                                <span class="block">Welcome to the</span>
+                                <span class="block text-aftrYellow">AFTR TESTNET</span>
                             </h1>
                             <p class="mt-3 text-base text-gray-300 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
-                                AFTR Market provides treasury management and governance on-chain for <a href="https://arweave.org" target="_blank" style="color:#FFFC79;">Arweave</a> assets.
+                                Design and manage AFTR Vehicles in a safe way to help you understand the benefits! 
+                                To start, press the <span class="text-aftrYellow">Launch</span> button to setup your environment.
                             </p>
                             <div class="mt-10 sm:mt-12">
                                 <form action="#" class="sm:max-w-xl sm:mx-auto lg:mx-0">
                                     <div class="sm:flex">
                                         <div class="mt-3 sm:mt-0 sm:ml-3">
-                                            <button @click.prevent="routeUser('PROD')" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Get Started</button>
+                                            <button @click.prevent="init" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Launch</button>
                                         </div>
                                         <div class="mt-3 sm:mt-0 sm:ml-3">
-                                            <button @click.prevent="routeUser('TEST')" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Live Demo</button>
+                                            <button @click.prevent="routeUser('PROD')" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Back to MAINNET</button>
                                         </div>
                                     </div>
                                 </form>
@@ -251,12 +252,13 @@ const founderFeatures = [
 export default {
     methods: {
         routeUser(site) {
-            if (site === 'TEST') {
-                window.location.href = import.meta.env.VITE_AFTR_TEST;
-            } else {
-                this.$router.push("../vehicles");
+            if (site === 'PROD') {
+                window.location.href = import.meta.env.VITE_AFTR_PROD;
             }
-        }
+        },
+        init() {
+            /*** ADD INIT CODE HERE */
+        },
     },
     setup() {
         return {

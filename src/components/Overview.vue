@@ -3,7 +3,7 @@
         <overview-dev></overview-dev>
     </div>
     <div v-else-if="overviewRoute === 'TEST'">
-        NEED TO BUILD
+        <overview-test></overview-test>
     </div>
     <div v-else>
         <overview-prod></overview-prod>
@@ -12,17 +12,18 @@
 
 <script>
 import OverviewProd from "./overview/OverviewProd.vue";
+import OverviewTest from "./overview/OverviewTest.vue";
 import OverviewDev from "./overview/OverviewDev.vue";
 
 export default {
-    components: { OverviewProd, OverviewDev },
+    components: { OverviewProd, OverviewTest, OverviewDev },
     props: { 
         siteMode: { type: String, required: false }
     },
     data() {
         return {
             //overviewRoute: import.meta.env.VITE_ENV,
-            overviewRoute: "PROD"
+            overviewRoute: "TEST"
         };
     },
 }
