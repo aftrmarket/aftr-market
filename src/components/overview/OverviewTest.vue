@@ -10,7 +10,11 @@
                                 <span class="block text-aftrYellow">AFTR TESTNET</span>
                             </h1>
                             <p class="mt-3 text-base text-gray-300 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
-                                Design and manage AFTR Vehicles in a safe way to help you understand the benefits! 
+                                The purpose of AFTR TESTNET is to show you how to build your AFTR Vehicles without having to transfer your current Arweave assets.
+                                On the TESTNET, you'll be given Arweave assets in the form of Profit Sharing Tokens as well as AR (TESTNET AR, not real AR 🤣)
+                                so that you can create your own vehicles and see how to manage and govern them.
+                            </p>
+                            <p class="mt-3 text-base text-gray-300 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
                                 To start, press the <span class="text-aftrYellow">Launch</span> button to setup your environment.
                             </p>
                             <div class="mt-10 sm:mt-12">
@@ -33,8 +37,51 @@
                         </div>
                     </div>
                 </div>
+                <div class="mt-3 text-base text-gray-300 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
+                    For more information, see below 👇
+                </div>
             </div>
         </div>
+
+        <div class="py-6 bg-gray-50 overflow-hidden">
+            <div class="max-w-7xl mx-auto px-4 space-y-8 sm:px-6 lg:px-8">
+                <div class="text-base max-w-prose mx-auto lg:max-w-none">
+                    <h2 class="text-base text-aftrBlue font-semibold tracking-wide uppercase">Instructions</h2>
+                    <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">What the Heck is an AFTR Vehicle?</p>
+                </div>
+
+
+        <div class="mt-8 lg:grid lg:grid-cols-2 lg:gap-8">
+            <div class="relative lg:row-start-1 lg:col-start-2">
+                        <div class="aspect-w-12 aspect-h-7 lg:aspect-none">
+                            <img class="rounded-lg shadow-lg object-cover object-center" src="https://images.unsplash.com/photo-1546913199-55e06682967e?ixlib=rb-1.2.1&auto=format&fit=crop&crop=focalpoint&fp-x=.735&fp-y=.55&w=1184&h=1376&q=80" alt="Whitney leaning against a railing on a downtown street" width="1184" height="1376" />
+                        </div>
+            </div>
+            <div class="mt-8 lg:mt-0">
+                <div class="text-base max-w-prose mx-auto lg:max-w-none">
+                    <p class="text-lg text-gray-500">
+                        AFTR Market allows you to create and group Arweave assets together inside of a “vehicle.”  By grouping these assets together on-chain, 
+                        you can then put governance around them to manage their profit streams.  Furthermore, you are essentially fractionalizing these assets 
+                        because when you setup DAO members on your AFTR vehicle, the profit streams will flow into the vehicle to those members proportionately.  
+                        This is because when you transfer Arweave assets to an AFTR Vehicle, the AFTR Vehicle becomes the balance holder on the asset contract.  
+                        Stated another way, if you create an AFTR Vehicle and put one of your Arweave PSTs inside of the vehicle, you transferred the asset from 
+                        your wallet to the Permaweb for safe keeping. <br/><br/>
+
+                        There are certainly more reasons to use AFTR Vehicles, every wallet holder containing Arweave assets such as PSTs or NFTs should consider 
+                        securing their assets in a vehicle.  Also note that when you create an AFTR Vehicle, you are minting a new asset on the Permaweb which can be traded as well.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+            </div>
+        </div>
+
+
 
         <div class="py-4 bg-gray-50 overflow-hidden lg:py-4">
             <div class="relative max-w-xl mx-auto px-4 sm:px-6 lg:px-8 lg:max-w-7xl">
@@ -252,7 +299,7 @@ const founderFeatures = [
 export default {
     methods: {
         routeUser(site) {
-            if (site === 'PROD') {
+            if (site === "PROD") {
                 window.location.href = import.meta.env.VITE_AFTR_PROD;
             }
         },
