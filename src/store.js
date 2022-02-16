@@ -163,11 +163,14 @@ const store = createStore({
                                 data.logo = setting[1];
                             }
                         });
-                        wallet.psts.push(data);
+                        if (data.balance > 0) {
+                            wallet.psts.push(data);
+                        }
                     }
                 } catch(e) {
                     console.log("ERROR reading contract for " + edge.node.id + ": " + error);
                 }
+                console.log("PSTS: " + JSON.stringify(wallet.psts));
             }
         } else {
             // Now query Verto to get all PSTs contained in Wallet
