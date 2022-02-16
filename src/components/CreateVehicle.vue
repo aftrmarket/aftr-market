@@ -88,9 +88,8 @@
                                         <span>Upload a file</span>
                                         <input @change="onFileChange" id="vehicleLogo" name="vehicleLogo" type="file" class="sr-only" />
                                     </label>
-                                    (UPLOADING TO ARWEAVE NOT YET IMPLEMENTED)
                                 </div>
-                                <p class="text-xs text-gray-500">200 x 200 PNG, JPG, or GIF</p>
+                                <p class="text-xs text-gray-500">200 x 200 PNG, JPG, SVG, or GIF</p>
                                 <p class="text-xs text-aftrRed" v-if="totalSize == 0 && totalCost == 0">
                                     AR fees apply
                                 </p>
@@ -363,15 +362,13 @@
                                                                 <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"></path>
                                                             </svg>
                                                         </button>
-                                                        <div v-if="emptyToken">
-                                                            <label class="pl-4 flex flex-col inline-flex block text-sm text-aftrRed">
-                                                                Token value should be atleast greater than zero.
+                                                        <div v-if="daoBalance == 0">
+                                                            <label class="pl-4 pt-3 flex flex-col inline-flex block text-sm text-aftrRed">
+                                                                You need to mint at least 1 token when creating a vehicle.
                                                             </label>
                                                         </div>
                                                     </td>
-                                                    <td v-if="
-                              member.wallet === $store.getters.getActiveAddress
-                            " class="text-center px-6 py-3"></td>
+                                                    <td v-if="member.wallet === $store.getters.getActiveAddress" class="text-center px-6 py-3"></td>
                                                     <td v-else class="text-center px-6 py-3">
                                                         <button @click.prevent="removeDaoMember(member)" type="submit" class="inline-flex items-center p-1 border border-transparent shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed">
                                                             <img src="../assets/delete-24px.svg" />
@@ -476,7 +473,6 @@ export default {
             pstInputValid: false, // Boolean to show when amount goes over tokens held
             nameValid: false, // Boolean for valid vehicle name
             tokenValid: false,
-            emptyToken: false,
             tickerValid: false, // Boolean for valid ticker name
             pricePerToken: null, // Selected PST's price
             pstValue: null, // pricePerShare * inputShares
@@ -553,11 +549,12 @@ export default {
             }
         },
         isInputValid() {
+            if (this.arConnected) {
             //if (this.nameValid && this.tickerValid && this.vehicleTokensValid && this.memberRowValid) {
-            return true;
-            // } else {
-            //     return false;
-            //}
+                return true;
+            } else {
+                return false;
+            }
         },
         ...mapGetters(["arConnected", "keyFile"]),
         // Code to handle a checkbox in the table to check/uncheck all rows.
@@ -689,7 +686,7 @@ export default {
                 console.log("total", total);
                 this.totalCost = total;
                 if (total > this.balance) {
-                    return alert("You don't have enough balance!");
+                    return alert("You don't have enough AR to upload this file!");
                 }
 
                 //if (import.meta.env.DEV) {
@@ -955,7 +952,6 @@ export default {
             }
 
             if (!this.tokenValid) {
-                this.emptyToken = true
                 this.$refs.tokenValue.focus();
                 return false;
             }
@@ -1021,7 +1017,6 @@ export default {
             } else {
                 await this.deployFile(this.files, arweave, "use_wallet");
             }
-            //await this.deployFile(this.files, arweave, use_wallet);     <---- IT LOOKS LIKE YOU HAVE IT IN THE RIGHT PLACE, BUT IT'S COMMENTED OUT (MAYBE B/C YOU WERE TROUBLESHOOTING)
 
             // Convert DAO Member array to dictionary
             this.vehicle.balances = this.daoMembers.reduce(
@@ -1068,67 +1063,6 @@ export default {
                     throw new Error("Please add tokens");
                 }
             }
-
-            /****/
-            const vehicleTest = {
-                name: "Test Check",
-                ticker: "CHECK",
-                balances: {
-                    "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8": 10000,
-                    KM66oKFLF60UrrOgSx5mb90gUd2v4i0T9RIcK9mfUiA: 2000,
-                    tv7gJr5TAys7oTpbfHI8dGO7t04jmacTNo20EfB0GJo: 1050,
-                    "zVNaaPGR8yL5Dp5x4Jb-XPH4hlvB7ZoAvVFquw7J58w": 100,
-                    ffOomWmOgtmJ816U_l5hsMpmEFsx5DUDxUEAcoLOy7Q: 200,
-                    "j12D8FZU-EBbIdCSkx6vO2shHlqbv5-5Ufl4jOuzGQw": 588,
-                    "h-Bgr13OWUOkRGWrnMT0LuUKfJhRss5pfTdxHmNcXyw": 9970,
-                },
-                tokens: [
-                    {
-                        //     id: "6eTVr8IKPNYbMHVcpHFXr-XNaL5hT6zRJXimcP-owmo",
-                        //     ticker: "OPENBITS",
-                        //     source: "UN8VLHqRGenuL3SCtbhHlJ_2ImgFVPIObyL921Wf6mo",
-                        //     txId: "tx2fasdfoijeo8547",
-                        //     balance: 30000,
-                        //     depositBlock: 646429,
-                        //     lockLength: 10,
-                        //     logo: "4lU64igaeoMKC9RgLELKr7bXxnS9V3YZzqxN1UDMAYU",
-                        //   },
-                        //   {
-                        //     id: "usjm4PCxUd5mtaon7zc97-dt-3qf67yPyqgzLnLqk5A",
-                        //     ticker: "VRT",
-                        //     source: "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I",
-                        //     txId: "tx3fasdfoijeo8547",
-                        //     balance: 15000,
-                        //     depositBlock: 646429,
-                        //     lockLength: 100,
-                        //     logo: "9CYPS85KChE_zQxNLi2y5r2FLG-YE6HiphYYTlgtrtg",
-                        //   },
-                        //   {
-                        //     id: "-8A6RexFkpfWwuyVO98wzSFZh0d6VJuI-buTJvlwOJQ",
-                        //     ticker: "ARDRIVE",
-                        //     source: "CH_52MZm60ewLdc-HGGM1DEk7hljT37Gf45JT5CoHUQ",
-                        //     txId: "tx6fasdfoijeo8547",
-                        //     balance: 20000,
-                        //     depositBlock: 646429,
-                        //     lockLength: 10,
-                        //     logo: "tN4vheZxrAIjqCfbs3MDdWTXg8a_57JUNyoqA4uwr1k",
-                    },
-                ],
-                status: "started",
-                tipsAr: 235,
-                tipsMisc: 2549,
-                creator: "j12D8FZU-EBbIdCSkx6vO2shHlqbv5-5Ufl4jOuzGQw",
-                ownership: "single",
-                votingSystem: "equal",
-                settings: [
-                    ["quorum", 0.5],
-                    ["support", 0.5],
-                    ["voteLength", 2160],
-                    ["lockMinLength", 100],
-                    ["lockMaxLength", 10000],
-                ],
-            };
-            /***/
 
             // Create SmartWeave contract
             try {
@@ -1273,17 +1207,17 @@ export default {
                             pst.tokens
                     );
                     //SOMETHING = await interactWrite(arweave, "use_wallet", pst.id, initTags);
-
-                    this.$router.push({
-                        name: "vehicle",
-                        params: { vehicleId: this.vehicle.id },
-                    });
                 }
             } catch (error) {
                 console.log("ERROR transferring tokens: " + error);
                 this.pageStatus = "error";
                 return false;
             }
+
+            this.$router.push({
+                name: "vehicle",
+                params: { vehicleId: this.vehicle.id },
+            });
 
             this.pageStatus = "";
         },
