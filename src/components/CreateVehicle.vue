@@ -183,9 +183,7 @@
                         <div v-if="arConnected" class="pt-6">
                             <label class="block text-sm font-medium text-gray-700">
                                 Creator:
-                                <span class="font-bold text-aftrBlue">{{
-                  walletAddressSubstr($store.getters.getActiveAddress)
-                }}</span>
+                                <span class="font-bold text-aftrBlue">{{ walletAddressSubstr($store.getters.getActiveAddress) }}</span>
                             </label>
                         </div>
                         <div v-else class="pt-6 flex justify-start items-center">
@@ -213,11 +211,7 @@
                             </div>
                             <input type="number" placeholder="Amount" v-model="pstInputTokens" @input="calcPstPrice" :class="inputBox(pstInputValid)" />
                             <span v-if="pstInputTokens" class="pl-4 pr-6">@ {{ formatNumber(pricePerToken, true) }} AR
-                                {{
-                  pstInputTokens
-                    ? " = " + formatNumber(pstValue, true) + " AR"
-                    : ""
-                }}</span>
+                                {{ pstInputTokens ? " = " + formatNumber(pstValue, true) + " AR" : "" }}</span>
                             <div class="pt-2">
                                 <button v-if="pstInputValid && pstInputTokens" @click.prevent="addPst" type="submit" class="inline-flex justify-center py-2 px-2 border border-gray shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-transparent hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
