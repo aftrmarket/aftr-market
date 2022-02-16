@@ -90,11 +90,8 @@
                                     </label>
                                 </div>
                                 <p class="text-xs text-gray-500">200 x 200 PNG, JPG, SVG, or GIF</p>
-                                <p class="text-xs text-aftrRed" v-if="totalSize == 0 && totalCost == 0">
-                                    AR fees apply
-                                </p>
-                                <p class="text-xs text-aftrRed" v-if="totalSize != 0 && totalCost != 0">
-                                    Total Cost : {{ totalCost }}
+                                <p class="text-xs text-aftrRed">
+                                    {{ fileMessage }}
                                 </p>
                             </div>
                         </div>
@@ -484,27 +481,18 @@ export default {
             memberRowValid: false,
             daoRowBalance: [],
             fileInfo: "",
+            fileInvalid: false,
             communityLogoValue: "",
             totalSize: 0,
             fee: 0,
             address: "",
             balance: "",
-            totalCost: 0,
             files: [],
             version: "1.0.0",
             quorumIsValid: true,
             supportIsValid: true,
             newQuorum: 0.5,
             newSupport: 0.5,
-            /**psts: [
-            { id: '46c0bdd1-56a9-4179-8a56-164b702a5cb8', ticker: 'AFTR', name: 'AFTR Market', price: 0.05 },
-            { id: '8f1d6790-b885-4078-af9d-4e431ed74cf6', ticker: 'ARDRIVE', name: 'ArDrive', price: 0.078 },
-            { id: 'c9f7418c-2587-433e-a355-03d2c5a5c5b3', ticker: 'ARVERIFY', name: 'ArVerify', price: 0.035 },
-            { id: 'f9fde4f9-89ec-404b-8a0a-1bc674b39676', ticker: 'XYZ', name: 'CommunityXYZ', price: 0.098 },
-            { id: 'af7997c3-36b3-42ea-b923-38c0e69c8802', ticker: 'KOI', name: 'Koi', price: 0.045 },
-            { id: '919ce858-2513-424a-9fdb-de146eee1417', ticker: 'OPENBITS', name: 'OpenBits', price: 0.06 },
-            { id: 'e6125855-8414-4ae1-b611-66aff71160a2', ticker: 'VRT', name: 'Verto Exchange', price: 0.1 }
-      ]**/
         };
     },
     computed: {
@@ -548,6 +536,15 @@ export default {
                 return true;
             } else {
                 return false;
+            }
+        },
+        fileMessage() {
+            if (this.fileInvalid) {
+                return "Not a valid image. Please try again."
+            } else if (this.totalSize === 0) {
+                return "If file size is less than 100kb, upload is free.  Overwise AR fees apply.";
+            } else {
+                return "File size: " + this.formatNumber(this.totalSize);
             }
         },
         ...mapGetters(["arConnected", "keyFile"]),
@@ -621,24 +618,36 @@ export default {
             }
         },
         async onFileChange(e) {
-            let wallet;
-            if (import.meta.env.DEV) {
-                if (this.keyFile.length) {
-                    wallet = JSON.parse(this.keyFile);
-                } else {
-                    alert("Please attach your keyfile");
-                }
-            }
-            let arweave = {};
-            arweave = await Arweave.init({
-                host: this.arweaveHost,
-                port: this.arweavePort,
-                protocol: this.arweaveProtocol,
-                timeout: 20000,
-                logging: true,
-            });
             const file = e.target.files[0];
             this.files = file;
+
+            // Error Handling
+            if (file.type.substring(0, 6) !== "image/") {
+                // Write file error message
+                this.fileInvalid = true;
+                console.log("FILE IS NOT IMAGE");
+                return;
+            } else {
+                this.fileInvalid = false;
+            }
+
+
+            // let wallet;
+            // if (import.meta.env.DEV) {
+            //     if (this.keyFile.length) {
+            //         wallet = JSON.parse(this.keyFile);
+            //     } else {
+            //         alert("Please attach your keyfile");
+            //     }
+            // }
+            // let arweave = {};
+            // arweave = await Arweave.init({
+            //     host: this.arweaveHost,
+            //     port: this.arweavePort,
+            //     protocol: this.arweaveProtocol,
+            //     timeout: 20000,
+            //     logging: true,
+            // });
 
             if (this.vehicleLogo) {
                 // Release the memory of the old file
@@ -648,50 +657,48 @@ export default {
             this.fileInfo = file.size + ", " + file.name + ", " + file.type;
             const filename = file.name.replace(/ /g, "") + file.lastModified;
 
-            const { data: winston } = await arweave.api.get(
-                `price/${file.size}`
-            );
-            const ar = arweave.ar.winstonToAr(winston, {
-                formatted: true,
-                decimals: 5,
-                trim: true,
-            });
-            if (import.meta.env.DEV) {
-                this.address = await arweave.wallets.jwkToAddress(wallet);
-            } else {
-                this.address = await arweave.wallets.jwkToAddress("use_wallet");
-            }
-            const bal = await arweave.wallets.getBalance(this.address);
-            this.balance = arweave.ar.winstonToAr(bal);
+            // const { data: winston } = await arweave.api.get(
+            //     `price/${file.size}`
+            // );
+            // const ar = arweave.ar.winstonToAr(winston, {
+            //     formatted: true,
+            //     decimals: 5,
+            //     trim: true,
+            // });
+            // if (import.meta.env.DEV) {
+            //     this.address = await arweave.wallets.jwkToAddress(wallet);
+            // } else {
+            //     this.address = await arweave.wallets.jwkToAddress("use_wallet");
+            // }
+            // const bal = await arweave.wallets.getBalance(this.address);
+            // this.balance = arweave.ar.winstonToAr(bal);
 
+            // Total size should be < ? so that it's a free transaction
             this.totalSize += file.size;
             console.log("totalSize", this.totalSize, this.balance);
 
+            /**** SHOULD THIS BE > 0? */
             if (this.totalSize != 0) {
-                const { data: winston } = await arweave.api.get(
-                    `price/${this.totalSize}`
-                );
-                this.fee = +winston * 0.1;
-                const ar = arweave.ar.winstonToAr(winston);
-                const arFee = arweave.ar.winstonToAr(this.fee.toString());
-                const total = arweave.ar.winstonToAr(
-                    (+winston + this.fee).toString()
-                );
-                console.log("total", total);
-                this.totalCost = total;
-                if (total > this.balance) {
-                    return alert("You don't have enough AR to upload this file!");
-                }
+                // const { data: winston } = await arweave.api.get(
+                //     `price/${this.totalSize}`
+                // );
+                // this.fee = +winston * 0.1;
+                // const ar = arweave.ar.winstonToAr(winston);
+                // const arFee = arweave.ar.winstonToAr(this.fee.toString());
+                // const total = arweave.ar.winstonToAr(
+                //     (+winston + this.fee).toString()
+                // );
+                // console.log("total", total);
+                // this.totalCost = total;
+                // if (total > this.balance) {
+                //     return alert("You don't have enough AR to upload this file!");
+                // }
 
                 //if (import.meta.env.DEV) {
                 //    await this.deployFile(this.files, arweave, wallet);
                 //} else {
                 //    await this.deployFile(this.files, arweave, "use_wallet");
                 //}
-            }
-
-            if (file.type.substring(0, 6) !== "image/") {
-                console.log("FILE IS NOT IMAGE");
             }
         },
         nameValidate() {
