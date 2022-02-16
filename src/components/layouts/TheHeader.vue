@@ -149,7 +149,7 @@ export default {
     },
     goTo(route) {
         let url = "../" + route;
-        this.$router.push(route);
+        this.$router.push(url);
     },
     toggleProfileMenu() {
       this.profileDropdown = !this.profileDropdown;
