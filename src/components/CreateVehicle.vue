@@ -356,13 +356,18 @@
                                                         {{ member.balance }}
                                                     </td>
                                                     <td class="flex content-center gap-x-2">
-                                                        <input type="number" placeholder="New Value..." v-model="daoRowBalance[index]" class="mt-1 mb-1 mr-4 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md" />
+                                                        <input name="tokenValue" ref="tokenValue" type="number" placeholder="New Value..." v-model="daoRowBalance[index]" :class="inputBox(tokenValid)"/>
                                                         <button @click.prevent="daoRowChange(member.wallet)" type="submit" class="inline-flex items-center p-1 border border-transparent shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-aftrBlue">
                                                             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                                                 <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"></path>
                                                                 <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"></path>
                                                             </svg>
                                                         </button>
+                                                        <div v-if="emptyToken">
+                                                            <label class="pl-4 flex flex-col inline-flex block text-sm text-aftrRed">
+                                                                Token value should be atleast greater than zero.
+                                                            </label>
+                                                        </div>
                                                     </td>
                                                     <td v-if="
                               member.wallet === $store.getters.getActiveAddress
@@ -470,6 +475,8 @@ export default {
             inputValid: false, // Boolean to show when any input field is invalid
             pstInputValid: false, // Boolean to show when amount goes over tokens held
             nameValid: false, // Boolean for valid vehicle name
+            tokenValid: false,
+            emptyToken: false,
             tickerValid: false, // Boolean for valid ticker name
             pricePerToken: null, // Selected PST's price
             pstValue: null, // pricePerShare * inputShares
@@ -741,6 +748,7 @@ export default {
             }
         },
         daoRowChange(wallet) {
+            this.tokenValid = true
             const arrayIndex = this.daoMembers.findIndex(
                 (item) => item.wallet === wallet
             );
@@ -943,6 +951,12 @@ export default {
             }
             if (!this.tickerValid) {
                 this.$refs.vehicleTicker.focus();
+                return false;
+            }
+
+            if (!this.tokenValid) {
+                this.emptyToken = true
+                this.$refs.tokenValue.focus();
                 return false;
             }
 
