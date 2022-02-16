@@ -41,11 +41,14 @@
                     <div class="mt-2 sm:mt-0 sm:col-span-2 pl-6">
                         <div class="flex text-sm text-gray-600">
                             <label for="newLogo" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
-                                <span>Upload a file</span>
+                                <span>Change the Logo</span>
                                 <input @change="onFileChange" id="newLogo" name="newLogo" type="file" class="sr-only" />
                             </label>
                         </div>
-                        <p class="text-xs text-gray-500">200 x 200 PNG, JPG, or GIF</p>
+                        <p class="text-xs text-gray-500">200 x 200 PNG, JPG, SVG, or GIF</p>
+                        <p class="text-xs text-aftrRed">
+                            {{ fileMessage }}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -138,7 +141,9 @@ export default {
             quorumIsValid: true,
             supportIsValid: true,
             voteLengthIsValid: true,
-            creatorIsValid: true
+            creatorIsValid: true,
+            totalSize: 0,
+            fileInvalid: false,
         };
     },
     watch: {
@@ -184,6 +189,15 @@ export default {
                 return '~NO ONE~';
             } else {
                 return this.vehicle.creator;
+            }
+        },
+        fileMessage() {
+            if (this.fileInvalid) {
+                return "Not a valid image. Please try again."
+            } else if (this.totalSize === 0) {
+                return "If file size is less than 100kb, upload is free.  Overwise AR fees apply.";
+            } else {
+                return "File size: " + this.formatNumber(this.totalSize);
             }
         },
         ...mapGetters(['arConnected', 'getActiveAddress', 'keyFile']),
