@@ -168,7 +168,7 @@ const store = createStore({
                         }
                     }
                 } catch(e) {
-                    console.log("ERROR reading contract for " + edge.node.id + ": " + error);
+                    console.log("ERROR reading contract for " + edge.node.id + ": " + e);
                 }
                 console.log("PSTS: " + JSON.stringify(wallet.psts));
             }
