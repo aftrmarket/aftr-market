@@ -433,6 +433,10 @@ import vertoInitState from "./../../testnet/contracts/vertoInitState.json";
 import * as vertoSource from "./../../testnet/contracts/vertoSource.js";
 import arDriveInitState from "./../../testnet/contracts/arDriveInitState.json";
 import * as arDriveSource from "./../../testnet/contracts/arDriveSource.js";
+import aftrAlquipaInitState from "./../../testnet/contracts/aftrAlquipaInitState.json";
+import aftrBlueHorizonInitState from "./../../testnet/contracts/aftrBlueHorizonInitState.json";
+import aftrChillinInitState from "./../../testnet/contracts/aftrChillinInitState.json";
+
 import Arweave from "arweave";
 import { mapGetters } from "vuex";
 import { createContractFromTx, createContract } from "smartweave";
@@ -551,6 +555,16 @@ export default {
           return false;
         }
       }
+      const addr = await arweave.wallets.jwkToAddress(use_wallet);
+      const server = this.arweaveHost + ":" + this.arweavePort;
+      const route = "/mint/" + addr + "/10000000000000"; // Amount in Winstons
+
+      console.log(server, route);
+      //const mintRes = await request(server).get(route);
+
+      console.log("WALLET: " + addr);
+      let balance = await arweave.wallets.getBalance(addr);
+      console.log("BALANCE: " + balance);
 
       let contractVertoTxId = await createContract(
         arweave,
@@ -574,8 +588,48 @@ export default {
         import.meta.env.VITE_ARWEAVE_PORT +
         "/mine";
       let response = await fetch(mineUrl);
-      console.log("Verto Contract ID: " + contractVertoTxId , contractArdriveTxId);
+      console.log("Verto Contract ID: " + contractVertoTxId, contractArdriveTxId);
+
+      let contractTxAlquipaId = await this.createAftrVehicle(
+        arweave,
+        use_wallet,
+        this.contractSourceId,
+        aftrAlquipaInitState
+      );
+      await fetch(mineUrl);
+      console.log("AFTR Vehicle - Alquipa: " + contractTxAlquipaId);
+
+      let contractTxBlueHorizonId = await this.createAftrVehicle(
+        arweave,
+        use_wallet,
+        this.contractSourceId,
+        aftrBlueHorizonInitState
+      );
+      await fetch(mineUrl);
+      console.log("AFTR Vehicle - Blue Horizon: " + contractTxBlueHorizonId);
+
+      let contractTxChillinId = await this.createAftrVehicle(
+        arweave,
+        use_wallet,
+        this.contractSourceId,
+        aftrChillinInitState
+      );
+      await fetch(mineUrl);
+      console.log("AFTR Vehicle - Chillin: " + contractTxChillinId);
+
       this.$router.push("vehicles");
+    },
+    async createAftrVehicle(arweave, wallet, aftrId, initState) {
+      let swTags = [{ name: "Protocol", value: this.tagProtocol }];
+      let contractTxId = await createContractFromTx(
+        arweave,
+        wallet,
+        aftrId,
+        new Uint8Array(initState),
+        swTags
+      );
+
+      return contractTxId;
     },
   },
   setup() {
