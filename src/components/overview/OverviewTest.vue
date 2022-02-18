@@ -126,15 +126,10 @@
 import {
     ChartPieIcon,
     ClipboardCheckIcon,
-    SpeakerphoneIcon,
-    ChartBarIcon,
-    ReceiptRefundIcon,
     CashIcon,
     TruckIcon,
-    CurrencyDollarIcon,
-    TrendingUpIcon,
-    GlobeAltIcon,
 } from "@heroicons/vue/outline";
+
 import vertoInitState from "./../../testnet/contracts/vertoInitState.json";
 import * as vertoSource from "./../../testnet/contracts/vertoSource.js";
 import arDriveInitState from "./../../testnet/contracts/arDriveInitState.json";
@@ -207,8 +202,6 @@ export default {
     setup() {
         return {
             initProcess,
-            //groupingFeatures,
-            //founderFeatures,
         };
     },
 };
