@@ -493,6 +493,7 @@ export default {
             supportIsValid: true,
             newQuorum: 0.5,
             newSupport: 0.5,
+            fileUpload: false
         };
     },
     computed: {
@@ -618,6 +619,7 @@ export default {
             }
         },
         async onFileChange(e) {
+            this.fileUpload = true
             const file = e.target.files[0];
             this.files = file;
 
@@ -1011,12 +1013,15 @@ export default {
                     use_wallet = JSON.parse(this.keyFile);
                 } else {
                     alert("Please attach your keyfile");
+                    return false;
                 }
             }
-            if (import.meta.env.DEV) {
-                await this.deployFile(this.files, arweave, use_wallet);
-            } else {
-                await this.deployFile(this.files, arweave, "use_wallet");
+            if(this.fileUpload){
+                if (import.meta.env.DEV) {
+                    await this.deployFile(this.files, arweave, use_wallet);
+                } else {
+                    await this.deployFile(this.files, arweave, "use_wallet");
+                }
             }
 
             // Convert DAO Member array to dictionary
