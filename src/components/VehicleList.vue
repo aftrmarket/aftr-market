@@ -146,7 +146,7 @@ export default {
                 if (!vehicle.tokens) {
                     vehicle.tokens = [];
                 }
-                // Logo
+                // Logo and Description
                 vehicle.settings.forEach((setting) => {
                     if (setting[0] === "communityLogo") {
                         vehicle.logo = setting[1];
@@ -161,6 +161,8 @@ export default {
                                 "aM7YfRnd97mTGLn_3vjLfWp2TgtBKRyDsBnlDhA1e-s";
                         }
                         /*** */
+                    } else if (setting[0] === "communityDescription") {
+                        vehicle.desc = setting[1];
                     }
                 });
 
