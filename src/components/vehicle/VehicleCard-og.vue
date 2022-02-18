@@ -1,42 +1,42 @@
 <template>
 
-    <div class="w-full justify-between p-6 space-x-6 overflow-hidden">
-        <div class="grid grid-rows-3 grid-flow-col gap-x-4 gap-y-1">
-            <div class="row-span-3 w-20">
-                <img class="w-20 h-20 bg-gray-300 rounded-full" :src="vehicleLogo" alt="">
+    <div class="w-full flex items-center justify-between p-6 space-x-6">
+        <img class="w-20 h-20 bg-gray-300 rounded-full flex-shrink-0" :src="vehicleLogo" alt="">
+        <div class="flex-1 truncate">
+            <div class="flex items-center space-x-3">
+                <h3 class="text-gray-900 text-2xl font-normal truncate">{{ vehicle.name }}</h3>
+                <span class="flex-shrink-0 inline-block px-2 py-0.5 text-green-800 text-xs font-medium bg-green-100 rounded-full">{{ vehicle.ticker }}</span>
             </div>
-            <div class="col-span-2 min-w-full">
-                <h3 class="text-gray-900 text-2xl font-normal line-clamp-1 break-all">{{ vehicle.name }}</h3>
-            </div>
-            <div class="row-span-2 col-span-1">
-                <div v-if="vehicle.desc" class="mt-1 text-gray-500 text-sm line-clamp-3 break-words">{{ vehicle.desc }}</div>
-                <div v-else class="border-t border-white w-60"></div>
-            </div>
+            <p class="mt-1 text-gray-500 text-sm truncate">
+                Treasury (AR): 
+                <span class="text-base text-aftrDarkGrey font-bold">{{ formatNumber(vehicle.treasury) }}</span> 
+            </p>
+            <p class="mt-1 text-gray-500 text-sm truncate">
+                Votes Opened: 
+                <span class="text-base text-aftrDarkGrey font-bold">{{ formatNumber(vehicle.totalActiveVotes) }}</span>
+            </p>
+            <!---
+            <p class="mt-1 text-gray-500 text-sm truncate"><span class="text-base text-aftrDarkGrey font-bold">{{ vehicle.leasedSeats }}</span> Leased Seats</p>
+            --->
         </div>
     </div>
-    <div class="grid grid-cols-3 justify-items-center">
-        <p class="pl-2 t-1 text-gray-500 text-sm truncate">Assets</p>
-        <p class="pl-2 t-1 text-gray-500 text-sm truncate">Members</p>
-        <p class="pl-2 t-1 text-gray-500 text-sm truncate">Active Votes</p>
-        <p>{{ vehicle.tokens.length }}</p>
-        <p>{{ Object.keys(vehicle.balances).length }}</p>
-        <p>{{ formatNumber(vehicle.totalActiveVotes) }}</p>
-        <!--
+    <div>
+        <p class="pl-2 t-1 text-gray-500 text-sm truncate">Performance</p>
         <div class="pb-3 grid grid-cols-2 items-center text-base">
             <div class="pl-3 justify-self-start">Tips(AR): <span class="font-medium text-green-500">{{ formatNumber(vehicle.tipsAr) }}</span></div>
             <div class="pr-3 justify-self-end">Tips(Misc): <span class="font-medium text-green-500">{{ formatNumber(vehicle.tipsMisc) }}</span></div>
-        </div>-->
+        </div>
     </div>
     <div>
         <div class="pt-4 pb-3 grid grid-cols-3 gap=2 items-center text-base">
             <div class="pl-3 justify-self-start">
-               <span :class="vehicleStatusAlert">{{ vehicleStatusText }}</span>
+                <div>{{ vehicle.tokens.length }} <span class="font-medium text-sm text-aftrDarkGrey">Tokens</span></div>
             </div>
             <div class="justify-self-center">
-
+                <span :class="vehicleStatusAlert">{{ vehicleStatusText }}</span>
             </div>
             <div class="pr-3 justify-self-end">
-                <span class="capitalize px-2 sm:px-4 py-3 inline-flex leading-3 text-xs font-medium rounded-full bg-blue-100 text-blue-800">{{ vehicle.ticker }}</span>
+                <div>{{ Object.keys(vehicle.balances).length }} <span class="font-medium text-sm text-aftrDarkGrey">Members</span></div>
             </div>
             <!---
             <div class="-ml-px w-0 flex-1 flex justify-end pr-3">
@@ -64,11 +64,11 @@ export default {
     computed: {
         vehicleStatusAlert() {
             if (typeof this.vehicle.status === 'undefined' || this.vehicle.status === 'stopped' || this.vehicle.status === '') {
-                return "capitalize px-2 sm:px-4 py-3 inline-flex leading-3 text-xs font-medium rounded-full bg-red-100 text-red-800";
+                return "capitalize px-2 sm:px-4 py-3 inline-flex leading-3 text-sm font-semibold rounded-full bg-red-100 text-red-800";
             } else if (this.vehicle.status === 'started') {
-                return "capitalize px-2 sm:px-4 py-3 inline-flex leading-3 text-xs font-medium rounded-full bg-green-100 text-green-800";
+                return "capitalize px-2 sm:px-4 py-3 inline-flex leading-3 text-sm font-semibold rounded-full bg-green-100 text-green-800";
             } else {
-                return "capitalize px-2 sm:px-4 py-3 inline-flex leading-3 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800";
+                return "capitalize px-2 sm:px-4 py-3 inline-flex leading-3 text-sm font-semibold rounded-full bg-yellow-100 text-yellow-800";
             }
         },
         vehicleStatusText() {
