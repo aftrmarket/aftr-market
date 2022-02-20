@@ -132,17 +132,12 @@ export default {
             // Add contractId to vehicle object
             this.vehicle.id = this.contractId;
 
-            // Logo
+            // Logo and Description
             this.vehicle.settings.forEach(setting => {
                 if (setting[0] === 'communityLogo') {
                     this.vehicle.logo = setting[1];
-
-                    /*** For DEMO Purposes ONLY */
-                    /*** Fixing Chillin's logo */
-                    if (this.vehicleId === "PFGb4J3IyeYFcNwtuHs94SDruqQOJ_6R3FywE0-PJkY") {
-                        this.vehicle.logo = "aM7YfRnd97mTGLn_3vjLfWp2TgtBKRyDsBnlDhA1e-s";
-                    }
-                    /*** */
+                } else if (setting[0] === "communityDescription") {
+                    this.vehicle.desc = setting[1];
                 }
             });
             // Tokens
