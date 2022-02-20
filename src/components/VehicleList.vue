@@ -150,17 +150,6 @@ export default {
                 vehicle.settings.forEach((setting) => {
                     if (setting[0] === "communityLogo") {
                         vehicle.logo = setting[1];
-
-                        /*** For DEMO Purposes ONLY */
-                        /*** Fixing Chillin's logo */
-                        if (
-                            vehicle.id ===
-                            "PFGb4J3IyeYFcNwtuHs94SDruqQOJ_6R3FywE0-PJkY"
-                        ) {
-                            vehicle.logo =
-                                "aM7YfRnd97mTGLn_3vjLfWp2TgtBKRyDsBnlDhA1e-s";
-                        }
-                        /*** */
                     } else if (setting[0] === "communityDescription") {
                         vehicle.desc = setting[1];
                     }
@@ -171,23 +160,13 @@ export default {
 
                 for (let token of vehicle.tokens) {
                     try {
-                        const response = await fetch(
-                            import.meta.env.VITE_VERTO_CACHE_URL +
-                                "token/" +
-                                token.tokenId +
-                                "/price"
-                        );
+                        const response = await fetch(import.meta.env.VITE_VERTO_CACHE_URL + "token/" + token.tokenId + "/price");
                         const responseObj = await response.json();
                         const pricePerToken = responseObj.price;
                         const tokenValue = pricePerToken * token.balance;
                         treasuryTotal += tokenValue;
                     } catch (error) {
-                        console.log(
-                            "ERROR calling Verto cache on " +
-                                token.name +
-                                ": " +
-                                error
-                        );
+                        console.log("ERROR calling Verto cache on " + token.name + ": " + error);
                     }
                 }
                 vehicle.treasury = treasuryTotal;
