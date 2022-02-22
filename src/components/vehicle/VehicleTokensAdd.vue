@@ -26,7 +26,7 @@
                             <option value="" disabled selected>
                                 Select Token
                             </option>
-                            <option v-for="pst in $store.getters.getActiveWallet.psts" :key="pst.id" :value="pst.id">
+                            <option v-for="pst in $store.getters.getActiveWallet.psts" :key="pst.id" :value="pst.id" :disabled="!pst.fcp">
                                 {{ pst.name }} ({{ pst.id }})
                             </option>
                         </select>

@@ -149,7 +149,8 @@ const store = createStore({
                             balance: 0,
                             name: vehicle.name,
                             ticker: vehicle.ticker,
-                            logo: ''
+                            logo: '',
+                            fcp: vehicle && vehicle.invocations && vehicle.foreignCalls  ? true : false
                         };
 
                         Object.keys(vehicle.balances).some(walletId=>{

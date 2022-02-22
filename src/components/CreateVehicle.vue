@@ -194,7 +194,7 @@
                         <div v-if="arConnected" class="pt-6">
                             <select v-model="selectedPstId" @change="pstChange" id="selectedPstId" name="selectedPstId" class="mt-1 block w-1/2 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                                 <option value="" disabled selected>Select PST</option>
-                                <option v-for="pst in $store.getters.getActiveWallet.psts" :key="pst.id" :value="pst.id">
+                                <option v-for="pst in $store.getters.getActiveWallet.psts" :key="pst.id" :value="pst.id" :disabled="!pst.fcp">
                                     {{ pst.name }} ({{ pst.id }})
                                 </option>
                             </select>
@@ -507,7 +507,7 @@ export default {
             const currentPst = this.$store.getters.getActiveWallet.psts.find(
                 (item) => item.id === this.selectedPstId
             );
-            console.log("currentPst", currentPst, currentPst.balance);
+            console.log("currentPst", currentPst.fcp, currentPst.balance);
             return this.formatNumber(currentPst.balance);
         },
         pstTicker() {
