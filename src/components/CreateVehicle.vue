@@ -923,7 +923,7 @@ export default {
                         wallet
                     );
 /*** Prajacta */
-/* check out these logs.  this.version doesn't work. */
+/* check out these console logs.  this.version doesn't work. */
 /* version should be stored in an env var anyway.
  * 
  * 
