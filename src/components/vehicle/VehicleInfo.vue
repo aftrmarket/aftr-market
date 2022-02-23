@@ -144,6 +144,8 @@ export default {
             creatorIsValid: true,
             totalSize: 0,
             fileInvalid: false,
+            fileUpload: false,
+            files: [],
         };
     },
     watch: {
@@ -329,6 +331,25 @@ export default {
                   logging: true,
                 });
 
+            if (this.fileUpload){
+                if (import.meta.env.DEV) {
+                    await this.deployFile(this.files, arweave, JSON.parse(this.keyFile));
+                    const mineUrl =
+                        import.meta.env.VITE_ARWEAVE_PROTOCOL +
+                        "://" +
+                        import.meta.env.VITE_ARWEAVE_HOST +
+                        ":" +
+                        import.meta.env.VITE_ARWEAVE_PORT +
+                        "/mine";    
+                    console.log("mineUrl ",mineUrl);    
+                    let response = await fetch(mineUrl);
+                } else {
+                    await this.deployFile(this.files, arweave, "use_wallet");
+                }
+            }
+
+                console.log("this.newLogo ",this.newLogo)
+
             if (this.isFormValid) {
                 // Determine what fields have changed
                 let changeMap = new Map();
@@ -446,7 +467,75 @@ export default {
 
                 this.$router.push("/vehicles");
             }
-        }
+        },
+        async onFileChange(e) {
+            this.fileUpload = true
+            const file = e.target.files[0];
+            this.files = file;
+
+            // Error Handling
+            if (file.type.substring(0, 6) !== "image/") {
+                // Write file error message
+                this.fileInvalid = true;
+                console.log("FILE IS NOT IMAGE");
+                return;
+            } else {
+                this.fileInvalid = false;
+            }
+
+
+            if (this.vehicleLogo) {
+                // Release the memory of the old file
+                URL.revokeObjectURL(this.vehicleLogo);
+            }
+            this.vehicleLogo = URL.createObjectURL(file);
+            this.fileInfo = file.size + ", " + file.name + ", " + file.type;
+            const filename = file.name.replace(/ /g, "") + file.lastModified;
+
+            // Total size should be < ? so that it's a free transaction
+            this.totalSize += file.size;
+            this.isFormValid = true
+            console.log("totalSize", this.totalSize, this.balance);
+
+            /**** SHOULD THIS BE > 0? */
+            if (this.totalSize != 0) {
+
+            }
+        },
+        readFile(file) {
+            // Thanks to https://dilshankelsen.com/convert-file-to-byte-array/
+            return new Promise((resolve, reject) => {
+                // Create file reader
+                let reader = new FileReader();
+
+                // Register event listeners
+                reader.addEventListener("loadend", e => resolve(e.target.result));
+                reader.addEventListener("error", reject);
+
+                console.log("readAsArrayBuffer",file)
+                // Read file
+                reader.readAsArrayBuffer(file);
+            });
+        },
+        async getAsByteArray(file) {
+            return new Uint8Array(await this.readFile(file));
+        },
+        async deployFile(file, arweave, wallet) {
+
+            const tx = await arweave.createTransaction({
+                data: await this.getAsByteArray(file)
+            }, wallet);
+
+            tx.addTag("Content-Type", file.type);
+            //tx.addTag("User-Agent", `AFTR.Market/this.version`);
+            tx.addTag("User-Agent", "AFTR.Market")
+
+            await arweave.transactions.sign(tx, wallet);
+            await arweave.transactions.post(tx);
+            this.newLogo = tx.id;
+            
+            console.log("txid", tx.id);
+        },
     },
     created() {
         this.checkEditStatus();

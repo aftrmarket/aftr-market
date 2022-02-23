@@ -911,44 +911,46 @@ export default {
         // updateDaoBalance() {
         //     //const daoBalance = Math.round(this.vehicleTokens / this.daoMembers.length);
         // },
-        async deployFile(file, arweave, wallet) {
+        readFile(file) {
+            // Thanks to https://dilshankelsen.com/convert-file-to-byte-array/
             return new Promise((resolve, reject) => {
-                const fileReader = new FileReader();
-                fileReader.readAsDataURL(file);
-                fileReader.onload = async (event) => {
-                    const data = new Uint8Array(event.target.result);
+                // Create file reader
+                let reader = new FileReader();
 
-                    const tx = await arweave.createTransaction(
-                        { data },
-                        wallet
-                    );
-/*** Prajacta */
-/* check out these console logs.  this.version doesn't work. */
-/* version should be stored in an env var anyway.
- * 
- * 
- *  */                    
-console.log("FILE TYPE: " + file.type);
-console.log("USER-AGENT: " + `AFTR.Market/this.version`);
-                    tx.addTag("Content-Type", file.type);
-                    tx.addTag("User-Agent", `AFTR.Market/this.version`);
+                // Register event listeners
+                reader.addEventListener("loadend", e => resolve(e.target.result));
+                reader.addEventListener("error", reject);
 
-                    await arweave.transactions.sign(tx, wallet);
-                    const txid = tx.id;
-                    console.log("txid", txid);
-
-                    this.communityLogoValue = txid;
-                    console.log("communityLogoValue", this.communityLogoValue);
-                    this.vehicle.settings = [
-                        ["quorum", this.newQuorum],
-                        ["support", this.newSupport],
-                        ["voteLength", 2160],
-                        ["communityDescription", this.vehicle.desc],
-                        ["communityLogo", this.communityLogoValue],
-                    ];
-                    resolve();
-                };
+                // Read file
+                reader.readAsArrayBuffer(file);
             });
+        },
+        async getAsByteArray(file) {
+            return new Uint8Array(await this.readFile(file));
+        },
+        async deployFile(file, arweave, wallet) {
+
+            const tx = await arweave.createTransaction({
+                data: await this.getAsByteArray(file)
+            }, wallet);
+
+            tx.addTag("Content-Type", file.type);
+            //tx.addTag("User-Agent", `AFTR.Market/this.version`);
+            tx.addTag("User-Agent", "AFTR.Market")
+
+            await arweave.transactions.sign(tx, wallet);
+            await arweave.transactions.post(tx);
+            this.communityLogoValue = tx.id;
+            console.log("communityLogoValue", this.communityLogoValue);
+                    
+            this.vehicle.settings = [
+                ["quorum", this.newQuorum],
+                ["support", this.newSupport],
+                ["voteLength", 2160],
+                ["communityDescription", this.vehicle.desc],
+                ["communityLogo", this.communityLogoValue],
+            ];
+            console.log("txid", tx.id);
         },
         async createVehicle() {
             if (!this.nameValid) {
@@ -1025,6 +1027,15 @@ console.log("USER-AGENT: " + `AFTR.Market/this.version`);
             if (this.fileUpload){
                 if (import.meta.env.DEV) {
                     await this.deployFile(this.files, arweave, use_wallet);
+                    const mineUrl =
+                        import.meta.env.VITE_ARWEAVE_PROTOCOL +
+                        "://" +
+                        import.meta.env.VITE_ARWEAVE_HOST +
+                        ":" +
+                        import.meta.env.VITE_ARWEAVE_PORT +
+                        "/mine";
+                    console.log("mineUrl ",mineUrl);    
+                    let response = await fetch(mineUrl);
                 } else {
                     await this.deployFile(this.files, arweave, "use_wallet");
                 }
