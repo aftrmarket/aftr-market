@@ -42,7 +42,7 @@
                         <div class="flex text-sm text-gray-600">
                             <label for="newLogo" class="relative cursor-pointer bg-white rounded-md font-medium text-aftrBlue hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
                                 <span>Change the Logo</span>
-                                <input @change="onFileChange" id="newLogo" name="newLogo" type="file" class="sr-only" />
+                                <input @change="onFileChange" id="newLogo" name="newLogo" type="file" accept="image/png, image/gif, image/jpeg" class="sr-only" />
                             </label>
                         </div>
                         <p class="text-xs text-gray-500">200 x 200 PNG, JPG, or GIF</p>
@@ -474,14 +474,14 @@ export default {
             this.files = file;
 
             // Error Handling
-            if (file.type.substring(0, 6) !== "image/") {
-                // Write file error message
-                this.fileInvalid = true;
-                console.log("FILE IS NOT IMAGE");
-                return;
-            } else {
-                this.fileInvalid = false;
-            }
+            // if (file.type.substring(0, 6) !== "image/") {
+            //     // Write file error message
+            //     this.fileInvalid = true;
+            //     console.log("FILE IS NOT IMAGE");
+            //     return;
+            // } else {
+            //     this.fileInvalid = false;
+            // }
 
 
             if (this.vehicleLogo) {
