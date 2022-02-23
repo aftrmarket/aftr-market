@@ -45,7 +45,7 @@
                                 <input @change="onFileChange" id="newLogo" name="newLogo" type="file" class="sr-only" />
                             </label>
                         </div>
-                        <p class="text-xs text-gray-500">200 x 200 PNG, JPG, SVG, or GIF</p>
+                        <p class="text-xs text-gray-500">200 x 200 PNG, JPG, or GIF</p>
                         <p class="text-xs text-aftrRed">
                             {{ fileMessage }}
                         </p>

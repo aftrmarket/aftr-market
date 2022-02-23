@@ -89,7 +89,7 @@
                                         <input @change="onFileChange" id="vehicleLogo" name="vehicleLogo" type="file" class="sr-only" />
                                     </label>
                                 </div>
-                                <p class="text-xs text-gray-500">200 x 200 PNG, JPG, SVG, or GIF</p>
+                                <p class="text-xs text-gray-500">200 x 200 PNG, JPG, or GIF</p>
                                 <p class="text-xs text-aftrRed">
                                     {{ fileMessage }}
                                 </p>
@@ -430,8 +430,7 @@ export default {
     data() {
         return {
             /** Smartweave variables */
-            contractSourceId: import.meta.env
-                .VITE_SMARTWEAVE_CONTRACT_SOURCE_ID,
+            contractSourceId: import.meta.env.VITE_SMARTWEAVE_CONTRACT_SOURCE_ID,
             tagProtocol: import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL,
             arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
             arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
@@ -923,7 +922,14 @@ export default {
                         { data },
                         wallet
                     );
-
+/*** Prajacta */
+/* check out these logs.  this.version doesn't work. */
+/* version should be stored in an env var anyway.
+ * 
+ * 
+ *  */                    
+console.log("FILE TYPE: " + file.type);
+console.log("USER-AGENT: " + `AFTR.Market/this.version`);
                     tx.addTag("Content-Type", file.type);
                     tx.addTag("User-Agent", `AFTR.Market/this.version`);
 
@@ -1016,7 +1022,7 @@ export default {
                     return false;
                 }
             }
-            if(this.fileUpload){
+            if (this.fileUpload){
                 if (import.meta.env.DEV) {
                     await this.deployFile(this.files, arweave, use_wallet);
                 } else {
