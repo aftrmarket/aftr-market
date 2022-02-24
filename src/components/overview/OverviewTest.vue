@@ -172,7 +172,7 @@
                             </div>
                             <div class="mt-6">
                                 <h2 class="text-3xl font-extrabold tracking-tight text-gray-900">Create Your Own Vehicle</h2>
-                                
+
                                 <p class="mt-4 flex flex-nowrap gap-2 text-lg text-gray-500"><img class="w-6" src="../../assets/overview-bullet-1.svg" /> Make it a Single Owner Vehicle</p>
                                 <ul>
                                     <li class="text-base text-gray-500 pl-8 list-disc list-inside">Make sure you connect your wallet with ArConnect.</li>
@@ -282,99 +282,104 @@ export default {
             };
         },
         async init() {
-      let arweave = {};
-      arweave = await Arweave.init({
-        host: this.arweaveHost,
-        port: this.arweavePort,
-        protocol: this.arweaveProtocol,
-        timeout: 20000,
-        logging: true,
-      });
-      let use_wallet;
-      if (import.meta.env.DEV) {
-        if (this.keyFile.length) {
-          use_wallet = JSON.parse(this.keyFile);
-        } else {
-          alert("Please attach your keyfile");
-          return false;
-        }
-      }
-      const addr = await arweave.wallets.jwkToAddress(use_wallet);
-      const server = this.arweaveHost + ":" + this.arweavePort;
-      const route = "/mint/" + addr + "/10000000000000"; // Amount in Winstons
+            let arweave = {};
+            arweave = await Arweave.init({
+                host: this.arweaveHost,
+                port: this.arweavePort,
+                protocol: this.arweaveProtocol,
+                timeout: 20000,
+                logging: true,
+            });
+            let use_wallet;
+            if (import.meta.env.DEV) {
+                if (this.keyFile.length) {
+                    use_wallet = JSON.parse(this.keyFile);
+                } else {
+                    alert("Please attach your keyfile");
+                    return false;
+                }
+            }
+            const addr = await arweave.wallets.jwkToAddress(use_wallet);
+            const server = this.arweaveHost + ":" + this.arweavePort;
+            const route = "/mint/" + addr + "/10000000000000"; // Amount in Winstons
 
-      console.log(server, route);
-      //const mintRes = await request(server).get(route);
+            console.log(server, route);
+            //const mintRes = await request(server).get(route);
 
-      console.log("WALLET: " + addr);
-      let balance = await arweave.wallets.getBalance(addr);
-      console.log("BALANCE: " + balance);
+            console.log("WALLET: " + addr);
+            let balance = await arweave.wallets.getBalance(addr);
+            console.log("BALANCE: " + balance);
 
-      let contractVertoTxId = await createContract(
-        arweave,
-        use_wallet,
-        new Uint8Array(vertoSource),
-        new Uint8Array(vertoInitState)
-      );
+            let contractVertoTxId = await createContract(
+                arweave,
+                use_wallet,
+                new Uint8Array(vertoSource),
+                new Uint8Array(vertoInitState)
+            );
 
-      let contractArdriveTxId = await createContract(
-        arweave,
-        use_wallet,
-        new Uint8Array(arDriveSource),
-        new Uint8Array(arDriveInitState)
-      );
+            let contractArdriveTxId = await createContract(
+                arweave,
+                use_wallet,
+                new Uint8Array(arDriveSource),
+                new Uint8Array(arDriveInitState)
+            );
 
-      const mineUrl =
-        import.meta.env.VITE_ARWEAVE_PROTOCOL +
-        "://" +
-        import.meta.env.VITE_ARWEAVE_HOST +
-        ":" +
-        import.meta.env.VITE_ARWEAVE_PORT +
-        "/mine";
-      let response = await fetch(mineUrl);
-      console.log("Verto Contract ID: " + contractVertoTxId, contractArdriveTxId);
+            const mineUrl =
+                import.meta.env.VITE_ARWEAVE_PROTOCOL +
+                "://" +
+                import.meta.env.VITE_ARWEAVE_HOST +
+                ":" +
+                import.meta.env.VITE_ARWEAVE_PORT +
+                "/mine";
+            let response = await fetch(mineUrl);
+            console.log(
+                "Verto Contract ID: " + contractVertoTxId,
+                contractArdriveTxId
+            );
 
-      let contractTxAlquipaId = await this.createAftrVehicle(
-        arweave,
-        use_wallet,
-        this.contractSourceId,
-        aftrAlquipaInitState
-      );
-      await fetch(mineUrl);
-      console.log("AFTR Vehicle - Alquipa: " + contractTxAlquipaId);
+            let contractTxAlquipaId = await this.createAftrVehicle(
+                arweave,
+                use_wallet,
+                this.contractSourceId,
+                aftrAlquipaInitState
+            );
+            await fetch(mineUrl);
+            console.log("AFTR Vehicle - Alquipa: " + contractTxAlquipaId);
 
-      let contractTxBlueHorizonId = await this.createAftrVehicle(
-        arweave,
-        use_wallet,
-        this.contractSourceId,
-        aftrBlueHorizonInitState
-      );
-      await fetch(mineUrl);
-      console.log("AFTR Vehicle - Blue Horizon: " + contractTxBlueHorizonId);
+            let contractTxBlueHorizonId = await this.createAftrVehicle(
+                arweave,
+                use_wallet,
+                this.contractSourceId,
+                aftrBlueHorizonInitState
+            );
+            await fetch(mineUrl);
+            console.log(
+                "AFTR Vehicle - Blue Horizon: " + contractTxBlueHorizonId
+            );
 
-      let contractTxChillinId = await this.createAftrVehicle(
-        arweave,
-        use_wallet,
-        this.contractSourceId,
-        aftrChillinInitState
-      );
-      await fetch(mineUrl);
-      console.log("AFTR Vehicle - Chillin: " + contractTxChillinId);
+            let contractTxChillinId = await this.createAftrVehicle(
+                arweave,
+                use_wallet,
+                this.contractSourceId,
+                aftrChillinInitState
+            );
+            await fetch(mineUrl);
+            console.log("AFTR Vehicle - Chillin: " + contractTxChillinId);
 
-      this.$router.push("vehicles");
-    },
-    async createAftrVehicle(arweave, wallet, aftrId, initState) {
-      let swTags = [{ name: "Protocol", value: this.tagProtocol }];
-      let contractTxId = await createContractFromTx(
-        arweave,
-        wallet,
-        aftrId,
-        new Uint8Array(initState),
-        swTags
-      );
+            this.$router.push("vehicles");
+        },
+        async createAftrVehicle(arweave, wallet, aftrId, initState) {
+            let swTags = [{ name: "Protocol", value: this.tagProtocol }];
+            let contractTxId = await createContractFromTx(
+                arweave,
+                wallet,
+                aftrId,
+                new Uint8Array(initState),
+                swTags
+            );
 
-      return contractTxId;
-    },
+            return contractTxId;
+        },
     },
     setup() {
         return {
