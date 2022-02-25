@@ -323,15 +323,16 @@ export default {
                 new Uint8Array(arDriveSource),
                 new Uint8Array(arDriveInitState)
             );
-
             const mineUrl =
-                import.meta.env.VITE_ARWEAVE_PROTOCOL +
-                "://" +
-                import.meta.env.VITE_ARWEAVE_HOST +
-                ":" +
-                import.meta.env.VITE_ARWEAVE_PORT +
-                "/mine";
-            let response = await fetch(mineUrl);
+                    import.meta.env.VITE_ARWEAVE_PROTOCOL +
+                    "://" +
+                    import.meta.env.VITE_ARWEAVE_HOST +
+                    ":" +
+                    import.meta.env.VITE_ARWEAVE_PORT +
+                    "/mine";
+            if(import.meta.env.MINE){                
+                let response = await fetch(mineUrl);
+            }
             console.log(
                 "Verto Contract ID: " + contractVertoTxId,
                 contractArdriveTxId
@@ -343,7 +344,9 @@ export default {
                 this.contractSourceId,
                 aftrAlquipaInitState
             );
-            await fetch(mineUrl);
+            if(import.meta.env.MINE){
+                await fetch(mineUrl);
+            }    
             console.log("AFTR Vehicle - Alquipa: " + contractTxAlquipaId);
 
             let contractTxBlueHorizonId = await this.createAftrVehicle(
@@ -352,7 +355,9 @@ export default {
                 this.contractSourceId,
                 aftrBlueHorizonInitState
             );
-            await fetch(mineUrl);
+            if(import.meta.env.MINE){
+                await fetch(mineUrl);
+            }    
             console.log(
                 "AFTR Vehicle - Blue Horizon: " + contractTxBlueHorizonId
             );
@@ -363,7 +368,9 @@ export default {
                 this.contractSourceId,
                 aftrChillinInitState
             );
-            await fetch(mineUrl);
+            if(import.meta.env.MINE){
+                await fetch(mineUrl);
+            }
             console.log("AFTR Vehicle - Chillin: " + contractTxChillinId);
 
             this.$router.push("vehicles");

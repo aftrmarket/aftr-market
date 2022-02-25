@@ -335,14 +335,16 @@ export default {
                 if (import.meta.env.DEV) {
                     await this.deployFile(this.files, arweave, JSON.parse(this.keyFile));
                     const mineUrl =
-                        import.meta.env.VITE_ARWEAVE_PROTOCOL +
-                        "://" +
-                        import.meta.env.VITE_ARWEAVE_HOST +
-                        ":" +
-                        import.meta.env.VITE_ARWEAVE_PORT +
-                        "/mine";    
-                    console.log("mineUrl ",mineUrl);    
-                    let response = await fetch(mineUrl);
+                            import.meta.env.VITE_ARWEAVE_PROTOCOL +
+                            "://" +
+                            import.meta.env.VITE_ARWEAVE_HOST +
+                            ":" +
+                            import.meta.env.VITE_ARWEAVE_PORT +
+                            "/mine"; 
+                    if(import.meta.env.MINE){                           
+                        console.log("mineUrl ",mineUrl);    
+                        let response = await fetch(mineUrl);
+                    }
                 } else {
                     await this.deployFile(this.files, arweave, "use_wallet");
                 }
@@ -458,8 +460,10 @@ export default {
                     console.log("TX: " + txid);
 
                     /**** IN ORDER FOR THIS TO PROCESS, YOU NEED TO RUN http://localhost:1984/mine */
-                    const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
-                    const response = await fetch(mineUrl);
+                    if(import.meta.env.MINE){
+                        const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
+                        const response = await fetch(mineUrl);
+                    }
                 } else {
                     const txid = await interactWrite(arweave, "use_wallet", this.contractId, input);
                     console.log("TX: " + txid);

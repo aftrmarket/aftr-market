@@ -85,6 +85,11 @@ export default {
                 logoUrl = "https://avatars.dicebear.com/api/pixel-art-neutral/:" + this.vehicle.ticker + ".svg";
             } else {
                 logoUrl = "https://arweave.net/" + this.vehicle.logo;
+                // if(import.meta.env.VITE_ARWEAVE_PORT){
+                //     logoUrl = `${import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/" + this.vehicle.logo}`
+                // } else {
+                //     logoUrl = `${import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + "/" + this.vehicle.logo}`
+                // }
             }
             
             return logoUrl;

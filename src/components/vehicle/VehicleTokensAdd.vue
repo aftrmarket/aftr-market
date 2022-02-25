@@ -186,20 +186,24 @@ export default {
       if (import.meta.env.DEV) {
         let wallet = JSON.parse(this.keyFile);
         const mineUrl =
-          import.meta.env.VITE_ARWEAVE_PROTOCOL +
-          "://" +
-          import.meta.env.VITE_ARWEAVE_HOST +
-          ":" +
-          import.meta.env.VITE_ARWEAVE_PORT +
-          "/mine";
-        let response = await fetch(mineUrl);
+            import.meta.env.VITE_ARWEAVE_PROTOCOL +
+            "://" +
+            import.meta.env.VITE_ARWEAVE_HOST +
+            ":" +
+            import.meta.env.VITE_ARWEAVE_PORT +
+            "/mine";
+        if(import.meta.env.MINE){
+          let response = await fetch(mineUrl);
+        }
 
         await interactWrite(arweave, wallet, currentPst.id, inputTransfer)
           .then(async (id) => {
             vertoTxId = id;
             console.log("Transfer Verto = " + JSON.stringify(vertoTxId));
 
-            await fetch(mineUrl);
+            if(import.meta.env.MINE){
+              await fetch(mineUrl);
+            }
 
             const inputDeposit = {
               function: "deposit",
@@ -210,7 +214,9 @@ export default {
             await interactWrite(arweave, wallet, this.vehicle.id, inputDeposit)
               .then(async (txId) => {
                 this.msg = "Deposit Successful : " + txId
-                await fetch(mineUrl);
+                if(import.meta.env.MINE){
+                  await fetch(mineUrl);
+                }
               })
               .catch((error) => {
                 this.msg = error;

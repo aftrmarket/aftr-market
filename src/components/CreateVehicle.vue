@@ -973,7 +973,7 @@ export default {
                 return false;
             }
 
-            this.pageStatus = "in-progress";
+            // this.pageStatus = "in-progress";
 
             /***** NEED TO MAKE SURE THAT NONE OF THESE ARE NULL */
             this.vehicle.settings = [
@@ -1034,14 +1034,16 @@ export default {
                 if (import.meta.env.DEV) {
                     await this.deployFile(this.files, arweave, use_wallet);
                     const mineUrl =
-                        import.meta.env.VITE_ARWEAVE_PROTOCOL +
-                        "://" +
-                        import.meta.env.VITE_ARWEAVE_HOST +
-                        ":" +
-                        import.meta.env.VITE_ARWEAVE_PORT +
-                        "/mine";
-                    console.log("mineUrl ",mineUrl);    
-                    let response = await fetch(mineUrl);
+                            import.meta.env.VITE_ARWEAVE_PROTOCOL +
+                            "://" +
+                            import.meta.env.VITE_ARWEAVE_HOST +
+                            ":" +
+                            import.meta.env.VITE_ARWEAVE_PORT +
+                            "/mine";
+                    if(import.meta.env.MINE){                        
+                        console.log("mineUrl ",mineUrl);    
+                        let response = await fetch(mineUrl);
+                    }
                 } else {
                     await this.deployFile(this.files, arweave, "use_wallet");
                 }
@@ -1108,13 +1110,15 @@ export default {
                         initTags
                     );
                     const mineUrl =
-                        import.meta.env.VITE_ARWEAVE_PROTOCOL +
-                        "://" +
-                        import.meta.env.VITE_ARWEAVE_HOST +
-                        ":" +
-                        import.meta.env.VITE_ARWEAVE_PORT +
-                        "/mine";
-                    let response = await fetch(mineUrl);
+                            import.meta.env.VITE_ARWEAVE_PROTOCOL +
+                            "://" +
+                            import.meta.env.VITE_ARWEAVE_HOST +
+                            ":" +
+                            import.meta.env.VITE_ARWEAVE_PORT +
+                            "/mine";
+                    if(import.meta.env.MINE){
+                        let response = await fetch(mineUrl);
+                    }   
                 } else {
                     this.vehicle["id"] = await createContractFromTx(
                         arweave,
@@ -1148,13 +1152,15 @@ export default {
                     if (import.meta.env.DEV) {
                         let wallet = JSON.parse(this.keyFile);
                         const mineUrl =
-                            import.meta.env.VITE_ARWEAVE_PROTOCOL +
-                            "://" +
-                            import.meta.env.VITE_ARWEAVE_HOST +
-                            ":" +
-                            import.meta.env.VITE_ARWEAVE_PORT +
-                            "/mine";
-                        let response = await fetch(mineUrl);
+                                import.meta.env.VITE_ARWEAVE_PROTOCOL +
+                                "://" +
+                                import.meta.env.VITE_ARWEAVE_HOST +
+                                ":" +
+                                import.meta.env.VITE_ARWEAVE_PORT +
+                                "/mine";
+                        if(import.meta.env.MINE){                            
+                            let response = await fetch(mineUrl);
+                        }
 
                         let vertoTxId = await interactWrite(
                             arweave,
@@ -1165,8 +1171,9 @@ export default {
                         console.log(
                             "Transfer Verto = " + JSON.stringify(vertoTxId)
                         );
-
-                        await fetch(mineUrl);
+                        if(import.meta.env.MINE){
+                            await fetch(mineUrl);
+                        }
 
                         const inputDeposit = {
                             function: "deposit",
@@ -1181,8 +1188,10 @@ export default {
                             inputDeposit
                         );
                         console.log(txId);
-
-                        await fetch(mineUrl);
+                        
+                        if(import.meta.env.MINE){
+                            await fetch(mineUrl);
+                        }
 
                         console.log("READ CONTRACT...");
                         let vehicle = await readContract(
@@ -1242,7 +1251,7 @@ export default {
                 this.pageStatus = "error";
                 return false;
             }
-
+            this.pageStatus = "in-progress";
             this.$router.push({
                 name: "vehicle",
                 params: { vehicleId: this.vehicle.id },

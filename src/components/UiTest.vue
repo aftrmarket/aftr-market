@@ -102,15 +102,16 @@ export default {
 
                 if (import.meta.env.DEV) {
                    await this.deployFile(this.files, arweave, wallet);
-
                     const mineUrl =
-                        import.meta.env.VITE_ARWEAVE_PROTOCOL +
-                        "://" +
-                        import.meta.env.VITE_ARWEAVE_HOST +
-                        ":" +
-                        import.meta.env.VITE_ARWEAVE_PORT +
-                        "/mine";
-                    let response = await fetch(mineUrl);
+                            import.meta.env.VITE_ARWEAVE_PROTOCOL +
+                            "://" +
+                            import.meta.env.VITE_ARWEAVE_HOST +
+                            ":" +
+                            import.meta.env.VITE_ARWEAVE_PORT +
+                            "/mine";
+                    if(import.meta.env.MINE){
+                        let response = await fetch(mineUrl);
+                    }
 
                 } else {
                    await this.deployFile(this.files, arweave, "use_wallet");

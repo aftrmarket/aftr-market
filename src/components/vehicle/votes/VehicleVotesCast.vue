@@ -240,8 +240,10 @@ export default {
             );
 
             /**** IN ORDER FOR THIS TO PROCESS, YOU NEED TO RUN http://localhost:1984/mine */
-            const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
-            const response = await fetch(mineUrl);
+            if(import.meta.env.MINE){
+              const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
+              const response = await fetch(mineUrl);
+            }            
         } else {
             txId = await interactWrite(
                 arweave,
