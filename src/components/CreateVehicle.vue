@@ -244,7 +244,7 @@
                                                     <td class="px-6 py-4 whitespace-nowrap">
                                                         <div class="flex items-center">
                                                             <div class="flex-shrink-0 h-10 w-10">
-                                                                <img class="h-10 w-10 rounded-full" :src="`https://arweave.net/` + pst.logo" alt="" />
+                                                                <img class="h-10 w-10 rounded-full" :src="ChangeEnvValue + pst.logo" alt="" />
                                                             </div>
                                                             <div class="ml-4">
                                                                 <div class="text-sm font-medium text-gray-900">
@@ -492,10 +492,21 @@ export default {
             supportIsValid: true,
             newQuorum: 0.5,
             newSupport: 0.5,
-            fileUpload: false
+            fileUpload: false,
+            logoUrl: ""
         };
     },
     computed: {
+        ChangeEnvValue() {
+            this.logoUrl = "https://arweave.net/";
+                
+                // if(import.meta.env.VITE_ARWEAVE_PORT){
+                //     logoUrl = `${import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT}`
+                // } else {
+                //     logoUrl = `${import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST}`
+                // }
+                return this.logoUrl;
+        },
         displaySeats() {
             return numberAbbreviate(this.seats, 2);
         },
