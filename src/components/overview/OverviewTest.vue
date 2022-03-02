@@ -11,11 +11,12 @@
                             </h1>
                             <p class="mt-3 text-base text-gray-300 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
                                 The purpose of the Playground is to show you how to build your AFTR Vehicles without having to transfer your current Arweave assets.
-                                On the Playground, you'll be given Arweave assets in the form of Profit Sharing Tokens as well as AR (TESTNET AR, not real AR 🤣)
+                                On the Playground, you'll be given Arweave assets in the form of Profit Sharing Tokens as well as AR (testnet AR, not real AR 🤣)
                                 so that you can create your own vehicles and see how to manage and govern them.
                             </p>
                             <p class="mt-3 text-base text-gray-300 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
-                                To start, press the <span class="text-aftrYellow">Launch</span> button to setup your environment.
+                                To start, press the <span class="text-aftrYellow">Launch</span> button to setup your environment
+                                (make sure you connect your wallet first).
                             </p>
                             <div class="mt-10 sm:mt-12">
                                 <form action="#" class="sm:max-w-xl sm:mx-auto lg:mx-0">
@@ -121,7 +122,7 @@
 
         <div class="relative bg-gray-50 pt-16 pb-32 overflow-hidden">
             <div class="relative max-w-xl mx-auto px-4 sm:px-6 lg:px-8 lg:max-w-7xl">
-                <h3 class="pb-4 text-2xl font-extrabold text-gray-900 text-left tracking-tight sm:text-3xl">What Happens When I Press the Launch Button?</h3>
+                <h3 class="pb-4 text-2xl font-extrabold text-gray-900 text-left tracking-tight sm:text-3xl">What to do in the AFTR Playground</h3>
                 <div class="lg:mx-auto lg:max-w-7xl lg:px-8 lg:grid lg:grid-cols-2 lg:grid-flow-col-dense lg:gap-24">
                     <div class="px-4 max-w-xl mx-auto sm:px-6 lg:py-16 lg:max-w-none lg:mx-0 lg:px-0">
                         <div>
