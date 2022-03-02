@@ -4,7 +4,7 @@
             <div class="mx-auto max-w-7xl lg:px-8">
                 <div class="lg:grid lg:grid-cols-2 lg:gap-8">
                     <div class="mx-auto max-w-md px-4 sm:max-w-2xl sm:px-6 sm:text-center lg:px-0 lg:text-left lg:flex lg:items-center">
-                        <div class="lg:py-24">
+                        <div class="">
                             <h1 class="mt-4 text-4xl tracking-tight font-bold text-white sm:mt-5 sm:text-6xl lg:mt-6 xl:text-5xl">
                                 <span class="block">Welcome to</span>
                                 <span class="block text-aftrYellow">AFTR Playground</span>
@@ -14,15 +14,11 @@
                                 On the Playground, you'll be given Arweave assets in the form of Profit Sharing Tokens as well as AR (testnet AR, not real AR 🤣)
                                 so that you can create your own vehicles and see how to manage and govern them.
                             </p>
-                            <p class="mt-3 text-base text-gray-300 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
-                                To start, press the <span class="text-aftrYellow">Launch</span> button to setup your environment
-                                (make sure you connect your wallet first).
-                            </p>
                             <div class="mt-10 sm:mt-12">
                                 <form action="#" class="sm:max-w-xl sm:mx-auto lg:mx-0">
                                     <div class="sm:flex">
                                         <div class="mt-3 sm:mt-0 sm:ml-3">
-                                            <button @click.prevent="init" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Launch</button>
+                                            <button @click.prevent="init" type="submit" :disabled="!arConnected" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Launch</button>
                                         </div>
                                         <div class="mt-3 sm:mt-0 sm:ml-3">
                                             <button @click.prevent="routeUser('PROD')" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Back to MAINNET</button>
@@ -32,9 +28,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="mt-12 -mb-16 sm:-mb-48 lg:m-0 lg:relative">
+                    <div class="mt-12 -mb-16 sm:-mb-48 lg:relative">
                         <div class="mx-auto max-w-md px-4 sm:max-w-2xl sm:px-6 lg:max-w-none lg:px-0">
-                            <img class="w-full lg:absolute lg:inset-y-0 lg:left-0 lg:h-full lg:w-auto lg:max-w-none" src="../../assets/overview-3d-illustration.svg" alt="" />
+                            <img class="w-full lg:absolute lg:inset-y-0 lg:left-0 lg:h-full lg:w-auto lg:max-w-none" src="../../assets/overview-test-launch.png" alt="" />
                         </div>
                     </div>
                     <div class="mt-3 text-base text-gray-300 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
@@ -261,8 +257,6 @@ export default {
     data() {
         return {
             /** Smartweave variables */
-            contractSourceId: import.meta.env
-                .VITE_SMARTWEAVE_CONTRACT_SOURCE_ID,
             tagProtocol: import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL,
             arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
             arweavePort: import.meta.env.VITE_ARWEAVE_PORT,

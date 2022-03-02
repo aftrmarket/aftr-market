@@ -1,6 +1,6 @@
 <template>
     <div v-if="overviewRoute === 'DEV'">
-        <overview-dev></overview-dev>
+        <overview-test></overview-test>
     </div>
     <div v-else-if="overviewRoute === 'TEST'">
         <overview-test></overview-test>
@@ -22,8 +22,8 @@ export default {
     },
     data() {
         return {
-            //overviewRoute: import.meta.env.VITE_ENV,
-            overviewRoute: "TEST"
+            overviewRoute: import.meta.env.VITE_ENV,
+            //overviewRoute: "TEST"
         };
     },
 }
