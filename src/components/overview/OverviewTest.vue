@@ -219,10 +219,12 @@ import * as arDriveSource from "./../../testnet/contracts/arDriveSource.js";
 import aftrAlquipaInitState from "./../../testnet/contracts/aftrAlquipaInitState.json";
 import aftrBlueHorizonInitState from "./../../testnet/contracts/aftrBlueHorizonInitState.json";
 import aftrChillinInitState from "./../../testnet/contracts/aftrChillinInitState.json";
+import * as aftrSourcePlayground from "./../../testnet/contracts/aftrSourcePlayground.js";
+import aftrInitStatePlayground from "./../../testnet/contracts/aftrInitStatePlayground.json";
 
 import Arweave from "arweave";
 import { mapGetters } from "vuex";
-import { createContractFromTx, createContract } from "smartweave";
+import { createContractFromTx, createContract, interactWrite, readContract } from 'smartweave';
 
 const initProcess = [
     {
@@ -265,6 +267,8 @@ export default {
             arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
             arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
             /** */
+            logoVint: "",
+            logoArhd: ""
         };
     },
     computed: {
@@ -290,6 +294,14 @@ export default {
                 timeout: 20000,
                 logging: true,
             });
+             const mineUrl =
+                    import.meta.env.VITE_ARWEAVE_PROTOCOL +
+                    "://" +
+                    import.meta.env.VITE_ARWEAVE_HOST +
+                    ":" +
+                    import.meta.env.VITE_ARWEAVE_PORT +
+                    "/mine";
+
             let use_wallet;
             if (import.meta.env.DEV) {
                 if (this.keyFile.length) {
@@ -304,74 +316,93 @@ export default {
             const route = "/mint/" + addr + "/10000000000000"; // Amount in Winstons
 
             console.log(server, route);
-            //const mintRes = await request(server).get(route);
 
             console.log("WALLET: " + addr);
             let balance = await arweave.wallets.getBalance(addr);
             console.log("BALANCE: " + balance);
+            if (balance < 10000000000000) {
+                const mintRes = await request(server).get(route);
+                balance = await arweave.wallets.getBalance(addr);
+            }
+            console.log("Balance for " + addr + ": " + balance.toString());
+            let aftrContractSrcId = "";     
+            
+            let query = `query($cursor: String) {
+                            transactions(
+                                tags: [ { name: "Protocol", values: ["${ import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL }"] } ]
+                                after: $cursor
+                            )
+                            { pageInfo { hasNextPage }
+                                edges { cursor node { id } }
+                            }
+                        }`;
 
-            let contractVertoTxId = await createContract(
-                arweave,
-                use_wallet,
-                new Uint8Array(vertoSource),
-                new Uint8Array(vertoInitState)
-            );
+            let response = await this.runQuery(arweave, query, "Failure on looking up AFTR Vehicles. ");
+            let numAftrVehicles = 0;
 
-            let contractArdriveTxId = await createContract(
-                arweave,
-                use_wallet,
-                new Uint8Array(arDriveSource),
-                new Uint8Array(arDriveInitState)
-            );
-            const mineUrl =
-                    import.meta.env.VITE_ARWEAVE_PROTOCOL +
-                    "://" +
-                    import.meta.env.VITE_ARWEAVE_HOST +
-                    ":" +
-                    import.meta.env.VITE_ARWEAVE_PORT +
-                    "/mine";
+            if (response) {
+                numAftrVehicles = response.data.data.transactions.edges.length;
+            }
+
+            let contractSource;
+            let initState;
+            let contractTxId = "";
+            if (numAftrVehicles > 0) {
+                aftrContractSrcId = await this.getContractSourceId(arweave, response.data.data.transactions.edges[0].node.id);
+            } else {
+                contractTxId = await createContract(arweave, use_wallet,  new Uint8Array(aftrSourcePlayground), new Uint8Array(aftrInitStatePlayground));
+                
+                if(import.meta.env.MINE){                
+                    await fetch(mineUrl);
+                }
+                aftrContractSrcId = await this.getContractSourceId(arweave, contractTxId);
+            }
+
+            console.log("AFTR Source ID: " + aftrContractSrcId);
+
+            let vintContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "pst", "Vint", "VINT", new Uint8Array(vertoInitState));
+            console.log("VINT: " + vintContractId);
+
+            let arhdContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "pst", "arHD", "ARHD", new Uint8Array(arDriveSource));
+            console.log("ARHD: " + arhdContractId);
+
+            let chillContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "aftr", "Chillin Treasury", "CHILL", new Uint8Array(aftrChillinInitState));
+            await this.updateTokensLogos(arweave, use_wallet, chillContractId, this.logoVint, this.logoArhd);
+            console.log("CHILL: " + chillContractId);
+
+            let alqpaContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "aftr", "Alquipa", "ALQPA", new Uint8Array(aftrAlquipaInitState));
+            await this.updateTokensLogos(arweave, use_wallet, alqpaContractId, this.logoVint, this.logoArhd);
+            console.log("ALQPA: " + alqpaContractId);
+
+            let blueContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "aftr", "Blue Horizon", "BLUE", new Uint8Array(aftrBlueHorizonInitState));
+            await this.updateTokensLogos(arweave, use_wallet, blueContractId, this.logoVint, this.logoArhd);
+            console.log("BLUE: " + blueContractId);
+
+            let input = {
+                function: "plygnd-mint",
+                qty: 100000
+            };
+            // Calls mint function on Blue Horizon contract. If user already has a balance, nothing happens.
+            contractTxId = await interactWrite(arweave, use_wallet, blueContractId, input);
             if(import.meta.env.MINE){                
-                let response = await fetch(mineUrl);
-            }
-            console.log(
-                "Verto Contract ID: " + contractVertoTxId,
-                contractArdriveTxId
-            );
-
-            let contractTxAlquipaId = await this.createAftrVehicle(
-                arweave,
-                use_wallet,
-                this.contractSourceId,
-                aftrAlquipaInitState
-            );
-            if(import.meta.env.MINE){
-                await fetch(mineUrl);
-            }    
-            console.log("AFTR Vehicle - Alquipa: " + contractTxAlquipaId);
-
-            let contractTxBlueHorizonId = await this.createAftrVehicle(
-                arweave,
-                use_wallet,
-                this.contractSourceId,
-                aftrBlueHorizonInitState
-            );
-            if(import.meta.env.MINE){
-                await fetch(mineUrl);
-            }    
-            console.log(
-                "AFTR Vehicle - Blue Horizon: " + contractTxBlueHorizonId
-            );
-
-            let contractTxChillinId = await this.createAftrVehicle(
-                arweave,
-                use_wallet,
-                this.contractSourceId,
-                aftrChillinInitState
-            );
-            if(import.meta.env.MINE){
                 await fetch(mineUrl);
             }
-            console.log("AFTR Vehicle - Chillin: " + contractTxChillinId);
+
+            console.log("Blue Horizon Contract Write: " + contractTxId);
+            
+            input = {
+                function: "plygnd-mint",
+                qty: 100000
+            };
+            contractTxId = await interactWrite(arweave, use_wallet, vintContractId, input);
+            console.log("User Wallet VINT: " + contractTxId);
+
+            contractTxId = await interactWrite(arweave, use_wallet, arhdContractId, input);
+            console.log("User Wallet ARHD: " + contractTxId);
+
+            if(import.meta.env.MINE){                
+                await fetch(mineUrl);
+            }
 
             this.$router.push("vehicles");
         },
@@ -384,9 +415,147 @@ export default {
                 new Uint8Array(initState),
                 swTags
             );
-
             return contractTxId;
         },
+        async runQuery(arweave, query, errorMsg) {
+            try {
+                let response = await arweave.api.post("graphql", {
+                    query: query
+                });
+
+                if (response.status !== 200) {
+                    response = null;
+                }
+
+                return response;
+            } catch(e) {
+                console.log(errorMsg + e);
+            }
+        },
+        /*** BEGIN SCRIPT FUNCTIONS */
+        async getContractSourceId(arweave, txId) {
+            let tx = await arweave.transactions.get(txId);
+            let allTags = [];
+            tx.get('tags').forEach(tag => {
+                let key = tag.get('name', {decode: true, string: true});
+                let value = tag.get('value', {decode: true, string: true});
+                allTags.push({
+                    key,
+                    value
+                });
+            });
+            for (let i = 0; i < allTags.length; i++) {
+                if (allTags[i].key === 'Contract-Src') {
+                    return allTags[i].value;
+                }
+            }
+        },
+        async  createSampleAftrVehicle(arweave, wallet, aftrSourceId, type = "aftr", name, ticker, initStatePath) {
+        let query = "";
+        
+        const mineUrl =
+                    import.meta.env.VITE_ARWEAVE_PROTOCOL +
+                    "://" +
+                    import.meta.env.VITE_ARWEAVE_HOST +
+                    ":" +
+                    import.meta.env.VITE_ARWEAVE_PORT +
+                    "/mine";
+
+        if (type === "aftr") {
+            query = `query($cursor: String) {
+                transactions(
+                    tags: [
+                        { name: "Protocol", values: ["${ import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL }"] },
+                        { name: "Aftr-Playground", values: ["${ ticker }"] }
+                    ]
+                    after: $cursor
+                )
+                { pageInfo { hasNextPage }
+                    edges { cursor node { id } }
+                }
+            }`;
+        } else {
+            query = `query($cursor: String) {
+                transactions(
+                    tags: [ 
+                        { name: "Aftr-Playground", values: ["${ ticker }"] },
+                        { name: "Aftr-Playground-Type", values: ["PST"] }
+                ]
+                    after: $cursor
+                )
+                { pageInfo { hasNextPage }
+                    edges { cursor node { id } }
+                }
+            }`;
+        }
+
+        let response = await this.runQuery(arweave, query, "Failure on looking up " + name);
+        let numAftrVehicles = 0;
+        if (response) {
+            numAftrVehicles = response.data.data.transactions.edges.length;
+        }
+        
+        if (numAftrVehicles === 0) {
+            let contractTxId = await this.createSampleContract(arweave, wallet, aftrSourceId, initStatePath, type, ticker);
+            if(import.meta.env.MINE){                
+                await fetch(mineUrl);
+            }
+
+            // Add the logo
+            const logoId = await getLogoId(wallet, name, ticker, type);
+            console.log("LOGO for " + name + ": " + logoId);
+
+            let input = {
+                function: "plygnd-addLogo",
+                logo: logoId
+            };
+            let res = await interactWrite(arweave, wallet, contractTxId, input);
+            if(import.meta.env.MINE){                
+                    await fetch(mineUrl);
+                }
+
+            console.log("LOGO ADD for " + name + ": " + res);
+            
+            return contractTxId;
+        } else {
+            return response.data.data.transactions.edges[0].node.id;
+        }
+        },
+        async updateTokensLogos(arweave,wallet, contractId, logoVint, logoArhd) {
+            const mineUrl =
+                    import.meta.env.VITE_ARWEAVE_PROTOCOL +
+                    "://" +
+                    import.meta.env.VITE_ARWEAVE_HOST +
+                    ":" +
+                    import.meta.env.VITE_ARWEAVE_PORT +
+                    "/mine";
+            let input = {
+                function: "plygnd-updateTokens",
+                logoVint: logoVint,
+                logoArhd: logoArhd
+            };
+            let res = await interactWrite(arweave, wallet, contractId, input);
+            if(import.meta.env.MINE){                
+                    await fetch(mineUrl);
+                }
+        },
+        async createSampleContract(arweave, wallet, aftrId, initState, type = "aftr", name) {
+            let swTags = [];
+            if (type === "aftr") {
+                swTags = [
+                    { name: 'Protocol', value:  import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL },
+                    { name: 'Aftr-Playground', value:  name }
+                ];
+            } else {
+                swTags = [
+                    { name: 'Aftr-Playground', value:  name },
+                    { name: 'Aftr-Playground-Type', value:  'PST' }
+                ];
+            }
+            let contractTxId = await createContractFromTx(arweave, wallet, aftrId, initState, swTags);
+
+            return contractTxId;
+        }
     },
     setup() {
         return {
