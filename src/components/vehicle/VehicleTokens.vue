@@ -210,14 +210,13 @@ export default {
         },
         ...mapGetters(['arConnected', 'getActiveAddress']),
         ChangeEnvValue() {
-            this.logoUrl = "https://arweave.net/";
-                
-                // if(import.meta.env.VITE_ARWEAVE_PORT){
-                //     logoUrl = `${import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT}`
-                // } else {
-                //     logoUrl = `${import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST}`
-                // }
-                return this.logoUrl;
+            // this.logoUrl = "https://arweave.net/";                
+            if(import.meta.env.VITE_ARWEAVE_PORT){
+                this.logoUrl = `${import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/"}`;
+            } else {
+                this.logoUrl = `${import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST}`;
+            }
+            return this.logoUrl;
         },
     },
     watch: {
