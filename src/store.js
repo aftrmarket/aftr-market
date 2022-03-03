@@ -108,6 +108,7 @@ const store = createStore({
                 "ACCESS_ARWEAVE_CONFIG",
             ]);
             wallet.address = await window.arweaveWallet.getActiveAddress();
+            console.log(wallet.address);
 
 /*** SAVE NEW CONFIG INFORMATION */
             let config = await window.arweaveWallet.getArweaveConfig();
@@ -116,7 +117,12 @@ const store = createStore({
         } catch (error) {
           console.log("ERROR during ArConnection: " + error);
         }
-  
+
+/*** THE REASON THIS WAS FAILING WAS BECAUSE arConnect WAS NEVER BEING SET TO TRUE. */ 
+if (wallet.address.length === 43) {
+    context.commit("arConnect", wallet);
+}
+
         if (import.meta.env.DEV || import.meta.env.TEST) {
             /*** HERE'S THE PROBLEM:
              * THIS CODE CAN ONLY WORK IF THERE IS DATA.
