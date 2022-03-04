@@ -99,7 +99,7 @@ export default {
     },
     computed: {
         ...mapGetters(['arConnected', 'getActiveAddress', 'getCurrentBlockValue']),
-         ...mapState(['currentBlock']),
+        ...mapState(['currentBlock']),
     },
     mounted () {
         this.$store.dispatch('loadCurrentBlock')
