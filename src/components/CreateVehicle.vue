@@ -557,7 +557,7 @@ export default {
                 return "File size: " + this.formatNumber(this.totalSize);
             }
         },
-        ...mapGetters(["arConnected", "keyFile"]),
+        ...mapGetters(["arConnected", "keyFile", "getAftrContractSrcId"]),
         // Code to handle a checkbox in the table to check/uncheck all rows.
         /******
       selectAll: {
@@ -1115,7 +1115,7 @@ export default {
                     this.vehicle["id"] = await createContractFromTx(
                         arweave,
                         use_wallet,
-                        this.contractSourceId,
+                        this.getAftrContractSrcId,
                         JSON.stringify(this.vehicle),
                         initTags
                     );

@@ -221,6 +221,7 @@ import aftrInitStatePlayground from "./../../testnet/contracts/aftrInitStatePlay
 
 import Arweave from "arweave";
 import { mapGetters } from "vuex";
+import request from 'supertest';
 import { createContractFromTx, createContract, interactWrite, readContract } from 'smartweave';
 
 const initProcess = [
@@ -267,7 +268,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters(["arConnected", "keyFile"]),
+        ...mapGetters(["arConnected", "keyFile", "arConnectConfig"]),
     },
     methods: {
         routeUser(site) {
@@ -281,6 +282,33 @@ export default {
             };
         },
         async init() {
+            
+            if(this.arConnectConfig){
+                console.log("arConnectConfig", this.arConnectConfig)
+                if(this.arConnectConfig.host == "localhost" || this.arConnectConfig.protocol == "http" || this.arConnectConfig.port == 1984){
+
+                    if(this.arConnectConfig.host == "localhost" && this.arConnectConfig.protocol == "http" && this.arConnectConfig.port == 1984){
+                        //true value
+                        console.log("Correct credentials : ", this.arConnectConfig)
+                    } else {
+                        alert("Check configuration value")
+                        return false;
+                    }
+
+                }
+
+                if(this.arConnectConfig.host == "www.arweave.run" || this.arConnectConfig.protocol == "https" || this.arConnectConfig.port == 443){
+                    if(this.arConnectConfig.host == "www.arweave.run" && this.arConnectConfig.protocol == "https" && this.arConnectConfig.port == 443){
+                        //true value
+                        console.log("Correct credentials : ", this.arConnectConfig)
+                    } else {
+                        alert("Check configration value")
+                        return false;
+                    }
+
+                }
+            }
+            
             let arweave = {};
             arweave = await Arweave.init({
                 host: this.arweaveHost,
@@ -307,7 +335,7 @@ export default {
                 }
             }
             const addr = await arweave.wallets.jwkToAddress(use_wallet);
-            const server = this.arweaveHost + ":" + this.arweavePort;
+            const server = this.arweaveProtocol + "//" + this.arweaveHost + ":" + this.arweavePort;
             const route = "/mint/" + addr + "/10000000000000"; // Amount in Winstons
 
             console.log(server, route);
@@ -346,13 +374,12 @@ export default {
                 aftrContractSrcId = await this.getContractSourceId(arweave, response.data.data.transactions.edges[0].node.id);
             } else {
                 contractTxId = await createContract(arweave, use_wallet,  new Uint8Array(aftrSourcePlayground), new Uint8Array(aftrInitStatePlayground));
-                
                 if(import.meta.env.MINE){                
                     await fetch(mineUrl);
                 }
                 aftrContractSrcId = await this.getContractSourceId(arweave, contractTxId);
             }
-
+            this.$store.commit("setAftrContractSrcId", aftrContractSrcId);
             console.log("AFTR Source ID: " + aftrContractSrcId);
 
             let vintContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "pst", "Vint", "VINT", new Uint8Array(vertoInitState));
@@ -429,6 +456,7 @@ export default {
         },
         /*** BEGIN SCRIPT FUNCTIONS */
         async getContractSourceId(arweave, txId) {
+            console.log("getContractSourceId")
             let tx = await arweave.transactions.get(txId);
             let allTags = [];
             tx.get('tags').forEach(tag => {

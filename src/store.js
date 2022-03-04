@@ -12,8 +12,10 @@ const store = createStore({
             smartWeaveConfig: {
                 contractSourceId: "", // Changes with every AFTR contract update
                 tagProtocol: "AFTR-Demo-a101"   // NOT USED HERE
-            }
+            },
             /** */
+            arConnectConfig: {},
+            getAftrContractSrcId: ""
         };
     },
     getters: {
@@ -34,6 +36,12 @@ const store = createStore({
         },
         keyFile(state) {
             return state.keyFile;
+        },
+        arConnectConfig(state) {
+            return state.arConnectConfig;
+        },
+        getAftrContractSrcId(state) {
+            return state.getAftrContractSrcId;
         }
     },
     mutations: {
@@ -61,7 +69,13 @@ const store = createStore({
                 }
             ***/
             state.activeWallet.psts[payload.index].balance = payload.balance;
-        }
+        },
+        setArConnectConfig (state, arConnectConfig) {
+            state.arConnectConfig = arConnectConfig
+        },
+        setAftrContractSrcId(state, item) {
+            state.getAftrContractSrcId = item
+        },
     },
     actions: {
         async loadCurrentBlock ({ commit }) {
@@ -112,7 +126,7 @@ const store = createStore({
 
 /*** SAVE NEW CONFIG INFORMATION */
             let config = await window.arweaveWallet.getArweaveConfig();
-            console.log(JSON.stringify(config));
+            context.commit("setArConnectConfig", config);
 /*** SAVE NEW CONFIG INFORMATION */
         } catch (error) {
           console.log("ERROR during ArConnection: " + error);
