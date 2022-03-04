@@ -81,14 +81,12 @@
           </div>
         </div>
       </nav>
-      <header class="py-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!--<span class="text-lg text-white">welcome to</span>-->
-            <img src="../../assets/aftr-market-text.svg" width="500" />
-            <!--
-          <h1 class="text-5xl font-bold text-white font-sans tracking-wider">
-            AFTR Market
-          </h1>-->
+      <header class="py-2">
+        <div class="grid grid-cols-2 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="py-8">
+                <img src="../../assets/aftr-market-text.svg" width="500" />
+            </div>
+            <div v-if="!launchSetupCorrect" class="py-1 text-right text-5xl animate-pulse">👆</div>
         </div>
       </header>
     </div>
@@ -134,7 +132,10 @@ export default {
     },
     walletAddressSubstr() {
         return this.$store.getters.getActiveAddress.substr(0, 10) + '...';
-    }
+    },
+    launchSetupCorrect() {
+        return this.$store.getters.getTestLaunchConfigState;
+    },
   },
   methods: {
     goHome() {

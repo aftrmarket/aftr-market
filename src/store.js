@@ -6,6 +6,7 @@ const store = createStore({
         return {
             activeWallet: {},
             arConnect: false,
+            testLaunchConfigCorrect: true,
             currentBlock: [],
             keyFile : {},
             /** Smartweave variables */
@@ -42,6 +43,9 @@ const store = createStore({
         },
         getAftrContractSrcId(state) {
             return state.getAftrContractSrcId;
+        },
+        getTestLaunchConfigState(state) {
+            return state.testLaunchConfigCorrect;
         }
     },
     mutations: {
@@ -76,6 +80,14 @@ const store = createStore({
         setAftrContractSrcId(state, item) {
             state.getAftrContractSrcId = item
         },
+        setTestLaunchConfigState(state) {
+            // If user tries to press the Launch button without Arconnecting, then turn flag on.
+            if (state.arConnect) {
+                state.testLaunchConfigCorrect = true;
+            } else {
+                state.testLaunchConfigCorrect = false;
+            }
+        },
     },
     actions: {
         async loadCurrentBlock ({ commit }) {
@@ -89,183 +101,165 @@ const store = createStore({
             .catch(error => {
               console.error(error);
             });
-   
-    },
-    async arConnect(context) {
-        let wallet = {
-          address: "",
-          psts: [],
-        };
-        try {
-/*** COMMENTED THIS OUT - NOT SURE WHAT IT'S NEEDED */
-        //   if (import.meta.env.DEV) {
-        //     const promiseResult = await window.arweaveWallet.connect([
-        //       "ACCESS_ADDRESS",
-        //       "ACCESS_ALL_ADDRESSES",
-        //       "SIGN_TRANSACTION",
-        //     ]);
-        //     wallet.address = await window.arweaveWallet.getActiveAddress();
-        //     console.log("wallet.address",wallet.address);
-        //   } else {
-        //     const promiseResult = await window.arweaveWallet.connect([
-        //       "ACCESS_ADDRESS",
-        //       "ACCESS_ALL_ADDRESSES",
-        //       "SIGN_TRANSACTION",
-        //     ]);
-        //     wallet.address = await window.arweaveWallet.getActiveAddress();
-        //   }
-
-            const promiseResult = await window.arweaveWallet.connect([
-                "ACCESS_ADDRESS",
-                "ACCESS_ALL_ADDRESSES",
-                "SIGN_TRANSACTION",
-                "ACCESS_ARWEAVE_CONFIG",
-            ]);
-            wallet.address = await window.arweaveWallet.getActiveAddress();
-            console.log(wallet.address);
-
-/*** SAVE NEW CONFIG INFORMATION */
-            let config = await window.arweaveWallet.getArweaveConfig();
-            context.commit("setArConnectConfig", config);
-/*** SAVE NEW CONFIG INFORMATION */
-        } catch (error) {
-          console.log("ERROR during ArConnection: " + error);
-        }
-
-/*** THE REASON THIS WAS FAILING WAS BECAUSE arConnect WAS NEVER BEING SET TO TRUE. */ 
-if (wallet.address.length === 43) {
-    context.commit("arConnect", wallet);
-}
-
-        if (import.meta.env.DEV || import.meta.env.TEST) {
-            /*** HERE'S THE PROBLEM:
-             * THIS CODE CAN ONLY WORK IF THERE IS DATA.
-             * SO, WHEN ARLOCAL IS RESTARTED, THERE IS NO DATA, 
-             * THEREFORE THIS CODE NEEDS TO RUN AS A PART OF THE LAUNCH SCRIPT
-             * FOR THE DEV AND TEST ENVS.
-             */
-            let query = {
-            query: `
-                    query($cursor: String) {
-                        transactions(
-                            tags: [{ name: "App-Name", values: ["SmartWeaveContract"] }]
-                            after: $cursor
-                        ) {
-                            pageInfo {
-                                hasNextPage
-                            }
-                            edges {
-                                cursor
-                                node { id } 
-                            }
-                        }
-                }`,
+        },
+        setTestLaunchConfigState({ commit }) {
+            commit("setTestLaunchConfigState");
+        },
+        async arConnect(context) {
+            let wallet = {
+            address: "",
+            psts: [],
             };
-        
-            let arweave = {};
             try {
-                arweave = await Arweave.init({
-                    host: import.meta.env.VITE_ARWEAVE_HOST,
-                    port: import.meta.env.VITE_ARWEAVE_PORT,
-                    protocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
-                    timeout: 20000,
-                    logging: true,
-                });
+                const promiseResult = await window.arweaveWallet.connect([
+                    "ACCESS_ADDRESS",
+                    "ACCESS_ALL_ADDRESSES",
+                    "SIGN_TRANSACTION",
+                    "ACCESS_ARWEAVE_CONFIG",
+                ]);
+                wallet.address = await window.arweaveWallet.getActiveAddress();
+                console.log(wallet.address);
+
+                let config = await window.arweaveWallet.getArweaveConfig();
+                context.commit("setArConnectConfig", config);
             } catch (error) {
-                console.log("ERROR connecting to Arweave: " + error);
-                return false;
+            console.log("ERROR during ArConnection: " + error);
             }
-
-            const response = await arweave.api.post('graphql', { query: query.query });
-
-            for(let edge of response.data.data.transactions.edges) {
-                console.log("CONTRACT: " + edge.node.id);
-                try {
-                    let vehicle = await readContract(arweave, edge.node.id);
-                
-                    if (vehicle && Object.keys(vehicle.balances).length != 0 && vehicle.name) {
-                        let data = {
-                            id: edge.node.id,
-                            balance: 0,
-                            name: vehicle.name,
-                            ticker: vehicle.ticker,
-                            logo: '',
-                            fcp: vehicle && vehicle.invocations && vehicle.foreignCalls  ? true : false
-                        };
-
-                        Object.keys(vehicle.balances).some(walletId=>{
-                            if(walletId == wallet.address){
-                                data.balance = vehicle.balances[wallet.address];
-                        }});
-
-                        // Logo
-                        vehicle.settings.forEach(setting => {
-                            if (setting[0] === 'communityLogo') {
-                                data.logo = setting[1];
-                            }
-                        });
-                        if (data.balance > 0) {
-                            wallet.psts.push(data);
-                        }
-                    }
-                } catch(e) {
-                    console.log("ERROR reading contract for " + edge.node.id + ": " + e);
-                }
-                console.log("PSTS: " + JSON.stringify(wallet.psts));
-            }
-        } else {
-/*** ONLY RUNS IN PROD
- * BUT NEEDS TO RUN HERE IN STORE.JS
- */
-            // Now query Verto to get all PSTs contained in Wallet
-            const response = await fetch(
-                import.meta.env.VITE_VERTO_CACHE_URL + "balance/" + wallet.address
-            );
-            wallet.psts = await response.json();
-            /**** RESPONSE RETURNS AS AN ARRAY OF KEY/VALUE PAIRS ****
-             * [ {
-             *  id: '',
-             *  balance: '',
-             *  name: '',
-             *  ticker: '',
-             *  logo: ''
-             * } ]
-             ****/
-
-
-            // Query Verto to get AR prices for each token
-/*** THIS CODE SHOULD ONLY RUN IN PROD AS WELL.
- * IN DEV AND TEST, WE WON'T HAVE ACCESS TO PRICES, SO WE SHOULD HARD-CODE THESE FOR TESTING.
- */
-            for (let pst of wallet.psts) {
-                try {
-                    const response = await fetch(
-                        import.meta.env.VITE_VERTO_CACHE_URL + "token/" + pst.id + "/price"
-                    );
-                    const jsonRes = await response.json();
-                    const i = wallet.psts.findIndex((item) => item.id === pst.id);
-                    wallet.psts[i]["price"] = jsonRes.price;
-                    wallet.psts[i]["total"] = jsonRes.price * wallet.psts[i]["balance"];
-                } catch (error) {
-                    console.log("ERROR while fetching AR prices of " + pst.name + " from Verto: " + error);
-                }
     
-                if (wallet.address.length === 43) {
-                    context.commit("arConnect", wallet);
+            if (wallet.address.length === 43) {
+                context.commit("arConnect", wallet);
+                context.commit("setTestLaunchConfigState");
+            }
+
+            if (import.meta.env.DEV || import.meta.env.TEST) {
+                /*** HERE'S THE PROBLEM:
+                 * THIS CODE CAN ONLY WORK IF THERE IS DATA.
+                 * SO, WHEN ARLOCAL IS RESTARTED, THERE IS NO DATA, 
+                 * THEREFORE THIS CODE NEEDS TO RUN AS A PART OF THE LAUNCH SCRIPT
+                 * FOR THE DEV AND TEST ENVS.
+                 */
+                let query = {
+                query: `
+                        query($cursor: String) {
+                            transactions(
+                                tags: [{ name: "App-Name", values: ["SmartWeaveContract"] }]
+                                after: $cursor
+                            ) {
+                                pageInfo {
+                                    hasNextPage
+                                }
+                                edges {
+                                    cursor
+                                    node { id } 
+                                }
+                            }
+                    }`,
+                };
+            
+                let arweave = {};
+                try {
+                    arweave = await Arweave.init({
+                        host: import.meta.env.VITE_ARWEAVE_HOST,
+                        port: import.meta.env.VITE_ARWEAVE_PORT,
+                        protocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
+                        timeout: 20000,
+                        logging: true,
+                    });
+                } catch (error) {
+                    console.log("ERROR connecting to Arweave: " + error);
+                    return false;
                 }
+
+                const response = await arweave.api.post('graphql', { query: query.query });
+
+                for(let edge of response.data.data.transactions.edges) {
+                    console.log("CONTRACT: " + edge.node.id);
+                    try {
+                        let vehicle = await readContract(arweave, edge.node.id);
+                    
+                        if (vehicle && Object.keys(vehicle.balances).length != 0 && vehicle.name) {
+                            let data = {
+                                id: edge.node.id,
+                                balance: 0,
+                                name: vehicle.name,
+                                ticker: vehicle.ticker,
+                                logo: '',
+                                fcp: vehicle && vehicle.invocations && vehicle.foreignCalls  ? true : false
+                            };
+
+                            Object.keys(vehicle.balances).some(walletId=>{
+                                if(walletId == wallet.address){
+                                    data.balance = vehicle.balances[wallet.address];
+                            }});
+
+                            // Logo
+                            vehicle.settings.forEach(setting => {
+                                if (setting[0] === 'communityLogo') {
+                                    data.logo = setting[1];
+                                }
+                            });
+                            if (data.balance > 0) {
+                                wallet.psts.push(data);
+                            }
+                        }
+                    } catch(e) {
+                        console.log("ERROR reading contract for " + edge.node.id + ": " + e);
+                    }
+                    console.log("PSTS: " + JSON.stringify(wallet.psts));
+                }
+            } else {
+    /*** ONLY RUNS IN PROD
+     * BUT NEEDS TO RUN HERE IN STORE.JS
+     */
+                // Now query Verto to get all PSTs contained in Wallet
+                const response = await fetch(
+                    import.meta.env.VITE_VERTO_CACHE_URL + "balance/" + wallet.address
+                );
+                wallet.psts = await response.json();
+                /**** RESPONSE RETURNS AS AN ARRAY OF KEY/VALUE PAIRS ****
+                 * [ {
+                 *  id: '',
+                 *  balance: '',
+                 *  name: '',
+                 *  ticker: '',
+                 *  logo: ''
+                 * } ]
+                 ****/
+
+
+                // Query Verto to get AR prices for each token
+    /*** THIS CODE SHOULD ONLY RUN IN PROD AS WELL.
+     * IN DEV AND TEST, WE WON'T HAVE ACCESS TO PRICES, SO WE SHOULD HARD-CODE THESE FOR TESTING.
+     */
+                for (let pst of wallet.psts) {
+                    try {
+                        const response = await fetch(
+                            import.meta.env.VITE_VERTO_CACHE_URL + "token/" + pst.id + "/price"
+                        );
+                        const jsonRes = await response.json();
+                        const i = wallet.psts.findIndex((item) => item.id === pst.id);
+                        wallet.psts[i]["price"] = jsonRes.price;
+                        wallet.psts[i]["total"] = jsonRes.price * wallet.psts[i]["balance"];
+                    } catch (error) {
+                        console.log("ERROR while fetching AR prices of " + pst.name + " from Verto: " + error);
+                    }
+        
+                    if (wallet.address.length === 43) {
+                        context.commit("arConnect", wallet);
+                    }
+                }
+    /*** END ONLY RUNS IN PROD */
             }
-/*** END ONLY RUNS IN PROD */
-        }
-      },
-        async arDisconnect(context) {
-            try {
-                const promiseResult = await window.arweaveWallet.disconnect();
-            } catch (error) {
-                console.log("ERROR during ArDisconnection: " + error);
+        },
+            async arDisconnect(context) {
+                try {
+                    const promiseResult = await window.arweaveWallet.disconnect();
+                } catch (error) {
+                    console.log("ERROR during ArDisconnection: " + error);
+                }
+                context.commit('arDisconnect');
             }
-            context.commit('arDisconnect');
         }
-    }
 });
 
 export default store;
