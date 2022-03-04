@@ -18,7 +18,7 @@
                                 <form action="#" class="sm:max-w-xl sm:mx-auto lg:mx-0">
                                     <div class="sm:flex">
                                         <div class="mt-3 sm:mt-0 sm:ml-3">
-                                            <button @click.prevent="init" type="submit" :disabled="!arConnected" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Launch</button>
+                                            <button @click.prevent="init" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Launch</button>
                                         </div>
                                         <div class="mt-3 sm:mt-0 sm:ml-3">
                                             <button @click.prevent="routeUser('PROD')" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Back to MAINNET</button>
@@ -268,7 +268,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters(["arConnected", "keyFile", "arConnectConfig"]),
+        ...mapGetters(["arConnected", "keyFile", "arConnectConfig", "getTestLaunchFlag"]),
     },
     methods: {
         routeUser(site) {
@@ -282,31 +282,28 @@ export default {
             };
         },
         async init() {
-            
-            if(this.arConnectConfig){
-                console.log("arConnectConfig", this.arConnectConfig)
-                if(this.arConnectConfig.host == "localhost" || this.arConnectConfig.protocol == "http" || this.arConnectConfig.port == 1984){
+            // Check to see if system is ready for for Test Launch
+            this.$store.dispatch("setTestLaunchConfigState");
 
-                    if(this.arConnectConfig.host == "localhost" && this.arConnectConfig.protocol == "http" && this.arConnectConfig.port == 1984){
-                        //true value
-                        console.log("Correct credentials : ", this.arConnectConfig)
-                    } else {
-                        alert("Check configuration value")
-                        return false;
-                    }
+            if (!this.$store.getters.getTestLaunchConfigState) {
+                alert("Please connect your Arweave wallet with ArConnect.");
+                return false;
+            }
 
+            // Check for correct ArConnect settings
+            if (import.meta.env.DEV) {
+                if (this.arConnectConfig.host != "localhost" || this.arConnectConfig.protocol != "http" || this.arConnectConfig.port != 1984) {
+                    alert("Your Arweave Config is pointing to the wrong gateway.  Please check your config in ArConnect.");
+                    return false;
                 }
-
-                if(this.arConnectConfig.host == "www.arweave.run" || this.arConnectConfig.protocol == "https" || this.arConnectConfig.port == 443){
-                    if(this.arConnectConfig.host == "www.arweave.run" && this.arConnectConfig.protocol == "https" && this.arConnectConfig.port == 443){
-                        //true value
-                        console.log("Correct credentials : ", this.arConnectConfig)
-                    } else {
-                        alert("Check configration value")
-                        return false;
-                    }
-
+            } else if (import.meta.env.TEST) {
+                if (this.arConnectConfig.host != "www.arweave.run" || this.arConnectConfig.protocol != "https" || this.arConnectConfig.port != 443) {
+                    alert("Your Arweave Config is pointing to the wrong gateway.  Please check your config in ArConnect.");
+                    return false;
                 }
+            } else {
+                // Situation should never occur :)
+                return false;
             }
             
             let arweave = {};
