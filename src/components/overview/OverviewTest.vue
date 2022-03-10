@@ -525,7 +525,6 @@ export default {
             if(import.meta.env.MINE){                
                 await fetch(mineUrl);
             }
-
             // Add the logo
             const logoId = await this.getLogoId(arweave, wallet, name, ticker, type);
             console.log("LOGO for " + name + ": " + logoId);
@@ -582,27 +581,49 @@ export default {
             return contractTxId;
        },
        async getLogoId(arweave, wallet, name, ticker, type = "aftr") {
+           console.log("getLogoId", name)
             // Gets logo for name.  If not found, uploads it.
-            let tags = [];
+            // let tags = [];
+            let query
             if (type === "aftr") {
-                tags = [ { name: "Aftr-Playground", values: [name] },  { name: "Content-Type", values: ["image/jpeg"] } ];
-            } else {
-                tags = [ { name: "Aftr-Playground", values: [name] },  { name: "Content-Type", values: ["image/png"] } ];
-            }
-
-            let query = `query($cursor: String) {
+                // tags = [ { name: "Aftr-Playground", values: [name] },  { name: "Content-Type", values: ["image/jpeg"] } ];
+                query = `query($cursor: String) {
                 transactions(
-                    tags: ${tags}
+                    tags: [ { name: "Aftr-Playground", values: ["${name}"] },  { name: "Content-Type", values: ["image/jpeg"] } ]
                     after: $cursor
                 )
                 { pageInfo { hasNextPage }
                     edges { cursor node { id } }
                 }
             }`;
-            let response = await this.runQuery(query, "Failure looking for " + name + " logo. ");
+            } else {
+                // tags = [ { name: "Aftr-Playground", values: [name] },  { name: "Content-Type", values: ["image/png"] } ];
+                query = `query($cursor: String) {
+                transactions(
+                    tags: [ { name: "Aftr-Playground", values: ["${name}"] },  { name: "Content-Type", values: ["image/png"] } ]
+                    after: $cursor
+                )
+                { pageInfo { hasNextPage }
+                    edges { cursor node { id } }
+                }
+            }`;
+            }
+            // let query = `query($cursor: String) {
+            //     transactions(
+            //         tags: ${tags}
+            //         after: $cursor
+            //     )
+            //     { pageInfo { hasNextPage }
+            //         edges { cursor node { id } }
+            //     }
+            // }`;
+
+            let response = await this.runQuery(arweave, query, "Failure looking for " + name + " logo. ");
+            console.log(response)
             let logoId = "";
             if (response) {
-                logoId = response.data.data.transactions.edges[0].node.id;
+                let data = response.data.data.transactions.edges
+                logoId =  data.length > 0 ? response.data.data.transactions.edges[0].node.id : response.data.data.transactions.edges;
             } else {
                 /*** ON THE WEBSITE, USE THE SAME DEPLOY FILE CODE AS IN CREATE VEHICLE */
                 // No logo found, so load logo
@@ -642,10 +663,11 @@ export default {
                 await fetch(mineUrl);
             }
             if (name === "Vint") {
-                logoVint = logoId;
+                this.logoVint = logoId;
             } else if (name === "arHD") {
-                logoArhd = logoId;
+                this.logoArhd = logoId;
             }
+            console.log("logoId",logoId)
             return logoId;
         }  
     },
