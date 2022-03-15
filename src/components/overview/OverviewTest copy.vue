@@ -216,7 +216,7 @@ import * as arDriveSource from "./../../testnet/contracts/arDriveSource.js";
 import aftrAlquipaInitState from "./../../testnet/contracts/aftrAlquipaInitState.json";
 import aftrBlueHorizonInitState from "./../../testnet/contracts/aftrBlueHorizonInitState.json";
 import aftrChillinInitState from "./../../testnet/contracts/aftrChillinInitState.json";
-import aftrSourcePlayground from "./../../testnet/contracts/aftrSourcePlayground.js?raw";
+import * as aftrSourcePlayground from "./../../testnet/contracts/aftrSourcePlayground.js";
 import aftrInitStatePlayground from "./../../testnet/contracts/aftrInitStatePlayground.json";
 
 import Arweave from "arweave";
@@ -282,9 +282,6 @@ export default {
             };
         },
         async init() {
-//console.log(JSON.stringify(aftrInitStatePlayground));
-console.log(typeof JSON.stringify(aftrSourcePlayground));
-
             // Check to see if system is ready for for Test Launch
             this.$store.dispatch("setTestLaunchConfigState");
 
@@ -376,68 +373,66 @@ console.log(typeof JSON.stringify(aftrSourcePlayground));
             if (numAftrVehicles > 0) {
                 aftrContractSrcId = await this.getContractSourceId(arweave, response.data.data.transactions.edges[0].node.id);
             } else {
-                contractTxId = await createContract(arweave, use_wallet,  aftrSourcePlayground, JSON.stringify(aftrInitStatePlayground));
-                console.log("*** CREATED SOURCE CONTRACT: " + contractTxId);
+                contractTxId = await createContract(arweave, use_wallet,  new Uint8Array(aftrSourcePlayground), new Uint8Array(aftrInitStatePlayground));
                 // if(import.meta.env.MINE){                
                    await fetch(mineUrl);
                 // }
                 aftrContractSrcId = await this.getContractSourceId(arweave, contractTxId);
-                console.log("*** FOUND CONTRACT SOURCE ID: " + aftrContractSrcId);
             }
             this.$store.commit("setAftrContractSrcId", aftrContractSrcId);
             console.log("AFTR Source ID: " + aftrContractSrcId);
 
-            // console.log("3. Sample PSTs");
+            console.log("3. Sample PSTs");
 
-            // let vintContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "pst", "Vint", "VINT", new Uint8Array(vertoInitState));
-            // console.log("VINT: " + vintContractId);
+            let vintContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "pst", "Vint", "VINT", new Uint8Array(vertoInitState));
+            console.log("VINT: " + vintContractId);
 
-            // let arhdContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "pst", "arHD", "ARHD", new Uint8Array(arDriveSource));
-            // console.log("ARHD: " + arhdContractId);
+            let arhdContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "pst", "arHD", "ARHD", new Uint8Array(arDriveSource));
+            console.log("ARHD: " + arhdContractId);
 
-            // console.log("4. Sample AFTR Vehicles");
+            console.log("4. Sample AFTR Vehicles");
 
-            // let chillContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "aftr", "Chillin Treasury", "CHILL", new Uint8Array(aftrChillinInitState));
-            // await this.updateTokensLogos(arweave, use_wallet, chillContractId, this.logoVint, this.logoArhd);
-            // console.log("CHILL: " + chillContractId);
+            let chillContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "aftr", "Chillin Treasury", "CHILL", new Uint8Array(aftrChillinInitState));
+            await this.updateTokensLogos(arweave, use_wallet, chillContractId, this.logoVint, this.logoArhd);
+            console.log("CHILL: " + chillContractId);
 
-            // let alqpaContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "aftr", "Alquipa", "ALQPA", new Uint8Array(aftrAlquipaInitState));
-            // await this.updateTokensLogos(arweave, use_wallet, alqpaContractId, this.logoVint, this.logoArhd);
-            // console.log("ALQPA: " + alqpaContractId);
+            let alqpaContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "aftr", "Alquipa", "ALQPA", new Uint8Array(aftrAlquipaInitState));
+            await this.updateTokensLogos(arweave, use_wallet, alqpaContractId, this.logoVint, this.logoArhd);
+            console.log("ALQPA: " + alqpaContractId);
 
-            // console.log("this.logoVint, this.logoArhd",this.logoVint, this.logoArhd)
-            // let blueContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "aftr", "Blue Horizon", "BLUE", new Uint8Array(aftrBlueHorizonInitState));
-            // await this.updateTokensLogos(arweave, use_wallet, blueContractId, this.logoVint, this.logoArhd);
-            // console.log("BLUE: " + blueContractId);
+            console.log("this.logoVint, this.logoArhd",this.logoVint, this.logoArhd)
+            let blueContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "aftr", "Blue Horizon", "BLUE", new Uint8Array(aftrBlueHorizonInitState));
+            await this.updateTokensLogos(arweave, use_wallet, blueContractId, this.logoVint, this.logoArhd);
+            console.log("BLUE: " + blueContractId);
 
-            // console.log("5. Add user to Blue Horizon Vehicle");
+            console.log("5. Add user to Blue Horizon Vehicle");
 
-            // let input = {
-            //     function: "plygnd-mint",
-            //     qty: 100000
-            // };
-            // // Calls mint function on Blue Horizon contract. If user already has a balance, nothing happens.
-            // contractTxId = await interactWrite(arweave, use_wallet, blueContractId, input);
-            // console.log("import.meta.env.MINE",import.meta.env.VITE_MINE , typeof(import.meta.env.MINE))
-            // // if(import.meta.env.MINE){             
-            //     await fetch(mineUrl);
-            // // }
+            let input = {
+                function: "plygnd-mint",
+                qty: 100000
+            };
+            // Calls mint function on Blue Horizon contract. If user already has a balance, nothing happens.
+            contractTxId = await interactWrite(arweave, use_wallet, blueContractId, input);
+            console.log("import.meta.env.MINE",import.meta.env.VITE_MINE , typeof(import.meta.env.MINE))
+            // if(import.meta.env.MINE){             
+                await fetch(mineUrl);
+            // }
 
-            // console.log("Blue Horizon Contract Write: " + contractTxId);
+            console.log("Blue Horizon Contract Write: " + contractTxId);
             
-            // input = {
-            //     function: "plygnd-mint",
-            //     qty: 100000
-            // };
-            // contractTxId = await interactWrite(arweave, use_wallet, vintContractId, input);
-            // console.log("User Wallet VINT: " + contractTxId);
+            input = {
+                function: "plygnd-mint",
+                qty: 100000
+            };
+            contractTxId = await interactWrite(arweave, use_wallet, vintContractId, input);
+            console.log("User Wallet VINT: " + contractTxId);
 
-            // contractTxId = await interactWrite(arweave, use_wallet, arhdContractId, input);
-            // console.log("User Wallet ARHD: " + contractTxId);
+            contractTxId = await interactWrite(arweave, use_wallet, arhdContractId, input);
+            console.log("User Wallet ARHD: " + contractTxId);
 
-            // // if(import.meta.env.MINE){                
-            //     await fetch(mineUrl);
-            // // }
+            // if(import.meta.env.MINE){                
+                await fetch(mineUrl);
+            // }
 
             // console.log(JSON.stringify(await readContract(arweave, blueContractId, undefined, true)));
             this.$router.push("vehicles");
