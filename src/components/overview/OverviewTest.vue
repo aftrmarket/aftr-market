@@ -209,15 +209,16 @@ import {
     PencilAltIcon,
 } from "@heroicons/vue/outline";
 
-import vertoInitState from "./../../testnet/contracts/vertoInitState.json";
+import vertoInitState from "./../../testnet/contracts/vertoInitState.json?raw";
 import * as vertoSource from "./../../testnet/contracts/vertoSource.js";
 import arDriveInitState from "./../../testnet/contracts/arDriveInitState.json";
-import * as arDriveSource from "./../../testnet/contracts/arDriveSource.js";
-import aftrAlquipaInitState from "./../../testnet/contracts/aftrAlquipaInitState.json";
-import aftrBlueHorizonInitState from "./../../testnet/contracts/aftrBlueHorizonInitState.json";
-import aftrChillinInitState from "./../../testnet/contracts/aftrChillinInitState.json";
+import * as arDriveSource from "./../../testnet/contracts/arDriveSource.js?raw";
+import aftrAlquipaInitState from "./../../testnet/contracts/aftrAlquipaInitState.json?raw";
+import aftrBlueHorizonInitState from "./../../testnet/contracts/aftrBlueHorizonInitState.json?raw";
+import aftrChillinInitState from "./../../testnet/contracts/aftrChillinInitState.json?raw";
 import aftrSourcePlayground from "./../../testnet/contracts/aftrSourcePlayground.js?raw";
 import aftrInitStatePlayground from "./../../testnet/contracts/aftrInitStatePlayground.json";
+import imgValue from "./../../testnet/assets/blue.jpeg?raw";
 
 import Arweave from "arweave";
 import { mapGetters } from "vuex";
@@ -264,7 +265,8 @@ export default {
             arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
             /** */
             logoVint: "",
-            logoArhd: ""
+            logoArhd: "",
+            image: imgValue
         };
     },
     computed: {
@@ -387,59 +389,59 @@ console.log(typeof JSON.stringify(aftrSourcePlayground));
             this.$store.commit("setAftrContractSrcId", aftrContractSrcId);
             console.log("AFTR Source ID: " + aftrContractSrcId);
 
-            // console.log("3. Sample PSTs");
+            console.log("3. Sample PSTs");
 
-            // let vintContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "pst", "Vint", "VINT", new Uint8Array(vertoInitState));
-            // console.log("VINT: " + vintContractId);
+            let vintContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "pst", "Vint", "VINT", JSON.stringify(vertoInitState));
+            console.log("VINT: " + vintContractId);
 
-            // let arhdContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "pst", "arHD", "ARHD", new Uint8Array(arDriveSource));
-            // console.log("ARHD: " + arhdContractId);
+            let arhdContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "pst", "arHD", "ARHD", JSON.stringify(arDriveSource));
+            console.log("ARHD: " + arhdContractId);
 
-            // console.log("4. Sample AFTR Vehicles");
+            console.log("4. Sample AFTR Vehicles");
 
-            // let chillContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "aftr", "Chillin Treasury", "CHILL", new Uint8Array(aftrChillinInitState));
-            // await this.updateTokensLogos(arweave, use_wallet, chillContractId, this.logoVint, this.logoArhd);
-            // console.log("CHILL: " + chillContractId);
+            let chillContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "aftr", "Chillin Treasury", "CHILL", aftrChillinInitState);
+            await this.updateTokensLogos(arweave, use_wallet, chillContractId, this.logoVint, this.logoArhd);
+            console.log("CHILL: " + chillContractId);
 
-            // let alqpaContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "aftr", "Alquipa", "ALQPA", new Uint8Array(aftrAlquipaInitState));
-            // await this.updateTokensLogos(arweave, use_wallet, alqpaContractId, this.logoVint, this.logoArhd);
-            // console.log("ALQPA: " + alqpaContractId);
+            let alqpaContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "aftr", "Alquipa", "ALQPA", aftrAlquipaInitState);
+            await this.updateTokensLogos(arweave, use_wallet, alqpaContractId, this.logoVint, this.logoArhd);
+            console.log("ALQPA: " + alqpaContractId);
 
             // console.log("this.logoVint, this.logoArhd",this.logoVint, this.logoArhd)
-            // let blueContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "aftr", "Blue Horizon", "BLUE", new Uint8Array(aftrBlueHorizonInitState));
-            // await this.updateTokensLogos(arweave, use_wallet, blueContractId, this.logoVint, this.logoArhd);
-            // console.log("BLUE: " + blueContractId);
+            let blueContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "aftr", "Blue Horizon", "BLUE", aftrBlueHorizonInitState);
+            await this.updateTokensLogos(arweave, use_wallet, blueContractId, this.logoVint, this.logoArhd);
+            console.log("BLUE: " + blueContractId);
 
-            // console.log("5. Add user to Blue Horizon Vehicle");
+            console.log("5. Add user to Blue Horizon Vehicle");
 
-            // let input = {
-            //     function: "plygnd-mint",
-            //     qty: 100000
-            // };
-            // // Calls mint function on Blue Horizon contract. If user already has a balance, nothing happens.
-            // contractTxId = await interactWrite(arweave, use_wallet, blueContractId, input);
-            // console.log("import.meta.env.MINE",import.meta.env.VITE_MINE , typeof(import.meta.env.MINE))
-            // // if(import.meta.env.MINE){             
-            //     await fetch(mineUrl);
-            // // }
+            let input = {
+                function: "plygnd-mint",
+                qty: 100000
+            };
+            // Calls mint function on Blue Horizon contract. If user already has a balance, nothing happens.
+            contractTxId = await interactWrite(arweave, use_wallet, blueContractId, input);
+            console.log("import.meta.env.MINE",import.meta.env.VITE_MINE , typeof(import.meta.env.MINE))
+            // if(import.meta.env.MINE){             
+                await fetch(mineUrl);
+            // }
 
-            // console.log("Blue Horizon Contract Write: " + contractTxId);
+            console.log("Blue Horizon Contract Write: " + contractTxId);
             
-            // input = {
-            //     function: "plygnd-mint",
-            //     qty: 100000
-            // };
-            // contractTxId = await interactWrite(arweave, use_wallet, vintContractId, input);
-            // console.log("User Wallet VINT: " + contractTxId);
+            input = {
+                function: "plygnd-mint",
+                qty: 100000
+            };
+            contractTxId = await interactWrite(arweave, use_wallet, vintContractId, input);
+            console.log("User Wallet VINT: " + contractTxId);
 
-            // contractTxId = await interactWrite(arweave, use_wallet, arhdContractId, input);
-            // console.log("User Wallet ARHD: " + contractTxId);
+            contractTxId = await interactWrite(arweave, use_wallet, arhdContractId, input);
+            console.log("User Wallet ARHD: " + contractTxId);
 
-            // // if(import.meta.env.MINE){                
-            //     await fetch(mineUrl);
-            // // }
+            // if(import.meta.env.MINE){                
+                await fetch(mineUrl);
+            // }
 
-            // console.log(JSON.stringify(await readContract(arweave, blueContractId, undefined, true)));
+            console.log(JSON.stringify(await readContract(arweave, blueContractId, undefined, true)));
             this.$router.push("vehicles");
         },
         async createAftrVehicle(arweave, wallet, aftrId, initState) {
@@ -622,29 +624,38 @@ console.log(typeof JSON.stringify(aftrSourcePlayground));
             }
            
             let response = await this.runQuery(arweave, query, "Failure looking for " + name + " logo. ");
-            console.log(response)
+            let datalogo = response.data.data.transactions.edges
             let logoId = "";
-            if (response) {
-                let data = response.data.data.transactions.edges
-                logoId =  data.length > 0 ? response.data.data.transactions.edges[0].node.id : response.data.data.transactions.edges;
+            if (datalogo.length > 0) {
+                // let data = response.data.data.transactions.edges
+                logoId =  datalogo.length > 0 ? response.data.data.transactions.edges[0].node.id : response.data.data.transactions.edges;
             } else {
                 /*** ON THE WEBSITE, USE THE SAME DEPLOY FILE CODE AS IN CREATE VEHICLE */
                 // No logo found, so load logo
                 let logoSrc = "";
                 if (type === "aftr") {
-                    logoSrc = "./../../testnet/assets/" + ticker.toLowerCase() + ".jpeg";  
-                    
+                    // logoSrc = "./../../testnet/assets/" + ticker.toLowerCase() + ".jpeg";  
+                     logoSrc = new URL("./../../testnet/assets/" + ticker.toLowerCase() + ".jpeg?raw", import.meta.url).href
+
                     console.log("logoSrc ",logoSrc)
                 } else {
-                    logoSrc = "./../../testnet/assets/" + ticker.toLowerCase() + ".png";
+                    logoSrc = new URL("./../../testnet/assets/" + ticker.toLowerCase() + ".png?raw", import.meta.url).href
 
                     console.log("logoSrc ",logoSrc)
                 }
-                console.log("logoSrc ",logoSrc)
-                const data = logoSrc
+               
+                // const data = logoSrc
+                
+                /**
+                  JOE here I try to add fileReader function but it is not working properly.
+                */
+
                 // const data = await fsAsync.readFile(path.join(__dirname, logoSrc));
+                // const tx = await arweave.createTransaction({
+                //     data: await this.getAsByteArray(logoSrc)
+                // }, wallet);
                 const tx = await arweave.createTransaction(
-                    { data }, 
+                    { data: logoSrc }, 
                     wallet
                 );
                 if (type === "aftr") {
@@ -672,7 +683,26 @@ console.log(typeof JSON.stringify(aftrSourcePlayground));
             }
             console.log("logoId",logoId)
             return logoId;
-        }  
+        },
+        async getAsByteArray(file) {
+            return new Uint8Array(await this.readFile(file));
+        },
+        readFile(file) {
+            // Thanks to https://dilshankelsen.com/convert-file-to-byte-array/
+            return new Promise((resolve, reject) => {
+                // Create file reader
+                let reader = new FileReader();
+
+                // Register event listeners
+                reader.addEventListener("loadend", e => {
+                    resolve(e.target.result)
+                });
+                reader.addEventListener("error", reject);
+
+                // Read file
+                reader.readAsArrayBuffer(file);
+            });
+        },
     },
     setup() {
         return {
