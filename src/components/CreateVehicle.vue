@@ -958,7 +958,8 @@ export default {
             await arweave.transactions.post(tx);
             this.communityLogoValue = tx.id;
             console.log("communityLogoValue", this.communityLogoValue);
-                    
+            
+            /*** Why are all these being updated here? */
             this.vehicle.settings = [
                 ["quorum", this.newQuorum],
                 ["support", this.newSupport],
@@ -966,6 +967,7 @@ export default {
                 ["communityDescription", this.vehicle.desc],
                 ["communityLogo", this.communityLogoValue],
             ];
+            /*********************** */
             console.log("txid", tx.id);
         },
         async createVehicle() {
