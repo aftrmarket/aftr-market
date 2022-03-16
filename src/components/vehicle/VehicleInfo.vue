@@ -120,6 +120,7 @@ export default {
             arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
             arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
             arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
+            arweaveMine: import.meta.env.VITE_MINE,
             /** */
             allowVehicleEdits: false,
             statusSwitchEnabled: false,
@@ -341,7 +342,7 @@ export default {
                             ":" +
                             import.meta.env.VITE_ARWEAVE_PORT +
                             "/mine"; 
-                    if(import.meta.env.MINE){                           
+                    if(Boolean(this.arweaveMine)){                           
                         console.log("mineUrl ",mineUrl);    
                         let response = await fetch(mineUrl);
                     }
@@ -460,7 +461,7 @@ export default {
                     console.log("TX: " + txid);
 
                     /**** IN ORDER FOR THIS TO PROCESS, YOU NEED TO RUN http://localhost:1984/mine */
-                    if(import.meta.env.MINE){
+                    if(Boolean(this.arweaveMine)){
                         const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
                         const response = await fetch(mineUrl);
                     }

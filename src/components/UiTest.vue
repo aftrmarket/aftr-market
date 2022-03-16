@@ -27,6 +27,7 @@ export default {
             arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
             arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
             arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
+            arweaveMine: import.meta.env.VITE_MINE,
             vehicleLogo: null,
             fileInfo: "",
             files: [],
@@ -109,7 +110,7 @@ export default {
                             ":" +
                             import.meta.env.VITE_ARWEAVE_PORT +
                             "/mine";
-                    if(import.meta.env.MINE){
+                    if(Boolean(this.arweaveMine)){
                         let response = await fetch(mineUrl);
                     }
 

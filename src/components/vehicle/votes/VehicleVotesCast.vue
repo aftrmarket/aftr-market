@@ -154,6 +154,7 @@ export default {
       arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
       arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
       arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
+      arweaveMine: import.meta.env.VITE_MINE,
       /** */
     };
   },
@@ -240,7 +241,7 @@ export default {
             );
 
             /**** IN ORDER FOR THIS TO PROCESS, YOU NEED TO RUN http://localhost:1984/mine */
-            if(import.meta.env.MINE){
+            if(Boolean(this.arweaveMine)){
               const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
               const response = await fetch(mineUrl);
             }            

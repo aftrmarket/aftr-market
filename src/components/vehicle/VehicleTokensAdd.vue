@@ -103,6 +103,7 @@ export default {
             arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
             arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
             arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
+            arweaveMine: import.meta.env.VITE_MINE,
             /** */
             msg: ""
         }
@@ -192,7 +193,7 @@ export default {
             ":" +
             import.meta.env.VITE_ARWEAVE_PORT +
             "/mine";
-        if(import.meta.env.MINE){
+        if(Boolean(this.arweaveMine)){
           let response = await fetch(mineUrl);
         }
 
@@ -201,7 +202,7 @@ export default {
             vertoTxId = id;
             console.log("Transfer Verto = " + JSON.stringify(vertoTxId));
 
-            if(import.meta.env.MINE){
+            if(Boolean(this.arweaveMine)){
               await fetch(mineUrl);
             }
 
@@ -214,7 +215,7 @@ export default {
             await interactWrite(arweave, wallet, this.vehicle.id, inputDeposit)
               .then(async (txId) => {
                 this.msg = "Deposit Successful : " + txId
-                if(import.meta.env.MINE){
+                if(Boolean(this.arweaveMine)){
                   await fetch(mineUrl);
                 }
               })

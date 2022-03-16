@@ -262,6 +262,7 @@ export default {
             arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
             arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
             arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
+            arweaveMine: import.meta.env.VITE_MINE,
             /** */
             logoVint: "",
             logoArhd: ""
@@ -374,9 +375,9 @@ export default {
                 aftrContractSrcId = await this.getContractSourceId(arweave, response.data.data.transactions.edges[0].node.id);
             } else {
                 contractTxId = await createContract(arweave, use_wallet,  new Uint8Array(aftrSourcePlayground), new Uint8Array(aftrInitStatePlayground));
-                // if(import.meta.env.MINE){                
+                if(Boolean(this.arweaveMine)){                
                    await fetch(mineUrl);
-                // }
+                }
                 aftrContractSrcId = await this.getContractSourceId(arweave, contractTxId);
             }
             this.$store.commit("setAftrContractSrcId", aftrContractSrcId);
@@ -413,10 +414,10 @@ export default {
             };
             // Calls mint function on Blue Horizon contract. If user already has a balance, nothing happens.
             contractTxId = await interactWrite(arweave, use_wallet, blueContractId, input);
-            console.log("import.meta.env.MINE",import.meta.env.VITE_MINE , typeof(import.meta.env.MINE))
-            // if(import.meta.env.MINE){             
+            
+            if(Boolean(this.arweaveMine)){             
                 await fetch(mineUrl);
-            // }
+            }
 
             console.log("Blue Horizon Contract Write: " + contractTxId);
             
@@ -430,9 +431,9 @@ export default {
             contractTxId = await interactWrite(arweave, use_wallet, arhdContractId, input);
             console.log("User Wallet ARHD: " + contractTxId);
 
-            // if(import.meta.env.MINE){                
+            if(Boolean(this.arweaveMine)){                
                 await fetch(mineUrl);
-            // }
+            }
 
             // console.log(JSON.stringify(await readContract(arweave, blueContractId, undefined, true)));
             this.$router.push("vehicles");
@@ -531,9 +532,9 @@ export default {
         if (numAftrVehicles === 0) {
             let contractTxId = await this.createSampleContract(arweave, wallet, aftrSourceId, initStatePath, type, ticker);
             
-            // if(import.meta.env.MINE){                
+            if(Boolean(this.arweaveMine)){                
                 await fetch(mineUrl);
-            // }
+            }
             // Add the logo
             const logoId = await this.getLogoId(arweave, wallet, name, ticker, type);
             console.log("LOGO for " + name + ": " + logoId);
@@ -544,9 +545,9 @@ export default {
                 logo: logoId
             };
             let res = await interactWrite(arweave, wallet, contractTxId, input);
-            // if(import.meta.env.MINE){                
-                    await fetch(mineUrl);
-                // }
+            if(Boolean(this.arweaveMine)){                
+                await fetch(mineUrl);
+            }
 
             console.log("LOGO ADD for " + name + ": " + res);
             
@@ -569,9 +570,9 @@ export default {
                 logoArhd: logoArhd
             };
             let res = await interactWrite(arweave, wallet, contractId, input);
-            // if(import.meta.env.MINE){                
-                    await fetch(mineUrl);
-                // }
+            if(Boolean(this.arweaveMine)){                
+                await fetch(mineUrl);
+            }
         },
         async createSampleContract(arweave, wallet, aftrId, initState, type = "aftr", name) {
             let swTags = [];

@@ -435,6 +435,7 @@ export default {
             arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
             arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
             arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
+            arweaveMine: import.meta.env.VITE_MINE,
             /** */
 
             leasingEnabled: false, // Is vehicle leasing enabled?
@@ -1052,7 +1053,7 @@ export default {
                             ":" +
                             import.meta.env.VITE_ARWEAVE_PORT +
                             "/mine";
-                    if(import.meta.env.MINE){                        
+                    if(Boolean(this.arweaveMine)){                        
                         console.log("mineUrl ",mineUrl);    
                         let response = await fetch(mineUrl);
                     }
@@ -1128,7 +1129,7 @@ export default {
                             ":" +
                             import.meta.env.VITE_ARWEAVE_PORT +
                             "/mine";
-                    if(import.meta.env.MINE){
+                    if(Boolean(this.arweaveMine)){
                         let response = await fetch(mineUrl);
                     }   
                 } else {
@@ -1170,7 +1171,7 @@ export default {
                                 ":" +
                                 import.meta.env.VITE_ARWEAVE_PORT +
                                 "/mine";
-                        if(import.meta.env.MINE){                            
+                        if(Boolean(this.arweaveMine)){                            
                             let response = await fetch(mineUrl);
                         }
 
@@ -1183,7 +1184,7 @@ export default {
                         console.log(
                             "Transfer Verto = " + JSON.stringify(vertoTxId)
                         );
-                        if(import.meta.env.MINE){
+                        if(Boolean(this.arweaveMine)){
                             await fetch(mineUrl);
                         }
 
@@ -1201,7 +1202,7 @@ export default {
                         );
                         console.log(txId);
                         
-                        if(import.meta.env.MINE){
+                        if(Boolean(this.arweaveMine)){
                             await fetch(mineUrl);
                         }
 
