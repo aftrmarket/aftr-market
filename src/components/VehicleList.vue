@@ -142,6 +142,8 @@ export default {
             try {
                 let vehicle = await readContract(this.arweave, contractId);
 
+                /*** TODO: Check to make sure contract source matches AFTR Contract Source */
+
                 vehicle.id = contractId;
                 if (!vehicle.tokens) {
                     vehicle.tokens = [];
@@ -224,6 +226,11 @@ export default {
     },
     async created() {
         this.isLoading = true;
+
+        // Get the AFTR Contract Source ID, In DEV/TEST, this has already been determined.
+        if (import.meta.env.PROD) {
+            this.$store.commit("setAftrContractSrcId", import.meta.env.VITE_SMARTWEAVE_CONTRACT_SOURCE_ID);
+        }
 
         // Use GraphQL to find all vehicle contracts, then load all vehicles
 
