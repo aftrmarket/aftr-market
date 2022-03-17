@@ -64,6 +64,7 @@
 import { readContract } from "smartweave";
 import VehicleCard from "./vehicle/VehicleCard.vue";
 import VehicleCardPlaceholder from "./vehicle/VehicleCardPlaceholder.vue";
+import { mapGetters } from "vuex";
 
 export default {
     components: { VehicleCard, VehicleCardPlaceholder },
@@ -110,6 +111,9 @@ export default {
             selectedMyVehicle: [],
         };
     },
+    computed: {
+        ...mapGetters(["getAftrContractSrcId"]),
+    },
     methods: {
         async getVehicle(event) {
             if (
@@ -138,12 +142,31 @@ export default {
         viewVehicle(vehicleId) {
             this.$router.push({ name: "vehicle", params: { vehicle: "joe" } });
         },
+        async returnContractSrc(contractId) {
+            let tx = await this.arweave.transactions.get(contractId);
+            let contractSrcId = "";
+
+            tx.get('tags').every(tag => {
+                let key = tag.get('name', {decode: true, string: true});
+                let value = tag.get('value', {decode: true, string: true});
+                if (key === "Contract-Src") {
+                    contractSrcId = value;
+                    return false;
+                }
+                return true;
+            });
+            return contractSrcId;
+        },
         async loadAllVehicles(contractId) {
             try {
                 let vehicle = await readContract(this.arweave, contractId);
 
-                /*** TODO: Check to make sure contract source matches AFTR Contract Source */
-
+                // Check to make sure contract source matches AFTR Contract Source
+                const contractSrc = await this.returnContractSrc(contractId);
+                if (contractSrc !== this.getAftrContractSrcId) {
+                    throw "Not valid AFTR Vehicle";
+                }
+                
                 vehicle.id = contractId;
                 if (!vehicle.tokens) {
                     vehicle.tokens = [];

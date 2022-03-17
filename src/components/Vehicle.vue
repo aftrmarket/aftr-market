@@ -81,6 +81,7 @@ import VehicleTokens from './vehicle/VehicleTokens.vue';
 import VehicleVotes from './vehicle/VehicleVotes.vue';
 import VehicleActivity from './vehicle/VehicleActivity.vue';
 import VehiclePlaceholder from './vehicle/VehiclePlaceholder.vue';
+import { mapGetters } from "vuex";
 
 export default {
     components: { VehicleInfo, VehicleMembers, VehicleTokens, VehicleVotes, VehicleActivity, VehiclePlaceholder },
@@ -121,7 +122,8 @@ export default {
             } else {
                 return "/src/assets/logo-placeholder.png";
             }
-        }
+        },
+        ...mapGetters(["getAftrContractSrcId"]),
     },
     methods: {
         viewVehicles() {
@@ -134,6 +136,21 @@ export default {
             activeTabIndex = this.tabs.findIndex(tab => tab.name === name);
             this.tabs[activeTabIndex].current = true;
             this.activeTab = this.tabs[activeTabIndex].name;
+        },
+        async returnContractSrc(arweave, contractId) {
+            let tx = await arweave.transactions.get(contractId);
+            let contractSrcId = "";
+
+            tx.get('tags').every(tag => {
+                let key = tag.get('name', {decode: true, string: true});
+                let value = tag.get('value', {decode: true, string: true});
+                if (key === "Contract-Src") {
+                    contractSrcId = value;
+                    return false;
+                }
+                return true;
+            });
+            return contractSrcId;
         },
         async loadVehicle() {
             // Add contractId to vehicle object
@@ -198,6 +215,13 @@ export default {
 
         try {
             this.vehicle = await readContract(arweave, this.contractId);
+            
+            // Ensure AFTR Vehicle
+            const contractSrc = await this.returnContractSrc(arweave, this.contractId);
+            if (contractSrc !== this.getAftrContractSrcId) {
+                throw "Not valid AFTR Vehicle";
+            }
+
             await this.loadVehicle();
         } catch (error) {
             console.log("ERROR calling SmartWeave: " + error);
