@@ -275,7 +275,7 @@ export default {
 
             // Need to save IDs in order to update the vehicles' tokens 
             logoVintId: "",
-            logoArhd: "",
+            logoArhdId: "",
         };
     },
     computed: {
@@ -407,16 +407,16 @@ export default {
             console.log("4. Sample AFTR Vehicles");
 
             let chillContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "aftr", "Chillin Treasury", "CHILL", this.logoChillin, aftrChillinInitState);
-            await this.updateTokensLogos(arweave, use_wallet, chillContractId, this.logoVint, this.logoArhd);
+            await this.updateTokensLogos(arweave, use_wallet, chillContractId, this.logoVintId, this.logoArhdId);
             console.log("CHILL: " + chillContractId);
 
             let alqpaContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "aftr", "Alquipa", "ALQPA", this.logoAlquipa, aftrAlquipaInitState);
-            await this.updateTokensLogos(arweave, use_wallet, alqpaContractId, this.logoVint, this.logoArhd);
+            await this.updateTokensLogos(arweave, use_wallet, alqpaContractId, this.logoVintId, this.logoArhdId);
             console.log("ALQPA: " + alqpaContractId);
 
             // console.log("this.logoVint, this.logoArhd",this.logoVint, this.logoArhd)
             let blueContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "aftr", "Blue Horizon", "BLUE",this.logoBlue, aftrBlueHorizonInitState);
-            await this.updateTokensLogos(arweave, use_wallet, blueContractId, this.logoVint, this.logoArhd);
+            await this.updateTokensLogos(arweave, use_wallet, blueContractId, this.logoVintId, this.logoArhdId);
             console.log("BLUE: " + blueContractId);
 
             console.log("5. Add user to Blue Horizon Vehicle");
