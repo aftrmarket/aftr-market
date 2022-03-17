@@ -16,7 +16,7 @@ const store = createStore({
             },
             /** */
             arConnectConfig: {},
-            getAftrContractSrcId: ""
+            aftrContractSrcId: ""
         };
     },
     getters: {
@@ -42,7 +42,7 @@ const store = createStore({
             return state.arConnectConfig;
         },
         getAftrContractSrcId(state) {
-            return state.getAftrContractSrcId;
+            return state.aftrContractSrcId;
         },
         getTestLaunchConfigState(state) {
             return state.testLaunchConfigCorrect;
@@ -78,7 +78,7 @@ const store = createStore({
             state.arConnectConfig = arConnectConfig
         },
         setAftrContractSrcId(state, item) {
-            state.getAftrContractSrcId = item
+            state.aftrContractSrcId = item
         },
         setTestLaunchConfigState(state) {
             // If user tries to press the Launch button without Arconnecting, then turn flag on.
