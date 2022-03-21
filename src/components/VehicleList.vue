@@ -250,7 +250,7 @@ export default {
     async created() {
         this.isLoading = true;
 
-        // Get the AFTR Contract Source ID, In DEV/TEST, this has already been determined.
+        // Get the AFTR Contract Source ID for Prod
         if (import.meta.env.PROD) {
             this.$store.commit("setAftrContractSrcId", import.meta.env.VITE_SMARTWEAVE_CONTRACT_SOURCE_ID);
         }

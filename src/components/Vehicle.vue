@@ -57,7 +57,7 @@
                                 <!--<vehicle-leases v-else-if="activeTab === 'Leases'"></vehicle-leases>-->
                                 <!--<vehicle-fractions v-else-if="activeTab === 'Fractions'"></vehicle-fractions>-->
                                 <vehicle-votes v-else-if="activeTab === 'Votes'" :vehicle="vehicle" :contractId="contractId"></vehicle-votes>
-                                <vehicle-activity v-else-if="activeTab === 'Activity'"></vehicle-activity>
+                                <vehicle-activity v-else-if="activeTab === 'Activity'" :arweave="arweave" :interactions="interactions"></vehicle-activity>
 
                             </div>
                         </section>
@@ -98,10 +98,12 @@ export default {
                 { name: 'Votes', href: '#', current: false },
                 { name: 'Activity', href: '#', current: false },
             ],
+            arweave: {},
             activeTab: "Info",
             pageStatus: "",
             contractId: this.vehicleId,
             vehicle: {},
+            interations: {},
 
             arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
             arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
@@ -198,9 +200,9 @@ export default {
     async created() {
         this.pageStatus = "in-progress";
 
-        let arweave = {};
+        //let arweave = {};
         try {
-            arweave = await Arweave.init({
+            this.arweave = await Arweave.init({
                 host: this.arweaveHost,
                 port: this.arweavePort,
                 protocol: this.arweaveProtocol,
@@ -214,10 +216,14 @@ export default {
         }
 
         try {
-            this.vehicle = await readContract(arweave, this.contractId);
+            //this.vehicle = await readContract(arweave, this.contractId);
+            const stateInteractions = await readContract(this.arweave, this.contractId, undefined, true);
+            this.vehicle = stateInteractions.state;
+            this.interactions = stateInteractions.validity;
+
             
             // Ensure AFTR Vehicle
-            const contractSrc = await this.returnContractSrc(arweave, this.contractId);
+            const contractSrc = await this.returnContractSrc(this.arweave, this.contractId);
             if (contractSrc !== this.getAftrContractSrcId) {
                 throw "Not valid AFTR Vehicle";
             }
