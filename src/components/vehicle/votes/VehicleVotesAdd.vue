@@ -352,7 +352,7 @@ export default {
                     logging: true,
                 });
             } catch (error) {
-                console.log("ERROR connecting to Arweave: " + error); // How can this ever happen? :)
+                this.$log.error("ERROR connecting to Arweave: " + error); // How can this ever happen? :)
                 this.pageStatus = "error";
                 return false;
             }
@@ -360,7 +360,7 @@ export default {
            let input = {
                function: 'propose',
            }
-           console.log("CONTRACT:  " + this.vehicle.id);
+           this.$log.info("VehicleVotesAdd : proposeVote :: ", "CONTRACT:  " + this.vehicle.id);
         }
     },
     setup() {

@@ -95,7 +95,7 @@ export default {
                 // const total = arweave.ar.winstonToAr(
                 //     (+winston + this.fee).toString()
                 // );
-                // console.log("total", total);
+                // this.$log.info("total", total);
                 // this.totalCost = total;
                 // if (total > this.balance) {
                 //     return alert("You don't have enough AR to upload this file!");
@@ -150,7 +150,7 @@ export default {
             await arweave.transactions.post(tx);
 
             this.communityLogoValue = tx.id;
-            console.log("txid", tx.id);
+            this.$log.info("UiTest : deployFile :: ","txid", tx.id);
         },
     },
     setup() {

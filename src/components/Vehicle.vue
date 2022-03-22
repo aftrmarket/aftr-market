@@ -129,7 +129,7 @@ export default {
     },
     methods: {
         viewVehicles() {
-            console.log("View Clicked");
+            this.$log.info("Vehicle : viewVehicles :: " ,"View Clicked");
             this.$router.push("../vehicles");
         },
         tabClick(name) {
@@ -179,7 +179,7 @@ export default {
                         token.total = pricePerToken * token.balance;
                         treasuryTotal += token.total;
                     } catch(error) {
-                        console.log("ERROR calling Verto cache on " + token.name + ": " + error);
+                        this.$log.info("Vehicle : loadVehicle :: ", "ERROR calling Verto cache on " + token.name + ": " + error);
                     }
                 }
             } else {
@@ -210,7 +210,7 @@ export default {
                 logging: true,
             });
         } catch (error) {
-            console.log("ERROR connecting to Arweave: " + error);
+            this.$log.error("Vehicle : created :: ", "ERROR connecting to Arweave: " + error);
             this.pageStatus = "error";
             return false;
         }
@@ -230,7 +230,7 @@ export default {
 
             await this.loadVehicle();
         } catch (error) {
-            console.log("ERROR calling SmartWeave: " + error);
+            this.$log.info("Vehicle : created :: ", "ERROR calling SmartWeave: " + error);
             this.pageStatus = "error";
             return false;
         }

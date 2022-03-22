@@ -343,7 +343,7 @@ export default {
                             import.meta.env.VITE_ARWEAVE_PORT +
                             "/mine"; 
                     if(Boolean(this.arweaveMine)){                           
-                        console.log("mineUrl ",mineUrl);    
+                        this.$log.info("VehicleInfo : updateVehicle :: ","mineUrl ",mineUrl);    
                         let response = await fetch(mineUrl);
                     }
                 } else {
@@ -351,7 +351,7 @@ export default {
                 }
             }
 
-                console.log("this.newLogo ",this.newLogo)
+                this.$log.info("VehicleInfo : updateVehicle :: ", "this.newLogo ",this.newLogo)
 
             if (this.isFormValid) {
                 // Determine what fields have changed
@@ -393,7 +393,7 @@ export default {
                     changeMap.set('settings.voteLength', this.newVoteLength);
                 }
 
-                console.log([...changeMap.entries()]);
+                this.$log.info("VehicleInfo : updateVehicle :: ", [...changeMap.entries()]);
 
                 /**** Tip to AFTR for change */
                 /*** TODO */
@@ -442,9 +442,9 @@ export default {
                 }
 
                 // Call Smartweave
-                console.log("CALL TO SMARTWEAVE");
-                console.log(JSON.stringify(input));
-                console.log("Contract ID: " + this.contractId);
+                this.$log.info("VehicleInfo : updateVehicle :: ", "CALL TO SMARTWEAVE");
+                this.$log.info("VehicleInfo : updateVehicle :: ", JSON.stringify(input));
+                this.$log.info("VehicleInfo : updateVehicle :: ", "Contract ID: " + this.contractId);
                 
                 //const txid = await interactWrite(arweave, "use_wallet", this.contractId, JSON.stringify(action));
                 /**** INSTEAD OF USING "use_wallet", copy the information out of your keyfile.json file and hardcode it below until I can figure out what's going on with ArConnect. */
@@ -458,7 +458,7 @@ export default {
                 } 
                 if (import.meta.env.DEV) {
                     const txid = await interactWrite(arweave, wallet, this.contractId, input);
-                    console.log("TX: " + txid);
+                    this.$log.info("VehicleInfo : updateVehicle :: ", "TX: " + txid);
 
                     /**** IN ORDER FOR THIS TO PROCESS, YOU NEED TO RUN http://localhost:1984/mine */
                     if(Boolean(this.arweaveMine)){
@@ -467,7 +467,7 @@ export default {
                     }
                 } else {
                     const txid = await interactWrite(arweave, "use_wallet", this.contractId, input);
-                    console.log("TX: " + txid);
+                    this.$log.info("VehicleInfo : updateVehicle :: ", "TX: " + txid);
                 }
 
                 this.$router.push("/vehicles");
@@ -482,7 +482,7 @@ export default {
             // if (file.type.substring(0, 6) !== "image/") {
             //     // Write file error message
             //     this.fileInvalid = true;
-            //     console.log("FILE IS NOT IMAGE");
+            //     this.$log.info("FILE IS NOT IMAGE");
             //     return;
             // } else {
             //     this.fileInvalid = false;
@@ -500,7 +500,7 @@ export default {
             // Total size should be < ? so that it's a free transaction
             this.totalSize += file.size;
             this.isFormValid = true
-            console.log("totalSize", this.totalSize, this.balance);
+            this.$log.info("VehicleInfo : onFileChange :: ", "totalSize", this.totalSize, this.balance);
 
             /**** SHOULD THIS BE > 0? */
             if (this.totalSize != 0) {
@@ -517,7 +517,7 @@ export default {
                 reader.addEventListener("loadend", e => resolve(e.target.result));
                 reader.addEventListener("error", reject);
 
-                console.log("readAsArrayBuffer",file)
+                this.$log.info("VehicleInfo : readFile :: ", "readAsArrayBuffer",file)
                 // Read file
                 reader.readAsArrayBuffer(file);
             });
@@ -539,7 +539,7 @@ export default {
             await arweave.transactions.post(tx);
             this.newLogo = tx.id;
             
-            console.log("txid", tx.id);
+            this.$log.info("VehicleInfo : deployFile :: ", "txid", tx.id);
         },
     },
     created() {

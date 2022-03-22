@@ -121,7 +121,7 @@ export default {
                 this.activities[i] = await this.readTags(i);
             }
         } catch (error) {
-            console.log("ERROR connecting to Arweave: " + error);
+            this.$log.error("VehicleActivity : created :: ", "ERROR connecting to Arweave: " + error);
         }
 
         this.isLoading = false;

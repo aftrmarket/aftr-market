@@ -129,7 +129,7 @@ export default {
                     const tokenValue = pricePerToken * token.balance;
                     treasuryTotal += tokenValue;
                 } catch(error) {
-                    console.log("ERROR calling Verto cache on " + token.name + ": " + error);
+                    this.$log.error("MyPortfolio : loadAllVehicles :: ", "ERROR calling Verto cache on " + token.name + ": " + error);
                 }
             }
             vehicle.treasury = treasuryTotal;
@@ -151,7 +151,7 @@ export default {
             }
             
         } catch (error) {
-            console.log("ERROR calling SmartWeave: " + error);
+            this.$log.error("MyPortfolio : loadAllVehicles :: ", "ERROR calling SmartWeave: " + error);
         }
     }
   },
@@ -191,7 +191,7 @@ export default {
 
         totalVehicles = response.data.data.transactions.edges.length;
     } catch (error) {
-        console.log("ERROR while fetching from gateway: " + error);
+        this.$log.error("MyPortfolio : created :: ", "ERROR while fetching from gateway: " + error);
     }
 
     // Load each Vehicle

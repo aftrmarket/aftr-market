@@ -1,3 +1,4 @@
+import VueLogger from 'vuejs3-logger';
 import { createApp } from 'vue';
 import { createRouter, createWebHistory } from 'vue-router';
 //import { uuid } from 'vue-uuid';
@@ -13,6 +14,17 @@ import UiTest from './components/UiTest.vue';
 import Overview from './components/Overview.vue';
 import MyPortfolio from './components/MyPortfolio.vue';
 import Chat from './components/utils/Chat.vue';
+
+const isProduction = process.env.NODE_ENV === 'development';
+const options = {
+    isEnabled: true,
+    logLevel : isProduction ? 'info' : ['debug', 'info', 'warn', 'error', 'fatal'],
+    stringifyArguments : true,
+    showLogLevel : true,
+    showMethodName : true,
+    separator: '|',
+    showConsoleColors: true,
+};
 
 const router = createRouter({
     history: createWebHistory(),
@@ -49,6 +61,7 @@ const router = createRouter({
 const app = createApp(App);
 app.use(store);
 app.use(router);
+app.use(VueLogger, options);
 //app.use(uuid);
 
 app.mount('#app');

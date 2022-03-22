@@ -253,7 +253,7 @@ export default {
                 input
             );
         }
-        console.log(txId);
+        this.$log.info("VehicleVotesCast : recordVote :: ", txId);
         this.$emit("close");
     },
   },

@@ -344,25 +344,25 @@ export default {
             } else {
                 use_wallet = "use_wallet";
             }
-            console.log("1. Ensure wallet has some AR to make transactions");
+            this.$log.info("OverviewTest : init :: ","1. Ensure wallet has some AR to make transactions");
 
             const addr = await arweave.wallets.jwkToAddress(use_wallet);
             const server = this.arweaveProtocol + "://" + this.arweaveHost + ":" + this.arweavePort;
             const route = "/mint/" + addr + "/10000000000000"; // Amount in Winstons
 
-            console.log(server, route);
+            this.$log.info("OverviewTest : init :: ", server, route);
 
-            console.log("WALLET: " + addr);
+            this.$log.info("OverviewTest : init :: ", "WALLET: " + addr);
             let balance = await arweave.wallets.getBalance(addr);
             if (balance < 10000000000000) {
                 const mintRes = await request(server).get(route);
                 balance = await arweave.wallets.getBalance(addr);
             }
             
-            console.log("Balance for " + addr + ": " + balance.toString());
+            this.$log.info("OverviewTest : init :: ", "Balance for " + addr + ": " + balance.toString());
             let aftrContractSrcId = "";     
             
-            console.log("2. AFTR Base Contract");
+            this.$log.info("OverviewTest : init :: ", "2. AFTR Base Contract");
 
             let query = `query($cursor: String) {
                             transactions(
@@ -387,37 +387,36 @@ export default {
                 aftrContractSrcId = await this.getContractSourceId(arweave, response.data.data.transactions.edges[0].node.id);
             } else {
                 contractTxId = await createContract(arweave, use_wallet,  aftrSourcePlayground, JSON.stringify(aftrInitStatePlayground));
-                console.log("*** CREATED SOURCE CONTRACT: " + contractTxId);
-                if(Boolean(this.arweaveMine)){   
-                    console.log("await fetch(mineUrl)")             
+                this.$log.info("OverviewTest : init :: ", "*** CREATED SOURCE CONTRACT: " + contractTxId);
+                if(Boolean(this.arweaveMine)){           
                    await fetch(mineUrl);
                 }
                 aftrContractSrcId = await this.getContractSourceId(arweave, contractTxId);
-                console.log("*** FOUND CONTRACT SOURCE ID: " + aftrContractSrcId);
+                this.$log.info("OverviewTest : init :: ", "*** FOUND CONTRACT SOURCE ID: " + aftrContractSrcId);
             }
             this.$store.commit("setAftrContractSrcId", aftrContractSrcId);
-            console.log("AFTR Source ID: " + aftrContractSrcId);
+            this.$log.info("OverviewTest : init :: ", "AFTR Source ID: " + aftrContractSrcId);
 
-            console.log("3. Sample PSTs");
+            this.$log.info("OverviewTest : init :: ", "3. Sample PSTs");
 
             let vintContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "pst", "Vint", "VINT", this.logoVint, JSON.stringify(vertoInitState));
-            console.log("VINT: " + vintContractId);
+            this.$log.info("OverviewTest : init :: ", "VINT: " + vintContractId);
 
             let arhdContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "pst", "arHD", "ARHD", this.logoArhd, JSON.stringify(arDriveSource));
-            console.log("ARHD: " + arhdContractId);
+            this.$log.info("OverviewTest : init :: ", "ARHD: " + arhdContractId);
 
-            console.log("4. Sample AFTR Vehicles");
+            this.$log.info("OverviewTest : init :: ", "4. Sample AFTR Vehicles");
 
             let chillContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "aftr", "Chillin Treasury", "CHILL", this.logoChillin, aftrChillinInitState);
-            console.log("CHILL: " + chillContractId);
+            this.$log.info("OverviewTest : init :: ", "CHILL: " + chillContractId);
 
             let alqpaContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "aftr", "Alquipa", "ALQPA", this.logoAlquipa, aftrAlquipaInitState);
-            console.log("ALQPA: " + alqpaContractId);
+            this.$log.info("OverviewTest : init :: ", "ALQPA: " + alqpaContractId);
 
             let blueContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "aftr", "Blue Horizon", "BLUE",this.logoBlue, aftrBlueHorizonInitState);
-            console.log("BLUE: " + blueContractId);
+            this.$log.info("OverviewTest : init :: ", "BLUE: " + blueContractId);
 
-            console.log("5. Add user to Blue Horizon Vehicle");
+            this.$log.info("OverviewTest : init :: ", "5. Add user to Blue Horizon Vehicle");
 
             let input = {};
             // Only add if user is not already there
@@ -430,11 +429,10 @@ export default {
                 // Calls mint function on Blue Horizon contract. If user already has a balance, nothing happens.
                 contractTxId = await interactWrite(arweave, use_wallet, blueContractId, input);
 
-                if(Boolean(this.arweaveMine)){   
-                    console.log("await fetch(mineUrl)")          
+                if(Boolean(this.arweaveMine)){          
                     await fetch(mineUrl);
                 }
-                console.log("Blue Horizon Contract Write: " + contractTxId);
+                this.$log.info("OverviewTest : init :: ", "Blue Horizon Contract Write: " + contractTxId);
             }
             
             // Give user's wallet PSTs
@@ -443,16 +441,16 @@ export default {
                 qty: 100000
             };
             contractTxId = await interactWrite(arweave, use_wallet, vintContractId, input);
-            console.log("User Wallet VINT: " + contractTxId);
+            this.$log.info("OverviewTest : init :: ", "User Wallet VINT: " + contractTxId);
 
             contractTxId = await interactWrite(arweave, use_wallet, arhdContractId, input);
-            console.log("User Wallet ARHD: " + contractTxId);
+            this.$log.info("OverviewTest : init :: ", "User Wallet ARHD: " + contractTxId);
 
             if(Boolean(this.arweaveMine)){                
                 await fetch(mineUrl);
             }
 
-            console.log(JSON.stringify(await readContract(arweave, blueContractId, undefined, true)));
+            this.$log.info("OverviewTest : init :: ", JSON.stringify(await readContract(arweave, blueContractId, undefined, true)));
             this.$router.push("vehicles");
         },
         async createAftrVehicle(arweave, wallet, aftrId, initState) {
@@ -478,7 +476,7 @@ export default {
 
                 return response;
             } catch(e) {
-                console.log(errorMsg + e);
+                this.$log.error("OverviewTest : runQuery :: ", errorMsg + e);
             }
         },
         /*** BEGIN SCRIPT FUNCTIONS */
@@ -494,7 +492,7 @@ export default {
                 });
             });
             for (let i = 0; i < allTags.length; i++) {
-                console.log("allTags[i].key === 'Contract-Src'", allTags[i].key === 'Contract-Src')
+                this.$log.info("OverviewTest : getContractSourceId :: ", "allTags[i].key === 'Contract-Src'", allTags[i].key === 'Contract-Src')
                 if (allTags[i].key === 'Contract-Src') {
                     return allTags[i].value;
                 }
@@ -542,20 +540,20 @@ export default {
         let response = await this.runQuery(arweave, query, "Failure on looking up " + name);
         let numAftrVehicles = 0;
         let res = response.data.data.transactions.edges;
-        console.log("query" ,query,res);
+        this.$log.info("OverviewTest : createSampleAftrVehicle :: ", "query" ,query,res);
         if (res.length > 0) {
             numAftrVehicles = response.data.data.transactions.edges.length;
         }
-        console.log("numAftrVehicles",numAftrVehicles)
+        this.$log.info("OverviewTest : createSampleAftrVehicle :: ", "numAftrVehicles",numAftrVehicles)
         if (numAftrVehicles === 0) {
             let contractTxId = await this.createSampleContract(arweave, wallet, aftrSourceId, initStatePath, type, ticker);
-            console.log("contractTxId", contractTxId)
+            this.$log.info("OverviewTest : createSampleAftrVehicle :: ", "contractTxId", contractTxId)
             if(Boolean(this.arweaveMine)){                
                 await fetch(mineUrl);
             }
             // Add the logo
             const logoId = await this.getLogoId(arweave, wallet, name, ticker, logoUrl, type);
-            console.log("LOGO for " + name + ": " + logoId);
+            this.$log.info("OverviewTest : createSampleAftrVehicle :: ", "LOGO for " + name + ": " + logoId);
             // JOE here we didn't get the value of logoId. But in contract repo we get an value 
 
             let input = {
@@ -567,7 +565,7 @@ export default {
                 await fetch(mineUrl);
             }
 
-            console.log("LOGO ADD for " + name + ": " + res);
+            this.$log.info("OverviewTest : createSampleAftrVehicle :: ", "LOGO ADD for " + name + ": " + res);
             
             await this.updateTokensLogos(arweave, wallet, contractTxId, this.logoVintId, this.logoArhdId);
             if(Boolean(this.arweaveMine)){                
@@ -610,13 +608,13 @@ export default {
                     { name: 'Aftr-Playground-Type', value:  'PST' }
                 ];
             }
-            console.log("initState", initState)
+            this.$log.info("OverviewTest : createSampleContract :: ", "initState", initState)
             let contractTxId = await createContractFromTx(arweave, wallet, aftrId, initState, swTags);
 
             return contractTxId;
        },
        async getLogoId(arweave, wallet, name, ticker, logoUrl, type = "aftr") {
-           console.log("getLogoId", name);
+           this.$log.info("OverviewTest : getLogoId :: ", name);
             // Gets logo for name.  If not found, uploads it.
             let tags = [];
             if (type === "aftr") {
@@ -637,18 +635,18 @@ export default {
             `;
             let response = await this.runQuery(arweave, query, "Failure looking for " + name + " logo. ");
             let datalogo = response.data.data.transactions.edges;
-            console.log("datalogo", datalogo)
+            this.$log.info("OverviewTest : getLogoId :: ", "datalogo", datalogo)
             let logoId = "";
             if (datalogo.length > 0) {
                 // let data = response.data.data.transactions.edges
                 logoId =  datalogo.length > 0 ? datalogo[0].node.id : datalogo;
             } else {
                 // No logo found, so fetch logo from Arweave
-                console.log("***logoUrl***", logoUrl)
+                this.$log.info("OverviewTest : getLogoId :: ", "***logoUrl***", logoUrl)
                 const response = await fetch(logoUrl);
-                console.log("response",response)
+                this.$log.info("OverviewTest : getLogoId :: ", "response",response)
                 const imgBlob = await response.blob();
-                console.log("imgBlob",imgBlob)
+                this.$log.info("OverviewTest : getLogoId :: ", "imgBlob",imgBlob)
                 const imgByteArray = await this.getAsByteArray(imgBlob);
 
                 const tx = await arweave.createTransaction({
@@ -678,7 +676,7 @@ export default {
             } else if (name === "arHD") {
                 this.logoArhdId = logoId;
             }
-            console.log("logoId", logoId)
+            this.$log.info("OverviewTest : getLogoId :: ", "logoId", logoId)
             return logoId;
         },
         async getAsByteArray(file) {

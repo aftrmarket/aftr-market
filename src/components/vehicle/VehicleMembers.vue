@@ -436,7 +436,7 @@ export default {
                 }
             }
             /*** CALL SMARTWEAVE */
-            console.log(JSON.stringify(action));
+            this.$log.info("VehicleMembers : submit :: ", JSON.stringify(action));
         },
         addMemberRow() {
             this.addRow = !this.addRow;
@@ -483,7 +483,7 @@ export default {
         //     }
             
         //     /*** CALL SMARTWEAVE */
-        //     console.log(JSON.stringify(action));
+        //     this.$log.info(JSON.stringify(action));
         // },
         // updateAllocations() {
         //     let recipient = '';
@@ -518,7 +518,7 @@ export default {
         //     }
 
         //     /*** CALL SMARTWEAVE */
-        //     console.log(JSON.stringify(action));
+        //     this.$log.info(JSON.stringify(action));
         // },
     },
     created() {

@@ -364,7 +364,7 @@ export default {
             }
 
             /*** CALL SMARTWEAVE */
-            console.log(JSON.stringify(action));
+            this.$log.info("VehicleTokens : submit :: ", JSON.stringify(action));
         },
     },
     created() {

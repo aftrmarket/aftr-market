@@ -184,7 +184,7 @@ export default {
             }
         },
         aggregateInfo() {
-            console.log(JSON.stringify(this.vehicle));
+            this.$log.info("VehicleInfoRead : aggregateInfo :: ", JSON.stringify(this.vehicle));
             
             if (!this.vehicle.votingSystem || this.vehicle.votingSystem === '' || this.vehicle.votingSystem === 'undefined') {
                 this.vehicle.votingSystem = 'equal';

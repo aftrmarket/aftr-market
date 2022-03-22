@@ -517,14 +517,14 @@ export default {
             const currentPst = this.$store.getters.getActiveWallet.psts.find(
                 (item) => item.id === this.selectedPstId
             );
-            console.log("currentPst", currentPst.fcp, currentPst.balance);
+            this.$log.info("CreateVehicle : pstBalance :: ", "currentPst Value", currentPst.fcp, currentPst.balance);
             return this.formatNumber(currentPst.balance);
         },
         pstTicker() {
             const currentPst = this.$store.getters.getActiveWallet.psts.find(
                 (item) => item.id === this.selectedPstId
             );
-            console.log("pstTicker", currentPst);
+            this.$log.info("CreateVehicle : pstTicker :: ","pstTicker value", currentPst);
             return currentPst.ticker;
         },
         vehicleTokenBox() {
@@ -643,7 +643,7 @@ export default {
             // if (file.type.substring(0, 6) !== "image/") {
             //     // Write file error message
             //     this.fileInvalid = true;
-            //     console.log("FILE IS NOT IMAGE");
+            //     this.$log.info("FILE IS NOT IMAGE");
             //     return;
             // } else {
             //     this.fileInvalid = false;
@@ -693,7 +693,7 @@ export default {
 
             // Total size should be < ? so that it's a free transaction
             this.totalSize += file.size;
-            console.log("totalSize", this.totalSize, this.balance);
+            this.$log.info("CreateVehicle : onFileChange :: ", "totalSize", this.totalSize, this.balance);
 
             /**** SHOULD THIS BE > 0? */
             if (this.totalSize != 0) {
@@ -706,7 +706,7 @@ export default {
                 // const total = arweave.ar.winstonToAr(
                 //     (+winston + this.fee).toString()
                 // );
-                // console.log("total", total);
+                // this.$log.info("total", total);
                 // this.totalCost = total;
                 // if (total > this.balance) {
                 //     return alert("You don't have enough AR to upload this file!");
@@ -958,7 +958,7 @@ export default {
             await arweave.transactions.sign(tx, wallet);
             await arweave.transactions.post(tx);
             this.communityLogoValue = tx.id;
-            console.log("communityLogoValue", this.communityLogoValue);
+            this.$log.info("CreateVehicle : deployFile :: ","communityLogoValue", this.communityLogoValue);
             
             /*** Why are all these being updated here? */
             this.vehicle.settings = [
@@ -969,7 +969,7 @@ export default {
                 ["communityLogo", this.communityLogoValue],
             ];
             /*********************** */
-            console.log("txid", tx.id);
+            this.$log.info("CreateVehicle : deployFile :: ", "txid", tx.id);
         },
         async createVehicle() {
             if (!this.nameValid) {
@@ -1008,7 +1008,7 @@ export default {
                     logging: true,
                 });
             } catch (error) {
-                console.log("ERROR connecting to Arweave: " + error); // How can this ever happen? :)
+                this.$log.error("CreateVehicle : createVehicle ::", "ERROR connecting to Arweave: " + error); // How can this ever happen? :)
                 this.pageStatus = "error";
                 return false;
             }
@@ -1054,7 +1054,7 @@ export default {
                             import.meta.env.VITE_ARWEAVE_PORT +
                             "/mine";
                     if(Boolean(this.arweaveMine)){                        
-                        console.log("mineUrl ",mineUrl);    
+                        this.$log.info("CreateVehicle : createVehicle :: ", "mineUrl ",mineUrl);    
                         let response = await fetch(mineUrl);
                     }
                 } else {
@@ -1077,16 +1077,17 @@ export default {
                     tokens: item.tokens,
                 };
             });
-            console.log("tmpPsts", tmpPsts);
+            this.$log.info("CreateVehicle : createVehicle :: ", "tmpPsts", tmpPsts);
             this.vehicle.tokens = tmpPsts;
-            console.log("VEHICLE: " + JSON.stringify(this.vehicle));
+            this.$log.info("CreateVehicle : createVehicle :: ", "VEHICLE: " + JSON.stringify(this.vehicle));
 
-            console.log("this.vehicle.ownership : ", this.vehicle.ownership);
+            this.$log.info("CreateVehicle : createVehicle :: ", "this.vehicle.ownership : ", this.vehicle.ownership);
 
             let obj = this.vehicle.balances;
 
             if (this.vehicle.ownership == "dao") {
-                console.log(
+                this.$log.info(
+                    "CreateVehicle : createVehicle :: ",
                     "this.vehicle.ownership--length",
                     Object.keys(obj).length,
                     Object.keys(obj).length < 2
@@ -1110,9 +1111,9 @@ export default {
 
             // Create SmartWeave contract
             try {
-                //console.log("arweave: " + JSON.stringify(arweave)); console.log("contractSourceId: " + this.contractSourceId);
-                console.log("vehicle: " + JSON.stringify(this.vehicle));
-                console.log("tags: " + JSON.stringify(initTags));
+                //this.$log.info("arweave: " + JSON.stringify(arweave)); this.$log.info("contractSourceId: " + this.contractSourceId);
+                this.$log.info("CreateVehicle : createVehicle :: ", "vehicle: " + JSON.stringify(this.vehicle));
+                this.$log.info("CreateVehicle : createVehicle :: ", "tags: " + JSON.stringify(initTags));
 
                 if (import.meta.env.DEV) {
                     this.vehicle["id"] = await createContractFromTx(
@@ -1142,9 +1143,9 @@ export default {
                     );
                 }
                 //this.vehicle['id'] = await createContractFromTx(arweave, jwk, this.contractSourceId, JSON.stringify(vehicleTest), initTags);
-                console.log("ID = " + this.vehicle["id"]);
+                this.$log.info("CreateVehicle : createVehicle :: ", "ID = " + this.vehicle["id"]);
             } catch (error) {
-                console.log("ERROR creating SmartWeave contract: " + error);
+                this.$log.error("CreateVehicle : createVehicle :: ", "ERROR creating SmartWeave contract: " + error);
                 this.pageStatus = "error";
                 return false;
             }
@@ -1181,8 +1182,8 @@ export default {
                             pst.id,
                             transferInput
                         );
-                        console.log(
-                            "Transfer Verto = " + JSON.stringify(vertoTxId)
+                        this.$log.info(
+                            "CreateVehicle : createVehicle :: ", "Transfer Verto = " + JSON.stringify(vertoTxId)
                         );
                         if(Boolean(this.arweaveMine)){
                             await fetch(mineUrl);
@@ -1200,20 +1201,20 @@ export default {
                             this.vehicle.id,
                             inputDeposit
                         );
-                        console.log(txId);
+                        this.$log.info("CreateVehicle : createVehicle :: ", txId);
                         
                         if(Boolean(this.arweaveMine)){
                             await fetch(mineUrl);
                         }
 
-                        console.log("READ CONTRACT...");
+                        this.$log.info("CreateVehicle : createVehicle :: ","READ CONTRACT...");
                         let vehicle = await readContract(
                             arweave,
                             this.vehicle.id,
                             undefined,
                             true
                         );
-                        console.log(JSON.stringify(vehicle));
+                        this.$log.info("CreateVehicle : createVehicle :: ", JSON.stringify(vehicle));
                     } else {
                         let vertoTxId = await interactWrite(
                             arweave,
@@ -1221,8 +1222,8 @@ export default {
                             pst.id,
                             transferInput
                         );
-                        console.log(
-                            "Transfer Verto = " + JSON.stringify(vertoTxId)
+                        this.$log.info(
+                            "CreateVehicle : createVehicle :: ", "Transfer Verto = " + JSON.stringify(vertoTxId)
                         );
 
                         const inputDeposit = {
@@ -1237,19 +1238,20 @@ export default {
                             this.vehicle.id,
                             inputDeposit
                         );
-                        console.log(txId);
+                        this.$log.info("CreateVehicle : createVehicle :: ", txId);
 
-                        console.log("READ CONTRACT...");
+                        this.$log.info("CreateVehicle : createVehicle :: ", "READ CONTRACT...");
                         let vehicle = await readContract(
                             arweave,
                             this.vehicle.id,
                             undefined,
                             true
                         );
-                        console.log(JSON.stringify(vehicle));
+                        this.$log.info("CreateVehicle : createVehicle :: ", JSON.stringify(vehicle));
                     }
 
-                    console.log(
+                    this.$log.info(
+                        "CreateVehicle : createVehicle :: ",
                         "TokenId: " +
                             pst.id +
                             " Name: " +
@@ -1260,7 +1262,7 @@ export default {
                     //SOMETHING = await interactWrite(arweave, "use_wallet", pst.id, initTags);
                 }
             } catch (error) {
-                console.log("ERROR transferring tokens: " + error);
+                this.$log.error("CreateVehicle : createVehicle :: ", "ERROR transferring tokens: " + error);
                 this.pageStatus = "error";
                 return false;
             }

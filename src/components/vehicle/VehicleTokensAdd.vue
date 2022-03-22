@@ -200,7 +200,7 @@ export default {
         await interactWrite(arweave, wallet, currentPst.id, inputTransfer)
           .then(async (id) => {
             vertoTxId = id;
-            console.log("Transfer Verto = " + JSON.stringify(vertoTxId));
+            this.$log.info("VehicleTokensAdd : interactWrite :: ", "Transfer Verto = " + JSON.stringify(vertoTxId));
 
             if(Boolean(this.arweaveMine)){
               await fetch(mineUrl);
@@ -211,7 +211,7 @@ export default {
               tokenId: currentPst.id,
               txId: vertoTxId,
             };
-            console.log("INPUT DEP: " + JSON.stringify(inputDeposit));
+            this.$log.info("VehicleTokensAdd : interactWrite :: ", "INPUT DEP: " + JSON.stringify(inputDeposit));
             await interactWrite(arweave, wallet, this.vehicle.id, inputDeposit)
               .then(async (txId) => {
                 this.msg = "Deposit Successful : " + txId
@@ -228,7 +228,7 @@ export default {
           });
 
         //let vertoTxId = await interactWrite(arweave, wallet, currentPst.id, inputTransfer);
-        //console.log("Transfer Verto = " + JSON.stringify(vertoTxId));
+        //this.$log.info("Transfer Verto = " + JSON.stringify(vertoTxId));
 
         // await fetch(mineUrl);
 
@@ -238,30 +238,30 @@ export default {
         //     txId: vertoTxId
         // };
 
-        //console.log("INPUT DEP: " + JSON.stringify(inputDeposit));
+        //this.$log.info("INPUT DEP: " + JSON.stringify(inputDeposit));
         //let txId = await interactWrite(arweave, wallet, this.vehicle.id, inputDeposit);
         //await fetch(mineUrl);
         let vehicle = {};
         try {
           vehicle = await readContract(arweave, this.vehicle.id);
-          console.log("VEHICLE = " + JSON.stringify(vehicle));
+          this.$log.info("VehicleTokensAdd : interactWrite :: ", "VEHICLE = " + JSON.stringify(vehicle));
         } catch (e) {
-          console.log("ERROR reading contract: " + e);
-          console.log("VEHICLE: " + JSON.stringify(vehicle));
-          console.log("THIS VEHICLE: " + this.vehicle.id);
+          this.$log.error("VehicleTokensAdd : interactWrite :: ", "ERROR reading contract: " + e);
+          this.$log.error("VehicleTokensAdd : interactWrite :: ", "VEHICLE: " + JSON.stringify(vehicle));
+          this.$log.error("VehicleTokensAdd : interactWrite :: ", "THIS VEHICLE: " + this.vehicle.id);
         }
       } else {
         await interactWrite(arweave, "use_wallet", currentPst.id, inputTransfer)
           .then(async (id) => {
             vertoTxId = id;
-            console.log("Transfer Verto = " + JSON.stringify(vertoTxId));
+            this.$log.info("VehicleTokensAdd : interactWrite :: ", "Transfer Verto = " + JSON.stringify(vertoTxId));
 
             const inputDeposit = {
               function: "deposit",
               tokenId: currentPst.id,
               txId: vertoTxId,
             };
-            console.log("INPUT DEP: " + JSON.stringify(inputDeposit));
+            this.$log.info("VehicleTokensAdd : interactWrite :: ", "INPUT DEP: " + JSON.stringify(inputDeposit));
             await interactWrite(arweave, "use_wallet", this.vehicle.id, inputDeposit)
               .then(async (txId) => {
                 this.msg = "Deposit Successful : " + txId
@@ -274,15 +274,15 @@ export default {
            this.msg = error;
           });
 
-        console.log("READ CONTRACT...");
+        this.$log.info("VehicleTokensAdd : interactWrite :: ", "READ CONTRACT...");
         let vehicle = {};
         try {
           vehicle = await readContract(arweave, this.vehicle.id);
-          console.log("VEHICLE = " + JSON.stringify(vehicle));
+          this.$log.info("VehicleTokensAdd : interactWrite :: ", "VEHICLE = " + JSON.stringify(vehicle));
         } catch (e) {
-          console.log("ERROR reading contract: " + e);
-          console.log("VEHICLE: " + JSON.stringify(vehicle));
-          console.log("THIS VEHICLE: " + this.vehicle.id);
+          this.$log.error("VehicleTokensAdd : interactWrite :: ", "ERROR reading contract: " + e);
+          this.$log.error("VehicleTokensAdd : interactWrite :: ", "VEHICLE: " + JSON.stringify(vehicle));
+          this.$log.error("VehicleTokensAdd : interactWrite :: ", "THIS VEHICLE: " + this.vehicle.id);
         }
       }
       window.location.reload();

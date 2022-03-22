@@ -13,6 +13,7 @@
     "@tailwindcss/line-clamp": "^0.3.1",
     "ar-gql": "^0.0.6",
     "arweave": "^1.10.18",
+    "dotenv": "^16.0.0",
     "esbuild": "^0.12.20",
     "install": "^0.13.0",
     "material-design-icons": "^3.0.1",
@@ -25,6 +26,7 @@
     "vue": "^3.0.5",
     "vue-router": "^4.0.5",
     "vue-uuid": "^2.0.2",
+    "vuejs3-logger": "1.0.0",
     "vuex": "^4.0.2"
   },
   "devDependencies": {

@@ -154,7 +154,7 @@ export default {
             }
         },
         transferTokens() {
-            console.log("TRANSFER");
+            this.$log.info("VehicleMembers : transferTokens :: ", "TRANSFER");
             this.$emit('close');
         },
         pstChange() {

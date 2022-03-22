@@ -177,11 +177,11 @@ export default {
       const reader = new FileReader();
         this.content = "check the console for file output";
         reader.onload = (res) => {
-          console.log(res.target.result);
+          this.$log.info("TheHeader : readFile :: ", res.target.result);
           this.content = res.target.result
           this.$store.commit("addKeyFile", this.content);
         };
-        reader.onerror = (err) => console.log(err);
+        reader.onerror = (err) => this.$log.error("TheHeader : readFile :: ", err);
         reader.readAsText(this.file);
     },
   },
