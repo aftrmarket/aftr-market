@@ -341,6 +341,8 @@ export default {
                     alert("Please attach your keyfile");
                     return false;
                 }
+            } else {
+                use_wallet = "use_wallet";
             }
             console.log("1. Ensure wallet has some AR to make transactions");
 
