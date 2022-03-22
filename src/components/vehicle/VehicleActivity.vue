@@ -65,7 +65,7 @@ export default {
             if (func.substr(0, 7) === "plygnd-") {
                 return "Playground Initialization ";
             } else if (func === "multiInteraction") {
-                return "Multiple Bundled Changes";
+                return "Multi-Interaction";
             } else {
                 return func;
             }
