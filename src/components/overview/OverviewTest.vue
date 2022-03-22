@@ -417,20 +417,25 @@ export default {
 
             console.log("5. Add user to Blue Horizon Vehicle");
 
-            let input = {
-                function: "plygnd-mint",
-                qty: 100000
-            };
-            // Calls mint function on Blue Horizon contract. If user already has a balance, nothing happens.
-            contractTxId = await interactWrite(arweave, use_wallet, blueContractId, input);
-            
-            if(Boolean(this.arweaveMine)){   
-                console.log("await fetch(mineUrl)")          
-                await fetch(mineUrl);
-            }
+            let input = {};
+            // Only add if user is not already there
+            const blueVeh = await readContract(arweave, blueContractId);
+            if (!(addr in blueVeh.balances)) {
+                input = {
+                    function: "plygnd-mint",
+                    qty: 100000
+                };
+                // Calls mint function on Blue Horizon contract. If user already has a balance, nothing happens.
+                contractTxId = await interactWrite(arweave, use_wallet, blueContractId, input);
 
-            console.log("Blue Horizon Contract Write: " + contractTxId);
+                if(Boolean(this.arweaveMine)){   
+                    console.log("await fetch(mineUrl)")          
+                    await fetch(mineUrl);
+                }
+                console.log("Blue Horizon Contract Write: " + contractTxId);
+            }
             
+            // Give user's wallet PSTs
             input = {
                 function: "plygnd-mint",
                 qty: 100000
