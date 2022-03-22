@@ -407,16 +407,12 @@ export default {
             console.log("4. Sample AFTR Vehicles");
 
             let chillContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "aftr", "Chillin Treasury", "CHILL", this.logoChillin, aftrChillinInitState);
-            await this.updateTokensLogos(arweave, use_wallet, chillContractId, this.logoVintId, this.logoArhdId);
             console.log("CHILL: " + chillContractId);
 
             let alqpaContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "aftr", "Alquipa", "ALQPA", this.logoAlquipa, aftrAlquipaInitState);
-            await this.updateTokensLogos(arweave, use_wallet, alqpaContractId, this.logoVintId, this.logoArhdId);
             console.log("ALQPA: " + alqpaContractId);
 
-            // console.log("this.logoVint, this.logoArhd",this.logoVint, this.logoArhd)
             let blueContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "aftr", "Blue Horizon", "BLUE",this.logoBlue, aftrBlueHorizonInitState);
-            await this.updateTokensLogos(arweave, use_wallet, blueContractId, this.logoVintId, this.logoArhdId);
             console.log("BLUE: " + blueContractId);
 
             console.log("5. Add user to Blue Horizon Vehicle");
@@ -561,17 +557,22 @@ export default {
             };
             let res = await interactWrite(arweave, wallet, contractTxId, input);
             if(Boolean(this.arweaveMine)){                
-                    await fetch(mineUrl);
+                await fetch(mineUrl);
             }
 
             console.log("LOGO ADD for " + name + ": " + res);
             
+            await this.updateTokensLogos(arweave, wallet, contractTxId, this.logoVintId, this.logoArhdId);
+            if(Boolean(this.arweaveMine)){                
+                await fetch(mineUrl);
+            }
+
             return contractTxId;
         } else {
             return response.data.data.transactions.edges[0].node.id;
         }
         },
-        async updateTokensLogos(arweave,wallet, contractId, logoVint, logoArhd) {
+        async updateTokensLogos(arweave, wallet, contractId, logoVint, logoArhd) {
             const mineUrl =
                     import.meta.env.VITE_ARWEAVE_PROTOCOL +
                     "://" +
