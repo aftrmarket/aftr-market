@@ -270,7 +270,7 @@ export default {
             logoArhd: "https://arweave.net/hxVzJL2uq41ncSt8PgR-5UDNR8tmLqO9JSisgNq7j10",
 
             logoBlue: "https://arweave.net/KM66oKFLF60UrrOgSx5mb90gUd2v4i0T9RIcK9mfUiA",
-            logoChillin: "https://arweave.net/-dbLBw5tTUGL-77J2RSWW1VMmlq5dItusX2vet_2B_4",
+            logoChillin: "https://arweave.net/aM7YfRnd97mTGLn_3vjLfWp2TgtBKRyDsBnlDhA1e-s",
             logoAlquipa: "https://arweave.net/nZr8RcHYY2XXloKcxtgrbssBdpvz6C2ifM92QvkYkgg",
 
             // Need to save IDs in order to update the vehicles' tokens 
