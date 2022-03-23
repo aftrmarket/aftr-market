@@ -1,5 +1,10 @@
 <template>
     <main class="-mt-32">
+        <div v-if="getMyVehicle" class="flex items-center justify-center ">
+            Loading....
+            <div class="w-12 h-12 border-b-2 border-gray-500 rounded-full animate-spin"></div>
+        </div>
+
         <div class="pt-10 bg-aftrDarkGrey sm:pt-16 lg:pt-8 lg:pb-14 lg:overflow-hidden">
             <div class="mx-auto max-w-7xl lg:px-8">
                 <div class="lg:grid lg:grid-cols-2 lg:gap-8">
@@ -276,6 +281,7 @@ export default {
             // Need to save IDs in order to update the vehicles' tokens 
             logoVintId: "",
             logoArhdId: "",
+            getMyVehicle: false
         };
     },
     computed: {
@@ -293,6 +299,7 @@ export default {
             };
         },
         async init() {
+            this.getMyVehicle = true
             // Check to see if system is ready for for Test Launch
             this.$store.dispatch("setTestLaunchConfigState");
 

@@ -253,8 +253,11 @@ export default {
                 input
             );
         }
+        alert("Thank you for casting your vote.  Your vote will be reflected in the next block.")
         this.$log.info("VehicleVotesCast : recordVote :: ", txId);
-        this.$emit("close");
+        this.$router.push("../vehicles");
+        // this.$emit("close");
+        return
     },
   },
   setup() {
