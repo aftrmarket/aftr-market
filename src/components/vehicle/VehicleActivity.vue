@@ -1,36 +1,41 @@
 <template>
-        <div v-for="(activity, interaction) in activities" :key="interaction" class="flex flex-col p-2 pt-4 gap-y-2 bg-white shadow overflow-hidden">
-            <div class="">
-                <span class="text-lg font-medium uppercase tracking-wide">{{ interactionText(getProperty(activity, "function")) }}</span>
-                <span class="font-mono text-sm text-gray-500">({{ interaction }})</span>
-            </div>
-            <div class="pl-4">
-                <span v-html="getAllInputs(JSON.parse(activity))"></span>
-            </div>
-            <div class="flex flex-row">
-                <div v-if="interactions[interaction]">
-                    <div class="pb-1 border-solid border border-green-500 rounded ">
-                        <span class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium bg-white border-1 border-green text-green">
-                            <svg class="-ml-0.5 mr-1.5 h-2 w-2" fill="green" viewBox="0 0 8 8">
-                                <circle cx="4" cy="4" r="3" />
-                            </svg>
-                            <span class="font-light text-green-600">Successful</span>
-                        </span>
-                    </div>
+    <div v-for="(activity, index) in activities" :key="activity.id" class="flex flex-col p-2 pt-4 gap-y-2 bg-white shadow overflow-hidden">
+        <div class="">
+            <span class="text-aftrBlue text-md font-medium uppercase tracking-wide">{{ activities.length - index }}. {{ interactionText(activity.input.function) }}</span>
+            <span class="font-mono text-xs text-gray-500">({{ activity.id }})</span>
+        </div>
+        <div class="pl-8 pb-4">
+            <span v-html="getAllInputs(activity.input)"></span>
+        </div>
+        <div class="flex flex-row">
+            <div v-if="activity.result">
+                <div class="pb-1 border-solid border border-green-500 rounded ">
+                    <span class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium bg-white border-1 border-green text-green">
+                        <svg class="-ml-0.5 mr-1.5 h-2 w-2" fill="green" viewBox="0 0 8 8">
+                            <circle cx="4" cy="4" r="3" />
+                        </svg>
+                        <span class="font-light text-green-600">Successful</span>
+                    </span>
                 </div>
-                <div v-else>
-                    <div class="pb-1 border-solid border border-red-500 rounded ">
-                        <span class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium bg-white border-1 border-red text-red">
-                            <svg class="-ml-0.5 mr-1.5 h-2 w-2" fill="red" viewBox="0 0 8 8">
-                                <circle cx="4" cy="4" r="3" />
-                            </svg>
-                            <span class="font-light text-red-600">Failed</span>
-                        </span>
-                    </div>
+            </div>
+            <div v-else>
+                <div class="pb-1 border-solid border border-red-500 rounded ">
+                    <span class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium bg-white border-1 border-red text-red">
+                        <svg class="-ml-0.5 mr-1.5 h-2 w-2" fill="red" viewBox="0 0 8 8">
+                            <circle cx="4" cy="4" r="3" />
+                        </svg>
+                        <span class="font-light text-red-600">Failed</span>
+                    </span>
                 </div>
-                <div></div>
+            </div>
+            <div class="pl-10 pt-2 text-xs">Block <span class="font-mono text-gray-500">{{ activity.block }}</span></div>
+            <div class="pl-10 pt-2 text-xs">
+                Caller 
+                    <span v-if="activity.result" class="font-mono text-green-600">{{ activity.owner }}</span>
+                    <span v-else class="font-mono text-red-600">{{ activity.owner }}</span>
             </div>
         </div>
+    </div>
 </template>
 
 <script>
@@ -39,7 +44,8 @@ export default {
     data() {
         return {
             isLoading: true,
-            activities: {},
+            edges: [],
+            activities: [],
         };
     },
     computed: {
@@ -52,14 +58,22 @@ export default {
         },
     },
     methods: {
-        getProperty(textObj, key = null, index = null) {
-            const obj = JSON.parse(textObj);
-            if (key) {
-                return obj[key];
+        parseActivity(edge) {
+            // Parses the query response and returns an object with the needed variables
+            let activity = {};
+            activity.id = edge.node.id;
+            activity.owner = edge.node.owner.address;
+            activity.timestamp = edge.node.block.timestamp;
+            activity.block = edge.node.block.height;
+            activity.result = this.interactions[activity.id];
+
+            // Parse Input tag to get the interaction specifics
+            for (let tag of edge.node.tags) {
+                if (tag.name === "Input") {
+                    activity.input = JSON.parse(tag.value);
+                }
             }
-            if (index) {
-                return Object.keys(obj)[index] + " : " + Object.values(obj)[index];
-            }
+            return activity;
         },
         interactionText(func) {
             if (func.substr(0, 7) === "plygnd-") {
@@ -70,61 +84,94 @@ export default {
                 return func;
             }
         },
+        getInputKey(input) {
+            
+        },
         getAllInputs(obj) {
-            let htmlText = "";
+            let htmlText = "Inputs:<br/>";
             const keys = Object.keys(obj);
 
             if (obj.function === "multiInteraction") {
                 // Loop thru actions
                 const actions = obj.actions;
-                let actionText = "<span class='pl-5'>";
-                let inputText = ""
+                let actionText = "";
                 let count = 1;
                 for (let action of actions) {
-                    actionText += count.toString() + ". " + action.input.function + "<br/>";
-                    inputText = this.getAllInputs(action.input);
-                    actionText += "<span class='pl-10'>" + inputText + "</span>";
+                    actionText += "<span class='pl-5'>" + count.toString() + ". " + action.input.function + "<br/>";
+
+                    for (let key in action.input) {
+                        if (action.input[key]) {
+                            actionText += "<p class='pl-8 text-sm'>- " + key + ": <span class='font-mono text-gray-600'>" + action.input[key] + "</span></p>";
+                        }
+                    }
                     count++;
                 }
-                htmlText += "actions:<br/>" + actionText + "</span>";
+                htmlText += actionText + "</span>";
             } else {
                 // Loop through keys
                 for (let i = 0; i < keys.length; i++) {
                     if (keys[i] !== "function" && obj[keys[i]] != "") {
-                        htmlText += keys[i] + ": <span class='font-mono text-sm text-gray-600'>" + obj[keys[i]] + "</span><br/>";
+                        htmlText += "<p class='pl-4 text-sm'>- " + keys[i] + ": <span class='font-mono text-sm text-gray-600'>" + obj[keys[i]] + "</span></p>";
                     }
                 }
             }
             return htmlText;
         },
-        async readTags(interactionId) {
-            let tx = await this.arweave.transactions.get(interactionId);
-            let input = "";
-            tx.get("tags").every((tag) => {
-                let key = tag.get("name", { decode: true, string: true });
-                let value = tag.get("value", { decode: true, string: true });
-                if (key === "Input") {
-                    input = value;
-                    return false;
+        async runQuery(query, errorMsg) {
+            try {
+                let response = await this.arweave.api.post("graphql", {
+                    query: query
+                });
+
+                if (response.status !== 200) {
+                    response = null;
                 }
-                return true;
-            });
-            return input;
+
+                return response;
+            } catch(e) {
+                this.$log.error("VehicleActivity : runQuery :: ", errorMsg + e);
+            }
+        },
+        async readInteractions() {
+            // Get all interaction ids for query
+            let interactionStrings = '[';
+            for (const i in this.interactions) {
+                    interactionStrings += '"' + i + '",';
+            }
+            interactionStrings += ']';
+            let query = `
+                query($cursor: String) {
+                    transactions(
+                        ids: ${interactionStrings}
+                        after: $cursor
+                    ) {
+                        pageInfo {
+                            hasNextPage
+                        }
+                        edges {
+                            cursor
+                            node { id, owner {address}, block {height, timestamp}, tags{name, value} } 
+                        }
+                    }
+                }
+            `;
+            // Return data about each interation
+            const responseData = await this.runQuery(query, "Error querying interactions. ");
+            this.edges = responseData.data.data.transactions.edges;
         },
     },
     async created() {
-        // Read the tags for all contract interactions
         this.isLoading = true;
+        
+        // Read the tags for all contract interactions
+        await this.readInteractions();
 
-        try {
-            for (const i in this.interactions) {
-                this.activities[i] = await this.readTags(i);
-            }
-        } catch (error) {
-            this.$log.error("VehicleActivity : created :: ", "ERROR connecting to Arweave: " + error);
+        // Build the activities array
+        for (let edge of this.edges) {
+            this.activities.push(this.parseActivity(edge));
         }
 
         this.isLoading = false;
-    },
-};
+    }
+}
 </script>
