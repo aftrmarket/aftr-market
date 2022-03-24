@@ -64,14 +64,14 @@
                 <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                   <DialogTitle
                     as="h3"
-                    class="text-lg leading-6 font-medium text-gray-900"
+                    class="text-lg leading-6 font-medium text-gray-900 break-all"
                   >
                     Cast Vote - {{ voteId }}
                   </DialogTitle>
                   <div class="pt-6 text-sm font-medium">
                     <dl>
                       <dt class="text-gray-500">Proposal</dt>
-                      <dd class="mt-1 text-gray-900">
+                      <dd class="mt-1 text-gray-900 break-all">
                         {{ displayProposal(vote.type) }}
                       </dd>
                     </dl>
@@ -193,6 +193,8 @@ export default {
         return "?";
       } else if (type === "???") {
         return "???";
+      } else {
+          return capitalize(this.vote.note);
       }
     },
     async recordVote(vote) {

@@ -51,7 +51,7 @@
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {{ walletAddressSubstr(vote.id) }}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 break-all">
                   {{ displayProposal(vote) }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -150,6 +150,8 @@ export default {
                 return "?";
             } else if (vote.type === '???') {
                 return "???";
+            } else {
+                return capitalize(vote.note);
             }
         },
         calculateStatus(vote) {
