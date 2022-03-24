@@ -187,8 +187,6 @@ export default {
           " to " +
           capitalize(this.vote.value)
         );
-      } else if (type === "mint") {
-        return "Mint " + this.vote.qty;
       } else if (type === "?") {
         return "?";
       } else if (type === "???") {

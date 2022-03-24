@@ -144,8 +144,6 @@ export default {
                 return vote.note;
             } else if (vote.type=== 'set') {
                 return "Change " + capitalize(vote.key) + " to " + capitalize(vote.value);
-            } else if (vote.type === 'mint') {
-                return "Mint " + vote.qty;
             } else if (vote.type === '?') {
                 return "?";
             } else if (vote.type === '???') {
