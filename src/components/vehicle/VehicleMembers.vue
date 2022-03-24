@@ -164,12 +164,21 @@
 import numeral from "numeral";
 import { mapGetters } from 'vuex';
 import { Switch, SwitchGroup, SwitchLabel } from '@headlessui/vue';
+import Arweave from "arweave";
+import { interactWrite } from "smartweave";
 
 export default {
     props: ['vehicle'],
     components: { Switch, SwitchGroup, SwitchLabel },
     data() {
         return {
+            /** Smartweave variables */
+            arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
+            arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
+            arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
+            arweaveMine: import.meta.env.VITE_MINE,
+            /** */
+
             memberRemoves: [],
             memberUpdates: {},
             memberAdds: [],
@@ -239,7 +248,7 @@ export default {
                 return "Membership changes will be proposed as votes because this is a DAO owned vehicle";
             }
         },
-        ...mapGetters(['arConnected', 'getActiveAddress']),
+        ...mapGetters(['arConnected', 'getActiveAddress', 'keyFile']),
     },
     methods: {
         formatNumber(num, dec = false) {
@@ -343,24 +352,27 @@ export default {
             
             input.function = 'propose';
             input.recipient = recipient;
-            input.qty = qty;
             if (type === 'removeMember') {
                 input.type = type;
+                input.qty = qty;
                 input.note = "Remove " + recipient + ", burning " + this.formatNumber(String(currentQty)) + " tokens";
             } else if (type === 'addMember') {
                 input.type = type;
+                input.qty = qty;
                 input.note = "Add " + recipient + ", minting " + qty + " tokens";
             } else if (currentQty > qty) {
+                input.qty = currentQty - qty;
                 input.type = 'burn';
                 input.note = "Burn " + this.formatNumber(String(currentQty - qty)) + " for " + recipient;
             } else if (currentQty < qty) {
+                input.qty = qty - currentQty;
                 input.type = 'mint';
                 input.note = "Mint " + this.formatNumber(String(qty - currentQty)) + " for " + recipient;
             }
 
             return input;
         },
-        submit() {
+        async submit() {
             if (!this.allowEdits || !this.uiEditMode) {
                 // No updates allowed
                 return;
@@ -373,70 +385,111 @@ export default {
             let action = {
                 input: {}
                 //caller: this.getActiveAddress
-            }
+            };
+
+            let input = {};
 
             if (count === 1) {
                 if (this.memberRemoves.length === 1) {
                     recipient = this.memberRemoves[0];
                     qty = +this.vehicle.balances[recipient];
-                    action.input = this.buildInput(recipient, qty, 'removeMember');
+                    input = this.buildInput(recipient, qty, 'removeMember');
                 } else if (this.memberAdds.length === 1) {
                     recipient = this.memberAdds[0].recipient;
                     qty = +this.memberAdds[0].qty;
-                    action.input = this.buildInput(recipient, qty, 'addMember');
+                    input = this.buildInput(recipient, qty, 'addMember');
                 } else if (Object.keys(this.memberUpdates).length === 1) {
                     recipient = Object.keys(this.memberUpdates)[0];
                     qty = +Object.values(this.memberUpdates)[0];
-                    action.input = this.buildInput(recipient, qty);
+                    input = this.buildInput(recipient, qty);
                 }
             } else if (count > 1) {
-                action.input.function = 'multiInteraction';
-                action.input.key = 'multi';
-                action.input.note = 'Multi-Interaction';
-                action.input.actions = [];
+                input.function = 'multiInteraction';
+                input.key = 'multi';
+                input.note = 'Multi-Interaction';
+                input.actions = [];
 
                 if (this.memberRemoves.length > 0) {
                     for(let member in this.memberRemoves) {
                         let multiAction = {
                             input: {}
-                            //caller: this.getActiveAddress
                         };
                         recipient = member;
                         qty = +this.vehicle.balances[member];
                     
                         multiAction.input = this.buildInput(recipient, qty, 'removeMember');
-                        action.input.actions.push(multiAction);
+                        input.actions.push(multiAction);
                     }
                 }
                 if (this.memberAdds.length > 0) {
                     this.memberAdds.forEach(member => {
                         let multiAction = {
                             input: {}
-                            //caller: this.getActiveAddress
                         };
                         recipient = member.recipient;
                         qty = +member.qty;
 
                         multiAction.input = this.buildInput(recipient, qty, 'addMember');
-                        action.input.actions.push(multiAction);
+                        input.actions.push(multiAction);
                     });
                 }
                 if (Object.keys(this.memberUpdates).length > 0) {
                     for(let member in this.memberUpdates) {
                         let multiAction = {
                             input: {}
-                            //caller: this.getActiveAddress
                         };
                         recipient = member;
                         qty = +this.memberUpdates[member];
                     
                         multiAction.input = this.buildInput(recipient, qty);
-                        action.input.actions.push(multiAction);
+                        input.actions.push(multiAction);
                     }
                 }
             }
             /*** CALL SMARTWEAVE */
-            this.$log.info("VehicleMembers : submit :: ", JSON.stringify(action));
+            let arweave = {};
+
+            arweave = await Arweave.init({
+            host: this.arweaveHost,
+            port: this.arweavePort,
+            protocol: this.arweaveProtocol,
+            timeout: 20000,
+            logging: true,
+            });
+
+            console.log(JSON.stringify(input));
+            console.log("VEH: " + JSON.stringify(this.vehicle));
+
+            this.$log.info("VehicleMembers : submit :: ", JSON.stringify(input));
+
+            let wallet;
+            if (import.meta.env.DEV) {
+                if(this.keyFile.length){
+                    wallet =  JSON.parse(this.keyFile);
+                } else {
+                    alert("Please attach your keyfile");
+                }        
+            }
+            let txid = "";
+            if (import.meta.env.DEV) {
+                txid = await interactWrite(arweave, wallet, this.vehicle.id, input);
+                
+                /**** IN ORDER FOR THIS TO PROCESS, YOU NEED TO RUN http://localhost:1984/mine */
+                if(Boolean(this.arweaveMine)){
+                    const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
+                    const response = await fetch(mineUrl);
+                }
+            } else {
+                txid = await interactWrite(arweave, "use_wallet", this.vehicle.id, input);
+            }
+            this.$log.info("VehicleMembers : sumbit :: ", "TX: " + txid);
+
+            let msg = "Your membership changes have been submitted to the Permaweb.  Your changes will be reflected in the next block.";
+            if (this.vehicle.ownership === "dao") {
+                msg = "Your membership changes have been proposed.  You'll be able to see the vote in the next block.";
+            }
+            alert(msg);
+            this.$router.push("/vehicles");
         },
         addMemberRow() {
             this.addRow = !this.addRow;
