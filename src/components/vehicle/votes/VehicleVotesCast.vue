@@ -211,7 +211,13 @@ export default {
             if (this.keyFile.length) {
                 wallet = JSON.parse(this.keyFile);
             } else {
-                alert("Please attach your keyfile");
+                // alert("Please attach your keyfile");
+                this.$swal({
+                    icon: 'warning',
+                    html: "Please attach your keyfile",
+                    showConfirmButton:false,
+                    timer: 2500
+                })
             }
         }
         // Create input
@@ -253,7 +259,13 @@ export default {
                 input
             );
         }
-        alert("Thank you for casting your vote.  Your vote will be reflected in the next block.")
+        // alert("Thank you for casting your vote.  Your vote will be reflected in the next block.")
+        this.$swal({
+                icon: "success",
+                html: "Thank you for casting your vote.  Your vote will be reflected in the next block.",
+                showConfirmButton:false,
+                timer: 2500
+        })
         this.$log.info("VehicleVotesCast : recordVote :: ", txId);
         this.$router.push("../vehicles");
         // this.$emit("close");

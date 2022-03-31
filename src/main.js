@@ -14,6 +14,9 @@ import UiTest from './components/UiTest.vue';
 import Overview from './components/Overview.vue';
 import MyPortfolio from './components/MyPortfolio.vue';
 import Chat from './components/utils/Chat.vue';
+import VueSweetalert2 from 'vue-sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
+
 
 const isProduction = process.env.NODE_ENV === 'development';
 const options = {
@@ -62,6 +65,7 @@ const app = createApp(App);
 app.use(store);
 app.use(router);
 app.use(VueLogger, options);
+app.use(VueSweetalert2);
 //app.use(uuid);
 
 app.mount('#app');

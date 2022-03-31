@@ -467,7 +467,13 @@ export default {
                 if(this.keyFile.length){
                     wallet =  JSON.parse(this.keyFile);
                 } else {
-                    alert("Please attach your keyfile");
+                    // alert("Please attach your keyfile");
+                    this.$swal({
+                        icon: 'warning',
+                        html: "Please attach your keyfile",
+                        showConfirmButton:false,
+                        timer: 2500
+                    })
                 }        
             }
             let txid = "";
@@ -488,7 +494,12 @@ export default {
             if (this.vehicle.ownership === "dao") {
                 msg = "Your membership changes have been proposed.  You'll be able to see the vote in the next block.";
             }
-            alert(msg);
+            // alert(msg);
+            this.$swal({
+                html: msg,
+                showConfirmButton:false,
+                timer: 2500
+            })
             this.$router.push("/vehicles");
         },
         addMemberRow() {

@@ -73,6 +73,9 @@
               </tr>
             </tbody>
         </table>
+        <div v-if="vehicle.votes.length == 0">
+            No Active Votes.
+        </div>
     </div>
 </template>
 

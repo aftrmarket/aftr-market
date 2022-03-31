@@ -158,7 +158,12 @@ export default {
   async created() {
     this.isLoading = true;
     if(!this.$store.getters.arConnected) {
-        alert("Please login to Aftr-Market")
+        // alert("Please login to Aftr-Market")
+        this.$swal({
+            html: "Please login to Aftr-Market",
+            showConfirmButton:false,
+            timer: 2500
+        })
     }
     
     // Use GraphQL to find all vehicle contracts, then load all vehicles

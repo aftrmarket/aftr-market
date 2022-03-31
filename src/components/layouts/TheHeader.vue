@@ -143,7 +143,12 @@ export default {
     },
     goMyPortfolio() {
       if(!this.$store.getters.arConnected){
-        alert("Please login to Aftr-Market")
+        // alert("Please login to Aftr-Market")
+        this.$swal({
+            html: "Please login to Aftr-Market",
+            showConfirmButton:false,
+            timer: 2500
+        })
       } else {
         this.$router.push("../MyPortfolio");
       }

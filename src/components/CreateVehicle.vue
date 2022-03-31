@@ -1039,7 +1039,13 @@ export default {
                 if (this.keyFile.length) {
                     use_wallet = JSON.parse(this.keyFile);
                 } else {
-                    alert("Please attach your keyfile");
+                    // alert("Please attach your keyfile");
+                    this.$swal({
+                        icon: 'warning',
+                        html: "Please attach your keyfile",
+                        showConfirmButton:false,
+                        timer: 2500
+                    })
                     return false;
                 }
             }
@@ -1093,9 +1099,14 @@ export default {
                     Object.keys(obj).length < 2
                 );
                 if (Object.keys(obj).length < 2) {
-                    alert(
-                        "Please add atleast two memebers if you are choose DAO ownership"
-                    );
+                    // alert(
+                    //     "Please add atleast two memebers if you are choose DAO ownership"
+                    // );
+                    this.$swal({
+                        html: "Please add atleast two memebers if you are choose DAO ownership",
+                        showConfirmButton:false,
+                        timer: 2500
+                    })
                     this.$router.push("vehicles");
                     return;
                 }
@@ -1103,7 +1114,12 @@ export default {
 
             for (var key in obj) {
                 if (obj[key] == 0) {
-                    alert("Please add tokens");
+                    // alert("Please add tokens");
+                    this.$swal({
+                        html: "Please add tokens",
+                        showConfirmButton:false,
+                        timer: 2500
+                    })
                     this.$router.push("vehicles");
                     throw new Error("Please add tokens");
                 }

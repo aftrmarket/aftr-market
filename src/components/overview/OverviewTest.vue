@@ -1,9 +1,9 @@
 <template>
     <main class="-mt-32">
-        <div v-if="getMyVehicle" class="flex items-center justify-center ">
-            Loading....
+        <!-- <div v-if="getMyVehicle" class="flex items-center justify-center ">
+            {{isLoading}}
             <div class="w-12 h-12 border-b-2 border-gray-500 rounded-full animate-spin"></div>
-        </div>
+        </div> -->
 
         <div class="pt-10 bg-aftrDarkGrey sm:pt-16 lg:pt-8 lg:pb-14 lg:overflow-hidden">
             <div class="mx-auto max-w-7xl lg:px-8">
@@ -281,7 +281,8 @@ export default {
             // Need to save IDs in order to update the vehicles' tokens 
             logoVintId: "",
             logoArhdId: "",
-            getMyVehicle: false
+            getMyVehicle: false,
+            isLoading: "Loading...."
         };
     },
     computed: {
@@ -304,19 +305,35 @@ export default {
             this.$store.dispatch("setTestLaunchConfigState");
 
             if (!this.$store.getters.getTestLaunchConfigState) {
-                alert("Please connect your Arweave wallet with ArConnect.");
+                this.$swal({
+                    icon: 'error',
+                    html : 'Please connect your Arweave wallet with ArConnect.',
+                    showConfirmButton:false,
+                    timer: 2500
+                });
+                // alert("Please connect your Arweave wallet with ArConnect.");
                 return false;
             }
 
             // Check for correct ArConnect settings
             if (import.meta.env.DEV) {
                 if (this.arConnectConfig.host != this.arweaveHost || this.arConnectConfig.protocol !=  this.arweaveProtocol || this.arConnectConfig.port != this.arweavePort) {
-                    alert("Your Arweave Config is pointing to the wrong gateway.  Please check your config in ArConnect.");
+                    this.$swal({
+                        icon: 'error',
+                        html : "Your Arweave Config is pointing to the wrong gateway.  Please check your config in ArConnect.",
+                        showConfirmButton:false,
+                        timer: 2500
+                    });
                     return false;
                 }
             } else if (import.meta.env.TEST) {
                 if (this.arConnectConfig.host != this.arweaveHost || this.arConnectConfig.protocol !=  this.arweaveProtocol || this.arConnectConfig.port != this.arweavePort) {
-                    alert("Your Arweave Config is pointing to the wrong gateway.  Please check your config in ArConnect.");
+                    this.$swal({
+                        icon: 'error',
+                        html : "Your Arweave Config is pointing to the wrong gateway.  Please check your config in ArConnect.",
+                        showConfirmButton:false,
+                        timer: 2500
+                    });
                     return false;
                 }
             } else {
@@ -345,12 +362,19 @@ export default {
                 if (this.keyFile.length) {
                     use_wallet = JSON.parse(this.keyFile);
                 } else {
-                    alert("Please attach your keyfile");
+                    this.$swal({
+                        icon: 'warning',
+                        html : "Please attach your keyfile",
+                        showConfirmButton:false,
+                        timer: 2500
+                    });
                     return false;
                 }
             } else {
                 use_wallet = "use_wallet";
             }
+            this.isLoading= "Checking user wallet."
+            this.$swal("Checking user wallet.")
             this.$log.info("OverviewTest : init :: ","1. Ensure wallet has some AR to make transactions");
 
             const addr = await arweave.wallets.jwkToAddress(use_wallet);
@@ -369,6 +393,12 @@ export default {
             this.$log.info("OverviewTest : init :: ", "Balance for " + addr + ": " + balance.toString());
             let aftrContractSrcId = "";     
             
+            this.isLoading= "Finding AFTR contract."
+            this.$swal({ 
+                        html: "Finding AFTR contract." ,
+                        showConfirmButton:false,
+                        timer: 2500
+            })
             this.$log.info("OverviewTest : init :: ", "2. AFTR Base Contract");
 
             let query = `query($cursor: String) {
@@ -406,6 +436,13 @@ export default {
 
             this.$log.info("OverviewTest : init :: ", "3. Sample PSTs");
 
+            this.isLoading = "Initializing PSTs"
+            this.$swal( {
+                html : "Initializing PSTs",
+                showConfirmButton:false,
+                timer: 2500
+            })
+
             let vintContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "pst", "Vint", "VINT", this.logoVint, JSON.stringify(vertoInitState));
             this.$log.info("OverviewTest : init :: ", "VINT: " + vintContractId);
 
@@ -413,6 +450,13 @@ export default {
             this.$log.info("OverviewTest : init :: ", "ARHD: " + arhdContractId);
 
             this.$log.info("OverviewTest : init :: ", "4. Sample AFTR Vehicles");
+
+            this.isLoading = "Creating sample AFTR Vehicles."
+            this.$swal({ 
+                html: "Creating sample AFTR Vehicles.",
+                showConfirmButton:false,
+                timer: 2500
+            })
 
             let chillContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "aftr", "Chillin Treasury", "CHILL", this.logoChillin, aftrChillinInitState);
             this.$log.info("OverviewTest : init :: ", "CHILL: " + chillContractId);
@@ -427,6 +471,13 @@ export default {
 
             let input = {};
             // Only add if user is not already there
+            this.isLoading = "Checking balances on Blue Horizon vehicle."
+            this.$swal({
+                icon: "success",
+                html: "Checking balances on Blue Horizon vehicle.",
+                showConfirmButton:false,
+                timer: 2500
+            })
             const blueVeh = await readContract(arweave, blueContractId);
             if (!(addr in blueVeh.balances)) {
                 input = {

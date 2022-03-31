@@ -453,7 +453,13 @@ export default {
                     if(this.keyFile.length){
                         wallet =  JSON.parse(this.keyFile)
                     } else {
-                        alert("Please attach your keyfile")
+                        // alert("Please attach your keyfile")
+                        this.$swal({
+                            icon: 'warning',
+                            html: "Please attach your keyfile",
+                            showConfirmButton:false,
+                            timer: 2500
+                        })
                     }        
                 } 
                 if (import.meta.env.DEV) {
