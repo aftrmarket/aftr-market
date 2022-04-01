@@ -1043,8 +1043,6 @@ export default {
                     this.$swal({
                         icon: 'warning',
                         html: "Please attach your keyfile",
-                        showConfirmButton:false,
-                        timer: 2500
                     })
                     return false;
                 }
@@ -1103,9 +1101,8 @@ export default {
                     //     "Please add atleast two memebers if you are choose DAO ownership"
                     // );
                     this.$swal({
+                        icon: 'warning',
                         html: "Please add atleast two memebers if you are choose DAO ownership",
-                        showConfirmButton:false,
-                        timer: 2500
                     })
                     this.$router.push("vehicles");
                     return;
@@ -1116,9 +1113,8 @@ export default {
                 if (obj[key] == 0) {
                     // alert("Please add tokens");
                     this.$swal({
+                        icon: 'warning',
                         html: "Please add tokens",
-                        showConfirmButton:false,
-                        timer: 2500
                     })
                     this.$router.push("vehicles");
                     throw new Error("Please add tokens");

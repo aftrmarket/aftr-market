@@ -215,8 +215,6 @@ export default {
                 this.$swal({
                     icon: 'warning',
                     html: "Please attach your keyfile",
-                    showConfirmButton:false,
-                    timer: 2500
                 })
             }
         }
@@ -263,8 +261,6 @@ export default {
         this.$swal({
                 icon: "success",
                 html: "Thank you for casting your vote.  Your vote will be reflected in the next block.",
-                showConfirmButton:false,
-                timer: 2500
         })
         this.$log.info("VehicleVotesCast : recordVote :: ", txId);
         this.$router.push("../vehicles");

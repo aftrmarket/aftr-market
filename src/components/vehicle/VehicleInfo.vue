@@ -457,8 +457,6 @@ export default {
                         this.$swal({
                             icon: 'warning',
                             html: "Please attach your keyfile",
-                            showConfirmButton:false,
-                            timer: 2500
                         })
                     }        
                 } 

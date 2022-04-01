@@ -308,8 +308,6 @@ export default {
                 this.$swal({
                     icon: 'error',
                     html : 'Please connect your Arweave wallet with ArConnect.',
-                    showConfirmButton:false,
-                    timer: 2500
                 });
                 // alert("Please connect your Arweave wallet with ArConnect.");
                 return false;
@@ -321,8 +319,6 @@ export default {
                     this.$swal({
                         icon: 'error',
                         html : "Your Arweave Config is pointing to the wrong gateway.  Please check your config in ArConnect.",
-                        showConfirmButton:false,
-                        timer: 2500
                     });
                     return false;
                 }
@@ -331,8 +327,6 @@ export default {
                     this.$swal({
                         icon: 'error',
                         html : "Your Arweave Config is pointing to the wrong gateway.  Please check your config in ArConnect.",
-                        showConfirmButton:false,
-                        timer: 2500
                     });
                     return false;
                 }
@@ -365,16 +359,16 @@ export default {
                     this.$swal({
                         icon: 'warning',
                         html : "Please attach your keyfile",
-                        showConfirmButton:false,
-                        timer: 2500
                     });
                     return false;
                 }
             } else {
                 use_wallet = "use_wallet";
             }
-            this.isLoading= "Checking user wallet."
-            this.$swal("Checking user wallet.")
+            this.$swal({
+                    icon: 'info',
+                    html : "Checking user wallet.",
+            })
             this.$log.info("OverviewTest : init :: ","1. Ensure wallet has some AR to make transactions");
 
             const addr = await arweave.wallets.jwkToAddress(use_wallet);
@@ -393,11 +387,9 @@ export default {
             this.$log.info("OverviewTest : init :: ", "Balance for " + addr + ": " + balance.toString());
             let aftrContractSrcId = "";     
             
-            this.isLoading= "Finding AFTR contract."
             this.$swal({ 
-                        html: "Finding AFTR contract." ,
-                        showConfirmButton:false,
-                        timer: 2500
+                    icon: 'info',
+                    html: "Finding AFTR contract." ,
             })
             this.$log.info("OverviewTest : init :: ", "2. AFTR Base Contract");
 
@@ -438,9 +430,8 @@ export default {
 
             this.isLoading = "Initializing PSTs"
             this.$swal( {
+                icon : 'info',
                 html : "Initializing PSTs",
-                showConfirmButton:false,
-                timer: 2500
             })
 
             let vintContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "pst", "Vint", "VINT", this.logoVint, JSON.stringify(vertoInitState));
@@ -453,9 +444,8 @@ export default {
 
             this.isLoading = "Creating sample AFTR Vehicles."
             this.$swal({ 
+                icon : 'info',
                 html: "Creating sample AFTR Vehicles.",
-                showConfirmButton:false,
-                timer: 2500
             })
 
             let chillContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "aftr", "Chillin Treasury", "CHILL", this.logoChillin, aftrChillinInitState);

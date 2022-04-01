@@ -215,8 +215,6 @@ export default {
             this.$swal({
                 logo: "error",
                 html: "ERROR to load vehicle. Please click on lunch button again",
-                showConfirmButton:false,
-                timer: 2500
             })
             this.$router.push("../overview");
             return false;
@@ -242,8 +240,6 @@ export default {
             this.$swal({
                 logo: "error",
                 html: "ERROR to load vehicle. Please click on lunch button again",
-                showConfirmButton:false,
-                timer: 2500
             })
             this.$router.push("../overview");
             return false;

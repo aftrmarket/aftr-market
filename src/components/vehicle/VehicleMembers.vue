@@ -471,8 +471,6 @@ export default {
                     this.$swal({
                         icon: 'warning',
                         html: "Please attach your keyfile",
-                        showConfirmButton:false,
-                        timer: 2500
                     })
                 }        
             }
@@ -496,9 +494,8 @@ export default {
             }
             // alert(msg);
             this.$swal({
+                icon: 'info',
                 html: msg,
-                showConfirmButton:false,
-                timer: 2500
             })
             this.$router.push("/vehicles");
         },
