@@ -214,7 +214,7 @@ export default {
             this.pageStatus = "error";
             this.$swal({
                 logo: "error",
-                html: "ERROR to load vehicle. Please click on lunch button again",
+                html: "ERROR to load vehicle. Please click the Launch button again",
             })
             this.$router.push("../overview");
             return false;
@@ -239,7 +239,7 @@ export default {
             this.pageStatus = "error";
             this.$swal({
                 logo: "error",
-                html: "ERROR to load vehicle. Please click on lunch button again",
+                html: "ERROR to load vehicle. Please click the Launch button again",
             })
             this.$router.push("../overview");
             return false;
