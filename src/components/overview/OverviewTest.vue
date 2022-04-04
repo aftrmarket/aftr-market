@@ -314,7 +314,7 @@ export default {
             }
 
             // Check for correct ArConnect settings
-            if (import.meta.env.DEV) {
+            if (import.meta.env.MODE === "development") {
                 if (this.arConnectConfig.host != this.arweaveHost || this.arConnectConfig.protocol !=  this.arweaveProtocol || this.arConnectConfig.port != this.arweavePort) {
                     this.$swal({
                         icon: 'error',
@@ -322,7 +322,7 @@ export default {
                     });
                     return false;
                 }
-            } else if (import.meta.env.TEST) {
+            } else if (import.meta.env.MODE === "test") {
                 if (this.arConnectConfig.host != this.arweaveHost || this.arConnectConfig.protocol !=  this.arweaveProtocol || this.arConnectConfig.port != this.arweavePort) {
                     this.$swal({
                         icon: 'error',
@@ -352,7 +352,7 @@ export default {
                     "/mine";
 
             let use_wallet;
-            if (import.meta.env.DEV) {
+            if (import.meta.env.MODE === "development") {
                 if (this.keyFile.length) {
                     use_wallet = JSON.parse(this.keyFile);
                 } else {

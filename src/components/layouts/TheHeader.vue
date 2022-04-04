@@ -66,7 +66,7 @@
                 </div>
                 <div v-else class="flex items-center">
                     <div class="text-aftrGo text-sm font-light">
-                    <input v-if="devMode" type="file" ref="doc" @change="readFile()" />
+                    <input v-if="siteMode==='DEV'" type="file" ref="doc" @change="readFile()" />
                   {{ walletAddressSubstr }}
                 </div>
                 <div>
@@ -101,7 +101,6 @@ export default {
       psts: [],
       devMode: import.meta.env.DEV,
       siteMode: import.meta.env.VITE_ENV,
-      //siteMode: "PROD",
       file: null, 
       content: {}
     };
