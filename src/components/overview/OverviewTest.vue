@@ -215,9 +215,9 @@ import {
 } from "@heroicons/vue/outline";
 
 import vertoInitState from "./../../testnet/contracts/vertoInitState.json";
-import * as vertoSource from "./../../testnet/contracts/vertoSource.js?raw";
+//import * as vertoSource from "./../../testnet/contracts/vertoSource.js?raw";
 import arDriveInitState from "./../../testnet/contracts/arDriveInitState.json";
-import * as arDriveSource from "./../../testnet/contracts/arDriveSource.js?raw";
+//import * as arDriveSource from "./../../testnet/contracts/arDriveSource.js?raw";
 import aftrAlquipaInitState from "./../../testnet/contracts/aftrAlquipaInitState.json?raw";
 import aftrBlueHorizonInitState from "./../../testnet/contracts/aftrBlueHorizonInitState.json?raw";
 import aftrChillinInitState from "./../../testnet/contracts/aftrChillinInitState.json?raw";
@@ -437,7 +437,7 @@ export default {
             let vintContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "pst", "Vint", "VINT", this.logoVint, JSON.stringify(vertoInitState));
             this.$log.info("OverviewTest : init :: ", "VINT: " + vintContractId);
 
-            let arhdContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "pst", "arHD", "ARHD", this.logoArhd, JSON.stringify(arDriveSource));
+            let arhdContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "pst", "arHD", "ARHD", this.logoArhd, JSON.stringify(arDriveInitState));
             this.$log.info("OverviewTest : init :: ", "ARHD: " + arhdContractId);
 
             this.$log.info("OverviewTest : init :: ", "4. Sample AFTR Vehicles");
