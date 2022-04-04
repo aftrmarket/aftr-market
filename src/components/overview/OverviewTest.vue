@@ -368,6 +368,7 @@ export default {
             this.$swal({
                     icon: 'info',
                     html : "Checking user wallet.",
+                    showConfirmButton: false,
             })
             this.$log.info("OverviewTest : init :: ","1. Ensure wallet has some AR to make transactions");
 
@@ -390,6 +391,7 @@ export default {
             this.$swal({ 
                     icon: 'info',
                     html: "Finding AFTR contract." ,
+                    showConfirmButton: false,
             })
             this.$log.info("OverviewTest : init :: ", "2. AFTR Base Contract");
 
@@ -432,6 +434,7 @@ export default {
             this.$swal( {
                 icon : 'info',
                 html : "Initializing PSTs",
+                showConfirmButton: false,
             })
 
             let vintContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "pst", "Vint", "VINT", this.logoVint, JSON.stringify(vertoInitState));
@@ -446,6 +449,7 @@ export default {
             this.$swal({ 
                 icon : 'info',
                 html: "Creating sample AFTR Vehicles.",
+                showConfirmButton: false,
             })
 
             let chillContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "aftr", "Chillin Treasury", "CHILL", this.logoChillin, aftrChillinInitState);
