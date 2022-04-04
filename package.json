@@ -2,8 +2,8 @@
   "name": "aftr",
   "version": "0.0.1",
   "scripts": {
-    "dev": "vite --mode development",
-    "build": "vite build --mode development",
+    "dev": "vite",
+    "build": "vite build",
     "serve": "vite preview"
   },
   "dependencies": {
