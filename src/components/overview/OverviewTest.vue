@@ -226,7 +226,6 @@ import aftrInitStatePlayground from "./../../testnet/contracts/aftrInitStatePlay
 
 import Arweave from "arweave";
 import { mapGetters } from "vuex";
-import request from 'supertest';
 import { createContractFromTx, createContract, interactWrite, readContract } from 'smartweave';
 
 const initProcess = [
@@ -381,7 +380,8 @@ export default {
             this.$log.info("OverviewTest : init :: ", "WALLET: " + addr);
             let balance = await arweave.wallets.getBalance(addr);
             if (balance < 10000000000000) {
-                const mintRes = await request(server).get(route);
+                //const mintRes = await request(server).get(route);
+                const mintRes = await fetch(server + route);
                 balance = await arweave.wallets.getBalance(addr);
             }
             
