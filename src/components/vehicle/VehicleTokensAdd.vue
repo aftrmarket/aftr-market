@@ -184,7 +184,7 @@ export default {
       );
 
       let vertoTxId;
-      if (import.meta.env.DEV) {
+      if (import.meta.env.VITE_ENV === "DEV") {
         let wallet = JSON.parse(this.keyFile);
         const mineUrl =
             import.meta.env.VITE_ARWEAVE_PROTOCOL +

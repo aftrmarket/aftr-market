@@ -333,7 +333,7 @@ export default {
                 });
 
             if (this.fileUpload){
-                if (import.meta.env.DEV) {
+                if (import.meta.env.VITE_ENV === "DEV") {
                     await this.deployFile(this.files, arweave, JSON.parse(this.keyFile));
                     const mineUrl =
                             import.meta.env.VITE_ARWEAVE_PROTOCOL +
@@ -449,7 +449,7 @@ export default {
                 //const txid = await interactWrite(arweave, "use_wallet", this.contractId, JSON.stringify(action));
                 /**** INSTEAD OF USING "use_wallet", copy the information out of your keyfile.json file and hardcode it below until I can figure out what's going on with ArConnect. */
                 let wallet;
-                if (import.meta.env.DEV) {
+                if (import.meta.env.VITE_ENV === "DEV") {
                     if(this.keyFile.length){
                         wallet =  JSON.parse(this.keyFile)
                     } else {
@@ -460,7 +460,7 @@ export default {
                         })
                     }        
                 } 
-                if (import.meta.env.DEV) {
+                if (import.meta.env.VITE_ENV === "DEV") {
                     const txid = await interactWrite(arweave, wallet, this.contractId, input);
                     this.$log.info("VehicleInfo : updateVehicle :: ", "TX: " + txid);
 

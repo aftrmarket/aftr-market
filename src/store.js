@@ -131,7 +131,7 @@ const store = createStore({
                 context.commit("setTestLaunchConfigState");
             }
 
-            if (import.meta.env.DEV || import.meta.env.TEST) {
+            if (import.meta.env.VITE_ENV === "DEV" || import.meta.env.VITE_ENV === "TEST") {
                 /*** HERE'S THE PROBLEM:
                  * THIS CODE CAN ONLY WORK IF THERE IS DATA.
                  * SO, WHEN ARLOCAL IS RESTARTED, THERE IS NO DATA, 

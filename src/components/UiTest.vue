@@ -42,7 +42,7 @@ export default {
             this.files = file;
 
             let wallet;
-            if (import.meta.env.DEV) {
+            if (import.meta.env.VITE_ENV === "DEV") {
                 if (this.keyFile.length) {
                     wallet = JSON.parse(this.keyFile);
                 } else {
@@ -79,7 +79,7 @@ export default {
             //     decimals: 5,
             //     trim: true,
             // });
-            // if (import.meta.env.DEV) {
+            // if (import.meta.env.VITE_ENV === "DEV") {
             //     this.address = await arweave.wallets.jwkToAddress(wallet);
             // } else {
             //     this.address = await arweave.wallets.jwkToAddress("use_wallet");
@@ -105,7 +105,7 @@ export default {
                 //     return alert("You don't have enough AR to upload this file!");
                 // }
 
-                if (import.meta.env.DEV) {
+                if (import.meta.env.VITE_ENV === "DEV") {
                    await this.deployFile(this.files, arweave, wallet);
                     const mineUrl =
                             import.meta.env.VITE_ARWEAVE_PROTOCOL +

@@ -99,7 +99,7 @@ export default {
       arConnected: false,
       profileDropdown: false,
       psts: [],
-      devMode: import.meta.env.DEV,
+      devMode: import.meta.env.VITE_ENV,
       siteMode: import.meta.env.VITE_ENV,
       file: null, 
       content: {}

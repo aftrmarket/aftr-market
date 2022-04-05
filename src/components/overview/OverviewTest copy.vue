@@ -292,12 +292,12 @@ export default {
             }
 
             // Check for correct ArConnect settings
-            if (import.meta.env.DEV) {
+            if (import.meta.env.VITE_ENV === "DEV") {
                 if (this.arConnectConfig.host != "localhost" || this.arConnectConfig.protocol != "http" || this.arConnectConfig.port != 1984) {
                     alert("Your Arweave Config is pointing to the wrong gateway.  Please check your config in ArConnect.");
                     return false;
                 }
-            } else if (import.meta.env.TEST) {
+            } else if (import.meta.env.VITE_ENV === "TEST") {
                 if (this.arConnectConfig.host != "www.arweave.run" || this.arConnectConfig.protocol != "https" || this.arConnectConfig.port != 443) {
                     alert("Your Arweave Config is pointing to the wrong gateway.  Please check your config in ArConnect.");
                     return false;
@@ -324,7 +324,7 @@ export default {
                     "/mine";
 
             let use_wallet;
-            if (import.meta.env.DEV) {
+            if (import.meta.env.VITE_ENV === "DEV") {
                 if (this.keyFile.length) {
                     use_wallet = JSON.parse(this.keyFile);
                 } else {

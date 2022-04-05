@@ -503,6 +503,75 @@ export default {
             }
 
             this.$log.info("OverviewTest : init :: ", JSON.stringify(await readContract(arweave, blueContractId, undefined, true)));
+            
+            let queryval = {
+                query: `
+                        query($cursor: String) {
+                            transactions(
+                                tags: [{ name: "App-Name", values: ["SmartWeaveContract"] }]
+                                after: $cursor
+                            ) {
+                                pageInfo {
+                                    hasNextPage
+                                }
+                                edges {
+                                    cursor
+                                    node { id } 
+                                }
+                            }
+                    }`,
+                };
+
+            const responseValue = await arweave.api.post('graphql', { query: queryval.query });
+
+            let wallet = {
+            address: "",
+            psts: [],
+            };
+
+            for(let edge of responseValue.data.data.transactions.edges) {
+                    try {
+                        let vehicle = await readContract(arweave, edge.node.id);
+
+                    
+                        if (vehicle && Object.keys(vehicle.balances).length != 0 && vehicle.name) {
+                            let data = {
+                                id: edge.node.id,
+                                balance: 0,
+                                name: vehicle.name,
+                                ticker: vehicle.ticker,
+                                logo: '',
+                                fcp: vehicle && vehicle.invocations && vehicle.foreignCalls  ? true : false
+                            };
+
+                            Object.keys(vehicle.balances).some(walletId=>{
+                                if(walletId == wallet.address){
+                                    data.balance = vehicle.balances[wallet.address];
+                            }});
+
+                            // Logo
+                            vehicle.settings.forEach(setting => {
+                                if (setting[0] === 'communityLogo') {
+                                    data.logo = setting[1];
+                                }
+                            });
+                                /*
+                                JOE : Here I got vehicle balance is zero. So thats why I am commenting the if condition. 
+                                otherwise this function is working correctly.
+                                */
+                            // if (data.balance > 0) {
+                                wallet.psts.push(data);
+                            // }
+                            
+                        }
+                    } catch(e) {
+                        this.$log.error("ERROR reading contract for " + edge.node.id + ": " + e);
+                    }
+                    this.$log.info("PSTS: " + JSON.stringify(wallet.psts));
+                    this.$store.commit("arConnect", wallet)
+                }
+            
+
             this.$router.push("vehicles");
         },
         async createAftrVehicle(arweave, wallet, aftrId, initState) {

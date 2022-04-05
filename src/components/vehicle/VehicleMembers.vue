@@ -463,7 +463,7 @@ export default {
             this.$log.info("VehicleMembers : submit :: ", JSON.stringify(input));
 
             let wallet;
-            if (import.meta.env.DEV) {
+            if (import.meta.env.VITE_ENV === "DEV") {
                 if(this.keyFile.length){
                     wallet =  JSON.parse(this.keyFile);
                 } else {
@@ -475,7 +475,7 @@ export default {
                 }        
             }
             let txid = "";
-            if (import.meta.env.DEV) {
+            if (import.meta.env.VITE_ENV === "DEV") {
                 txid = await interactWrite(arweave, wallet, this.vehicle.id, input);
                 
                 /**** IN ORDER FOR THIS TO PROCESS, YOU NEED TO RUN http://localhost:1984/mine */

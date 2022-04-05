@@ -207,7 +207,7 @@ export default {
         });
 
         let wallet;
-        if (import.meta.env.DEV) {
+        if (import.meta.env.VITE_ENV === "DEV") {
             if (this.keyFile.length) {
                 wallet = JSON.parse(this.keyFile);
             } else {
@@ -236,7 +236,7 @@ export default {
             };
         }
         // Call SmartWeave
-        if (import.meta.env.DEV) {
+        if (import.meta.env.VITE_ENV === "DEV") {
             txId = await interactWrite(
                 arweave,
                 wallet,

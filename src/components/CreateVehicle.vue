@@ -651,7 +651,7 @@ export default {
 
 
             // let wallet;
-            // if (import.meta.env.DEV) {
+            // if (import.meta.env.VITE_ENV === "DEV") {
             //     if (this.keyFile.length) {
             //         wallet = JSON.parse(this.keyFile);
             //     } else {
@@ -683,7 +683,7 @@ export default {
             //     decimals: 5,
             //     trim: true,
             // });
-            // if (import.meta.env.DEV) {
+            // if (import.meta.env.VITE_ENV === "DEV") {
             //     this.address = await arweave.wallets.jwkToAddress(wallet);
             // } else {
             //     this.address = await arweave.wallets.jwkToAddress("use_wallet");
@@ -712,7 +712,7 @@ export default {
                 //     return alert("You don't have enough AR to upload this file!");
                 // }
 
-                //if (import.meta.env.DEV) {
+                //if (import.meta.env.VITE_ENV === "DEV") {
                 //    await this.deployFile(this.files, arweave, wallet);
                 //} else {
                 //    await this.deployFile(this.files, arweave, "use_wallet");
@@ -1035,7 +1035,7 @@ export default {
             // Default Settings
             /*** TODO: ADD LOGO (communityLogo) to settings when implemented */
             let use_wallet;
-            if (import.meta.env.DEV) {
+            if (import.meta.env.VITE_ENV === "DEV") {
                 if (this.keyFile.length) {
                     use_wallet = JSON.parse(this.keyFile);
                 } else {
@@ -1048,7 +1048,7 @@ export default {
                 }
             }
             if (this.fileUpload){
-                if (import.meta.env.DEV) {
+                if (import.meta.env.VITE_ENV === "DEV") {
                     await this.deployFile(this.files, arweave, use_wallet);
                     const mineUrl =
                             import.meta.env.VITE_ARWEAVE_PROTOCOL +
@@ -1127,7 +1127,7 @@ export default {
                 this.$log.info("CreateVehicle : createVehicle :: ", "vehicle: " + JSON.stringify(this.vehicle));
                 this.$log.info("CreateVehicle : createVehicle :: ", "tags: " + JSON.stringify(initTags));
 
-                if (import.meta.env.DEV) {
+                if (import.meta.env.VITE_ENV === "DEV") {
                     this.vehicle["id"] = await createContractFromTx(
                         arweave,
                         use_wallet,
@@ -1175,7 +1175,7 @@ export default {
                         target: this.vehicle.id,
                         qty: pst.tokens, // PST qty
                     };
-                    if (import.meta.env.DEV) {
+                    if (import.meta.env.VITE_ENV === "DEV") {
                         let wallet = JSON.parse(this.keyFile);
                         const mineUrl =
                                 import.meta.env.VITE_ARWEAVE_PROTOCOL +
