@@ -17,12 +17,18 @@ import Chat from './components/utils/Chat.vue';
 import VueSweetalert2 from 'vue-sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
 
-
-const isProduction = process.env.NODE_ENV === 'development';
+let logLevel = "";
+if (import.meta.env.VITE_ENV === 'PROD') {
+    logLevel = "fatal";
+} else if (import.meta.env.VITE_ENV === 'TEST') {
+    logLevel = "info";
+} else {
+    logLevel = "debug";
+}
 const options = {
     isEnabled: true,
-    logLevel : isProduction ? 'info' : ['debug', 'info', 'warn', 'error', 'fatal'],
-    stringifyArguments : true,
+    logLevel : logLevel,
+    stringifyArguments : false,
     showLogLevel : true,
     showMethodName : true,
     separator: '|',
