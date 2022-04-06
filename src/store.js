@@ -131,86 +131,87 @@ const store = createStore({
                 context.commit("setTestLaunchConfigState");
             }
 
-            if (import.meta.env.VITE_ENV === "DEV" || import.meta.env.VITE_ENV === "TEST") {
-                /*** HERE'S THE PROBLEM:
-                 * THIS CODE CAN ONLY WORK IF THERE IS DATA.
-                 * SO, WHEN ARLOCAL IS RESTARTED, THERE IS NO DATA, 
-                 * THEREFORE THIS CODE NEEDS TO RUN AS A PART OF THE LAUNCH SCRIPT
-                 * FOR THE DEV AND TEST ENVS.
-                 */
-                let query = {
-                query: `
-                        query($cursor: String) {
-                            transactions(
-                                tags: [{ name: "App-Name", values: ["SmartWeaveContract"] }]
-                                after: $cursor
-                            ) {
-                                pageInfo {
-                                    hasNextPage
-                                }
-                                edges {
-                                    cursor
-                                    node { id } 
-                                }
-                            }
-                    }`,
-                };
+            // if (import.meta.env.VITE_ENV === "DEV" || import.meta.env.VITE_ENV === "TEST") {
+            //     /*** HERE'S THE PROBLEM:
+            //      * THIS CODE CAN ONLY WORK IF THERE IS DATA.
+            //      * SO, WHEN ARLOCAL IS RESTARTED, THERE IS NO DATA, 
+            //      * THEREFORE THIS CODE NEEDS TO RUN AS A PART OF THE LAUNCH SCRIPT
+            //      * FOR THE DEV AND TEST ENVS.
+            //      */
+            //     let query = {
+            //     query: `
+            //             query($cursor: String) {
+            //                 transactions(
+            //                     tags: [{ name: "App-Name", values: ["SmartWeaveContract"] }]
+            //                     after: $cursor
+            //                 ) {
+            //                     pageInfo {
+            //                         hasNextPage
+            //                     }
+            //                     edges {
+            //                         cursor
+            //                         node { id } 
+            //                     }
+            //                 }
+            //         }`,
+            //     };
             
-                let arweave = {};
-                try {
-                    arweave = await Arweave.init({
-                        host: import.meta.env.VITE_ARWEAVE_HOST,
-                        port: import.meta.env.VITE_ARWEAVE_PORT,
-                        protocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
-                        timeout: 20000,
-                        logging: true,
-                    });
-                } catch (error) {
-                    console.log("ERROR connecting to Arweave: " + error);
-                    return false;
-                }
+            //     let arweave = {};
+            //     try {
+            //         arweave = await Arweave.init({
+            //             host: import.meta.env.VITE_ARWEAVE_HOST,
+            //             port: import.meta.env.VITE_ARWEAVE_PORT,
+            //             protocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
+            //             timeout: 20000,
+            //             logging: true,
+            //         });
+            //     } catch (error) {
+            //         console.log("ERROR connecting to Arweave: " + error);
+            //         return false;
+            //     }
 
-                const response = await arweave.api.post('graphql', { query: query.query });
+            //     const response = await arweave.api.post('graphql', { query: query.query });
 
-                for(let edge of response.data.data.transactions.edges) {
-                    console.log("CONTRACT: " + edge.node.id);
-                    try {
-                        let vehicle = await readContract(arweave, edge.node.id);
+            //     for(let edge of response.data.data.transactions.edges) {
+            //         console.log("CONTRACT: " + edge.node.id);
+            //         try {
+            //             let vehicle = await readContract(arweave, edge.node.id);
                     
-                        if (vehicle && Object.keys(vehicle.balances).length != 0 && vehicle.name) {
-                            let data = {
-                                id: edge.node.id,
-                                balance: 0,
-                                name: vehicle.name,
-                                ticker: vehicle.ticker,
-                                logo: '',
-                                fcp: vehicle && vehicle.invocations && vehicle.foreignCalls  ? true : false
-                            };
+            //             if (vehicle && Object.keys(vehicle.balances).length != 0 && vehicle.name) {
+            //                 let data = {
+            //                     id: edge.node.id,
+            //                     balance: 0,
+            //                     name: vehicle.name,
+            //                     ticker: vehicle.ticker,
+            //                     logo: '',
+            //                     fcp: vehicle && vehicle.invocations && vehicle.foreignCalls  ? true : false
+            //                 };
 
-                            Object.keys(vehicle.balances).some(walletId=>{
-                                if(walletId == wallet.address){
-                                    data.balance = vehicle.balances[wallet.address];
-                            }});
+            //                 Object.keys(vehicle.balances).some(walletId=>{
+            //                     if(walletId == wallet.address){
+            //                         data.balance = vehicle.balances[wallet.address];
+            //                 }});
 
-                            // Logo
-                            vehicle.settings.forEach(setting => {
-                                if (setting[0] === 'communityLogo') {
-                                    data.logo = setting[1];
-                                }
-                            });
-                            if (data.balance > 0) {
-                                wallet.psts.push(data);
-                            }
-                        }
-                    } catch(e) {
-                        console.log("ERROR reading contract for " + edge.node.id + ": " + e);
-                    }
-                    console.log("PSTS: " + JSON.stringify(wallet.psts));
-                }
-            } else {
+            //                 // Logo
+            //                 vehicle.settings.forEach(setting => {
+            //                     if (setting[0] === 'communityLogo') {
+            //                         data.logo = setting[1];
+            //                     }
+            //                 });
+            //                 if (data.balance > 0) {
+            //                     wallet.psts.push(data);
+            //                 }
+            //             }
+            //         } catch(e) {
+            //             console.log("ERROR reading contract for " + edge.node.id + ": " + e);
+            //         }
+            //         console.log("PSTS: " + JSON.stringify(wallet.psts));
+            //     }
+            // } else {
     /*** ONLY RUNS IN PROD
      * BUT NEEDS TO RUN HERE IN STORE.JS
      */
+            if (import.meta.env.VITE_ENV === "PROD") {
                 // Now query Verto to get all PSTs contained in Wallet
                 const response = await fetch(
                     import.meta.env.VITE_VERTO_CACHE_URL + "balance/" + wallet.address
