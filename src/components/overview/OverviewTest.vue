@@ -293,11 +293,6 @@ export default {
                 window.location.href = import.meta.env.VITE_AFTR_PROD;
             }
         },
-        setup() {
-            return {
-                initProcess,
-            };
-        },
         async init() {
             this.getMyVehicle = true
             // Check to see if system is ready for for Test Launch
@@ -528,12 +523,16 @@ export default {
             address: "",
             psts: [],
             };
-
+/**
+ * CODE IS BROKEN IN THIS FOR LOOP.
+ * AS YOU CAN SEE USING THE CONSOLE LOG, THE WALLET BALANCE IS GETTING WIPED OUT IN THE LOOP.
+ * SO, FOCUS ON FIXING THAT PART.
+ */
+console.log("WALLET BALANCE BEFORE LOOP: " + this.$store.getters.getActiveAddress);
             for(let edge of responseValue.data.data.transactions.edges) {
                     try {
                         let vehicle = await readContract(arweave, edge.node.id);
 
-                    
                         if (vehicle && Object.keys(vehicle.balances).length != 0 && vehicle.name) {
                             let data = {
                                 id: edge.node.id,
@@ -558,10 +557,13 @@ export default {
                                 /*
                                 JOE : Here I got vehicle balance is zero. So thats why I am commenting the if condition. 
                                 otherwise this function is working correctly.
+                                
+                                PRAJACTA: THIS IS NEEDED.  THE WALLET ADDRESS IS GETTING WIPED OUT, SO THAT'S WHY THIS IS FAILING.
                                 */
-                            // if (data.balance > 0) {
+
+                            if (data.balance > 0) {
                                 wallet.psts.push(data);
-                            // }
+                            }
                             
                         }
                     } catch(e) {
@@ -570,9 +572,10 @@ export default {
                     this.$log.info("PSTS: " + JSON.stringify(wallet.psts));
                     this.$store.commit("arConnect", wallet)
                 }
-            
-
             this.$router.push("vehicles");
+            
+console.log("WALLET BALANCE AFTER LOOP: " + this.$store.getters.getActiveAddress);
+
         },
         async createAftrVehicle(arweave, wallet, aftrId, initState) {
             let swTags = [{ name: "Protocol", value: this.tagProtocol }];
