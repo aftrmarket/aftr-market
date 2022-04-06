@@ -285,7 +285,8 @@ export default {
           this.$log.error("VehicleTokensAdd : interactWrite :: ", "THIS VEHICLE: " + this.vehicle.id);
         }
       }
-      window.location.reload();
+      // window.location.reload();
+      this.$router.push("../vehicles");
       this.$emit("close");
     },
         pstChange() {

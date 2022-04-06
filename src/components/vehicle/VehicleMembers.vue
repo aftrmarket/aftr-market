@@ -457,9 +457,6 @@ export default {
             logging: true,
             });
 
-            console.log(JSON.stringify(input));
-            console.log("VEH: " + JSON.stringify(this.vehicle));
-
             this.$log.info("VehicleMembers : submit :: ", JSON.stringify(input));
 
             let wallet;

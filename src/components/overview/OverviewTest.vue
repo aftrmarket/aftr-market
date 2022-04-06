@@ -520,15 +520,17 @@ export default {
             const responseValue = await arweave.api.post('graphql', { query: queryval.query });
 
             let wallet = {
-            address: "",
-            psts: [],
+                address: "",
+                psts: [],
             };
 /**
  * CODE IS BROKEN IN THIS FOR LOOP.
  * AS YOU CAN SEE USING THE CONSOLE LOG, THE WALLET BALANCE IS GETTING WIPED OUT IN THE LOOP.
  * SO, FOCUS ON FIXING THAT PART.
  */
-console.log("WALLET BALANCE BEFORE LOOP: " + this.$store.getters.getActiveAddress);
+
+            wallet.address = this.$store.getters.getActiveAddress
+
             for(let edge of responseValue.data.data.transactions.edges) {
                     try {
                         let vehicle = await readContract(arweave, edge.node.id);
@@ -573,9 +575,6 @@ console.log("WALLET BALANCE BEFORE LOOP: " + this.$store.getters.getActiveAddres
                     this.$store.commit("arConnect", wallet)
                 }
             this.$router.push("vehicles");
-            
-console.log("WALLET BALANCE AFTER LOOP: " + this.$store.getters.getActiveAddress);
-
         },
         async createAftrVehicle(arweave, wallet, aftrId, initState) {
             let swTags = [{ name: "Protocol", value: this.tagProtocol }];
