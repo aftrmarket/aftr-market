@@ -306,7 +306,7 @@ export default {
                 // alert("Please connect your Arweave wallet with ArConnect.");
                 return false;
             }
-console.log("DO I GET HERE?");
+
             // Check for correct ArConnect settings
             if (import.meta.env.VITE_ENV === "DEV") {
                 if (this.arConnectConfig.host != this.arweaveHost || this.arConnectConfig.protocol !=  this.arweaveProtocol || this.arConnectConfig.port != this.arweavePort) {
@@ -317,6 +317,7 @@ console.log("DO I GET HERE?");
                     return false;
                 }
             } else if (import.meta.VITE_ENV === "TEST") {
+                console.log("DO I GET HERE?");
                 if (this.arConnectConfig.host != this.arweaveHost || this.arConnectConfig.protocol !=  this.arweaveProtocol || this.arConnectConfig.port != this.arweavePort) {
                     this.$swal({
                         icon: 'error',
