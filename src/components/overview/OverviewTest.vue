@@ -369,6 +369,7 @@ export default {
                     html : "Checking user wallet.",
                     showConfirmButton: false,
             })
+            console.log("DO I GET HERE?");
             this.$log.info("OverviewTest : init :: ","1. Ensure wallet has some AR to make transactions");
 
             const addr = await arweave.wallets.jwkToAddress(use_wallet);
