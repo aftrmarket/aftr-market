@@ -21,7 +21,7 @@ let logLevel = "";
 if (import.meta.env.VITE_ENV === 'PROD') {
     logLevel = "fatal";
 } else if (import.meta.env.VITE_ENV === 'TEST') {
-    logLevel = "info";
+    logLevel = "debug";
 } else {
     logLevel = "debug";
 }
