@@ -5,8 +5,14 @@
     </div>
     <div class="flex flex-col">
         <div class="flex justify-between">
-            <div class="mt-2 pb-3 text-sm text-gray-700">Current Block: {{ currentBlock.height  }}</div>
             
+            <div class="mt-2 pb-3 text-sm text-gray-700">Current Block: {{ currentBlock.height  }}</div>
+            <div class="mt-2 pb-3 text-sm text-gray-700" id="votes">
+                <div class="filter">
+                    <label><input type="radio" v-model="selectedVoteCategory" value="All" />  All Votes </label>
+                    <label><input type="radio" v-model="selectedVoteCategory" value="Active" />  Active Votes </label>
+                </div>
+            </div>
             <div v-if="false">
                 <button v-if="allowAdd" @click.prevent="openModal('add')" type="button" class="inline-flex items-center px-4 py-2 mb-3 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -46,8 +52,8 @@
                 </th>
               </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200" v-for="vote in votes" :key="vote.id">
-              <tr v-if="vote.status === 'active'">
+            <tbody class="bg-white divide-y divide-gray-200" v-for="vote in filteredPeople" :key="vote.id">
+              <tr >
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {{ walletAddressSubstr(vote.id) }}
                 </td>
@@ -96,13 +102,24 @@ export default {
             allowAdd: false,
             voteId: 0,
             voteData : {},
-            votes: this.vehicle.votes
+            votes: this.vehicle.votes,
+            selectedVoteCategory: "All"
             //currentBlock: 110,  // TEMP, GET CURRENT BLOCK
         };
     },
     computed: {
         ...mapGetters(['arConnected', 'getActiveAddress', 'getCurrentBlockValue']),
         ...mapState(['currentBlock']),
+        filteredPeople() {
+			let status = this.selectedVoteCategory;
+            let vote = this.votes
+            if(status == "active" || status == "Active"){
+                    let voteArray = vote.filter(voteVal => voteVal.status === 'active' || voteVal.status === 'Active');
+                    return voteArray;
+            } else {
+                return vote
+            }
+        },
     },
     mounted () {
         this.$store.dispatch('loadCurrentBlock')
