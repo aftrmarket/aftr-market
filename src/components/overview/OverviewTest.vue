@@ -330,13 +330,18 @@ export default {
             }
             
             let arweave = {};
-            arweave = await Arweave.init({
-                host: this.arweaveHost,
-                port: this.arweavePort,
-                protocol: this.arweaveProtocol,
-                timeout: 20000,
-                logging: true,
-            });
+            try{
+                    arweave = await Arweave.init({
+                    host: this.arweaveHost,
+                    port: this.arweavePort,
+                    protocol: this.arweaveProtocol,
+                    timeout: 20000,
+                    logging: true,
+                });
+            } catch(e) {
+                console.log("Arweave connection failed: " + e);
+            }
+
              const mineUrl =
                     import.meta.env.VITE_ARWEAVE_PROTOCOL +
                     "://" +
