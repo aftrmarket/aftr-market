@@ -316,7 +316,7 @@ export default {
                     });
                     return false;
                 }
-            } else if (import.meta.VITE_ENV === "TEST") {
+            } else if (import.meta.env.VITE_ENV === "TEST") {
                 if (this.arConnectConfig.host != this.arweaveHost || this.arConnectConfig.protocol !=  this.arweaveProtocol || this.arConnectConfig.port != this.arweavePort) {
                     this.$swal({
                         icon: 'error',
@@ -326,8 +326,7 @@ export default {
                 }
             } else {
                 // Situation should never occur :)
-                console.log("DO I GET HERE?");
-                console.log("Value: " + import.meta.VITE_ENV);
+                this.$log.info("OverviewTest : init :: ", "Situation should never occur");
                 return false;
             }
             
@@ -341,7 +340,7 @@ export default {
                     logging: true,
                 });
             } catch(e) {
-                console.log("Arweave connection failed: " + e);
+                this.$log.info("OverviewTest : init :: ", "Error connecting to Arweave " + e);
             }
 
              const mineUrl =
