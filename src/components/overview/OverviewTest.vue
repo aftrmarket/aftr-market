@@ -317,7 +317,6 @@ export default {
                     return false;
                 }
             } else if (import.meta.VITE_ENV === "TEST") {
-                console.log("DO I GET HERE?");
                 if (this.arConnectConfig.host != this.arweaveHost || this.arConnectConfig.protocol !=  this.arweaveProtocol || this.arConnectConfig.port != this.arweavePort) {
                     this.$swal({
                         icon: 'error',
@@ -327,6 +326,8 @@ export default {
                 }
             } else {
                 // Situation should never occur :)
+                console.log("DO I GET HERE?");
+                console.log("Value: " + import.meta.VITE_ENV);
                 return false;
             }
             
