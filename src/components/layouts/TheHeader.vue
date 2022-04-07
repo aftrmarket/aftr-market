@@ -99,7 +99,7 @@ export default {
       arConnected: false,
       profileDropdown: false,
       psts: [],
-      devMode: import.meta.env.VITE_ENV,
+      devMode: import.meta.env.VITE_ARWEAVE_HOST === "localhost",
       siteMode: import.meta.env.VITE_ENV,
       file: null, 
       content: {}
