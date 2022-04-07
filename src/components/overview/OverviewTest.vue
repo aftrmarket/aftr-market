@@ -306,7 +306,7 @@ export default {
                 // alert("Please connect your Arweave wallet with ArConnect.");
                 return false;
             }
-
+console.log("DO I GET HERE?");
             // Check for correct ArConnect settings
             if (import.meta.env.VITE_ENV === "DEV") {
                 if (this.arConnectConfig.host != this.arweaveHost || this.arConnectConfig.protocol !=  this.arweaveProtocol || this.arConnectConfig.port != this.arweavePort) {
@@ -330,7 +330,6 @@ export default {
             }
             
             let arweave = {};
-console.log("DO I GET HERE?");
             try{
                 arweave = await Arweave.init({
                     host: this.arweaveHost,
