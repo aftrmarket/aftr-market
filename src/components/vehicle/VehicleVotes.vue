@@ -3,20 +3,14 @@
         <vehicle-votes-add v-if="showAddVotes" :vehicle="vehicle" @close="closeModal('add')"></vehicle-votes-add>
         <vehicle-votes-cast v-if="showCastVotes" :vehicle="vehicle" :voteId="voteId" :voteData="voteData" :contractId="contractId" :currentBlock="currentBlock.height"  @close="closeModal('cast')"></vehicle-votes-cast>
     </div>
-    <h3 class="mt-4 pt-4 text-xl font-light leading-6">Settings</h3>
-    <div class="border-b border-gray-200 bg-white sm:p-6">
-            <div class="pt-2 grid grid-cols-3 flex items-center gap-x-4">
-                <label class="block text-sm font-medium text-gray-700">Status</label>
-            </div>
-            <div>
-                <input type="radio" v-model="selectedVoteCategory" value="Active" /><label class="px-2 text-sm text-gray-700">Active Votes</label>
-                <input type="radio" v-model="selectedVoteCategory" value="All" /><label class="px-2 text-sm text-gray-700">Concluded Votes</label>
-            </div>
-    </div>
     <div class="flex flex-col">
         <div class="flex justify-between">
             
             <div class="mt-2 pb-3 text-sm text-gray-700">Current Block: {{ currentBlock.height  }}</div>
+            <div>
+                <input type="radio" v-model="selectedVoteCategory" value="Active" class="form-radio text-aftrBlue" /><label class="px-2 text-sm text-gray-700">Active Votes</label>
+                <input type="radio" v-model="selectedVoteCategory" value="Concluded" class="form-radio text-aftrBlue" /><label class="px-2 text-sm text-gray-700">Concluded Votes</label>
+            </div>
 
             <div v-if="false">
                 <button v-if="allowAdd" @click.prevent="openModal('add')" type="button" class="inline-flex items-center px-4 py-2 mb-3 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
@@ -109,7 +103,6 @@ export default {
             voteData : {},
             votes: this.vehicle.votes,
             selectedVoteCategory: "Active"
-            //currentBlock: 110,  // TEMP, GET CURRENT BLOCK
         };
     },
     computed: {
