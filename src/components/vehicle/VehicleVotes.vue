@@ -3,16 +3,21 @@
         <vehicle-votes-add v-if="showAddVotes" :vehicle="vehicle" @close="closeModal('add')"></vehicle-votes-add>
         <vehicle-votes-cast v-if="showCastVotes" :vehicle="vehicle" :voteId="voteId" :voteData="voteData" :contractId="contractId" :currentBlock="currentBlock.height"  @close="closeModal('cast')"></vehicle-votes-cast>
     </div>
+    <h3 class="mt-4 pt-4 text-xl font-light leading-6">Settings</h3>
+    <div class="border-b border-gray-200 bg-white sm:p-6">
+            <div class="pt-2 grid grid-cols-3 flex items-center gap-x-4">
+                <label class="block text-sm font-medium text-gray-700">Status</label>
+            </div>
+            <div>
+                <input type="radio" v-model="selectedVoteCategory" value="Active" /><label class="px-2 text-sm text-gray-700">Active Votes</label>
+                <input type="radio" v-model="selectedVoteCategory" value="All" /><label class="px-2 text-sm text-gray-700">Concluded Votes</label>
+            </div>
+    </div>
     <div class="flex flex-col">
         <div class="flex justify-between">
             
             <div class="mt-2 pb-3 text-sm text-gray-700">Current Block: {{ currentBlock.height  }}</div>
-            <div class="mt-2 pb-3 text-sm text-gray-700" id="votes">
-                <div class="filter">
-                    <label><input type="radio" v-model="selectedVoteCategory" value="All" />  All Votes </label>
-                    <label><input type="radio" v-model="selectedVoteCategory" value="Active" />  Active Votes </label>
-                </div>
-            </div>
+
             <div v-if="false">
                 <button v-if="allowAdd" @click.prevent="openModal('add')" type="button" class="inline-flex items-center px-4 py-2 mb-3 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -32,7 +37,7 @@
                 </div>
             </div>
         </div>
-        <table v-if="vehicle.votes.length > 0" class="min-w-full divide-y divide-gray-200">
+        <table v-if="filteredPeople.length > 0" class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -79,8 +84,8 @@
               </tr>
             </tbody>
         </table>
-        <div v-if="vehicle.votes.length == 0">
-            No Active Votes.
+        <div v-if="filteredPeople.length == 0">
+            Votes are not available.
         </div>
     </div>
 </template>
@@ -103,7 +108,7 @@ export default {
             voteId: 0,
             voteData : {},
             votes: this.vehicle.votes,
-            selectedVoteCategory: "All"
+            selectedVoteCategory: "Active"
             //currentBlock: 110,  // TEMP, GET CURRENT BLOCK
         };
     },
@@ -114,10 +119,11 @@ export default {
 			let status = this.selectedVoteCategory;
             let vote = this.votes
             if(status == "active" || status == "Active"){
-                    let voteArray = vote.filter(voteVal => voteVal.status === 'active' || voteVal.status === 'Active');
+                    let voteArray = vote.filter(voteVal => voteVal.status === 'active');
                     return voteArray;
             } else {
-                return vote
+                    let voteArray = vote.filter(voteVal => voteVal.status != 'active');
+                    return voteArray;
             }
         },
     },
