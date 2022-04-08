@@ -314,6 +314,7 @@ export default {
                         icon: 'error',
                         html : "Your Arweave Config is pointing to the wrong gateway.  Please check your config in ArConnect.",
                     });
+                    this.$store.dispatch("arDisconnect");
                     return false;
                 }
             } else if (import.meta.env.VITE_ENV === "TEST") {
@@ -322,6 +323,7 @@ export default {
                         icon: 'error',
                         html : "Your Arweave Config is pointing to the wrong gateway.  Please check your config in ArConnect.",
                     });
+                    this.$store.dispatch("arDisconnect");
                     return false;
                 }
             } else {
@@ -530,11 +532,6 @@ export default {
                 address: "",
                 psts: [],
             };
-/**
- * CODE IS BROKEN IN THIS FOR LOOP.
- * AS YOU CAN SEE USING THE CONSOLE LOG, THE WALLET BALANCE IS GETTING WIPED OUT IN THE LOOP.
- * SO, FOCUS ON FIXING THAT PART.
- */
 
             wallet.address = this.$store.getters.getActiveAddress
 
