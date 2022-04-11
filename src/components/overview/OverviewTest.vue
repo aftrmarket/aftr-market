@@ -226,7 +226,12 @@ import aftrInitStatePlayground from "./../../testnet/contracts/aftrInitStatePlay
 
 import Arweave from "arweave";
 import { mapGetters } from "vuex";
-import { createContractFromTx, createContract, interactWrite, readContract } from 'smartweave';
+import {
+    createContractFromTx,
+    createContract,
+    interactWrite,
+    readContract,
+} from "smartweave";
 
 const initProcess = [
     {
@@ -272,20 +277,20 @@ export default {
             // Saved logos on Arweave
             logoVint: "https://arweave.net/CpuwI6XuBk2bFMYT7q5N8XuiSKzkOEWJP2n1CPDmNX4",
             logoArhd: "https://arweave.net/hxVzJL2uq41ncSt8PgR-5UDNR8tmLqO9JSisgNq7j10",
-
             logoBlue: "https://arweave.net/KM66oKFLF60UrrOgSx5mb90gUd2v4i0T9RIcK9mfUiA",
             logoChillin: "https://arweave.net/aM7YfRnd97mTGLn_3vjLfWp2TgtBKRyDsBnlDhA1e-s",
             logoAlquipa: "https://arweave.net/nZr8RcHYY2XXloKcxtgrbssBdpvz6C2ifM92QvkYkgg",
 
-            // Need to save IDs in order to update the vehicles' tokens 
+            // Need to save IDs in order to update the vehicles' tokens
             logoVintId: "",
             logoArhdId: "",
             getMyVehicle: false,
-            isLoading: "Loading...."
+            isLoading: "Loading....",
         };
     },
     computed: {
-        ...mapGetters(["arConnected", "keyFile", "arConnectConfig", "getTestLaunchFlag"]),
+        ...mapGetters(["arConnected","keyFile","arConnectConfig","getTestLaunchFlag",
+        ]),
     },
     methods: {
         routeUser(site) {
@@ -295,59 +300,65 @@ export default {
         },
         async init() {
             try {
-                
-            this.getMyVehicle = true
-            // Check to see if system is ready for for Test Launch
-            this.$store.dispatch("setTestLaunchConfigState");
+                this.getMyVehicle = true;
+                // Check to see if system is ready for for Test Launch
+                this.$store.dispatch("setTestLaunchConfigState");
 
-            if (!this.$store.getters.getTestLaunchConfigState) {
-                this.$swal({
-                    icon: 'error',
-                    html : 'Please connect your Arweave wallet with ArConnect.',
-                });
-                // alert("Please connect your Arweave wallet with ArConnect.");
-                return false;
-            }
-
-            // Check for correct ArConnect settings
-            if (import.meta.env.VITE_ENV === "DEV") {
-                if (this.arConnectConfig.host != this.arweaveHost || this.arConnectConfig.protocol !=  this.arweaveProtocol || this.arConnectConfig.port != this.arweavePort) {
+                if (!this.$store.getters.getTestLaunchConfigState) {
                     this.$swal({
-                        icon: 'error',
-                        html : "Your Arweave Config is pointing to the wrong gateway.  Please check your config in ArConnect.",
+                        icon: "error",
+                        html: "Please connect your Arweave wallet with ArConnect.",
                     });
-                    this.$store.dispatch("arDisconnect");
                     return false;
                 }
-            } else if (import.meta.env.VITE_ENV === "TEST") {
-                if (this.arConnectConfig.host != this.arweaveHost || this.arConnectConfig.protocol !=  this.arweaveProtocol || this.arConnectConfig.port != this.arweavePort) {
-                    this.$swal({
-                        icon: 'error',
-                        html : "Your Arweave Config is pointing to the wrong gateway.  Please check your config in ArConnect.",
-                    });
-                    this.$store.dispatch("arDisconnect");
+
+                // Check for correct ArConnect settings
+                if (import.meta.env.VITE_ENV === "DEV") {
+                    if (
+                        this.arConnectConfig.host != this.arweaveHost ||
+                        this.arConnectConfig.protocol != this.arweaveProtocol ||
+                        this.arConnectConfig.port != this.arweavePort
+                    ) {
+                        this.$swal({
+                            icon: "error",
+                            html: "Your Arweave Config is pointing to the wrong gateway.  Please check your config in ArConnect.",
+                        });
+                        this.$store.dispatch("arDisconnect");
+                        return false;
+                    }
+                } else if (import.meta.env.VITE_ENV === "TEST") {
+                    if (
+                        this.arConnectConfig.host != this.arweaveHost ||
+                        this.arConnectConfig.protocol != this.arweaveProtocol ||
+                        this.arConnectConfig.port != this.arweavePort
+                    ) {
+                        this.$swal({
+                            icon: "error",
+                            html: "Your Arweave Config is pointing to the wrong gateway.  Please check your config in ArConnect.",
+                        });
+                        this.$store.dispatch("arDisconnect");
+                        return false;
+                    }
+                } else {
+                    // Situation should never occur :)
+                    this.$log.info("OverviewTest : init :: ", "Situation should never occur");
                     return false;
                 }
-            } else {
-                // Situation should never occur :)
-                this.$log.info("OverviewTest : init :: ", "Situation should never occur");
-                return false;
-            }
-            
-            let arweave = {};
-            try{
-                arweave = await Arweave.init({
-                    host: this.arweaveHost,
-                    port: this.arweavePort,
-                    protocol: this.arweaveProtocol,
-                    timeout: 20000,
-                    logging: true,
-                });
-            } catch(e) {
-                this.$log.info("OverviewTest : init :: ", "Error connecting to Arweave " + e);
-            }
 
-             const mineUrl =
+                let arweave = {};
+                try {
+                    arweave = await Arweave.init({
+                        host: this.arweaveHost,
+                        port: this.arweavePort,
+                        protocol: this.arweaveProtocol,
+                        timeout: 20000,
+                        logging: true,
+                    });
+                } catch (e) {
+                    this.$log.info("OverviewTest : init :: ", "Error connecting to Arweave " + e);
+                }
+
+                const mineUrl =
                     import.meta.env.VITE_ARWEAVE_PROTOCOL +
                     "://" +
                     import.meta.env.VITE_ARWEAVE_HOST +
@@ -355,57 +366,64 @@ export default {
                     import.meta.env.VITE_ARWEAVE_PORT +
                     "/mine";
 
-            let use_wallet;
-            if (import.meta.env.VITE_ENV === "DEV") {
-                if (this.keyFile.length) {
-                    use_wallet = JSON.parse(this.keyFile);
+                let use_wallet;
+                if (import.meta.env.VITE_ENV === "DEV") {
+                    if (this.keyFile.length) {
+                        use_wallet = JSON.parse(this.keyFile);
+                    } else {
+                        this.$swal({
+                            icon: "warning",
+                            html: "Please attach your keyfile",
+                        });
+                        return false;
+                    }
                 } else {
-                    this.$swal({
-                        icon: 'warning',
-                        html : "Please attach your keyfile",
-                    });
-                    return false;
+                    use_wallet = "use_wallet";
                 }
-            } else {
-                use_wallet = "use_wallet";
-            }
-            this.$swal({
-                    icon: 'info',
-                    html : "Checking user wallet.",
+                this.$swal({
+                    icon: "info",
+                    html: "Checking user wallet.",
                     showConfirmButton: false,
-                    allowOutsideClick: false
-            })
-            
-            this.$log.info("OverviewTest : init :: ","1. Ensure wallet has some AR to make transactions");
+                    allowOutsideClick: false,
+                });
 
-            const addr = await arweave.wallets.jwkToAddress(use_wallet);
-            const server = this.arweaveProtocol + "://" + this.arweaveHost + ":" + this.arweavePort;
-            const route = "/mint/" + addr + "/10000000000000"; // Amount in Winstons
+                this.$log.info("OverviewTest : init :: ", "1. Ensure wallet has some AR to make transactions");
 
-            this.$log.info("OverviewTest : init :: ", server, route);
+                const addr = await arweave.wallets.jwkToAddress(use_wallet);
+                const server =
+                    this.arweaveProtocol +
+                    "://" +
+                    this.arweaveHost +
+                    ":" +
+                    this.arweavePort;
+                const route = "/mint/" + addr + "/10000000000000"; // Amount in Winstons
 
-            this.$log.info("OverviewTest : init :: ", "WALLET: " + addr);
-            let balance = await arweave.wallets.getBalance(addr);
-            if (balance < 10000000000000) {
-                //const mintRes = await request(server).get(route);
-                const mintRes = await fetch(server + route);
-                balance = await arweave.wallets.getBalance(addr);
-            }
-            
-            this.$log.info("OverviewTest : init :: ", "Balance for " + addr + ": " + balance.toString());
-            let aftrContractSrcId = "";     
-            
-            this.$swal({ 
-                    icon: 'info',
-                    html: "Finding AFTR contract." ,
+                this.$log.info("OverviewTest : init :: ", server, route);
+
+                this.$log.info("OverviewTest : init :: ", "WALLET: " + addr);
+                let balance = await arweave.wallets.getBalance(addr);
+                if (balance < 10000000000000) {
+                    //const mintRes = await request(server).get(route);
+                    const mintRes = await fetch(server + route);
+                    balance = await arweave.wallets.getBalance(addr);
+                }
+
+                this.$log.info("OverviewTest : init :: ", "Balance for " + addr + ": " + balance.toString());
+                let aftrContractSrcId = "";
+
+                this.$swal({
+                    icon: "info",
+                    html: "Finding AFTR contract.",
                     showConfirmButton: false,
-                    allowOutsideClick: false
-            })
-            this.$log.info("OverviewTest : init :: ", "2. AFTR Base Contract");
+                    allowOutsideClick: false,
+                });
+                this.$log.info("OverviewTest : init :: ", "2. AFTR Base Contract");
 
-            let query = `query($cursor: String) {
+                let query = `query($cursor: String) {
                             transactions(
-                                tags: [ { name: "Protocol", values: ["${ import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL }"] } ]
+                                tags: [ { name: "Protocol", values: ["${
+                                    import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL
+                                }"] } ]
                                 after: $cursor
                             )
                             { pageInfo { hasNextPage }
@@ -413,110 +431,200 @@ export default {
                             }
                         }`;
 
-            let response = await this.runQuery(arweave, query, "Failure on looking up AFTR Vehicles. ");
-            let numAftrVehicles = 0;
-            if (response) {
-                numAftrVehicles = response.data.data.transactions.edges.length;
-            }
-
-            let contractSource;
-            let initState;
-            let contractTxId = "";
-            if (numAftrVehicles > 0) {
-                aftrContractSrcId = await this.getContractSourceId(arweave, response.data.data.transactions.edges[0].node.id);
-            } else {
-                contractTxId = await createContract(arweave, use_wallet,  aftrSourcePlayground, JSON.stringify(aftrInitStatePlayground));
-                this.$log.info("OverviewTest : init :: ", "*** CREATED SOURCE CONTRACT: " + contractTxId);
-                if(Boolean(this.arweaveMine)){           
-                   await fetch(mineUrl);
+                let response = await this.runQuery(arweave, query, "Failure on looking up AFTR Vehicles. ");
+                let numAftrVehicles = 0;
+                if (response) {
+                    numAftrVehicles = response.data.data.transactions.edges.length;
                 }
-                aftrContractSrcId = await this.getContractSourceId(arweave, contractTxId);
-                this.$log.info("OverviewTest : init :: ", "*** FOUND CONTRACT SOURCE ID: " + aftrContractSrcId);
-            }
-            this.$store.commit("setAftrContractSrcId", aftrContractSrcId);
-            this.$log.info("OverviewTest : init :: ", "AFTR Source ID: " + aftrContractSrcId);
 
-            this.$log.info("OverviewTest : init :: ", "3. Sample PSTs");
+                let contractSource;
+                let initState;
+                let contractTxId = "";
+                if (numAftrVehicles > 0) {
+                    aftrContractSrcId = await this.getContractSourceId(arweave, response.data.data.transactions.edges[0].node.id);
+                } else {
+                    contractTxId = await createContract(
+                        arweave,
+                        use_wallet,
+                        aftrSourcePlayground,
+                        JSON.stringify(aftrInitStatePlayground)
+                    );
+                    this.$log.info("OverviewTest : init :: ", "*** CREATED SOURCE CONTRACT: " + contractTxId);
+                    if (Boolean(this.arweaveMine)) {
+                        await fetch(mineUrl);
+                    }
+                    aftrContractSrcId = await this.getContractSourceId(
+                        arweave,
+                        contractTxId
+                    );
+                    this.$log.info("OverviewTest : init :: ", "*** FOUND CONTRACT SOURCE ID: " + aftrContractSrcId);
+                }
+                this.$store.commit("setAftrContractSrcId", aftrContractSrcId);
+                this.$log.info("OverviewTest : init :: ", "AFTR Source ID: " + aftrContractSrcId);
 
-            this.isLoading = "Initializing PSTs"
-            this.$swal( {
-                icon : 'info',
-                html : "Initializing PSTs",
-                showConfirmButton: false,
-                allowOutsideClick: false
-            })
+                this.$log.info("OverviewTest : init :: ", "3. Sample PSTs");
 
-            let vintContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "pst", "Vint", "VINT", this.logoVint, JSON.stringify(vertoInitState));
-            this.$log.info("OverviewTest : init :: ", "VINT: " + vintContractId);
+                this.isLoading = "Initializing PSTs";
+                this.$swal({
+                    icon: "info",
+                    html: "Initializing PSTs",
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                });
 
-            let arhdContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "pst", "arHD", "ARHD", this.logoArhd, JSON.stringify(arDriveInitState));
-            this.$log.info("OverviewTest : init :: ", "ARHD: " + arhdContractId);
+                let vintContractId = await this.createSampleAftrVehicle(
+                    arweave,
+                    use_wallet,
+                    aftrContractSrcId,
+                    "pst",
+                    "Vint",
+                    "VINT",
+                    this.logoVint,
+                    JSON.stringify(vertoInitState)
+                );
+                this.$log.info("OverviewTest : init :: ", "VINT: " + vintContractId);
 
-            this.$log.info("OverviewTest : init :: ", "4. Sample AFTR Vehicles");
+                let arhdContractId = await this.createSampleAftrVehicle(
+                    arweave,
+                    use_wallet,
+                    aftrContractSrcId,
+                    "pst",
+                    "arHD",
+                    "ARHD",
+                    this.logoArhd,
+                    JSON.stringify(arDriveInitState)
+                );
+                this.$log.info("OverviewTest : init :: ", "ARHD: " + arhdContractId);
 
-            this.isLoading = "Creating sample AFTR Vehicles."
-            this.$swal({ 
-                icon : 'info',
-                html: "Creating sample AFTR Vehicles.",
-                showConfirmButton: false,
-                allowOutsideClick: false
-            })
+                this.$log.info("OverviewTest : init :: ", "4. Sample AFTR Vehicles");
 
-            let chillContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "aftr", "Chillin Treasury", "CHILL", this.logoChillin, aftrChillinInitState);
-            this.$log.info("OverviewTest : init :: ", "CHILL: " + chillContractId);
+                this.isLoading = "Creating sample AFTR Vehicles.";
+                this.$swal({
+                    icon: "info",
+                    html: "Creating sample AFTR Vehicles.",
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                });
 
-            let alqpaContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "aftr", "Alquipa", "ALQPA", this.logoAlquipa, aftrAlquipaInitState);
-            this.$log.info("OverviewTest : init :: ", "ALQPA: " + alqpaContractId);
+                let chillContractId = await this.createSampleAftrVehicle(
+                    arweave,
+                    use_wallet,
+                    aftrContractSrcId,
+                    "aftr",
+                    "Chillin Treasury",
+                    "CHILL",
+                    this.logoChillin,
+                    aftrChillinInitState
+                );
+                this.$log.info(
+                    "OverviewTest : init :: ",
+                    "CHILL: " + chillContractId
+                );
 
-            let blueContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "aftr", "Blue Horizon", "BLUE",this.logoBlue, aftrBlueHorizonInitState);
-            this.$log.info("OverviewTest : init :: ", "BLUE: " + blueContractId);
+                let alqpaContractId = await this.createSampleAftrVehicle(
+                    arweave,
+                    use_wallet,
+                    aftrContractSrcId,
+                    "aftr",
+                    "Alquipa",
+                    "ALQPA",
+                    this.logoAlquipa,
+                    aftrAlquipaInitState
+                );
+                this.$log.info(
+                    "OverviewTest : init :: ",
+                    "ALQPA: " + alqpaContractId
+                );
 
-            this.$log.info("OverviewTest : init :: ", "5. Add user to Blue Horizon Vehicle");
+                let blueContractId = await this.createSampleAftrVehicle(
+                    arweave,
+                    use_wallet,
+                    aftrContractSrcId,
+                    "aftr",
+                    "Blue Horizon",
+                    "BLUE",
+                    this.logoBlue,
+                    aftrBlueHorizonInitState
+                );
+                this.$log.info(
+                    "OverviewTest : init :: ",
+                    "BLUE: " + blueContractId
+                );
 
-            let input = {};
-            // Only add if user is not already there
-            this.isLoading = "Checking balances on Blue Horizon vehicle."
-            this.$swal({
-                icon: "success",
-                html: "Checking balances on Blue Horizon vehicle.",
-                showConfirmButton:false,
-                timer: 2500,
-                allowOutsideClick: false
-            })
-            const blueVeh = await readContract(arweave, blueContractId);
-            if (!(addr in blueVeh.balances)) {
+                this.$log.info(
+                    "OverviewTest : init :: ",
+                    "5. Add user to Blue Horizon Vehicle"
+                );
+
+                let input = {};
+                // Only add if user is not already there
+                this.isLoading = "Checking balances on Blue Horizon vehicle.";
+                this.$swal({
+                    icon: "success",
+                    html: "Checking balances on Blue Horizon vehicle.",
+                    showConfirmButton: false,
+                    timer: 2500,
+                    allowOutsideClick: false,
+                });
+                const blueVeh = await readContract(arweave, blueContractId);
+                if (!(addr in blueVeh.balances)) {
+                    input = {
+                        function: "plygnd-mint",
+                        qty: 100000,
+                    };
+                    // Calls mint function on Blue Horizon contract. If user already has a balance, nothing happens.
+                    contractTxId = await interactWrite(
+                        arweave,
+                        use_wallet,
+                        blueContractId,
+                        input
+                    );
+
+                    if (Boolean(this.arweaveMine)) {
+                        await fetch(mineUrl);
+                    }
+                    this.$log.info("OverviewTest : init :: ", "Blue Horizon Contract Write: " + contractTxId);
+                }
+
+                // Give user's wallet PSTs
                 input = {
                     function: "plygnd-mint",
-                    qty: 100000
+                    qty: 100000,
                 };
-                // Calls mint function on Blue Horizon contract. If user already has a balance, nothing happens.
-                contractTxId = await interactWrite(arweave, use_wallet, blueContractId, input);
+                contractTxId = await interactWrite(
+                    arweave,
+                    use_wallet,
+                    vintContractId,
+                    input
+                );
+                this.$log.info("OverviewTest : init :: ", "User Wallet VINT: " + contractTxId);
 
-                if(Boolean(this.arweaveMine)){          
+                contractTxId = await interactWrite(
+                    arweave,
+                    use_wallet,
+                    arhdContractId,
+                    input
+                );
+                this.$log.info("OverviewTest : init :: ", "User Wallet ARHD: " + contractTxId);
+
+                if (Boolean(this.arweaveMine)) {
                     await fetch(mineUrl);
                 }
-                this.$log.info("OverviewTest : init :: ", "Blue Horizon Contract Write: " + contractTxId);
-            }
-            
-            // Give user's wallet PSTs
-            input = {
-                function: "plygnd-mint",
-                qty: 100000
-            };
-            contractTxId = await interactWrite(arweave, use_wallet, vintContractId, input);
-            this.$log.info("OverviewTest : init :: ", "User Wallet VINT: " + contractTxId);
 
-            contractTxId = await interactWrite(arweave, use_wallet, arhdContractId, input);
-            this.$log.info("OverviewTest : init :: ", "User Wallet ARHD: " + contractTxId);
+                this.$log.info(
+                    "OverviewTest : init :: ",
+                    JSON.stringify(
+                        await readContract(
+                            arweave,
+                            blueContractId,
+                            undefined,
+                            true
+                        )
+                    )
+                );
 
-            if(Boolean(this.arweaveMine)){                
-                await fetch(mineUrl);
-            }
-
-            this.$log.info("OverviewTest : init :: ", JSON.stringify(await readContract(arweave, blueContractId, undefined, true)));
-            
-            let queryval = {
-                query: `
+                let queryval = {
+                    query: `
                         query($cursor: String) {
                             transactions(
                                 tags: [{ name: "App-Name", values: ["SmartWeaveContract"] }]
@@ -533,66 +641,75 @@ export default {
                     }`,
                 };
 
-            const responseValue = await arweave.api.post('graphql', { query: queryval.query });
+                const responseValue = await arweave.api.post("graphql", { query: queryval.query,});
 
-            let wallet = {
-                address: "",
-                psts: [],
-            };
+                let wallet = {
+                    address: "",
+                    psts: [],
+                };
 
-            wallet.address = this.$store.getters.getActiveAddress
+                wallet.address = this.$store.getters.getActiveAddress;
 
-            for(let edge of responseValue.data.data.transactions.edges) {
+                for (let edge of responseValue.data.data.transactions.edges) {
                     try {
                         let vehicle = await readContract(arweave, edge.node.id);
 
-                        if (vehicle && Object.keys(vehicle.balances).length != 0 && vehicle.name) {
+                        if (
+                            vehicle &&
+                            Object.keys(vehicle.balances).length != 0 &&
+                            vehicle.name
+                        ) {
                             let data = {
                                 id: edge.node.id,
                                 balance: 0,
                                 name: vehicle.name,
                                 ticker: vehicle.ticker,
-                                logo: '',
-                                fcp: vehicle && vehicle.invocations && vehicle.foreignCalls  ? true : false
+                                logo: "",
+                                fcp:
+                                    vehicle &&
+                                    vehicle.invocations &&
+                                    vehicle.foreignCalls
+                                        ? true
+                                        : false,
                             };
 
-                            Object.keys(vehicle.balances).some(walletId=>{
-                                if(walletId == wallet.address){
-                                    data.balance = vehicle.balances[wallet.address];
-                            }});
+                            Object.keys(vehicle.balances).some((walletId) => {
+                                if (walletId == wallet.address) {
+                                    data.balance =
+                                        vehicle.balances[wallet.address];
+                                }
+                            });
 
                             // Logo
-                            vehicle.settings.forEach(setting => {
-                                if (setting[0] === 'communityLogo') {
+                            vehicle.settings.forEach((setting) => {
+                                if (setting[0] === "communityLogo") {
                                     data.logo = setting[1];
                                 }
                             });
-                                /*
-                                JOE : Here I got vehicle balance is zero. So thats why I am commenting the if condition. 
-                                otherwise this function is working correctly.
-                                
-                                PRAJACTA: THIS IS NEEDED.  THE WALLET ADDRESS IS GETTING WIPED OUT, SO THAT'S WHY THIS IS FAILING.
-                                */
 
                             if (data.balance > 0) {
                                 wallet.psts.push(data);
                             }
 
-                            this.$log.info("OverviewTest : init :: ", wallet)
-                            
+                            this.$log.info("OverviewTest : init :: ", wallet);
                         }
-                    } catch(e) {
-                        this.$log.error("ERROR reading contract for " + edge.node.id + ": " + e);
+                    } catch (e) {
+                        this.$log.error(
+                            "ERROR reading contract for " +
+                                edge.node.id +
+                                ": " +
+                                e
+                        );
                     }
                     this.$log.info("PSTS: " + JSON.stringify(wallet.psts));
-                    this.$store.commit("arConnect", wallet)
+                    this.$store.commit("arConnect", wallet);
                 }
-            this.$router.push("vehicles");
+                this.$router.push("vehicles");
             } catch (error) {
-                this.$swal({ 
-                    icon : 'error',
+                this.$swal({
+                    icon: "error",
                     html: error,
-                })
+                });
             }
         },
         async createAftrVehicle(arweave, wallet, aftrId, initState) {
@@ -608,16 +725,14 @@ export default {
         },
         async runQuery(arweave, query, errorMsg) {
             try {
-                let response = await arweave.api.post("graphql", {
-                    query: query
-                });
+                let response = await arweave.api.post("graphql", { query: query,});
 
                 if (response.status !== 200) {
                     response = null;
                 }
 
                 return response;
-            } catch(e) {
+            } catch (e) {
                 this.$log.error("OverviewTest : runQuery :: ", errorMsg + e);
             }
         },
@@ -625,39 +740,54 @@ export default {
         async getContractSourceId(arweave, txId) {
             let tx = await arweave.transactions.get(txId);
             let allTags = [];
-            tx.get('tags').forEach(tag => {
-                let key = tag.get('name', {decode: true, string: true});
-                let value = tag.get('value', {decode: true, string: true});
+            tx.get("tags").forEach((tag) => {
+                let key = tag.get("name", { decode: true, string: true });
+                let value = tag.get("value", { decode: true, string: true });
                 allTags.push({
                     key,
-                    value
+                    value,
                 });
             });
             for (let i = 0; i < allTags.length; i++) {
-                this.$log.info("OverviewTest : getContractSourceId :: ", "allTags[i].key === 'Contract-Src'", allTags[i].key === 'Contract-Src')
-                if (allTags[i].key === 'Contract-Src') {
+                this.$log.info(
+                    "OverviewTest : getContractSourceId :: ",
+                    "allTags[i].key === 'Contract-Src'",
+                    allTags[i].key === "Contract-Src"
+                );
+                if (allTags[i].key === "Contract-Src") {
                     return allTags[i].value;
                 }
             }
         },
-        async  createSampleAftrVehicle(arweave, wallet, aftrSourceId, type = "aftr", name, ticker, logoUrl, initStatePath) {
+        async createSampleAftrVehicle(
+            arweave,
+            wallet,
+            aftrSourceId,
+            type = "aftr",
+            name,
+            ticker,
+            logoUrl,
+            initStatePath
+        ) {
             try {
                 let query = "";
-        
+
                 const mineUrl =
-                            import.meta.env.VITE_ARWEAVE_PROTOCOL +
-                            "://" +
-                            import.meta.env.VITE_ARWEAVE_HOST +
-                            ":" +
-                            import.meta.env.VITE_ARWEAVE_PORT +
-                            "/mine";
+                    import.meta.env.VITE_ARWEAVE_PROTOCOL +
+                    "://" +
+                    import.meta.env.VITE_ARWEAVE_HOST +
+                    ":" +
+                    import.meta.env.VITE_ARWEAVE_PORT +
+                    "/mine";
 
                 if (type === "aftr") {
                     query = `query($cursor: String) {
                         transactions(
                             tags: [
-                                { name: "Protocol", values: ["${ import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL }"] },
-                                { name: "Aftr-Playground", values: ["${ ticker }"] }
+                                { name: "Protocol", values: ["${
+                                    import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL
+                                }"] },
+                                { name: "Aftr-Playground", values: ["${ticker}"] }
                             ]
                             after: $cursor
                         )
@@ -669,7 +799,7 @@ export default {
                     query = `query($cursor: String) {
                         transactions(
                             tags: [ 
-                                { name: "Aftr-Playground", values: ["${ ticker }"] },
+                                { name: "Aftr-Playground", values: ["${ticker}"] },
                                 { name: "Aftr-Playground-Type", values: ["PST"] }
                         ]
                             after: $cursor
@@ -679,91 +809,166 @@ export default {
                         }
                     }`;
                 }
-                
-                let response = await this.runQuery(arweave, query, "Failure on looking up " + name);
+
+                let response = await this.runQuery(
+                    arweave,
+                    query,
+                    "Failure on looking up " + name
+                );
                 let numAftrVehicles = 0;
                 let res = response.data.data.transactions.edges;
-                this.$log.info("OverviewTest : createSampleAftrVehicle :: ", "query" ,query,res);
+                this.$log.info(
+                    "OverviewTest : createSampleAftrVehicle :: ",
+                    "query",
+                    query,
+                    res
+                );
                 if (res.length > 0) {
-                    numAftrVehicles = response.data.data.transactions.edges.length;
+                    numAftrVehicles =
+                        response.data.data.transactions.edges.length;
                 }
-                this.$log.info("OverviewTest : createSampleAftrVehicle :: ", "numAftrVehicles",numAftrVehicles)
+                this.$log.info(
+                    "OverviewTest : createSampleAftrVehicle :: ",
+                    "numAftrVehicles",
+                    numAftrVehicles
+                );
                 if (numAftrVehicles === 0) {
-                    let contractTxId = await this.createSampleContract(arweave, wallet, aftrSourceId, initStatePath, type, ticker);
-                    this.$log.info("OverviewTest : createSampleAftrVehicle :: ", "contractTxId", contractTxId)
-                    if(Boolean(this.arweaveMine)){                
+                    let contractTxId = await this.createSampleContract(
+                        arweave,
+                        wallet,
+                        aftrSourceId,
+                        initStatePath,
+                        type,
+                        ticker
+                    );
+                    this.$log.info(
+                        "OverviewTest : createSampleAftrVehicle :: ",
+                        "contractTxId",
+                        contractTxId
+                    );
+                    if (Boolean(this.arweaveMine)) {
                         await fetch(mineUrl);
                     }
                     // Add the logo
-                    const logoId = await this.getLogoId(arweave, wallet, name, ticker, logoUrl, type);
-                    this.$log.info("OverviewTest : createSampleAftrVehicle :: ", "LOGO for " + name + ": " + logoId);
-                    // JOE here we didn't get the value of logoId. But in contract repo we get an value 
+                    const logoId = await this.getLogoId(
+                        arweave,
+                        wallet,
+                        name,
+                        ticker,
+                        logoUrl,
+                        type
+                    );
+                    this.$log.info(
+                        "OverviewTest : createSampleAftrVehicle :: ",
+                        "LOGO for " + name + ": " + logoId
+                    );
+                    // JOE here we didn't get the value of logoId. But in contract repo we get an value
 
                     let input = {
                         function: "plygnd-addLogo",
-                        logo: logoId
+                        logo: logoId,
                     };
-                    let res = await interactWrite(arweave, wallet, contractTxId, input);
-                    if(Boolean(this.arweaveMine)){                
+                    let res = await interactWrite(
+                        arweave,
+                        wallet,
+                        contractTxId,
+                        input
+                    );
+                    if (Boolean(this.arweaveMine)) {
                         await fetch(mineUrl);
                     }
 
-                    this.$log.info("OverviewTest : createSampleAftrVehicle :: ", "LOGO ADD for " + name + ": " + res);
-                    
-                    await this.updateTokensLogos(arweave, wallet, contractTxId, this.logoVintId, this.logoArhdId);
-                    if(Boolean(this.arweaveMine)){                
+                    this.$log.info(
+                        "OverviewTest : createSampleAftrVehicle :: ",
+                        "LOGO ADD for " + name + ": " + res
+                    );
+
+                    await this.updateTokensLogos(
+                        arweave,
+                        wallet,
+                        contractTxId,
+                        this.logoVintId,
+                        this.logoArhdId
+                    );
+                    if (Boolean(this.arweaveMine)) {
                         await fetch(mineUrl);
                     }
 
                     return contractTxId;
                 } else {
                     return response.data.data.transactions.edges[0].node.id;
-                }                
+                }
             } catch (error) {
-                this.$swal({ 
-                    icon : 'error',
+                this.$swal({
+                    icon: "error",
                     html: error,
-                })
-            }        
+                });
+            }
         },
-        async updateTokensLogos(arweave, wallet, contractId, logoVint, logoArhd) {
+        async updateTokensLogos(
+            arweave,
+            wallet,
+            contractId,
+            logoVint,
+            logoArhd
+        ) {
             const mineUrl =
-                    import.meta.env.VITE_ARWEAVE_PROTOCOL +
-                    "://" +
-                    import.meta.env.VITE_ARWEAVE_HOST +
-                    ":" +
-                    import.meta.env.VITE_ARWEAVE_PORT +
-                    "/mine";
+                import.meta.env.VITE_ARWEAVE_PROTOCOL +
+                "://" +
+                import.meta.env.VITE_ARWEAVE_HOST +
+                ":" +
+                import.meta.env.VITE_ARWEAVE_PORT +
+                "/mine";
             let input = {
                 function: "plygnd-updateTokens",
                 logoVint: logoVint,
-                logoArhd: logoArhd
+                logoArhd: logoArhd,
             };
             let res = await interactWrite(arweave, wallet, contractId, input);
-            if(Boolean(this.arweaveMine)){                
+            if (Boolean(this.arweaveMine)) {
                 await fetch(mineUrl);
             }
         },
-        async createSampleContract(arweave, wallet, aftrId, initState, type = "aftr", name) {
+        async createSampleContract(
+            arweave,
+            wallet,
+            aftrId,
+            initState,
+            type = "aftr",
+            name
+        ) {
             let swTags = [];
             if (type === "aftr") {
                 swTags = [
-                    { name: 'Protocol', value:  import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL },
-                    { name: 'Aftr-Playground', value:  name }
+                    {
+                        name: "Protocol",
+                        value: import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL,
+                    },
+                    { name: "Aftr-Playground", value: name },
                 ];
             } else {
                 swTags = [
-                    { name: 'Aftr-Playground', value:  name },
-                    { name: 'Aftr-Playground-Type', value:  'PST' }
+                    { name: "Aftr-Playground", value: name },
+                    { name: "Aftr-Playground-Type", value: "PST" },
                 ];
             }
-            this.$log.info("OverviewTest : createSampleContract :: ", "initState", initState)
-            let contractTxId = await createContractFromTx(arweave, wallet, aftrId, initState, swTags);
+            this.$log.info(
+                "OverviewTest : createSampleContract :: ",
+                "initState",
+                initState
+            );
+            let contractTxId = await createContractFromTx(
+                arweave,
+                wallet,
+                aftrId,
+                initState,
+                swTags
+            );
 
             return contractTxId;
-       },
-       async getLogoId(arweave, wallet, name, ticker, logoUrl, type = "aftr") {
-           this.$log.info("OverviewTest : getLogoId :: ", name);
+        },
+        async getLogoId(arweave, wallet, name, ticker, logoUrl, type = "aftr") {
+            this.$log.info("OverviewTest : getLogoId :: ", name);
             // Gets logo for name.  If not found, uploads it.
             let tags = [];
             if (type === "aftr") {
@@ -782,25 +987,48 @@ export default {
                     }
                 }
             `;
-            let response = await this.runQuery(arweave, query, "Failure looking for " + name + " logo. ");
+            let response = await this.runQuery(
+                arweave,
+                query,
+                "Failure looking for " + name + " logo. "
+            );
             let datalogo = response.data.data.transactions.edges;
-            this.$log.info("OverviewTest : getLogoId :: ", "datalogo", datalogo)
+            this.$log.info(
+                "OverviewTest : getLogoId :: ",
+                "datalogo",
+                datalogo
+            );
             let logoId = "";
             if (datalogo.length > 0) {
                 // let data = response.data.data.transactions.edges
-                logoId =  datalogo.length > 0 ? datalogo[0].node.id : datalogo;
+                logoId = datalogo.length > 0 ? datalogo[0].node.id : datalogo;
             } else {
                 // No logo found, so fetch logo from Arweave
-                this.$log.info("OverviewTest : getLogoId :: ", "***logoUrl***", logoUrl)
+                this.$log.info(
+                    "OverviewTest : getLogoId :: ",
+                    "***logoUrl***",
+                    logoUrl
+                );
                 const response = await fetch(logoUrl);
-                this.$log.info("OverviewTest : getLogoId :: ", "response",response)
+                this.$log.info(
+                    "OverviewTest : getLogoId :: ",
+                    "response",
+                    response
+                );
                 const imgBlob = await response.blob();
-                this.$log.info("OverviewTest : getLogoId :: ", "imgBlob",imgBlob)
+                this.$log.info(
+                    "OverviewTest : getLogoId :: ",
+                    "imgBlob",
+                    imgBlob
+                );
                 const imgByteArray = await this.getAsByteArray(imgBlob);
 
-                const tx = await arweave.createTransaction({
-                    data: imgByteArray
-                }, wallet);
+                const tx = await arweave.createTransaction(
+                    {
+                        data: imgByteArray,
+                    },
+                    wallet
+                );
 
                 tx.addTag("Content-Type", imgBlob.type);
                 tx.addTag("User-Agent", "AFTR.Market");
@@ -816,7 +1044,7 @@ export default {
                     ":" +
                     import.meta.env.VITE_ARWEAVE_PORT +
                     "/mine";
-                if(Boolean(this.arweaveMine)){    
+                if (Boolean(this.arweaveMine)) {
                     await fetch(mineUrl);
                 }
             }
@@ -825,7 +1053,7 @@ export default {
             } else if (name === "arHD") {
                 this.logoArhdId = logoId;
             }
-            this.$log.info("OverviewTest : getLogoId :: ", "logoId", logoId)
+            this.$log.info("OverviewTest : getLogoId :: ", "logoId", logoId);
             return logoId;
         },
         async getAsByteArray(file) {
@@ -838,8 +1066,8 @@ export default {
                 let reader = new FileReader();
 
                 // Register event listeners
-                reader.addEventListener("loadend", e => {
-                    resolve(e.target.result)
+                reader.addEventListener("loadend", (e) => {
+                    resolve(e.target.result);
                 });
                 reader.addEventListener("error", reject);
 
