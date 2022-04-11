@@ -1,5 +1,5 @@
 <template>
-    <main class="-mt-32">
+    <main class="-mt-40">
         <!-- <div v-if="getMyVehicle" class="flex items-center justify-center ">
             {{isLoading}}
             <div class="w-12 h-12 border-b-2 border-gray-500 rounded-full animate-spin"></div>
@@ -10,7 +10,7 @@
                 <div class="lg:grid lg:grid-cols-2 lg:gap-8">
                     <div class="mx-auto max-w-md px-4 sm:max-w-2xl sm:px-6 sm:text-center lg:px-0 lg:text-left lg:flex lg:items-center">
                         <div class="">
-                            <h1 class="mt-4 text-4xl tracking-tight font-bold text-white sm:mt-5 sm:text-6xl lg:mt-6 xl:text-5xl">
+                            <h1 class="text-4xl tracking-tight font-bold text-white sm:mt-5 sm:text-6xl xl:text-5xl">
                                 <span class="block">Welcome to</span>
                                 <span class="block text-aftrYellow">AFTR Playground</span>
                             </h1>
@@ -33,7 +33,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="mt-12 -mb-16 sm:-mb-48 lg:relative">
+                    <div class="mt-6 sm:-mb-32 lg:relative">
                         <div class="mx-auto max-w-md px-4 sm:max-w-2xl sm:px-6 lg:max-w-none lg:px-0">
                             <img class="w-full lg:absolute lg:inset-y-0 lg:left-0 lg:h-full lg:w-auto lg:max-w-none" src="../../assets/overview-test-launch.png" alt="" />
                         </div>
