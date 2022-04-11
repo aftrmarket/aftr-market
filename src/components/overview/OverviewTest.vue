@@ -294,6 +294,8 @@ export default {
             }
         },
         async init() {
+            try {
+                
             this.getMyVehicle = true
             // Check to see if system is ready for for Test Launch
             this.$store.dispatch("setTestLaunchConfigState");
@@ -575,6 +577,8 @@ export default {
                             if (data.balance > 0) {
                                 wallet.psts.push(data);
                             }
+
+                            this.$log.info("OverviewTest : init :: ", wallet)
                             
                         }
                     } catch(e) {
@@ -584,6 +588,12 @@ export default {
                     this.$store.commit("arConnect", wallet)
                 }
             this.$router.push("vehicles");
+            } catch (error) {
+                this.$swal({ 
+                    icon : 'error',
+                    html: error,
+                })
+            }
         },
         async createAftrVehicle(arweave, wallet, aftrId, initState) {
             let swTags = [{ name: "Protocol", value: this.tagProtocol }];
