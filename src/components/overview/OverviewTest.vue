@@ -566,6 +566,7 @@ export default {
                     timer: 2500,
                     allowOutsideClick: false,
                 });
+                const test = await this.transferTokens(arweave, blueContractId, vintContractId)
                 const blueVeh = await readContract(arweave, blueContractId);
                 if (!(addr in blueVeh.balances)) {
                     input = {
@@ -1074,6 +1075,91 @@ export default {
                 // Read file
                 reader.readAsArrayBuffer(file);
             });
+        },
+        /*NEW FUNCION FOR TOKEN*/
+        async transferTokens(arweave, blueContractId, vintContractId) {
+            console.log("transferTokens")
+            const inputTransfer = {
+                function: "transfer",
+                target: blueContractId,
+                qty: 100,
+            };
+            const currentPst = vintContractId
+            // this.$store.getters.getActiveWallet.psts.find(
+            //     (item) => item.id === vintContractId
+            // );
+ 
+            let vertoTxId;
+
+            let wallet = JSON.parse(this.keyFile);
+            const mineUrl =
+                import.meta.env.VITE_ARWEAVE_PROTOCOL +
+                "://" +
+                import.meta.env.VITE_ARWEAVE_HOST +
+                ":" +
+                import.meta.env.VITE_ARWEAVE_PORT +
+                "/mine";
+
+            if (Boolean(this.arweaveMine)) {
+                let response = await fetch(mineUrl);
+            }
+
+            await interactWrite(arweave, wallet, currentPst, inputTransfer)
+                .then(async (id) => {
+                vertoTxId = id;
+                this.$log.info(
+                    "VehicleTokensAdd : interactWrite :: ",
+                    "Transfer Verto = " + JSON.stringify(vertoTxId)
+                );
+
+                if (Boolean(this.arweaveMine)) {
+                    await fetch(mineUrl);
+                }
+
+                const inputDeposit = {
+                    function: "deposit",
+                    tokenId: currentPst,
+                    txId: vertoTxId,
+                };
+                this.$log.info(
+                    "VehicleTokensAdd : interactWrite :: ",
+                    "INPUT DEP: " + JSON.stringify(inputDeposit)
+                );
+                await interactWrite(arweave, wallet, blueContractId, inputDeposit)
+                    .then(async (txId) => {
+                    if (Boolean(this.arweaveMine)) {
+                        await fetch(mineUrl);
+                    }
+                    })
+                    .catch((error) => {
+                        console.log(error)
+                    });
+                })
+                .catch((error) => {
+                    console.log(error)
+                });
+
+            let vehicle = {};
+            try {
+                vehicle = await readContract(arweave, blueContractId);
+                this.$log.info(
+                "VehicleTokensAdd : interactWrite :: ",
+                "VEHICLE = " + JSON.stringify(vehicle)
+                );
+            } catch (e) {
+                this.$log.error(
+                "VehicleTokensAdd : interactWrite :: ",
+                "ERROR reading contract: " + e
+                );
+                this.$log.error(
+                "VehicleTokensAdd : interactWrite :: ",
+                "VEHICLE: " + JSON.stringify(vehicle)
+                );
+                this.$log.error(
+                "VehicleTokensAdd : interactWrite :: ",
+                "THIS VEHICLE: " + blueContractId
+                );
+            }
         },
     },
     setup() {
