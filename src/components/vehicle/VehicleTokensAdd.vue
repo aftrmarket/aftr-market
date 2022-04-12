@@ -34,7 +34,7 @@
                     <div v-if="selectedPstId !== ''">
                         <div class="pt-6 pb-4">
                             <label class="block text-sm font-medium text-gray-700">
-                                You have <span class="font-bold text-aftrBlue">{{ pstBalance }} {{ pstTicker }}</span><span> available to use in your vehicle.</span>
+                                You have <span class="font-bold text-aftrBlue">{{ formatNumber(pstBalance - pstInputTokens) }} {{ pstTicker }}</span><span> available to use in your vehicle.</span>
                             </label>
                         </div>
                         <input type="number" placeholder="Amount" v-model="pstInputTokens" @input="calcPstPrice" :class="inputBox(pstInputValid)" />
@@ -113,7 +113,7 @@ export default {
     computed : {
         pstBalance() {
             const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.id === this.selectedPstId);
-            return this.formatNumber(currentPst.balance);
+            return currentPst.balance;
         },
         pstTicker() {
             const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.id === this.selectedPstId);
@@ -164,61 +164,53 @@ export default {
                 return "mt-1 focus:ring-aftrRed focus:border-aftrRed shadow-sm sm:text-sm border-gray-300 rounded-md";
             }
         },
+        availableTokensText(valid) {
+
+        },
         async transferTokens() {
-        this.msg = "Please wait for deposit into vehicle to complete..."
-        let arweave = {};
+            this.msg = "Please wait for deposit into vehicle to complete..."
+            let arweave = {};
 
-        arweave = await Arweave.init({
-            host: this.arweaveHost,
-            port: this.arweavePort,
-            protocol: this.arweaveProtocol,
-            timeout: 20000,
-            logging: true,
-        });
+            arweave = await Arweave.init({
+                host: this.arweaveHost,
+                port: this.arweavePort,
+                protocol: this.arweaveProtocol,
+                timeout: 20000,
+                logging: true,
+            });
 
-        const inputTransfer = {
-            function: "transfer",
-            target: this.vehicle.id,
-            qty: Number(this.pstInputTokens),
-        };
-        const currentPst = this.$store.getters.getActiveWallet.psts.find(
-            (item) => item.id === this.selectedPstId
-        );
+            const inputTransfer = {
+                function: "transfer",
+                target: this.vehicle.id,
+                qty: Number(this.pstInputTokens),
+            };
+            const currentPst = this.$store.getters.getActiveWallet.psts.find(
+                (item) => item.id === this.selectedPstId
+            );
 
-        let vertoTxId;
-        if (import.meta.env.VITE_ENV === "DEV") {
-            let wallet = JSON.parse(this.keyFile);
-            const mineUrl =
-                import.meta.env.VITE_ARWEAVE_PROTOCOL +
-                "://" +
-                import.meta.env.VITE_ARWEAVE_HOST +
-                ":" +
-                import.meta.env.VITE_ARWEAVE_PORT +
-                "/mine";
-            if(Boolean(this.arweaveMine)){
-            let response = await fetch(mineUrl);
+            let wallet;
+            if (import.meta.env.VITE_ENV === "DEV") {
+                wallet = JSON.parse(this.keyFile);
+            } else {
+                wallet = "use_wallet";
             }
+            const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
 
             await interactWrite(arweave, wallet, currentPst.id, inputTransfer)
             .then(async (id) => {
-                vertoTxId = id;
-                this.$log.info("VehicleTokensAdd : interactWrite :: ", "Transfer Verto = " + JSON.stringify(vertoTxId));
-
-                if(Boolean(this.arweaveMine)){
-                await fetch(mineUrl);
-                }
+                this.$log.info("VehicleTokensAdd : interactWrite :: ", "Transfer ID = " + JSON.stringify(id));
 
                 const inputDeposit = {
-                function: "deposit",
-                tokenId: currentPst.id,
-                txId: vertoTxId,
+                    function: "deposit",
+                    tokenId: currentPst.id,
+                    txId: id,
                 };
                 this.$log.info("VehicleTokensAdd : interactWrite :: ", "INPUT DEP: " + JSON.stringify(inputDeposit));
                 await interactWrite(arweave, wallet, this.vehicle.id, inputDeposit)
                 .then(async (txId) => {
                     this.msg = "Deposit Successful : " + txId
                     if(Boolean(this.arweaveMine)){
-                    await fetch(mineUrl);
+                        await fetch(mineUrl);
                     }
                 })
                 .catch((error) => {
@@ -226,56 +218,19 @@ export default {
                 });
             })
             .catch((error) => {
-            this.msg = error;
+                this.msg = error;
             });
 
-            let vehicle = {};
-            try {
-                vehicle = await readContract(arweave, this.vehicle.id);
-                this.$log.info("VehicleTokensAdd : interactWrite :: ", "VEHICLE = " + JSON.stringify(vehicle));
-            } catch (e) {
-                this.$log.error("VehicleTokensAdd : interactWrite :: ", "ERROR reading contract: " + e);
-                this.$log.error("VehicleTokensAdd : interactWrite :: ", "VEHICLE: " + JSON.stringify(vehicle));
-                this.$log.error("VehicleTokensAdd : interactWrite :: ", "THIS VEHICLE: " + this.vehicle.id);
+            if (import.meta.env.VITE_ENV !== "PROD") {
+                /*** This will not be needed when ArConnect is automatically updated on TESTNET */
+                // Update user's PST balance 
+                const updatedPst = this.$store.getters.getActiveWallet.psts.find((item) => item.id === this.selectedPstId);
+                updatedPst.balance = this.pstBalance - this.pstInputTokens;
+                /***  */
             }
-        } else {
-            await interactWrite(arweave, "use_wallet", currentPst.id, inputTransfer)
-            .then(async (id) => {
-                vertoTxId = id;
-                this.$log.info("VehicleTokensAdd : interactWrite :: ", "Transfer Verto = " + JSON.stringify(vertoTxId));
 
-                const inputDeposit = {
-                function: "deposit",
-                tokenId: currentPst.id,
-                txId: vertoTxId,
-                };
-                this.$log.info("VehicleTokensAdd : interactWrite :: ", "INPUT DEP: " + JSON.stringify(inputDeposit));
-                await interactWrite(arweave, "use_wallet", this.vehicle.id, inputDeposit)
-                .then(async (txId) => {
-                    this.msg = "Deposit Successful : " + txId
-                })
-                .catch((error) => {
-                    this.msg = error;
-                });
-            })
-            .catch((error) => {
-            this.msg = error;
-            });
-
-            this.$log.info("VehicleTokensAdd : interactWrite :: ", "READ CONTRACT...");
-            let vehicle = {};
-            try {
-                vehicle = await readContract(arweave, this.vehicle.id);
-                this.$log.info("VehicleTokensAdd : interactWrite :: ", "VEHICLE = " + JSON.stringify(vehicle));
-            } catch (e) {
-                this.$log.error("VehicleTokensAdd : interactWrite :: ", "ERROR reading contract: " + e);
-                this.$log.error("VehicleTokensAdd : interactWrite :: ", "VEHICLE: " + JSON.stringify(vehicle));
-                this.$log.error("VehicleTokensAdd : interactWrite :: ", "THIS VEHICLE: " + this.vehicle.id);
-            }
-        }
-        // window.location.reload();
-        this.$router.push("../vehicles");
-        this.$emit("close");
+            this.$router.push("../vehicles");
+            this.$emit("close");
         },
         pstChange() {
             this.pstInputTokens = null;
