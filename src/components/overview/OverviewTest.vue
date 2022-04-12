@@ -477,28 +477,10 @@ export default {
                 vertoInitState.balances[userAddr] = 100000;
                 arDriveInitState.balances[userAddr] = 100000;
 
-                let vintContractId = await this.createSampleAftrVehicle(
-                    arweave,
-                    use_wallet,
-                    aftrContractSrcId,
-                    "pst",
-                    "Vint",
-                    "VINT",
-                    this.logoVint,
-                    JSON.stringify(vertoInitState)
-                );
+                let vintContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "pst", "Vint", "VINT", this.logoVint, JSON.stringify(vertoInitState));
                 this.$log.info("OverviewTest : init :: ", "VINT: " + vintContractId);
 
-                let arhdContractId = await this.createSampleAftrVehicle(
-                    arweave,
-                    use_wallet,
-                    aftrContractSrcId,
-                    "pst",
-                    "arHD",
-                    "ARHD",
-                    this.logoArhd,
-                    JSON.stringify(arDriveInitState)
-                );
+                let arhdContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "pst", "arHD", "ARHD", this.logoArhd,JSON.stringify(arDriveInitState));
                 this.$log.info("OverviewTest : init :: ", "ARHD: " + arhdContractId);
 
                 this.$log.info("OverviewTest : init :: ", "4. Sample AFTR Vehicles");
@@ -511,40 +493,13 @@ export default {
                     allowOutsideClick: false,
                 });
 
-                let chillContractId = await this.createSampleAftrVehicle(
-                    arweave,
-                    use_wallet,
-                    aftrContractSrcId,
-                    "aftr",
-                    "Chillin Treasury",
-                    "CHILL",
-                    this.logoChillin,
-                    aftrChillinInitState
-                );
+                let chillContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "aftr", "Chillin Treasury", "CHILL", this.logoChillin, aftrChillinInitState, vintContractId, arhdContractId);
                 this.$log.info("OverviewTest : init :: ", "CHILL: " + chillContractId);
 
-                let alqpaContractId = await this.createSampleAftrVehicle(
-                    arweave,
-                    use_wallet,
-                    aftrContractSrcId,
-                    "aftr",
-                    "Alquipa",
-                    "ALQPA",
-                    this.logoAlquipa,
-                    aftrAlquipaInitState
-                );
+                let alqpaContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "aftr", "Alquipa", "ALQPA", this.logoAlquipa, aftrAlquipaInitState, vintContractId, arhdContractId);
                 this.$log.info("OverviewTest : init :: ", "ALQPA: " + alqpaContractId);
 
-                let blueContractId = await this.createSampleAftrVehicle(
-                    arweave,
-                    use_wallet,
-                    aftrContractSrcId,
-                    "aftr",
-                    "Blue Horizon",
-                    "BLUE",
-                    this.logoBlue,
-                    aftrBlueHorizonInitState
-                );
+                let blueContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "aftr", "Blue Horizon", "BLUE", this.logoBlue, aftrBlueHorizonInitState, vintContractId, arhdContractId);
                 this.$log.info("OverviewTest : init :: ", "BLUE: " + blueContractId);
 
                 this.$log.info("OverviewTest : init :: ", "5. Add user to Blue Horizon Vehicle");
@@ -559,14 +514,6 @@ export default {
                     timer: 2500,
                     allowOutsideClick: false,
                 });
-
-                // Transfer tokens into AFTR Vehicles
-                let transRes = await this.transferTokens(arweave, use_wallet, blueContractId, vintContractId, 10000);
-                transRes = await this.transferTokens(arweave, use_wallet, blueContractId, arhdContractId, 25000);
-                transRes = await this.transferTokens(arweave, use_wallet, chillContractId, vintContractId, 1000);
-                transRes = await this.transferTokens(arweave, use_wallet, chillContractId, arhdContractId, 15000);
-                transRes = await this.transferTokens(arweave, use_wallet, alqpaContractId, vintContractId, 17000);
-                transRes = await this.transferTokens(arweave, use_wallet, alqpaContractId, arhdContractId, 5000);
 
                 const blueVeh = await readContract(arweave, blueContractId);
                 if (!(addr in blueVeh.balances)) {
@@ -756,16 +703,7 @@ export default {
                 }
             }
         },
-        async createSampleAftrVehicle(
-            arweave,
-            wallet,
-            aftrSourceId,
-            type = "aftr",
-            name,
-            ticker,
-            logoUrl,
-            initStatePath
-        ) {
+        async createSampleAftrVehicle(arweave, wallet, aftrSourceId, type = "aftr", name, ticker, logoUrl, initStatePath, vintContractId = "", arhdContractId = "") {
             try {
                 let query = "";
 
@@ -807,88 +745,59 @@ export default {
                     }`;
                 }
 
-                let response = await this.runQuery(
-                    arweave,
-                    query,
-                    "Failure on looking up " + name
-                );
+                let response = await this.runQuery(arweave, query, "Failure on looking up " + name);
                 let numAftrVehicles = 0;
                 let res = response.data.data.transactions.edges;
-                this.$log.info(
-                    "OverviewTest : createSampleAftrVehicle :: ",
-                    "query",
-                    query,
-                    res
-                );
+                this.$log.info("OverviewTest : createSampleAftrVehicle :: ", "query", query, res);
                 if (res.length > 0) {
-                    numAftrVehicles =
-                        response.data.data.transactions.edges.length;
+                    numAftrVehicles = response.data.data.transactions.edges.length;
                 }
-                this.$log.info(
-                    "OverviewTest : createSampleAftrVehicle :: ",
-                    "numAftrVehicles",
-                    numAftrVehicles
-                );
+                this.$log.info("OverviewTest : createSampleAftrVehicle :: ", "numAftrVehicles", numAftrVehicles);
                 if (numAftrVehicles === 0) {
-                    let contractTxId = await this.createSampleContract(
-                        arweave,
-                        wallet,
-                        aftrSourceId,
-                        initStatePath,
-                        type,
-                        ticker
-                    );
-                    this.$log.info(
-                        "OverviewTest : createSampleAftrVehicle :: ",
-                        "contractTxId",
-                        contractTxId
-                    );
+                    let contractTxId = await this.createSampleContract(arweave, wallet, aftrSourceId, initStatePath, type, ticker);
+                    this.$log.info("OverviewTest : createSampleAftrVehicle :: ", "contractTxId", contractTxId);
                     if (Boolean(this.arweaveMine)) {
                         await fetch(mineUrl);
                     }
                     // Add the logo
-                    const logoId = await this.getLogoId(
-                        arweave,
-                        wallet,
-                        name,
-                        ticker,
-                        logoUrl,
-                        type
-                    );
-                    this.$log.info(
-                        "OverviewTest : createSampleAftrVehicle :: ",
-                        "LOGO for " + name + ": " + logoId
-                    );
+                    const logoId = await this.getLogoId(arweave, wallet, name, ticker, logoUrl, type);
+                    this.$log.info("OverviewTest : createSampleAftrVehicle :: ", "LOGO for " + name + ": " + logoId);
                     // JOE here we didn't get the value of logoId. But in contract repo we get an value
 
                     let input = {
                         function: "plygnd-addLogo",
                         logo: logoId,
                     };
-                    let res = await interactWrite(
-                        arweave,
-                        wallet,
-                        contractTxId,
-                        input
-                    );
+                    let res = await interactWrite(arweave, wallet, contractTxId, input);
                     if (Boolean(this.arweaveMine)) {
                         await fetch(mineUrl);
                     }
 
-                    this.$log.info(
-                        "OverviewTest : createSampleAftrVehicle :: ",
-                        "LOGO ADD for " + name + ": " + res
-                    );
+                    this.$log.info("OverviewTest : createSampleAftrVehicle :: ", "LOGO ADD for " + name + ": " + res);
 
-                    await this.updateTokensLogos(
-                        arweave,
-                        wallet,
-                        contractTxId,
-                        this.logoVintId,
-                        this.logoArhdId
-                    );
+                    await this.updateTokensLogos(arweave, wallet, contractTxId, this.logoVintId, this.logoArhdId);
                     if (Boolean(this.arweaveMine)) {
                         await fetch(mineUrl);
+                    }
+
+                    // Transfer tokens to AFTR vehicles
+                    if (type === "aftr") {
+                        let qtyVint = 0;
+                        let qtyArhd = 0;
+
+                        // Just create some varying quantities
+                        if (ticker === "ALQPA") {
+                            qtyVint = 17000;
+                            qtyArhd = 5000;
+                        } else if (ticker === "CHILL") {
+                            qtyVint = 1000;
+                            qtyArhd = 15000;
+                        } else {
+                            qtyVint = 10000;
+                            qtyArhd = 25000;
+                        }
+                        let transRes = await this.transferTokens(arweave, wallet, contractTxId, vintContractId, qtyVint);
+                        transRes = await this.transferTokens(arweave, wallet, contractTxId, arhdContractId, qtyArhd);
                     }
 
                     return contractTxId;
@@ -902,13 +811,7 @@ export default {
                 });
             }
         },
-        async updateTokensLogos(
-            arweave,
-            wallet,
-            contractId,
-            logoVint,
-            logoArhd
-        ) {
+        async updateTokensLogos(arweave, wallet, contractId, logoVint, logoArhd) {
             const mineUrl =
                 import.meta.env.VITE_ARWEAVE_PROTOCOL +
                 "://" +
@@ -926,14 +829,7 @@ export default {
                 await fetch(mineUrl);
             }
         },
-        async createSampleContract(
-            arweave,
-            wallet,
-            aftrId,
-            initState,
-            type = "aftr",
-            name
-        ) {
+        async createSampleContract(arweave, wallet, aftrId, initState, type = "aftr", name) {
             let swTags = [];
             if (type === "aftr") {
                 swTags = [
