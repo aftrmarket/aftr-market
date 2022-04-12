@@ -38,14 +38,16 @@
                             </label>
                         </div>
                         <input type="number" placeholder="Amount" v-model="pstInputTokens" @input="calcPstPrice" :class="inputBox(pstInputValid)" />
-                        <span v-if="pstInputTokens" class="block text-xs pt-2 pl-4 pr-6">@ {{ formatNumber( pricePerToken, true) }} AR {{ pstInputTokens ? " = " + formatNumber(pstValue, true) + " AR" : "" }}</span>
+                        <span v-if="pstInputTokens && false" class="block text-xs pt-2 pl-4 pr-6">@ {{ formatNumber( pricePerToken, true) }} AR {{ pstInputTokens ? " = " + formatNumber(pstValue, true) + " AR" : "" }}</span>
                     </div>
+                    <!--
                   <div class="mt-2">
                     <p class="text-sm text-gray-500">
                       Are you sure you want to transfer these tokens from your
                       wallet to the vehicle? This action cannot be undone.
                     </p>
                   </div>
+                  -->
                 </div>
               </div>
             </div>
@@ -162,133 +164,119 @@ export default {
                 return "mt-1 focus:ring-aftrRed focus:border-aftrRed shadow-sm sm:text-sm border-gray-300 rounded-md";
             }
         },
-    async transferTokens() {
-      this.msg = "Please wait for deposit into vehicle to complete..."
-      let arweave = {};
+        async transferTokens() {
+        this.msg = "Please wait for deposit into vehicle to complete..."
+        let arweave = {};
 
-      arweave = await Arweave.init({
-        host: this.arweaveHost,
-        port: this.arweavePort,
-        protocol: this.arweaveProtocol,
-        timeout: 20000,
-        logging: true,
-      });
+        arweave = await Arweave.init({
+            host: this.arweaveHost,
+            port: this.arweavePort,
+            protocol: this.arweaveProtocol,
+            timeout: 20000,
+            logging: true,
+        });
 
-      const inputTransfer = {
-        function: "transfer",
-        target: this.vehicle.id,
-        qty: Number(this.pstInputTokens),
-      };
-      const currentPst = this.$store.getters.getActiveWallet.psts.find(
-        (item) => item.id === this.selectedPstId
-      );
+        const inputTransfer = {
+            function: "transfer",
+            target: this.vehicle.id,
+            qty: Number(this.pstInputTokens),
+        };
+        const currentPst = this.$store.getters.getActiveWallet.psts.find(
+            (item) => item.id === this.selectedPstId
+        );
 
-      let vertoTxId;
-      if (import.meta.env.VITE_ENV === "DEV") {
-        let wallet = JSON.parse(this.keyFile);
-        const mineUrl =
-            import.meta.env.VITE_ARWEAVE_PROTOCOL +
-            "://" +
-            import.meta.env.VITE_ARWEAVE_HOST +
-            ":" +
-            import.meta.env.VITE_ARWEAVE_PORT +
-            "/mine";
-        if(Boolean(this.arweaveMine)){
-          let response = await fetch(mineUrl);
-        }
-
-        await interactWrite(arweave, wallet, currentPst.id, inputTransfer)
-          .then(async (id) => {
-            vertoTxId = id;
-            this.$log.info("VehicleTokensAdd : interactWrite :: ", "Transfer Verto = " + JSON.stringify(vertoTxId));
-
+        let vertoTxId;
+        if (import.meta.env.VITE_ENV === "DEV") {
+            let wallet = JSON.parse(this.keyFile);
+            const mineUrl =
+                import.meta.env.VITE_ARWEAVE_PROTOCOL +
+                "://" +
+                import.meta.env.VITE_ARWEAVE_HOST +
+                ":" +
+                import.meta.env.VITE_ARWEAVE_PORT +
+                "/mine";
             if(Boolean(this.arweaveMine)){
-              await fetch(mineUrl);
+            let response = await fetch(mineUrl);
             }
 
-            const inputDeposit = {
-              function: "deposit",
-              tokenId: currentPst.id,
-              txId: vertoTxId,
-            };
-            this.$log.info("VehicleTokensAdd : interactWrite :: ", "INPUT DEP: " + JSON.stringify(inputDeposit));
-            await interactWrite(arweave, wallet, this.vehicle.id, inputDeposit)
-              .then(async (txId) => {
-                this.msg = "Deposit Successful : " + txId
+            await interactWrite(arweave, wallet, currentPst.id, inputTransfer)
+            .then(async (id) => {
+                vertoTxId = id;
+                this.$log.info("VehicleTokensAdd : interactWrite :: ", "Transfer Verto = " + JSON.stringify(vertoTxId));
+
                 if(Boolean(this.arweaveMine)){
-                  await fetch(mineUrl);
+                await fetch(mineUrl);
                 }
-              })
-              .catch((error) => {
-                this.msg = error;
-              });
-          })
-          .catch((error) => {
-           this.msg = error;
-          });
 
-        //let vertoTxId = await interactWrite(arweave, wallet, currentPst.id, inputTransfer);
-        //this.$log.info("Transfer Verto = " + JSON.stringify(vertoTxId));
+                const inputDeposit = {
+                function: "deposit",
+                tokenId: currentPst.id,
+                txId: vertoTxId,
+                };
+                this.$log.info("VehicleTokensAdd : interactWrite :: ", "INPUT DEP: " + JSON.stringify(inputDeposit));
+                await interactWrite(arweave, wallet, this.vehicle.id, inputDeposit)
+                .then(async (txId) => {
+                    this.msg = "Deposit Successful : " + txId
+                    if(Boolean(this.arweaveMine)){
+                    await fetch(mineUrl);
+                    }
+                })
+                .catch((error) => {
+                    this.msg = error;
+                });
+            })
+            .catch((error) => {
+            this.msg = error;
+            });
 
-        // await fetch(mineUrl);
+            let vehicle = {};
+            try {
+                vehicle = await readContract(arweave, this.vehicle.id);
+                this.$log.info("VehicleTokensAdd : interactWrite :: ", "VEHICLE = " + JSON.stringify(vehicle));
+            } catch (e) {
+                this.$log.error("VehicleTokensAdd : interactWrite :: ", "ERROR reading contract: " + e);
+                this.$log.error("VehicleTokensAdd : interactWrite :: ", "VEHICLE: " + JSON.stringify(vehicle));
+                this.$log.error("VehicleTokensAdd : interactWrite :: ", "THIS VEHICLE: " + this.vehicle.id);
+            }
+        } else {
+            await interactWrite(arweave, "use_wallet", currentPst.id, inputTransfer)
+            .then(async (id) => {
+                vertoTxId = id;
+                this.$log.info("VehicleTokensAdd : interactWrite :: ", "Transfer Verto = " + JSON.stringify(vertoTxId));
 
-        // const inputDeposit = {
-        //     function: "deposit",
-        //     tokenId: currentPst.id,
-        //     txId: vertoTxId
-        // };
+                const inputDeposit = {
+                function: "deposit",
+                tokenId: currentPst.id,
+                txId: vertoTxId,
+                };
+                this.$log.info("VehicleTokensAdd : interactWrite :: ", "INPUT DEP: " + JSON.stringify(inputDeposit));
+                await interactWrite(arweave, "use_wallet", this.vehicle.id, inputDeposit)
+                .then(async (txId) => {
+                    this.msg = "Deposit Successful : " + txId
+                })
+                .catch((error) => {
+                    this.msg = error;
+                });
+            })
+            .catch((error) => {
+            this.msg = error;
+            });
 
-        //this.$log.info("INPUT DEP: " + JSON.stringify(inputDeposit));
-        //let txId = await interactWrite(arweave, wallet, this.vehicle.id, inputDeposit);
-        //await fetch(mineUrl);
-        let vehicle = {};
-        try {
-          vehicle = await readContract(arweave, this.vehicle.id);
-          this.$log.info("VehicleTokensAdd : interactWrite :: ", "VEHICLE = " + JSON.stringify(vehicle));
-        } catch (e) {
-          this.$log.error("VehicleTokensAdd : interactWrite :: ", "ERROR reading contract: " + e);
-          this.$log.error("VehicleTokensAdd : interactWrite :: ", "VEHICLE: " + JSON.stringify(vehicle));
-          this.$log.error("VehicleTokensAdd : interactWrite :: ", "THIS VEHICLE: " + this.vehicle.id);
+            this.$log.info("VehicleTokensAdd : interactWrite :: ", "READ CONTRACT...");
+            let vehicle = {};
+            try {
+                vehicle = await readContract(arweave, this.vehicle.id);
+                this.$log.info("VehicleTokensAdd : interactWrite :: ", "VEHICLE = " + JSON.stringify(vehicle));
+            } catch (e) {
+                this.$log.error("VehicleTokensAdd : interactWrite :: ", "ERROR reading contract: " + e);
+                this.$log.error("VehicleTokensAdd : interactWrite :: ", "VEHICLE: " + JSON.stringify(vehicle));
+                this.$log.error("VehicleTokensAdd : interactWrite :: ", "THIS VEHICLE: " + this.vehicle.id);
+            }
         }
-      } else {
-        await interactWrite(arweave, "use_wallet", currentPst.id, inputTransfer)
-          .then(async (id) => {
-            vertoTxId = id;
-            this.$log.info("VehicleTokensAdd : interactWrite :: ", "Transfer Verto = " + JSON.stringify(vertoTxId));
-
-            const inputDeposit = {
-              function: "deposit",
-              tokenId: currentPst.id,
-              txId: vertoTxId,
-            };
-            this.$log.info("VehicleTokensAdd : interactWrite :: ", "INPUT DEP: " + JSON.stringify(inputDeposit));
-            await interactWrite(arweave, "use_wallet", this.vehicle.id, inputDeposit)
-              .then(async (txId) => {
-                this.msg = "Deposit Successful : " + txId
-              })
-              .catch((error) => {
-                this.msg = error;
-              });
-          })
-          .catch((error) => {
-           this.msg = error;
-          });
-
-        this.$log.info("VehicleTokensAdd : interactWrite :: ", "READ CONTRACT...");
-        let vehicle = {};
-        try {
-          vehicle = await readContract(arweave, this.vehicle.id);
-          this.$log.info("VehicleTokensAdd : interactWrite :: ", "VEHICLE = " + JSON.stringify(vehicle));
-        } catch (e) {
-          this.$log.error("VehicleTokensAdd : interactWrite :: ", "ERROR reading contract: " + e);
-          this.$log.error("VehicleTokensAdd : interactWrite :: ", "VEHICLE: " + JSON.stringify(vehicle));
-          this.$log.error("VehicleTokensAdd : interactWrite :: ", "THIS VEHICLE: " + this.vehicle.id);
-        }
-      }
-      // window.location.reload();
-      this.$router.push("../vehicles");
-      this.$emit("close");
-    },
+        // window.location.reload();
+        this.$router.push("../vehicles");
+        this.$emit("close");
+        },
         pstChange() {
             this.pstInputTokens = null;
             this.pricePerToken = null;
@@ -298,7 +286,7 @@ export default {
             this.pricePerToken = currentPst.balance;
             this.pstValue = currentPst.balance * this.pstInputTokens;
             this.updatePstInputValid(currentPst.balance);
-            this.msg = "WARNING: Please wait while the transactions complete. If you leave or close this page, your deposit will fail."
+            this.msg = "WARNING: Are you sure you want to transfer these tokens from your wallet to the vehicle? This action cannot be undone."
         },
         updatePstInputValid(balance) {
             if (Number(this.pstInputTokens) <= balance) {
