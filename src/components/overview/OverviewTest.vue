@@ -522,12 +522,7 @@ export default {
                         qty: 100000,
                     };
                     // Calls mint function on Blue Horizon contract. If user already has a balance, nothing happens.
-                    contractTxId = await interactWrite(
-                        arweave,
-                        use_wallet,
-                        blueContractId,
-                        input
-                    );
+                    contractTxId = await interactWrite(arweave, use_wallet, blueContractId, input);
 
                     if (Boolean(this.arweaveMine)) {
                         await fetch(mineUrl);
@@ -540,37 +535,17 @@ export default {
                     function: "plygnd-mint",
                     qty: 100000,
                 };
-                contractTxId = await interactWrite(
-                    arweave,
-                    use_wallet,
-                    vintContractId,
-                    input
-                );
+                contractTxId = await interactWrite(arweave, use_wallet, vintContractId, input);
                 this.$log.info("OverviewTest : init :: ", "User Wallet VINT: " + contractTxId);
 
-                contractTxId = await interactWrite(
-                    arweave,
-                    use_wallet,
-                    arhdContractId,
-                    input
-                );
+                contractTxId = await interactWrite(arweave, use_wallet, arhdContractId, input);
                 this.$log.info("OverviewTest : init :: ", "User Wallet ARHD: " + contractTxId);
 
                 if (Boolean(this.arweaveMine)) {
                     await fetch(mineUrl);
                 }
 
-                this.$log.info(
-                    "OverviewTest : init :: ",
-                    JSON.stringify(
-                        await readContract(
-                            arweave,
-                            blueContractId,
-                            undefined,
-                            true
-                        )
-                    )
-                );
+                this.$log.info("OverviewTest : init :: ", JSON.stringify(await readContract(arweave, blueContractId, undefined, true)));
 
                 let queryval = {
                     query: `
@@ -597,35 +572,25 @@ export default {
                     psts: [],
                 };
 
-                wallet.address = this.$store.getters.getActiveAddress;
+                wallet.address = userAddr;
 
                 for (let edge of responseValue.data.data.transactions.edges) {
                     try {
                         let vehicle = await readContract(arweave, edge.node.id);
 
-                        if (
-                            vehicle &&
-                            Object.keys(vehicle.balances).length != 0 &&
-                            vehicle.name
-                        ) {
+                        if (vehicle && Object.keys(vehicle.balances).length != 0 && vehicle.name) {
                             let data = {
                                 id: edge.node.id,
                                 balance: 0,
                                 name: vehicle.name,
                                 ticker: vehicle.ticker,
                                 logo: "",
-                                fcp:
-                                    vehicle &&
-                                    vehicle.invocations &&
-                                    vehicle.foreignCalls
-                                        ? true
-                                        : false,
+                                fcp: vehicle && vehicle.invocations && vehicle.foreignCalls ? true : false,
                             };
 
                             Object.keys(vehicle.balances).some((walletId) => {
                                 if (walletId == wallet.address) {
-                                    data.balance =
-                                        vehicle.balances[wallet.address];
+                                    data.balance = vehicle.balances[wallet.address];
                                 }
                             });
 
@@ -968,7 +933,6 @@ export default {
                 reader.readAsArrayBuffer(file);
             });
         },
-        /*NEW FUNCION FOR TOKEN*/
         async transferTokens(arweave, wallet, vehContractId, pstContractId, qty) {
             const inputTransfer = {
                 function: "transfer",
@@ -976,21 +940,11 @@ export default {
                 qty: qty,
             };
 
-            const mineUrl =
-                import.meta.env.VITE_ARWEAVE_PROTOCOL +
-                "://" +
-                import.meta.env.VITE_ARWEAVE_HOST +
-                ":" +
-                import.meta.env.VITE_ARWEAVE_PORT +
-                "/mine";
+            const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
 
             await interactWrite(arweave, wallet, pstContractId, inputTransfer)
                 .then(async (id) => { 
                     this.$log.info("OverviewTestTransferTokens : interactWrite :: ", "Transfer Vint = " + JSON.stringify(id));
-
-                    if (Boolean(this.arweaveMine)) {
-                        await fetch(mineUrl);
-                    }
 
                     const inputDeposit = {
                         function: "deposit",
@@ -1011,18 +965,8 @@ export default {
                 })
                 .catch((error) => {
                     this.$log.info("OverviewTestTransferTokens : interactWriteTransfer :: Error: " + error);
-                });
-
-            let vehicle = {};
-            try {
-                vehicle = await readContract(arweave, vehContractId);
-                this.$log.info("OverviewTestTransferTokens : readContract :: ", "VEHICLE = " + JSON.stringify(vehicle));
-            } catch (e) {
-                this.$log.error("OverviewTestTransferTokens : readContract :: ", "ERROR reading contract: " + e);
-                this.$log.error("OverviewTestTransferTokens : readContract :: ", "VEHICLE: " + JSON.stringify(vehicle));
-                this.$log.error("OverviewTestTransferTokens : readContract :: ", "THIS VEHICLE: " + vehContractId
-                );
-            }
+                }
+            );
         },
     },
     setup() {
