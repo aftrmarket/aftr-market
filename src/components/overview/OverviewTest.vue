@@ -545,7 +545,7 @@ export default {
                     await fetch(mineUrl);
                 }
 
-                this.$log.info("OverviewTest : init :: ", JSON.stringify(await readContract(arweave, blueContractId, undefined, true)));
+                //this.$log.info("OverviewTest : init :: ", JSON.stringify(await readContract(arweave, blueContractId, undefined, true)));
 
                 let queryval = {
                     query: `
