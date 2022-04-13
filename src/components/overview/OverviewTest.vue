@@ -441,26 +441,18 @@ export default {
                 let initState;
                 let contractTxId = "";
                 if (numAftrVehicles > 0) {
-                    aftrContractSrcId = await this.getContractSourceId(arweave, response.data.data.transactions.edges[0].node.id);
+                    // Want to grab the first AFTR vehicle b/c we can ensure that won't be an errored vehicle
+                    aftrContractSrcId = await this.getContractSourceId(arweave, response.data.data.transactions.edges[numAftrVehicles - 1].node.id);
                 } else {
-                    contractTxId = await createContract(
-                        arweave,
-                        use_wallet,
-                        aftrSourcePlayground,
-                        JSON.stringify(aftrInitStatePlayground)
-                    );
+                    contractTxId = await createContract(arweave, use_wallet, aftrSourcePlayground, JSON.stringify(aftrInitStatePlayground));
                     this.$log.info("OverviewTest : init :: ", "*** CREATED SOURCE CONTRACT: " + contractTxId);
                     if (Boolean(this.arweaveMine)) {
                         await fetch(this.mineUrl);
                     }
-                    aftrContractSrcId = await this.getContractSourceId(
-                        arweave,
-                        contractTxId
-                    );
+                    aftrContractSrcId = await this.getContractSourceId(arweave, contractTxId);
                     this.$log.info("OverviewTest : init :: ", "*** FOUND CONTRACT SOURCE ID: " + aftrContractSrcId);
                 }
                 this.$store.commit("setAftrContractSrcId", aftrContractSrcId);
-    console.log("aftrContractSrcId: " + aftrContractSrcId);
                 this.$log.info("OverviewTest : init :: ", "AFTR Source ID: " + aftrContractSrcId);
 
                 this.$log.info("OverviewTest : init :: ", "3. Sample PSTs");
