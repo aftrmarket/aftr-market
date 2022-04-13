@@ -272,6 +272,7 @@ export default {
             arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
             arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
             arweaveMine: import.meta.env.VITE_MINE,
+            mineUrl: arweaveProtocol + "://" + arweaveHost + ":" + arweavePort + "/mine",
             /** */
 
             // Saved logos on Arweave
@@ -358,14 +359,6 @@ export default {
                     this.$log.info("OverviewTest : init :: ", "Error connecting to Arweave " + e);
                 }
 
-                const mineUrl =
-                    import.meta.env.VITE_ARWEAVE_PROTOCOL +
-                    "://" +
-                    import.meta.env.VITE_ARWEAVE_HOST +
-                    ":" +
-                    import.meta.env.VITE_ARWEAVE_PORT +
-                    "/mine";
-
                 let use_wallet;
                 if (import.meta.env.VITE_ENV === "DEV") {
                     if (this.keyFile.length) {
@@ -403,7 +396,6 @@ export default {
                 this.$log.info("OverviewTest : init :: ", "WALLET: " + addr);
                 let balance = await arweave.wallets.getBalance(addr);
                 if (balance < 10000000000000) {
-                    //const mintRes = await request(server).get(route);
                     const mintRes = await fetch(server + route);
                     balance = await arweave.wallets.getBalance(addr);
                 }
@@ -451,7 +443,7 @@ export default {
                     );
                     this.$log.info("OverviewTest : init :: ", "*** CREATED SOURCE CONTRACT: " + contractTxId);
                     if (Boolean(this.arweaveMine)) {
-                        await fetch(mineUrl);
+                        await fetch(this.mineUrl);
                     }
                     aftrContractSrcId = await this.getContractSourceId(
                         arweave,
@@ -525,7 +517,7 @@ export default {
                     contractTxId = await interactWrite(arweave, use_wallet, blueContractId, input);
 
                     if (Boolean(this.arweaveMine)) {
-                        await fetch(mineUrl);
+                        await fetch(this.mineUrl);
                     }
                     this.$log.info("OverviewTest : init :: ", "Blue Horizon Contract Write: " + contractTxId);
                 }
@@ -542,7 +534,7 @@ export default {
                 this.$log.info("OverviewTest : init :: ", "User Wallet ARHD: " + contractTxId);
 
                 if (Boolean(this.arweaveMine)) {
-                    await fetch(mineUrl);
+                    await fetch(this.mineUrl);
                 }
 
                 //this.$log.info("OverviewTest : init :: ", JSON.stringify(await readContract(arweave, blueContractId, undefined, true)));
@@ -623,13 +615,7 @@ export default {
         },
         async createAftrVehicle(arweave, wallet, aftrId, initState) {
             let swTags = [{ name: "Protocol", value: this.tagProtocol }];
-            let contractTxId = await createContractFromTx(
-                arweave,
-                wallet,
-                aftrId,
-                new Uint8Array(initState),
-                swTags
-            );
+            let contractTxId = await createContractFromTx(arweave, wallet, aftrId, new Uint8Array(initState), swTags);
             return contractTxId;
         },
         async runQuery(arweave, query, errorMsg) {
@@ -652,17 +638,10 @@ export default {
             tx.get("tags").forEach((tag) => {
                 let key = tag.get("name", { decode: true, string: true });
                 let value = tag.get("value", { decode: true, string: true });
-                allTags.push({
-                    key,
-                    value,
-                });
+                allTags.push({key, value, });
             });
             for (let i = 0; i < allTags.length; i++) {
-                this.$log.info(
-                    "OverviewTest : getContractSourceId :: ",
-                    "allTags[i].key === 'Contract-Src'",
-                    allTags[i].key === "Contract-Src"
-                );
+                this.$log.info("OverviewTest : getContractSourceId :: ", "allTags[i].key === 'Contract-Src'", allTags[i].key === "Contract-Src");
                 if (allTags[i].key === "Contract-Src") {
                     return allTags[i].value;
                 }
@@ -671,14 +650,6 @@ export default {
         async createSampleAftrVehicle(arweave, wallet, aftrSourceId, type = "aftr", name, ticker, logoUrl, initStatePath, vintContractId = "", arhdContractId = "") {
             try {
                 let query = "";
-
-                const mineUrl =
-                    import.meta.env.VITE_ARWEAVE_PROTOCOL +
-                    "://" +
-                    import.meta.env.VITE_ARWEAVE_HOST +
-                    ":" +
-                    import.meta.env.VITE_ARWEAVE_PORT +
-                    "/mine";
 
                 if (type === "aftr") {
                     query = `query($cursor: String) {
@@ -722,7 +693,7 @@ export default {
                     let contractTxId = await this.createSampleContract(arweave, wallet, aftrSourceId, initStatePath, type, ticker);
                     this.$log.info("OverviewTest : createSampleAftrVehicle :: ", "contractTxId", contractTxId);
                     if (Boolean(this.arweaveMine)) {
-                        await fetch(mineUrl);
+                        await fetch(this.mineUrl);
                     }
                     // Add the logo
                     const logoId = await this.getLogoId(arweave, wallet, name, ticker, logoUrl, type);
@@ -735,14 +706,14 @@ export default {
                     };
                     let res = await interactWrite(arweave, wallet, contractTxId, input);
                     if (Boolean(this.arweaveMine)) {
-                        await fetch(mineUrl);
+                        await fetch(this.mineUrl);
                     }
 
                     this.$log.info("OverviewTest : createSampleAftrVehicle :: ", "LOGO ADD for " + name + ": " + res);
 
                     await this.updateTokensLogos(arweave, wallet, contractTxId, this.logoVintId, this.logoArhdId);
                     if (Boolean(this.arweaveMine)) {
-                        await fetch(mineUrl);
+                        await fetch(this.mineUrl);
                     }
 
                     // Transfer tokens to AFTR vehicles
@@ -777,13 +748,6 @@ export default {
             }
         },
         async updateTokensLogos(arweave, wallet, contractId, logoVint, logoArhd) {
-            const mineUrl =
-                import.meta.env.VITE_ARWEAVE_PROTOCOL +
-                "://" +
-                import.meta.env.VITE_ARWEAVE_HOST +
-                ":" +
-                import.meta.env.VITE_ARWEAVE_PORT +
-                "/mine";
             let input = {
                 function: "plygnd-updateTokens",
                 logoVint: logoVint,
@@ -791,7 +755,7 @@ export default {
             };
             let res = await interactWrite(arweave, wallet, contractId, input);
             if (Boolean(this.arweaveMine)) {
-                await fetch(mineUrl);
+                await fetch(this.mineUrl);
             }
         },
         async createSampleContract(arweave, wallet, aftrId, initState, type = "aftr", name) {
@@ -810,18 +774,8 @@ export default {
                     { name: "Aftr-Playground-Type", value: "PST" },
                 ];
             }
-            this.$log.info(
-                "OverviewTest : createSampleContract :: ",
-                "initState",
-                initState
-            );
-            let contractTxId = await createContractFromTx(
-                arweave,
-                wallet,
-                aftrId,
-                initState,
-                swTags
-            );
+            this.$log.info("OverviewTest : createSampleContract :: ", "initState", initState);
+            let contractTxId = await createContractFromTx(arweave, wallet, aftrId, initState, swTags);
 
             return contractTxId;
         },
@@ -845,48 +799,23 @@ export default {
                     }
                 }
             `;
-            let response = await this.runQuery(
-                arweave,
-                query,
-                "Failure looking for " + name + " logo. "
-            );
+            let response = await this.runQuery(arweave, query, "Failure looking for " + name + " logo. ");
             let datalogo = response.data.data.transactions.edges;
-            this.$log.info(
-                "OverviewTest : getLogoId :: ",
-                "datalogo",
-                datalogo
-            );
+            this.$log.info("OverviewTest : getLogoId :: ", "datalogo", datalogo);
             let logoId = "";
             if (datalogo.length > 0) {
                 // let data = response.data.data.transactions.edges
                 logoId = datalogo.length > 0 ? datalogo[0].node.id : datalogo;
             } else {
                 // No logo found, so fetch logo from Arweave
-                this.$log.info(
-                    "OverviewTest : getLogoId :: ",
-                    "***logoUrl***",
-                    logoUrl
-                );
+                this.$log.info("OverviewTest : getLogoId :: ", "***logoUrl***", logoUrl);
                 const response = await fetch(logoUrl);
-                this.$log.info(
-                    "OverviewTest : getLogoId :: ",
-                    "response",
-                    response
-                );
+                this.$log.info("OverviewTest : getLogoId :: ", "response", response);
                 const imgBlob = await response.blob();
-                this.$log.info(
-                    "OverviewTest : getLogoId :: ",
-                    "imgBlob",
-                    imgBlob
-                );
+                this.$log.info("OverviewTest : getLogoId :: ", "imgBlob", imgBlob);
                 const imgByteArray = await this.getAsByteArray(imgBlob);
 
-                const tx = await arweave.createTransaction(
-                    {
-                        data: imgByteArray,
-                    },
-                    wallet
-                );
+                const tx = await arweave.createTransaction({ data: imgByteArray, }, wallet);
 
                 tx.addTag("Content-Type", imgBlob.type);
                 tx.addTag("User-Agent", "AFTR.Market");
@@ -895,15 +824,9 @@ export default {
                 await arweave.transactions.sign(tx, wallet);
                 await arweave.transactions.post(tx);
                 logoId = tx.id;
-                const mineUrl =
-                    import.meta.env.VITE_ARWEAVE_PROTOCOL +
-                    "://" +
-                    import.meta.env.VITE_ARWEAVE_HOST +
-                    ":" +
-                    import.meta.env.VITE_ARWEAVE_PORT +
-                    "/mine";
+
                 if (Boolean(this.arweaveMine)) {
-                    await fetch(mineUrl);
+                    await fetch(this.mineUrl);
                 }
             }
             if (name === "Vint") {
@@ -940,8 +863,6 @@ export default {
                 qty: qty,
             };
 
-            const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
-
             await interactWrite(arweave, wallet, pstContractId, inputTransfer)
                 .then(async (id) => { 
                     this.$log.info("OverviewTestTransferTokens : interactWrite :: ", "Transfer Vint = " + JSON.stringify(id));
@@ -956,7 +877,7 @@ export default {
                     await interactWrite(arweave, wallet, vehContractId, inputDeposit)
                         .then(async (txId) => {
                             if (Boolean(this.arweaveMine)) {
-                                await fetch(mineUrl);
+                                await fetch(this.mineUrl);
                             }
                         })
                         .catch((error) => {
