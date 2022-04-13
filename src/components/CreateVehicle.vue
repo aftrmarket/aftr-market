@@ -244,7 +244,7 @@
                                                     <td class="px-6 py-4 whitespace-nowrap">
                                                         <div class="flex items-center">
                                                             <div class="flex-shrink-0 h-10 w-10">
-                                                                <img class="h-10 w-10 rounded-full" :src="ChangeEnvValue + pst.logo" alt="" />
+                                                                <img class="h-10 w-10 rounded-full" :src="pstLogo(pst.id, pst.logo)" alt="" />
                                                             </div>
                                                             <div class="ml-4">
                                                                 <div class="text-sm font-medium text-gray-900">
@@ -495,19 +495,9 @@ export default {
             newQuorum: 0.5,
             newSupport: 0.5,
             fileUpload: false,
-            logoUrl: ""
         };
     },
     computed: {
-        ChangeEnvValue() {
-            //this.logoUrl = "https://arweave.net/";  
-            if(import.meta.env.VITE_ARWEAVE_PORT){
-                this.logoUrl = `${import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/"}`;
-            } else {
-                this.logoUrl = `${import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST}`;
-            }
-            return this.logoUrl;
-        },
         displaySeats() {
             return numberAbbreviate(this.seats, 2);
         },
@@ -627,6 +617,20 @@ export default {
                 return numberAbbreviate(numBlocks, 2);
             } else {
                 return "0";
+            }
+        },
+        pstLogo(id, logo) {
+            let logoUrl = "";
+            if (logo || logo != "") {
+                if(import.meta.env.VITE_ARWEAVE_PORT){
+                    logoUrl = `${import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/"}`;
+                } else {
+                    logoUrl = `${import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST}`;
+                }
+                return logoUrl + logo;
+            } else {
+                logoUrl = "https://avatars.dicebear.com/api/pixel-art-neutral/:" + id + ".svg";
+                return logoUrl;
             }
         },
         async onFileChange(e) {

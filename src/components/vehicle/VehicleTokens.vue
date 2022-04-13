@@ -22,14 +22,14 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-for="(pst, index) in vehicle.tokens" :key="pst.id" class="hover:bg-gray-50">
+                                <tr v-for="(pst, index) in vehicle.tokens" :key="pst.txId" class="hover:bg-gray-50">
                                     <td v-if="allowTransfer" class="text-center py-2 pl-3">
                                         <input type="checkbox" :value="pst.txId" v-model="tokenSelected" :class="checkboxClass" />
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center">
                                             <div class="flex-shrink-0 h-10 w-10">
-                                                <img class="h-10 w-10 rounded-full" :src="ChangeEnvValue + pst.logo" alt="" />
+                                                <img class="h-10 w-10 rounded-full" :src="pstLogo(pst.tokenId, pst.logo)" alt="" />
                                             </div>
                                             <div class="ml-4">
                                                 <div class="font-medium text-gray-900"> {{ pst.name + " (" + pst.ticker + ")" }} </div>
@@ -160,7 +160,6 @@ export default {
             transferAddrs: [],
             transferAmounts: [],
             proposedChanges: [],
-            logoUrl: "",
 
 /*** TODO: HANDLE TOKENS THAT ARE LOCKED! */
 /**************************************** */
@@ -209,15 +208,6 @@ export default {
             }
         },
         ...mapGetters(['arConnected', 'getActiveAddress']),
-        ChangeEnvValue() {
-            // this.logoUrl = "https://arweave.net/";                
-            if(import.meta.env.VITE_ARWEAVE_PORT){
-                this.logoUrl = `${import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/"}`;
-            } else {
-                this.logoUrl = `${import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST}`;
-            }
-            return this.logoUrl;
-        },
     },
     watch: {
         arConnected(value) {
@@ -236,6 +226,20 @@ export default {
                 this.allowTransfer = true;
             } else {
                 this.allowTransfer = false;
+            }
+        },
+        pstLogo(id, logo) {
+            let logoUrl = "";
+            if (logo || logo != "") {
+                if(import.meta.env.VITE_ARWEAVE_PORT){
+                    logoUrl = `${import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/"}`;
+                } else {
+                    logoUrl = `${import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST}`;
+                }
+                return logoUrl + logo;
+            } else {
+                logoUrl = "https://avatars.dicebear.com/api/pixel-art-neutral/:" + id + ".svg";
+                return logoUrl;
             }
         },
         arConnect() {

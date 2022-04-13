@@ -82,7 +82,7 @@ export default {
             let logoUrl = "";
 
             if (!this.vehicle.logo || this.vehicle.logo === '') {
-                logoUrl = "https://avatars.dicebear.com/api/pixel-art-neutral/:" + this.vehicle.ticker + ".svg";
+                logoUrl = "https://avatars.dicebear.com/api/pixel-art-neutral/:" + this.vehicle.id + ".svg";
             } else {
                 // logoUrl = "https://arweave.net/" + this.vehicle.logo;
                 if(import.meta.env.VITE_ARWEAVE_PORT){

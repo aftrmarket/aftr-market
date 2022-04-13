@@ -164,9 +164,6 @@ export default {
                 return "mt-1 focus:ring-aftrRed focus:border-aftrRed shadow-sm sm:text-sm border-gray-300 rounded-md";
             }
         },
-        availableTokensText(valid) {
-
-        },
         async transferTokens() {
             this.msg = "Please wait for deposit into vehicle to complete..."
             let arweave = {};
