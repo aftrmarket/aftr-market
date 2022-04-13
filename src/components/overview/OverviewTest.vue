@@ -4,7 +4,6 @@
             {{isLoading}}
             <div class="w-12 h-12 border-b-2 border-gray-500 rounded-full animate-spin"></div>
         </div> -->
-
         <div class="pt-10 bg-aftrDarkGrey sm:pt-16 lg:pt-8 lg:pb-14 lg:overflow-hidden">
             <div class="mx-auto max-w-7xl lg:px-8">
                 <div class="lg:grid lg:grid-cols-2 lg:gap-8">

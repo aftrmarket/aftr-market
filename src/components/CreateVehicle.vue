@@ -435,6 +435,7 @@ export default {
             arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
             arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
             arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
+            mineUrl: import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine",
             arweaveMine: import.meta.env.VITE_MINE,
             /** */
 
@@ -1023,7 +1024,7 @@ export default {
             //this.vehicle.logo = "9CYPS85KChE_zQxNLi2y5r2FLG-YE6HiphYYTlgtrtg";      // TEMP LOGO
             this.vehicle.ownership = this.ownership;
             this.vehicle.votingSystem = this.votingSystem;
-            this.vehicle.status = "stopped";
+            this.vehicle.status = "started";
             this.vehicle.vault = {};
             this.vehicle.votes = [];
             this.vehicle.tipsAr = 0;
@@ -1050,27 +1051,18 @@ export default {
             if (this.fileUpload){
                 if (import.meta.env.VITE_ENV === "DEV") {
                     await this.deployFile(this.files, arweave, use_wallet);
-                    const mineUrl =
-                            import.meta.env.VITE_ARWEAVE_PROTOCOL +
-                            "://" +
-                            import.meta.env.VITE_ARWEAVE_HOST +
-                            ":" +
-                            import.meta.env.VITE_ARWEAVE_PORT +
-                            "/mine";
-                    if(Boolean(this.arweaveMine)){                        
-                        this.$log.info("CreateVehicle : createVehicle :: ", "mineUrl ",mineUrl);    
-                        let response = await fetch(mineUrl);
-                    }
                 } else {
                     await this.deployFile(this.files, arweave, "use_wallet");
+                }
+
+                if(Boolean(this.arweaveMine)){                        
+                    this.$log.info("CreateVehicle : createVehicle :: ", "mineUrl ", this.mineUrl);    
+                    await fetch(this.mineUrl);
                 }
             }
 
             // Convert DAO Member array to dictionary
-            this.vehicle.balances = this.daoMembers.reduce(
-                (a, x) => ({ ...a, [x.wallet]: x.balance }),
-                {}
-            );
+            this.vehicle.balances = this.daoMembers.reduce( (a, x) => ({ ...a, [x.wallet]: x.balance }), {} );
 
             const tmpPsts = this.vehiclePsts.map((item) => {
                 return {
@@ -1081,21 +1073,16 @@ export default {
                     tokens: item.tokens,
                 };
             });
-            this.$log.info("CreateVehicle : createVehicle :: ", "tmpPsts", tmpPsts);
-            this.vehicle.tokens = tmpPsts;
-            this.$log.info("CreateVehicle : createVehicle :: ", "VEHICLE: " + JSON.stringify(this.vehicle));
+            //this.$log.info("CreateVehicle : createVehicle :: ", "tmpPsts", tmpPsts);
+            this.vehicle.tokens = [];
+            //this.$log.info("CreateVehicle : createVehicle :: ", "VEHICLE: " + JSON.stringify(this.vehicle));
 
-            this.$log.info("CreateVehicle : createVehicle :: ", "this.vehicle.ownership : ", this.vehicle.ownership);
+            //this.$log.info("CreateVehicle : createVehicle :: ", "this.vehicle.ownership : ", this.vehicle.ownership);
 
             let obj = this.vehicle.balances;
 
             if (this.vehicle.ownership == "dao") {
-                this.$log.info(
-                    "CreateVehicle : createVehicle :: ",
-                    "this.vehicle.ownership--length",
-                    Object.keys(obj).length,
-                    Object.keys(obj).length < 2
-                );
+                this.$log.info("CreateVehicle : createVehicle :: ", "this.vehicle.ownership--length", Object.keys(obj).length, Object.keys(obj).length < 2);
                 if (Object.keys(obj).length < 2) {
                     // alert(
                     //     "Please add atleast two memebers if you are choose DAO ownership"
@@ -1128,31 +1115,13 @@ export default {
                 this.$log.info("CreateVehicle : createVehicle :: ", "tags: " + JSON.stringify(initTags));
 
                 if (import.meta.env.VITE_ENV === "DEV") {
-                    this.vehicle["id"] = await createContractFromTx(
-                        arweave,
-                        use_wallet,
-                        this.getAftrContractSrcId,
-                        JSON.stringify(this.vehicle),
-                        initTags
-                    );
-                    const mineUrl =
-                            import.meta.env.VITE_ARWEAVE_PROTOCOL +
-                            "://" +
-                            import.meta.env.VITE_ARWEAVE_HOST +
-                            ":" +
-                            import.meta.env.VITE_ARWEAVE_PORT +
-                            "/mine";
+                    this.vehicle["id"] = await createContractFromTx(arweave, use_wallet, this.getAftrContractSrcId, JSON.stringify(this.vehicle), initTags);
+                    
                     if(Boolean(this.arweaveMine)){
-                        let response = await fetch(mineUrl);
+                        await fetch(this.mineUrl);
                     }   
                 } else {
-                    this.vehicle["id"] = await createContractFromTx(
-                        arweave,
-                        "use_wallet",
-                        this.contractSourceId,
-                        JSON.stringify(this.vehicle),
-                        initTags
-                    );
+                    this.vehicle["id"] = await createContractFromTx(arweave, "use_wallet", this.contractSourceId, JSON.stringify(this.vehicle), initTags);
                 }
                 //this.vehicle['id'] = await createContractFromTx(arweave, jwk, this.contractSourceId, JSON.stringify(vehicleTest), initTags);
                 this.$log.info("CreateVehicle : createVehicle :: ", "ID = " + this.vehicle["id"]);
@@ -1169,7 +1138,7 @@ export default {
              */
             try {
                 // Loop through vehicle PSTs and perform transfers
-                for (const pst of this.vehicle.tokens) {
+                for (const pst of this.vehiclePsts) {
                     transferInput = {
                         function: "transfer",
                         target: this.vehicle.id,
@@ -1177,100 +1146,47 @@ export default {
                     };
                     if (import.meta.env.VITE_ENV === "DEV") {
                         let wallet = JSON.parse(this.keyFile);
-                        const mineUrl =
-                                import.meta.env.VITE_ARWEAVE_PROTOCOL +
-                                "://" +
-                                import.meta.env.VITE_ARWEAVE_HOST +
-                                ":" +
-                                import.meta.env.VITE_ARWEAVE_PORT +
-                                "/mine";
-                        if(Boolean(this.arweaveMine)){                            
-                            let response = await fetch(mineUrl);
-                        }
-
-                        let vertoTxId = await interactWrite(
-                            arweave,
-                            wallet,
-                            pst.id,
-                            transferInput
-                        );
-                        this.$log.info(
-                            "CreateVehicle : createVehicle :: ", "Transfer Verto = " + JSON.stringify(vertoTxId)
-                        );
+                        let txId = await interactWrite(arweave, wallet, pst.id, transferInput);
+                        this.$log.info("CreateVehicle : createVehicle :: ", "Transfer token = " + JSON.stringify(txId));
                         if(Boolean(this.arweaveMine)){
-                            await fetch(mineUrl);
+                            await fetch(this.mineUrl);
                         }
 
                         const inputDeposit = {
                             function: "deposit",
                             tokenId: pst.id,
-                            txId: vertoTxId,
+                            txId: txId,
                         };
 
-                        let txId = await interactWrite(
-                            arweave,
-                            wallet,
-                            this.vehicle.id,
-                            inputDeposit
-                        );
+                        txId = await interactWrite(arweave, wallet, this.vehicle.id, inputDeposit);
                         this.$log.info("CreateVehicle : createVehicle :: ", txId);
                         
                         if(Boolean(this.arweaveMine)){
-                            await fetch(mineUrl);
+                            await fetch(this.mineUrl);
                         }
 
                         this.$log.info("CreateVehicle : createVehicle :: ","READ CONTRACT...");
-                        let vehicle = await readContract(
-                            arweave,
-                            this.vehicle.id,
-                            undefined,
-                            true
-                        );
+                        let vehicle = await readContract(arweave, this.vehicle.id, undefined, true);
                         this.$log.info("CreateVehicle : createVehicle :: ", JSON.stringify(vehicle));
                     } else {
-                        let vertoTxId = await interactWrite(
-                            arweave,
-                            "use_wallet",
-                            pst.id,
-                            transferInput
-                        );
-                        this.$log.info(
-                            "CreateVehicle : createVehicle :: ", "Transfer Verto = " + JSON.stringify(vertoTxId)
-                        );
+                        let txId = await interactWrite(arweave, "use_wallet", pst.id, transferInput);
+                        this.$log.info("CreateVehicle : createVehicle :: ", "Transfer tokens = " + JSON.stringify(txId));
 
                         const inputDeposit = {
                             function: "deposit",
                             tokenId: pst.id,
-                            txId: vertoTxId,
+                            txId: txId,
                         };
 
-                        let txId = await interactWrite(
-                            arweave,
-                            wallet,
-                            this.vehicle.id,
-                            inputDeposit
-                        );
+                        txId = await interactWrite(arweave, wallet, this.vehicle.id, inputDeposit);
                         this.$log.info("CreateVehicle : createVehicle :: ", txId);
 
                         this.$log.info("CreateVehicle : createVehicle :: ", "READ CONTRACT...");
-                        let vehicle = await readContract(
-                            arweave,
-                            this.vehicle.id,
-                            undefined,
-                            true
-                        );
+                        let vehicle = await readContract(arweave, this.vehicle.id, undefined, true);
                         this.$log.info("CreateVehicle : createVehicle :: ", JSON.stringify(vehicle));
                     }
 
-                    this.$log.info(
-                        "CreateVehicle : createVehicle :: ",
-                        "TokenId: " +
-                            pst.id +
-                            " Name: " +
-                            pst.name +
-                            " Qty: " +
-                            pst.tokens
-                    );
+                    this.$log.info("CreateVehicle : createVehicle :: ", "TokenId: " + pst.id + " Name: " + pst.name + " Qty: " + pst.tokens);
                     //SOMETHING = await interactWrite(arweave, "use_wallet", pst.id, initTags);
                 }
             } catch (error) {
