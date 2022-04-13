@@ -616,7 +616,6 @@ export default {
                     this.$log.info("PSTS: " + JSON.stringify(wallet.psts));
                     this.$store.commit("arConnect", wallet);
                 }
-                console.log("****************")
                 this.$swal.close();
                 this.$router.push("vehicles");
             } catch (error) {
