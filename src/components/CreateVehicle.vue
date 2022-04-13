@@ -1117,10 +1117,8 @@ export default {
                 this.$log.info("CreateVehicle : createVehicle :: ", "tags: " + JSON.stringify(initTags));
 
                 if (import.meta.env.VITE_ENV === "DEV") {
-                    console.log("getAftrContractSrcId: WTH");
                     this.vehicle["id"] = await createContractFromTx(arweave, use_wallet, this.getAftrContractSrcId, JSON.stringify(this.vehicle), initTags);  
                 } else {
-                    console.log("getAftrContractSrcId: " + this.getAftrContractSrcId);
                     this.vehicle["id"] = await createContractFromTx(arweave, "use_wallet", this.getAftrContractSrcId, JSON.stringify(this.vehicle), initTags);
                 }
                 this.$log.info("CreateVehicle : createVehicle :: ", "ID = " + this.vehicle["id"]);
@@ -1181,7 +1179,7 @@ export default {
                             txId: txId,
                         };
 
-                        txId = await interactWrite(arweave, wallet, this.vehicle.id, inputDeposit);
+                        txId = await interactWrite(arweave, "use_wallet", this.vehicle.id, inputDeposit);
                         this.$log.info("CreateVehicle : createVehicle :: ", txId);
 
                         this.$log.info("CreateVehicle : createVehicle :: ", "READ CONTRACT...");
