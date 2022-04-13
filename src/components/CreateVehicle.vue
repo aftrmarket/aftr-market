@@ -1117,15 +1117,16 @@ export default {
                 this.$log.info("CreateVehicle : createVehicle :: ", "tags: " + JSON.stringify(initTags));
 
                 if (import.meta.env.VITE_ENV === "DEV") {
-                    this.vehicle["id"] = await createContractFromTx(arweave, use_wallet, this.getAftrContractSrcId, JSON.stringify(this.vehicle), initTags);
-                    
-                    if(Boolean(this.arweaveMine)){
-                        await fetch(this.mineUrl);
-                    }   
+                    this.vehicle["id"] = await createContractFromTx(arweave, use_wallet, this.getAftrContractSrcId, JSON.stringify(this.vehicle), initTags);  
                 } else {
+                    console.log("getAftrContractSrcId: " + this.getAftrContractSrcId);
                     this.vehicle["id"] = await createContractFromTx(arweave, "use_wallet", this.getAftrContractSrcId, JSON.stringify(this.vehicle), initTags);
                 }
                 this.$log.info("CreateVehicle : createVehicle :: ", "ID = " + this.vehicle["id"]);
+
+                if(Boolean(this.arweaveMine)){
+                    await fetch(this.mineUrl);
+                } 
             } catch (error) {
                 this.$log.error("CreateVehicle : createVehicle :: ", "ERROR creating SmartWeave contract: " + error);
                 this.pageStatus = "error";
