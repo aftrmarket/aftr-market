@@ -460,6 +460,7 @@ export default {
                     this.$log.info("OverviewTest : init :: ", "*** FOUND CONTRACT SOURCE ID: " + aftrContractSrcId);
                 }
                 this.$store.commit("setAftrContractSrcId", aftrContractSrcId);
+    console.log("aftrContractSrcId: " + aftrContractSrcId);
                 this.$log.info("OverviewTest : init :: ", "AFTR Source ID: " + aftrContractSrcId);
 
                 this.$log.info("OverviewTest : init :: ", "3. Sample PSTs");
