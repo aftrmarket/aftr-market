@@ -394,11 +394,20 @@ export default {
                 this.$log.info("OverviewTest : init :: ", server, route);
 
                 this.$log.info("OverviewTest : init :: ", "WALLET: " + addr);
-                let balance = await arweave.wallets.getBalance(addr);
-                if (balance < 10000000000000) {
-                    const mintRes = await fetch(server + route);
+                let balance;
+                try {
                     balance = await arweave.wallets.getBalance(addr);
+                    if (balance < 10000000000000) {
+                        const mintRes = await fetch(server + route);
+                        balance = await arweave.wallets.getBalance(addr);
+                    }
+                } catch (error) {
+                        this.$swal({
+                        icon: "error",
+                        html: "Wallet balance having some issue."
+                    });
                 }
+                
 
                 this.$log.info("OverviewTest : init :: ", "Balance for " + addr + ": " + balance.toString());
                 let aftrContractSrcId = "";
@@ -499,14 +508,16 @@ export default {
                 let input = {};
                 // Only add if user is not already there
                 this.isLoading = "Checking balances on Blue Horizon vehicle.";
-                this.$swal({
+
+                 this.$swal({
                     icon: "success",
                     html: "Checking balances on Blue Horizon vehicle.",
                     showConfirmButton: false,
-                    timer: 2500,
+                    // timer: 2500,
                     allowOutsideClick: false,
                 });
 
+               
                 const blueVeh = await readContract(arweave, blueContractId);
                 if (!(addr in blueVeh.balances)) {
                     input = {
@@ -605,6 +616,8 @@ export default {
                     this.$log.info("PSTS: " + JSON.stringify(wallet.psts));
                     this.$store.commit("arConnect", wallet);
                 }
+                console.log("****************")
+                this.$swal.close();
                 this.$router.push("vehicles");
             } catch (error) {
                 this.$swal({
