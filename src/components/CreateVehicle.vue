@@ -101,20 +101,14 @@
                                 <label for="seats" class="block text-sm font-medium text-gray-700">Number of Seats Available</label>
                                 <div class="flex justify-start items-center">
                                     <input type="number" v-model="seats" class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md" />
-                                    <label class="pl-4 block text-sm text-gray-700">~<span class="text-lg text-aftrBlue">{{
-                      displaySeats
-                    }}</span>
-                                        seats will be created</label>
+                                    <label class="pl-4 block text-sm text-gray-700">~<span class="text-lg text-aftrBlue">{{ displaySeats }}</span> seats will be created</label>
                                 </div>
                             </div>
                             <div class="pt-2">
                                 <label for="seats" class="block text-sm font-medium text-gray-700">Vehicle Lock Period</label>
                                 <div class="flex justify-start items-center">
                                     <input type="number" v-model="lockPeriod" @change="lockChange" class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md" />
-                                    <label class="pl-4 block text-sm text-gray-700">Months (~<span class="text-lg text-aftrBlue">{{
-                      monthsInBlocks(lockPeriod)
-                    }}</span>
-                                        Blocks)</label>
+                                    <label class="pl-4 block text-sm text-gray-700">Months (~<span class="text-lg text-aftrBlue">{{ monthsInBlocks(lockPeriod) }}</span> Blocks)</label>
                                 </div>
                             </div>
                             <div class="pt-2">
@@ -130,14 +124,7 @@
                                     <input type="number" placeholder="Min" v-model="minLease" class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md" />
                                     <input type="number" placeholder="Max" v-model="maxLease" class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md" />
                                     <label class="pl-4 block text-sm text-gray-700">
-                                        Months (~<span class="text-lg text-aftrBlue">{{
-                      monthsInBlocks(minLease)
-                    }}</span>
-                                        to
-                                        <span class="text-lg text-aftrBlue">{{
-                      monthsInBlocks(maxLease)
-                    }}</span>
-                                        Blocks)
+                                        Months (~<span class="text-lg text-aftrBlue">{{ monthsInBlocks(minLease) }}</span> to <span class="text-lg text-aftrBlue">{{ monthsInBlocks(maxLease) }}</span> Blocks)
                                     </label>
                                 </div>
                             </div>
@@ -172,7 +159,7 @@
                             </div>
                         </div>
                     </div>
-
+<!--
                     <h3 class="mt-4 border-t border-gray-200 pt-4 text-xl font-light leading-6">
                         Add Tokens
                     </h3>
@@ -218,8 +205,9 @@
                                 </button>
                             </div>
                         </div>
-
+-->
                         <!-- Table of PSTs -->
+<!--
                         <div v-if="vehiclePsts.length > 0" class="pt-1">
                             <div class="pt-2 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                                 <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
@@ -274,7 +262,9 @@
                                 </div>
                             </div>
                         </div>
+-->
                         <!-- End of PST Table -->
+<!--
                     </div>
                     <div class="pl-6 pb-4 text-right">
                         <div class="text-right">
@@ -286,7 +276,7 @@
                             </span>
                         </div>
                     </div>
-
+-->
                     <!-- DAO -->
                     <h3 class="mt-4 border-t border-gray-200 pt-4 text-xl font-light leading-6">
                         DAO Members
@@ -991,7 +981,7 @@ export default {
                 return false;
             }
 
-            // this.pageStatus = "in-progress";
+            this.pageStatus = "in-progress";
 
             /***** NEED TO MAKE SURE THAT NONE OF THESE ARE NULL */
             this.vehicle.settings = [
@@ -1132,74 +1122,68 @@ export default {
                 return false;
             }
 
-            let transferInput = {};
+/*** Removing token deposits from Vehicle Creation for now. */
+/*** This can be risky if something fails. */
+/*** Token deposits will be handled on the tokens tab in the vehicle. */
+            // let transferInput = {};
+            // try {
+            //     // Loop through vehicle PSTs and perform transfers
+            //     for (const pst of this.vehiclePsts) {
+            //         transferInput = {
+            //             function: "transfer",
+            //             target: this.vehicle.id,
+            //             qty: pst.tokens, // PST qty
+            //         };
+            //         if (import.meta.env.VITE_ENV === "DEV") {
+            //             let wallet = JSON.parse(this.keyFile);
+            //             let txId = await interactWrite(arweave, wallet, pst.id, transferInput);
+            //             this.$log.info("CreateVehicle : createVehicle :: ", "Transfer token = " + JSON.stringify(txId));
+            //             if(Boolean(this.arweaveMine)){
+            //                 await fetch(this.mineUrl);
+            //             }
 
-            /**** TRANSFER -> THEN DEPOSIT FUNCTIONS NEED TO BE CALLED
-             **** THE SAME CODE THAT WAS IMPLEMENTED FOR THE ADD TOKEN BUTTON
-             */
-            try {
-                // Loop through vehicle PSTs and perform transfers
-                for (const pst of this.vehiclePsts) {
-                    transferInput = {
-                        function: "transfer",
-                        target: this.vehicle.id,
-                        qty: pst.tokens, // PST qty
-                    };
-                    if (import.meta.env.VITE_ENV === "DEV") {
-                        let wallet = JSON.parse(this.keyFile);
-                        let txId = await interactWrite(arweave, wallet, pst.id, transferInput);
-                        this.$log.info("CreateVehicle : createVehicle :: ", "Transfer token = " + JSON.stringify(txId));
-                        if(Boolean(this.arweaveMine)){
-                            await fetch(this.mineUrl);
-                        }
+            //             const inputDeposit = {
+            //                 function: "deposit",
+            //                 tokenId: pst.id,
+            //                 txId: txId,
+            //             };
 
-                        const inputDeposit = {
-                            function: "deposit",
-                            tokenId: pst.id,
-                            txId: txId,
-                        };
-
-                        txId = await interactWrite(arweave, wallet, this.vehicle.id, inputDeposit);
-                        this.$log.info("CreateVehicle : createVehicle :: ", txId);
+            //             txId = await interactWrite(arweave, wallet, this.vehicle.id, inputDeposit);
+            //             this.$log.info("CreateVehicle : createVehicle :: ", txId);
                         
-                        if(Boolean(this.arweaveMine)){
-                            await fetch(this.mineUrl);
-                        }
+            //             // if(Boolean(this.arweaveMine)){
+            //             //     await fetch(this.mineUrl);
+            //             // }
 
-                        this.$log.info("CreateVehicle : createVehicle :: ","READ CONTRACT...");
-                        let vehicle = await readContract(arweave, this.vehicle.id, undefined, true);
-                        this.$log.info("CreateVehicle : createVehicle :: ", JSON.stringify(vehicle));
-                    } else {
-                        let txId = await interactWrite(arweave, "use_wallet", pst.id, transferInput);
-                        this.$log.info("CreateVehicle : createVehicle :: ", "Transfer tokens = " + JSON.stringify(txId));
+            //         } else {
+            //             let txId = await interactWrite(arweave, "use_wallet", pst.id, transferInput);
+            //             this.$log.info("CreateVehicle : createVehicle :: ", "Transfer tokens = " + JSON.stringify(txId));
 
-                        const inputDeposit = {
-                            function: "deposit",
-                            tokenId: pst.id,
-                            txId: txId,
-                        };
+            //             const inputDeposit = {
+            //                 function: "deposit",
+            //                 tokenId: pst.id,
+            //                 txId: txId,
+            //             };
 
-                        txId = await interactWrite(arweave, "use_wallet", this.vehicle.id, inputDeposit);
-                        this.$log.info("CreateVehicle : createVehicle :: ", txId);
+            //             txId = await interactWrite(arweave, "use_wallet", this.vehicle.id, inputDeposit);
+            //             this.$log.info("CreateVehicle : createVehicle :: ", txId);
+            //         }
 
-                        this.$log.info("CreateVehicle : createVehicle :: ", "READ CONTRACT...");
-                        let vehicle = await readContract(arweave, this.vehicle.id, undefined, true);
-                        this.$log.info("CreateVehicle : createVehicle :: ", JSON.stringify(vehicle));
-                    }
-
-                    this.$log.info("CreateVehicle : createVehicle :: ", "TokenId: " + pst.id + " Name: " + pst.name + " Qty: " + pst.tokens);
-                    //SOMETHING = await interactWrite(arweave, "use_wallet", pst.id, initTags);
-                }
-            } catch (error) {
-                this.$log.error("CreateVehicle : createVehicle :: ", "ERROR transferring tokens: " + error);
-                this.pageStatus = "error";
-                return false;
-            }
-            this.pageStatus = "in-progress";
-            this.$router.push({
-                name: "vehicle",
-                params: { vehicleId: this.vehicle.id },
-            });
+            //         this.$log.info("CreateVehicle : createVehicle :: ", "TokenId: " + pst.id + " Name: " + pst.name + " Qty: " + pst.tokens);
+            //         if(Boolean(this.arweaveMine)){
+            //             await fetch(this.mineUrl);
+            //         }
+            //     }
+            // } catch (error) {
+            //     this.$log.error("CreateVehicle : createVehicle :: ", "ERROR transferring tokens: " + error);
+            //     this.pageStatus = "error";
+            //     return false;
+            // }
+            // this.pageStatus = "in-progress";
+            // this.$router.push({
+            //     name: "vehicle",
+            //     params: { vehicleId: this.vehicle.id },
+            // });
 
             this.pageStatus = "";
         },
