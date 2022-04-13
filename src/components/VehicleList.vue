@@ -165,6 +165,8 @@ export default {
                 let isAftrVehicle = true;
                 const contractSrc = await this.returnContractSrc(contractId);
                 if (contractSrc !== this.getAftrContractSrcId) {
+                    console.log("FAILED CONTRACT SRC: " + contractSrc);
+                    
                     //throw "Not valid AFTR Vehicle";
                     this.$log.error("VehicleList : loadAllVehicles :: ", "Invalid AFTR Vehicle found - Contract ID: " + contractId);
                     //isAftrVehicle = false;
