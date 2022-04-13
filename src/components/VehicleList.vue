@@ -162,85 +162,91 @@ export default {
                 let vehicle = await readContract(this.arweave, contractId);
 
                 // Check to make sure contract source matches AFTR Contract Source
+                let isAftrVehicle = true;
                 const contractSrc = await this.returnContractSrc(contractId);
                 if (contractSrc !== this.getAftrContractSrcId) {
-                    throw "Not valid AFTR Vehicle";
+                    //throw "Not valid AFTR Vehicle";
+                    this.$log.error("VehicleList : loadAllVehicles :: ", "Invalid AFTR Vehicle found - Contract ID: " + contractId);
+                    //isAftrVehicle = false;
+                    return;
                 }
                 
-                vehicle.id = contractId;
-                if (!vehicle.tokens) {
-                    vehicle.tokens = [];
-                }
-                // Logo and Description
-                vehicle.settings.forEach((setting) => {
-                    if (setting[0] === "communityLogo") {
-                        vehicle.logo = setting[1];
-                    } else if (setting[0] === "communityDescription") {
-                        vehicle.desc = setting[1];
+                if (isAftrVehicle) {
+                    vehicle.id = contractId;
+                    if (!vehicle.tokens) {
+                        vehicle.tokens = [];
                     }
-                });
-
-                // Treasury
-                let treasuryTotal = 0;
-
-                for (let token of vehicle.tokens) {
-                    try {
-                        const response = await fetch(import.meta.env.VITE_VERTO_CACHE_URL + "token/" + token.tokenId + "/price");
-                        const responseObj = await response.json();
-                        const pricePerToken = responseObj.price;
-                        const tokenValue = pricePerToken * token.balance;
-                        treasuryTotal += tokenValue;
-                    } catch (error) {
-                        this.$log.error("VehicleList : loadAllVehicles :: ", "ERROR calling Verto cache on " + token.name + ": " + error);
-                    }
-                }
-                vehicle.treasury = treasuryTotal;
-
-                // Tips (AR)
-                /*** HOW CAN THIS BE DETERMINED? */
-                //vehicle.tipsAr = 10000;
-
-                // Tips (Misc)
-                /*** HOW CAN THIS BE DETERMINED? */
-                //vehicle.tipsMisc = 142545
-
-                // Votes Opened
-                if (
-                    typeof vehicle.votes !== "undefined" &&
-                    vehicle.votes.length !== 0
-                ) {
-                    const activeVotes = vehicle.votes.filter(
-                        (vote) => vote.status === "active"
-                    );
-                    vehicle.totalActiveVotes = activeVotes.length;
-                } else {
-                    vehicle.totalActiveVotes = 0;
-                }
-                if (this.getMyVehicle == false) {
-                    await Object.keys(vehicle.balances).some((walletId) => {
-                        if (walletId == this.$store.getters.getActiveAddress) {
-                            if (vehicle.balances[walletId] > 0) {
-                                this.selectedMyVehicle.push(vehicle);
-                            }
-                        } else {
-                            Object.keys(vehicle.vault).some((walletId) => {
-                                if (
-                                    walletId ==
-                                    this.$store.getters.getActiveAddress
-                                ) {
-                                    if (vehicle.vault[walletId] > 0) {
-                                        this.selectedMyVehicle.push(vehicle);
-                                    }
-                                }
-                            });
+                    // Logo and Description
+                    vehicle.settings.forEach((setting) => {
+                        if (setting[0] === "communityLogo") {
+                            vehicle.logo = setting[1];
+                        } else if (setting[0] === "communityDescription") {
+                            vehicle.desc = setting[1];
                         }
                     });
-                }
-                this.$log.info("VehicleList : loadAllVehicles :: ", "this.selectedMyVehicle", this.selectedMyVehicle);
-                if (this.getMyVehicle) {
-                    this.selectedVehicle.push(vehicle);
-                } else {
-                    this.vehicles.push(vehicle);
+
+                    // Treasury
+                    let treasuryTotal = 0;
+
+                    for (let token of vehicle.tokens) {
+                        try {
+                            const response = await fetch(import.meta.env.VITE_VERTO_CACHE_URL + "token/" + token.tokenId + "/price");
+                            const responseObj = await response.json();
+                            const pricePerToken = responseObj.price;
+                            const tokenValue = pricePerToken * token.balance;
+                            treasuryTotal += tokenValue;
+                        } catch (error) {
+                            this.$log.error("VehicleList : loadAllVehicles :: ", "ERROR calling Verto cache on " + token.name + ": " + error);
+                        }
+                    }
+                    vehicle.treasury = treasuryTotal;
+
+                    // Tips (AR)
+                    /*** HOW CAN THIS BE DETERMINED? */
+                    //vehicle.tipsAr = 10000;
+
+                    // Tips (Misc)
+                    /*** HOW CAN THIS BE DETERMINED? */
+                    //vehicle.tipsMisc = 142545
+
+                    // Votes Opened
+                    if (
+                        typeof vehicle.votes !== "undefined" &&
+                        vehicle.votes.length !== 0
+                    ) {
+                        const activeVotes = vehicle.votes.filter(
+                            (vote) => vote.status === "active"
+                        );
+                        vehicle.totalActiveVotes = activeVotes.length;
+                    } else {
+                        vehicle.totalActiveVotes = 0;
+                    }
+                    if (this.getMyVehicle == false) {
+                        await Object.keys(vehicle.balances).some((walletId) => {
+                            if (walletId == this.$store.getters.getActiveAddress) {
+                                if (vehicle.balances[walletId] > 0) {
+                                    this.selectedMyVehicle.push(vehicle);
+                                }
+                            } else {
+                                Object.keys(vehicle.vault).some((walletId) => {
+                                    if (
+                                        walletId ==
+                                        this.$store.getters.getActiveAddress
+                                    ) {
+                                        if (vehicle.vault[walletId] > 0) {
+                                            this.selectedMyVehicle.push(vehicle);
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    }
+                    
+                    if (this.getMyVehicle) {
+                        this.selectedVehicle.push(vehicle);
+                    } else {
+                        this.vehicles.push(vehicle);
+                    }
                 }
             } catch (error) {
                 this.$log.error("VehicleList : loadAllVehicles :: ", "ERROR calling SmartWeave: " + error);
