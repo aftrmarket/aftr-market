@@ -107,8 +107,8 @@ const store = createStore({
         },
         async arConnect(context) {
             let wallet = {
-            address: "",
-            psts: [],
+                address: "",
+                psts: [],
             };
             try {
                 const promiseResult = await window.arweaveWallet.connect([
@@ -123,7 +123,8 @@ const store = createStore({
                 let config = await window.arweaveWallet.getArweaveConfig();
                 context.commit("setArConnectConfig", config);
             } catch (error) {
-            console.log("ERROR during ArConnection: " + error);
+                console.log("ERROR during ArConnection: " + error);
+                alert("Do you have the ArConnect wallet?.  AFTR Market integrates with ArConnect, so you'll need have the ArConnect plugin installed in your browser.  Go to ArConnect.io for more information.");
             }
     
             if (wallet.address.length === 43) {
