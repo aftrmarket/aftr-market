@@ -112,8 +112,8 @@ export default {
     },
     computed: {
         vehicleLogo() {
+            let logoUrl =""
             if (this.vehicle.logo) {
-                let logoUrl =""
                 if(import.meta.env.VITE_ARWEAVE_PORT){
                     logoUrl = `${import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/" + this.vehicle.logo}`;
                 } else {
@@ -121,7 +121,8 @@ export default {
                 }
                 return logoUrl;
             } else {
-                return "../assets/logo-placeholder.png";
+                logoUrl = "https://avatars.dicebear.com/api/pixel-art-neutral/:" + this.vehicle.id + ".svg";
+                return logoUrl;
             }
         },
         ...mapGetters(["getAftrContractSrcId"]),
