@@ -113,7 +113,6 @@ export default {
     computed: {
         vehicleLogo() {
             if (this.vehicle.logo) {
-                // return "https://arweave.net/" + this.vehicle.logo;
                 let logoUrl =""
                 if(import.meta.env.VITE_ARWEAVE_PORT){
                     logoUrl = `${import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/" + this.vehicle.logo}`;
@@ -122,7 +121,7 @@ export default {
                 }
                 return logoUrl;
             } else {
-                return "/src/assets/logo-placeholder.png";
+                return "../assets/logo-placeholder.png";
             }
         },
         ...mapGetters(["getAftrContractSrcId"]),
