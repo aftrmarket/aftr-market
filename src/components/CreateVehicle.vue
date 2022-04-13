@@ -20,45 +20,7 @@
                 </div>
             </div>
         </div>
-        <div v-if="pageStatus === 'in-progress'">
-            <!-- ***** Alert Messages ***** -->
-            <form-container>
-                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
-                    <div class="animate-pulse flex">
-                        <div class="flex-shrink-0">
-                            <!--<ExclamationIcon class='h-5 w-5 text-yellow-400' aria-hidden='true' /> -->
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="#E49B0F">
-                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                            </svg>
-                        </div>
-                        <div class="ml-3">
-                            <p class="text-sm text-aftrDarkGrey">
-                                Your vehicle is being assembled...
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </form-container>
-        </div>
-        <div v-else-if="pageStatus === 'error'">
-            <form-container>
-                <div class="bg-red-50 border-l-4 border-red-400 p-4">
-                    <div class="animate-pulse flex">
-                        <div class="flex-shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="red">
-                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                            </svg>
-                        </div>
-                        <div class="ml-3">
-                            <p class="text-sm text-aftrDarkGrey">
-                                A problem occurred while creating your vehicle.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </form-container>
-        </div>
-        <div v-if="pageStatus === ''">
+        <div>
             <!-- Vehicle Info -->
             <form-container>
                 <form action="#" method="POST">
@@ -440,8 +402,6 @@ export default {
 
             createInProgress: false, // Boolean to toggle wait
 
-            pageStatus: "", // Flag to format page based on status
-
             selectedPstId: "", // ID of selected PST
             pstInputTokens: null, // Number of tokens of PST
             vehicleLogo: null, // Logo for vehicle
@@ -627,40 +587,6 @@ export default {
             this.fileUpload = true
             const file = e.target.files[0];
             this.files = file;
-
-            // Error Handling
-            /*** PRAJACTA - WE DON'T NEED THIS.
-             * If we add an accept key in the input tag in the HTML, 
-             * this error handling is handled automatically.
-             * Remove this comment and the error handling code, once you read it :) 
-             * We can probably remove the fileInvalid var as well.
-             */
-            // if (file.type.substring(0, 6) !== "image/") {
-            //     // Write file error message
-            //     this.fileInvalid = true;
-            //     this.$log.info("FILE IS NOT IMAGE");
-            //     return;
-            // } else {
-            //     this.fileInvalid = false;
-            // }
-
-
-            // let wallet;
-            // if (import.meta.env.VITE_ENV === "DEV") {
-            //     if (this.keyFile.length) {
-            //         wallet = JSON.parse(this.keyFile);
-            //     } else {
-            //         alert("Please attach your keyfile");
-            //     }
-            // }
-            // let arweave = {};
-            // arweave = await Arweave.init({
-            //     host: this.arweaveHost,
-            //     port: this.arweavePort,
-            //     protocol: this.arweaveProtocol,
-            //     timeout: 20000,
-            //     logging: true,
-            // });
 
             if (this.vehicleLogo) {
                 // Release the memory of the old file
@@ -895,34 +821,26 @@ export default {
         },
         addDaoMember() {
             const member = {};
-            if (!this.daoMembers[this.memberWallet]) {
+            const foundWallet = this.daoMembers.find( x => x.wallet === this.memberWallet);
+
+            if (foundWallet) {
+                foundWallet.balance += parseInt(this.memberAmount);
+            } else {
                 member.wallet = this.memberWallet;
                 member.balance = parseInt(this.memberAmount);
                 this.daoMembers.push(member);
-                this.sumDaoAmounts();
             }
-            // if (this.daoBalance) {
-            //     this.daoBalance += this.memberAmount;
-            // } else {
-            //     this.daoBalance = this.memberAmount;
-            // }
-
-            //this.updateAvailableTokens();
+            this.sumDaoAmounts();
             this.memberWallet = "";
             this.memberAmount = null;
             this.onTokenChange();
         },
         removeDaoMember(id) {
             const arrayIndex = this.daoMembers.findIndex((item) => item === id);
-            // this.daoBalance -= this.daoMembers[arrayIndex].balance;
-            this.sumDaoAmounts();
             this.memberAmount = null;
             this.daoMembers.splice(arrayIndex, 1);
-            //this.onTokenChange();
+            this.sumDaoAmounts();
         },
-        // updateDaoBalance() {
-        //     //const daoBalance = Math.round(this.vehicleTokens / this.daoMembers.length);
-        // },
         readFile(file) {
             // Thanks to https://dilshankelsen.com/convert-file-to-byte-array/
             return new Promise((resolve, reject) => {
@@ -954,16 +872,6 @@ export default {
             await arweave.transactions.post(tx);
             this.communityLogoValue = tx.id;
             this.$log.info("CreateVehicle : deployFile :: ","communityLogoValue", this.communityLogoValue);
-            
-            /*** Why are all these being updated here? */
-            this.vehicle.settings = [
-                ["quorum", this.newQuorum],
-                ["support", this.newSupport],
-                ["voteLength", 2160],
-                ["communityDescription", this.vehicle.desc],
-                ["communityLogo", this.communityLogoValue],
-            ];
-            /*********************** */
             this.$log.info("CreateVehicle : deployFile :: ", "txid", tx.id);
         },
         async createVehicle() {
@@ -981,7 +889,12 @@ export default {
                 return false;
             }
 
-            this.pageStatus = "in-progress";
+            this.$swal({
+                icon: "info",
+                html: "Please wait while your new vehicle is being created...",
+                showConfirmButton: false,
+                allowOutsideClick: false,
+            });
 
             /***** NEED TO MAKE SURE THAT NONE OF THESE ARE NULL */
             this.vehicle.settings = [
@@ -1004,11 +917,20 @@ export default {
                 });
             } catch (error) {
                 this.$log.error("CreateVehicle : createVehicle ::", "ERROR connecting to Arweave: " + error); // How can this ever happen? :)
-                this.pageStatus = "error";
-                return false;
+                this.$swal.fire({
+                    icon: "error",
+                    html: "An error occurred when trying to connect to Arweave.  You can try again and/or let us know that you're having trouble.",
+                    showConfirmButton: true,
+                    allowOutsideClick: false,
+                }).then((result) => {
+                    this.$router.push("vehicles");
+                });
             }
 
-            const initTags = [{ name: "Protocol", value: this.tagProtocol }];
+            let initTags = [{ name: "Protocol", value: this.tagProtocol }];
+            if (import.meta.env.VITE_ENV !== "PROD") {
+                initTags.push({ name: "Aftr-Playground", value: this.vehicle.ticker});
+            }
             this.vehicle.creator = this.$store.getters.getActiveAddress;
             //this.vehicle.seats = this.seats;  /*** NO LONGER USED */
             this.vehicle.lockPeriod = this.lockPeriod;
@@ -1042,6 +964,12 @@ export default {
                 }
             }
             if (this.fileUpload){
+                this.$swal({
+                    icon: "info",
+                    html: "Uploading logo...",
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                });
                 if (import.meta.env.VITE_ENV === "DEV") {
                     await this.deployFile(this.files, arweave, use_wallet);
                 } else {
@@ -1066,40 +994,34 @@ export default {
                     tokens: item.tokens,
                 };
             });
-            //this.$log.info("CreateVehicle : createVehicle :: ", "tmpPsts", tmpPsts);
+
             this.vehicle.tokens = [];
-            //this.$log.info("CreateVehicle : createVehicle :: ", "VEHICLE: " + JSON.stringify(this.vehicle));
-
-            //this.$log.info("CreateVehicle : createVehicle :: ", "this.vehicle.ownership : ", this.vehicle.ownership);
-
             let obj = this.vehicle.balances;
 
             if (this.vehicle.ownership == "dao") {
                 this.$log.info("CreateVehicle : createVehicle :: ", "this.vehicle.ownership--length", Object.keys(obj).length, Object.keys(obj).length < 2);
                 if (Object.keys(obj).length < 2) {
-                    // alert(
-                    //     "Please add atleast two memebers if you are choose DAO ownership"
-                    // );
-                    this.$swal({
+                    this.$swal.fire({
                         icon: 'warning',
-                        html: "Please add atleast two memebers if you are choose DAO ownership",
-                    })
-                    this.$router.push("vehicles");
-                    return;
+                        html: "A DAO Owned vehicle requires that there are at least 2 members assigned to the vehicle.  Either change the vehicle ownership to a single owner or add another member.",
+                        allowOutsideClick: false,
+                    }).then((result) => { return });
                 }
             }
 
-            for (var key in obj) {
-                if (obj[key] == 0) {
-                    // alert("Please add tokens");
-                    this.$swal({
-                        icon: 'warning',
-                        html: "Please add tokens",
-                    })
-                    this.$router.push("vehicles");
-                    throw new Error("Please add tokens");
-                }
-            }
+            /*** I think this is an old error checking routine. */
+            // for (var key in obj) {
+            //     console.log("KEY: " + key + ": " + obj[key]);
+            //     if (obj[key] == 0) {
+            //         // alert("Please add tokens");
+            //         this.$swal({
+            //             icon: 'warning',
+            //             html: "Please add tokens",
+            //         })
+            //         //this.$router.push("vehicles");
+            //         throw new Error("Please add tokens");
+            //     }
+            // }
 
             // Create SmartWeave contract
             try {
@@ -1115,11 +1037,27 @@ export default {
 
                 if(Boolean(this.arweaveMine)){
                     await fetch(this.mineUrl);
-                } 
+                }
+
+                this.$swal.fire({
+                    icon: "success",
+                    html: "Your vehicle, " + this.vehicle.name + ", was successfully created!  You can add assets when you're ready.",
+                    showConfirmButton: true,
+                    allowOutsideClick: false,
+                }).then((result) => {
+                    console.log("ID: " + this.vehicle.id);
+                    this.$router.push({
+                        name: "vehicle",
+                        params: { vehicleId: this.vehicle.id },
+                    });
+                });
             } catch (error) {
                 this.$log.error("CreateVehicle : createVehicle :: ", "ERROR creating SmartWeave contract: " + error);
-                this.pageStatus = "error";
-                return false;
+                this.$swal.fire({
+                    icon: 'error',
+                    html: "An error occurred during the creation of your vehicle.  You can try again and/or let us know.",
+                    allowOutsideClick: false,
+                }).then((result) => { return });
             }
 
 /*** Removing token deposits from Vehicle Creation for now. */
@@ -1176,16 +1114,8 @@ export default {
             //     }
             // } catch (error) {
             //     this.$log.error("CreateVehicle : createVehicle :: ", "ERROR transferring tokens: " + error);
-            //     this.pageStatus = "error";
             //     return false;
             // }
-            // this.pageStatus = "in-progress";
-            // this.$router.push({
-            //     name: "vehicle",
-            //     params: { vehicleId: this.vehicle.id },
-            // });
-
-            this.pageStatus = "";
         },
         cancelCreate() {
             this.$router.push("vehicles");
