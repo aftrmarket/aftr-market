@@ -1117,6 +1117,7 @@ export default {
                 this.$log.info("CreateVehicle : createVehicle :: ", "tags: " + JSON.stringify(initTags));
 
                 if (import.meta.env.VITE_ENV === "DEV") {
+                    console.log("getAftrContractSrcId: WTH");
                     this.vehicle["id"] = await createContractFromTx(arweave, use_wallet, this.getAftrContractSrcId, JSON.stringify(this.vehicle), initTags);  
                 } else {
                     console.log("getAftrContractSrcId: " + this.getAftrContractSrcId);
