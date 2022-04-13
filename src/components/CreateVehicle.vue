@@ -207,7 +207,7 @@
                                 </label>
                             </div>
                             <input type="number" placeholder="Amount" v-model="pstInputTokens" @input="calcPstPrice" :class="inputBox(pstInputValid)" />
-                            <span v-if="pstInputTokens" class="pl-4 pr-6">@ {{ formatNumber(pricePerToken, true) }} AR
+                            <span v-if="pstInputTokens && false" class="pl-4 pr-6">@ {{ formatNumber(pricePerToken, true) }} AR
                                 {{ pstInputTokens ? " = " + formatNumber(pstValue, true) + " AR" : "" }}</span>
                             <div class="pt-2">
                                 <button v-if="pstInputValid && pstInputTokens" @click.prevent="addPst" type="submit" class="inline-flex justify-center py-2 px-2 border border-gray shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-transparent hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
@@ -828,7 +828,7 @@ export default {
         //     }
         // },
         updatePstInputValid(balance) {
-            if (Number(this.pstInputTokens) <= balance) {
+            if (Number(this.pstInputTokens) <= balance && Number(this.pstInputTokens > 0)) {
                 this.pstInputValid = true;
             } else {
                 this.pstInputValid = false;

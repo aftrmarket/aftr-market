@@ -244,7 +244,7 @@ export default {
             this.msg = "WARNING: Are you sure you want to transfer these tokens from your wallet to the vehicle? This action cannot be undone."
         },
         updatePstInputValid(balance) {
-            if (Number(this.pstInputTokens) <= balance) {
+            if (Number(this.pstInputTokens) <= balance && Number(this.pstInputTokens > 0)) {
                 this.pstInputValid = true;
             } else {
                 this.pstInputValid = false;
