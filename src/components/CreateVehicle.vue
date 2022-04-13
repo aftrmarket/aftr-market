@@ -1044,7 +1044,6 @@ export default {
                 if (this.keyFile.length) {
                     use_wallet = JSON.parse(this.keyFile);
                 } else {
-                    // alert("Please attach your keyfile");
                     this.$swal({
                         icon: 'warning',
                         html: "Please attach your keyfile",
@@ -1114,7 +1113,6 @@ export default {
 
             // Create SmartWeave contract
             try {
-                //this.$log.info("arweave: " + JSON.stringify(arweave)); this.$log.info("contractSourceId: " + this.contractSourceId);
                 this.$log.info("CreateVehicle : createVehicle :: ", "vehicle: " + JSON.stringify(this.vehicle));
                 this.$log.info("CreateVehicle : createVehicle :: ", "tags: " + JSON.stringify(initTags));
 
@@ -1125,9 +1123,8 @@ export default {
                         await fetch(this.mineUrl);
                     }   
                 } else {
-                    this.vehicle["id"] = await createContractFromTx(arweave, "use_wallet", this.contractSourceId, JSON.stringify(this.vehicle), initTags);
+                    this.vehicle["id"] = await createContractFromTx(arweave, "use_wallet", this.getAftrContractSrcId, JSON.stringify(this.vehicle), initTags);
                 }
-                //this.vehicle['id'] = await createContractFromTx(arweave, jwk, this.contractSourceId, JSON.stringify(vehicleTest), initTags);
                 this.$log.info("CreateVehicle : createVehicle :: ", "ID = " + this.vehicle["id"]);
             } catch (error) {
                 this.$log.error("CreateVehicle : createVehicle :: ", "ERROR creating SmartWeave contract: " + error);
