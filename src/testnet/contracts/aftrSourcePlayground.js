@@ -234,7 +234,9 @@ async function handle(state, action) {
   if (input.function === "withdrawal") {
   }
   if (input.function === "deposit") {
-    ContractAssert(input.txId, "The transaction is not valid.  Tokens were not transferred to vehicle.");
+    if (!input.txId) {
+      ThrowError("The transaction is not valid.  Tokens were not transferred to vehicle.");
+    }
     let lockLength = 0;
     if (input.lockLength) {
       lockLength = input.lockLength;
@@ -257,11 +259,24 @@ async function handle(state, action) {
     state.tokens.push(txObj);
   }
   if (input.function === "invoke") {
-    ContractAssert(!!input.invocation, "Missing function invocation.");
-    ContractAssert(typeof input.invocation !== "string", "Invalide invocation.");
-    ContractAssert(!!input.foreignContract, "Missing Foreign Contract ID.");
-    ContractAssert(typeof input.foreignContract !== "string", "Invalide Foreign Contract ID.");
-    ContractAssert(typeof input.foreignContract !== "string", "Invalide input.");
+    if (!input.invocation) {
+      ThrowError("Missing function invocation.");
+    }
+    if (typeof input.invocation !== "string") {
+      ThrowError("Invalid invocation.");
+    }
+    if (!input.foreignContract) {
+      ThrowError("Missing Foreign Contract ID.");
+    }
+    if (typeof input.foreignContract !== "string") {
+      ThrowError("Invalid Foreign Contract ID.");
+    }
+    if (typeof input.foreignContract !== "string") {
+      ThrowError("Invalid input.");
+    }
+    if (input.foreignContract === SmartWeave.contract.id) {
+      ThrowError("A Foreign Call cannot call itself.");
+    }
     state.foreignCalls.push({
       txID: SmartWeave.transaction.id,
       contract: input.foreignContract,
@@ -269,9 +284,16 @@ async function handle(state, action) {
     });
   }
   if (input.function === "readOutbox") {
-    ContractAssert(!!input.contract, "Missing contract to invoke");
+    if (!input.contract) {
+      ThrowError("Missing contract to invoke.");
+    }
+    if (input.constract === SmartWeave.contract.id) {
+      ThrowError("Invalid Foreign Call. A contract cannot invoke itself.");
+    }
     const foreignState = await SmartWeave.contracts.readContractState(input.contract);
-    ContractAssert(!!foreignState.foreignCalls, "Contract is missing support for foreign calls");
+    if (!foreignState.foreignCalls) {
+      ThrowError("Contract is missing support for foreign calls");
+    }
     const calls = foreignState.foreignCalls.filter((element) => element.contract === SmartWeave.contract.id && !state.invocations.includes(element.txID));
     let res = state;
     for (const entry of calls) {
@@ -284,14 +306,18 @@ async function handle(state, action) {
 /*** PLAYGROUND FUNCTIONS - NOT FOR PRODUCTION */
     /*** ADDED MINT FUNCTION FOR THE TEST GATEWAY - NOT FOR PRODUCTION */
     if (input.function === 'plygnd-mint') {
-        //ContractAssert(!!input.qty, "Missing qty");
+        if (!input.qty) {
+            ThrowError("Missing qty.");
+        }
         if (!(caller in state.balances)) {
             balances[caller] = input.qty;
         }
     }
     /*** ADDED ADDLOGO FUNCTION TO EASILY ADD LOGO ON TEST GATEWAY - NOT FOR PRODUCTION */
     if (input.function === "plygnd-addLogo") {
-        //ContractAssert(!!input.logo, "Missing logo");
+        if (!input.logo) {
+            ThrowError("Missing logo");
+        }
 
         // Add logo
         updateSetting(state, "communityLogo", input.logo);
@@ -299,8 +325,13 @@ async function handle(state, action) {
 
     /*** ADDED UPDATETOKENS FUNCTION TO UPDATE THE TOKEN OBJECT'S LOGOS ON INIT - NOT FOR PRODUCTION */
     if (input.function === 'plygnd-updateTokens') {
-        //ContractAssert(!!input.logoVint, "Missing Vint logo");
-        //ContractAssert(!!input.logoArhd, "Missing arHD logo");
+        if (!input.logoVint) {
+            ThrowError("Missing Vint logo");
+        }
+
+        if (!input.logoArhd) {
+            ThrowError("Missing arHD logo");
+        }
 
         // Update logo in tokens[] if aftr vehicle
         if (state.tokens) {
@@ -316,6 +347,7 @@ async function handle(state, action) {
         }
     }
 /*** PLAYGROUND FUNCTIONS END */
+
 
   if (input.function === "multiInteraction") {
     if (typeof input.actions === "undefined") {
@@ -486,8 +518,12 @@ async function validateTransfer(tokenId, transferTx) {
     tx.get("tags").forEach((tag) => {
       if (tag.get("name", { decode: true, string: true }) === "Input") {
         const input = JSON.parse(tag.get("value", { decode: true, string: true }));
-        ContractAssert(input.function === "transfer", "The interaction is not a transfer");
-        ContractAssert(input.target === SmartWeave.transaction.tags.find(({ name }) => name === "Contract").value, "The target of this transfer is not this contract.");
+        if (input.function !== "transfer") {
+          ThrowError("The interaction is not a transfer.");
+        }
+        if (input.target !== SmartWeave.transaction.tags.find(({ name }) => name === "Contract").value) {
+          ThrowError("The target of this transfer is not this contract.");
+        }
         txObj.qty = input.qty;
       }
     });
@@ -498,8 +534,12 @@ async function validateTransfer(tokenId, transferTx) {
 }
 async function ensureValidInteraction(contractId, interactionId) {
   const contractInteractions = await SmartWeave.contracts.readContractState(contractId, void 0, true);
-  ContractAssert(interactionId in contractInteractions.validity, "The interaction is not associated with this contract.");
-  ContractAssert(contractInteractions.validity[interactionId], "The interaction was invalid.");
+  if (!(interactionId in contractInteractions.validity)) {
+    ThrowError("The interaction is not associated with this contract.");
+  }
+  if (!contractInteractions.validity[interactionId]) {
+    ThrowError("The interaction was invalid.");
+  }
   const settings = new Map(contractInteractions.state.settings);
   return {
     name: contractInteractions.state.name,

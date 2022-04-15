@@ -473,7 +473,7 @@ export default {
                 let vintContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "pst", "Vint", "VINT", this.logoVint, JSON.stringify(vertoInitState));
                 this.$log.info("OverviewTest : init :: ", "VINT: " + vintContractId);
 
-                let arhdContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "pst", "arHD", "ARHD", this.logoArhd,JSON.stringify(arDriveInitState));
+                let arhdContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "pst", "arHD", "ARHD", this.logoArhd, JSON.stringify(arDriveInitState));
                 this.$log.info("OverviewTest : init :: ", "ARHD: " + arhdContractId);
 
                 this.$log.info("OverviewTest : init :: ", "4. Sample AFTR Vehicles");
@@ -509,7 +509,6 @@ export default {
                     allowOutsideClick: false,
                 });
 
-               
                 const blueVeh = await readContract(arweave, blueContractId);
                 if (!(addr in blueVeh.balances)) {
                     input = {
@@ -539,8 +538,6 @@ export default {
                 if (Boolean(this.arweaveMine)) {
                     await fetch(this.mineUrl);
                 }
-
-                //this.$log.info("OverviewTest : init :: ", JSON.stringify(await readContract(arweave, blueContractId, undefined, true)));
 
                 let queryval = {
                     query: `
@@ -572,7 +569,6 @@ export default {
                 for (let edge of responseValue.data.data.transactions.edges) {
                     try {
                         let vehicle = await readContract(arweave, edge.node.id);
-
                         if (vehicle && Object.keys(vehicle.balances).length != 0 && vehicle.name) {
                             let data = {
                                 id: edge.node.id,

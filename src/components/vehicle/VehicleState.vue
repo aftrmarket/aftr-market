@@ -1,6 +1,6 @@
 <template> 
     <div class="pt-4 w-full">
-        <vue-json-pretty :path="'res'" :data="vehicle" :showDoubleQuotes="keyQuotes" :deep="depth" :deepCollapseChildren="true" :showLength="true" :showSelectController="true"> </vue-json-pretty>
+        <vue-json-pretty :path="'res'" :data="state" :showDoubleQuotes="keyQuotes" :deep=depth :deepCollapseChildren="false" :showLength="true" :showSelectController="true"> </vue-json-pretty>
     </div>
 </template>
 
@@ -13,6 +13,7 @@ export default {
     components: { VueJsonPretty },
     data() {
         return {
+            state: {},
             keyQuotes: false,
             depth: 3,
         };
@@ -21,10 +22,19 @@ export default {
         
     },
     methods: {
-        
+        cleanupState(){
+            /*** 
+             * When a vehicle is created, a few keys are added to make them easier to access on the site.
+             * This routine strips those keys so the UI just shows the state.
+            ***/
+           this.state = this.vehicle;
+           delete this.state.id;
+           delete this.state.logo;
+           delete this.state.desc;
+        }
     },
     async created() {
-
+        this.cleanupState();
     }
 }
 </script>
