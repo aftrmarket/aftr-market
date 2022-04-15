@@ -57,6 +57,7 @@
                                 <!--<vehicle-leases v-else-if="activeTab === 'Leases'"></vehicle-leases>-->
                                 <!--<vehicle-fractions v-else-if="activeTab === 'Fractions'"></vehicle-fractions>-->
                                 <vehicle-votes v-else-if="activeTab === 'Votes'" :vehicle="vehicle" :contractId="contractId"></vehicle-votes>
+                                <vehicle-state v-else-if="activeTab === 'State'" :vehicle="vehicle"></vehicle-state>
                                 <vehicle-activity v-else-if="activeTab === 'Activity'" :arweave="arweave" :interactions="interactions"></vehicle-activity>
 
                             </div>
@@ -79,12 +80,13 @@ import VehicleTokens from './vehicle/VehicleTokens.vue';
 //import VehicleLeases from './vehicle/VehicleLeases.vue';
 //import VehicleFractions from './vehicle/VehicleFractions.vue';
 import VehicleVotes from './vehicle/VehicleVotes.vue';
+import VehicleState from './vehicle/VehicleState.vue';
 import VehicleActivity from './vehicle/VehicleActivity.vue';
 import VehiclePlaceholder from './vehicle/VehiclePlaceholder.vue';
 import { mapGetters } from "vuex";
 
 export default {
-    components: { VehicleInfo, VehicleMembers, VehicleTokens, VehicleVotes, VehicleActivity, VehiclePlaceholder },
+    components: { VehicleInfo, VehicleMembers, VehicleTokens, VehicleVotes, VehicleState, VehicleActivity, VehiclePlaceholder },
     props: ['vehicleId'],
     data() {
         return {
@@ -96,6 +98,7 @@ export default {
                 //{ name: 'Fractions', href: '#', current: false },
                 //{ name: 'Leases', href: '#', current: false },
                 { name: 'Votes', href: '#', current: false },
+                { name: 'State', href: '#', current: false },
                 { name: 'Activity', href: '#', current: false },
             ],
             arweave: {},

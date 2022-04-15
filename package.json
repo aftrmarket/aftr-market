@@ -20,6 +20,7 @@
     "numeral": "^2.0.6",
     "smartweave": "^0.4.46",
     "vue": "^3.0.5",
+    "vue-json-pretty": "^2.0.6",
     "vue-router": "^4.0.5",
     "vue-sweetalert2": "^5.0.2",
     "vue-uuid": "^2.0.2",
