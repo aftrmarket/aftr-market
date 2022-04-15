@@ -31,7 +31,7 @@
                 </div>
             </div>
         </div>
-        <table v-if="filteredPeople.length > 0" class="min-w-full divide-y divide-gray-200">
+        <table v-if="filteredVotes.length > 0" class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -51,7 +51,7 @@
                 </th>
               </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200" v-for="vote in filteredPeople" :key="vote.id">
+            <tbody class="bg-white divide-y divide-gray-200" v-for="vote in filteredVotes" :key="vote.id">
               <tr >
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {{ walletAddressSubstr(vote.id) }}
@@ -78,8 +78,8 @@
               </tr>
             </tbody>
         </table>
-        <div v-if="filteredPeople.length == 0">
-            Votes are not available.
+        <div v-if="filteredVotes.length == 0">
+            No Votes to show.
         </div>
     </div>
 </template>
@@ -108,7 +108,7 @@ export default {
     computed: {
         ...mapGetters(['arConnected', 'getActiveAddress', 'getCurrentBlockValue']),
         ...mapState(['currentBlock']),
-        filteredPeople() {
+        filteredVotes() {
 			let status = this.selectedVoteCategory;
             let vote = this.votes
             if(status == "active" || status == "Active"){
