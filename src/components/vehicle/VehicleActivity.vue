@@ -76,7 +76,9 @@ export default {
             return activity;
         },
         interactionText(func) {
-            if (func.substr(0, 7) === "plygnd-") {
+            if (typeof func == "undefined") {
+                return "Unable to Display Interaction";
+            } else if (func.substr(0, 7) === "plygnd-") {
                 return "Playground Initialization ";
             } else if (func === "multiInteraction") {
                 return "Multi-Interaction";
@@ -84,14 +86,13 @@ export default {
                 return func;
             }
         },
-        getInputKey(input) {
-            
-        },
         getAllInputs(obj) {
             let htmlText = "Inputs:<br/>";
             const keys = Object.keys(obj);
 
-            if (obj.function === "multiInteraction") {
+            if (typeof obj.function == "undefined") {
+                htmlText += "<span class='pl-5'>Unable to show input.</span><br/>";
+            } else if (obj.function === "multiInteraction") {
                 // Loop thru actions
                 const actions = obj.actions;
                 let actionText = "";
