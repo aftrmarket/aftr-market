@@ -27,7 +27,7 @@ export default {
              * When a vehicle is created, a few keys are added to make them easier to access on the site.
              * This routine strips those keys so the UI just shows the state.
             ***/
-           this.state = this.vehicle;
+           this.state = JSON.parse(JSON.stringify(this.vehicle));
            delete this.state.id;
            delete this.state.logo;
            delete this.state.desc;
