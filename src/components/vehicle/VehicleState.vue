@@ -14,7 +14,7 @@ export default {
     data() {
         return {
             state: {},
-            keyQuotes: false,
+            keyQuotes: true,
             depth: 3,
         };
     },
