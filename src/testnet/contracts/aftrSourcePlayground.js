@@ -262,8 +262,8 @@ async function handle(state, action) {
     if (!input.invocation) {
       ThrowError("Missing function invocation.");
     }
-    if (typeof input.invocation !== "string") {
-      ThrowError("Invalid invocation.");
+    if (!input.invocation.function) {
+        ThrowError("Invalid invocation.");
     }
     if (!input.foreignContract) {
       ThrowError("Missing Foreign Contract ID.");
