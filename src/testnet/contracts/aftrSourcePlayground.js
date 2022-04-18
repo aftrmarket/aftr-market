@@ -287,7 +287,7 @@ async function handle(state, action) {
     if (!input.contract) {
       ThrowError("Missing contract to invoke.");
     }
-    if (input.constract === SmartWeave.contract.id) {
+    if (input.contract === SmartWeave.contract.id) {
       ThrowError("Invalid Foreign Call. A contract cannot invoke itself.");
     }
     const foreignState = await SmartWeave.contracts.readContractState(input.contract);
