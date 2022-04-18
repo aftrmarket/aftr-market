@@ -312,7 +312,7 @@
                                                         </div>
                                                     </td>
                                                     <td v-if="member.wallet === $store.getters.getActiveAddress" class="text-center px-6 py-3"></td>
-                                                    <td v-else class="text-center px-6 py-3">
+                                                    <td v-else class="text-center px-6">
                                                         <button @click.prevent="removeDaoMember(member)" type="submit" class="inline-flex items-center p-1 border border-transparent shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed">
                                                             <img src="../assets/delete-24px.svg" />
                                                         </button>
