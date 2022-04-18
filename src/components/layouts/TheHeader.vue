@@ -40,13 +40,13 @@
                             <path fill-rule="evenodd" d="M17.778 8.222c-4.296-4.296-11.26-4.296-15.556 0A1 1 0 01.808 6.808c5.076-5.077 13.308-5.077 18.384 0a1 1 0 01-1.414 1.414zM14.95 11.05a7 7 0 00-9.9 0 1 1 0 01-1.414-1.414 9 9 0 0112.728 0 1 1 0 01-1.414 1.414zM12.12 13.88a3 3 0 00-4.242 0 1 1 0 01-1.415-1.415 5 5 0 017.072 0 1 1 0 01-1.415 1.415zM9 16a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd" />
                         </svg>
                     </div>
-                    <select v-if="devMode" v-model="siteMode" @change="switchMode" id="selectedSiteMode" name="selectedSiteMode" class="mt-1 text-white border-gray-300 bg-aftrDarkGrey focus:outline-none focus:ring-aftrYellow focus:border-aftrYellow sm:text-sm rounded-md">
+                    <select v-if="devMode" v-model="siteMode" @change="switchMode" id="selectedSiteMode" name="selectedSiteMode" class="mt-1 block w-full pl-3 pr-10 py-2 bg-aftrDarkGrey text-white border-gray-300 focus:outline-none focus:ring-aftrYellow focus:border-aftrYellow sm:text-sm rounded-md">
                         <option value="" selected disabled>{{ showSiteMode }}</option>
                         <option v-show="siteMode !== 'PROD'" value="PROD">MAINNET</option>
                         <option v-show="siteMode !== 'TEST'" value="TEST">TESTNET</option>
                         <option v-show="siteMode !== 'DEV'" value="DEV">DEVNET</option>
                     </select>
-                    <select v-else v-model="siteMode" @change="switchMode" id="selectedSiteMode" name="selectedSiteMode" class="mt-1 text-white border-gray-300 bg-aftrDarkGrey focus:outline-none focus:ring-aftrYellow focus:border-aftrYellow sm:text-sm rounded-md">
+                    <select v-else v-model="siteMode" @change="switchMode" id="selectedSiteMode" name="selectedSiteMode" class="mt-1 block w-full pl-3 pr-10 py-2 bg-aftrDarkGrey text-white border-gray-300 focus:outline-none focus:ring-aftrYellow focus:border-aftrYellow sm:text-sm rounded-md">
                         <option value="" selected disabled>{{ showSiteMode }}</option>
                         <option v-show="siteMode !== 'PROD'" value="PROD">MAINNET</option>
                         <option v-show="siteMode !== 'TEST'" value="TEST">TESTNET</option>

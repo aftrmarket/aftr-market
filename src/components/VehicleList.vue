@@ -4,7 +4,7 @@
             <div class="max-w-7xl mx-auto pb-12 px-4 sm:px-6 lg:px-8">
                 <!-- Heading Row -->
                 <div class="pb-5 sm:flex sm:items-center sm:justify-between">
-                    <select name="selectedVehicle" class="text-blue" @change="getVehicle($event)">
+                    <select name="selectedVehicle" class="mt-1 block pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" @change="getVehicle($event)">
                         <option value="" disabled selected>Select Vehicles</option>
                         <option v-bind:value="all_vehicle">All Vehicles</option>
                         <option v-bind:value="my_vehicle">My Vehicles</option>
