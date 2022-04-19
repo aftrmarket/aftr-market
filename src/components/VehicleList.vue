@@ -73,8 +73,6 @@ import { readContract } from "smartweave";
 import VehicleCard from "./vehicle/VehicleCard.vue";
 import VehicleCardPlaceholder from "./vehicle/VehicleCardPlaceholder.vue";
 import { mapGetters } from "vuex";
-// import "@ocrv/vue-tailwind-pagination/dist/style.css";
-import '@ocrv/vue-tailwind-pagination/styles'
 import VueTailwindPagination from "@ocrv/vue-tailwind-pagination";
 
 export default {
