@@ -200,12 +200,12 @@ export default {
                 const inputDeposit = {
                     function: "deposit",
                     tokenId: currentPst.id,
-                    txId: id,
+                    txID: id,
                 };
                 this.$log.info("VehicleTokensAdd : interactWrite :: ", "INPUT DEP: " + JSON.stringify(inputDeposit));
                 await interactWrite(arweave, wallet, this.vehicle.id, inputDeposit)
-                .then(async (txId) => {
-                    this.msg = "Deposit Successful : " + txId
+                .then(async (txID) => {
+                    this.msg = "Deposit Successful : " + txID
                     if(Boolean(this.arweaveMine)){
                         await fetch(mineUrl);
                     }

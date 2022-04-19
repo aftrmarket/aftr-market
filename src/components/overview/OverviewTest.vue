@@ -632,8 +632,8 @@ export default {
             }
         },
         /*** BEGIN SCRIPT FUNCTIONS */
-        async getContractSourceId(arweave, txId) {
-            let tx = await arweave.transactions.get(txId);
+        async getContractSourceId(arweave, txID) {
+            let tx = await arweave.transactions.get(txID);
             let allTags = [];
             tx.get("tags").forEach((tag) => {
                 let key = tag.get("name", { decode: true, string: true });
@@ -870,12 +870,12 @@ export default {
                     const inputDeposit = {
                         function: "deposit",
                         tokenId: pstContractId,
-                        txId: id,
+                        txID: id,
                     };
                     this.$log.info("OverviewTestTransferTokens : interactWrite :: ", "INPUT DEP: " + JSON.stringify(inputDeposit));
 
                     await interactWrite(arweave, wallet, vehContractId, inputDeposit)
-                        .then(async (txId) => {
+                        .then(async (txID) => {
                             if (Boolean(this.arweaveMine)) {
                                 await fetch(this.mineUrl);
                             }

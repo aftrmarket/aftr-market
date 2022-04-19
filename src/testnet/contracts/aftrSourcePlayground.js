@@ -234,16 +234,16 @@ async function handle(state, action) {
   if (input.function === "withdrawal") {
   }
   if (input.function === "deposit") {
-    if (!input.txId) {
+    if (!input.txID) {
       ThrowError("The transaction is not valid.  Tokens were not transferred to vehicle.");
     }
     let lockLength = 0;
     if (input.lockLength) {
       lockLength = input.lockLength;
     }
-    const validatedTx = await validateTransfer(input.tokenId, input.txId);
+    const validatedTx = await validateTransfer(input.tokenId, input.txID);
     const txObj = {
-      txId: input.txId,
+      txID: input.txID,
       tokenId: validatedTx.tokenId,
       source: caller,
       balance: validatedTx.qty,
@@ -441,7 +441,7 @@ function getStateValue(vehicle, key) {
 }
 function processWithdrawal(vehicle, tokenObj) {
   if (Array.isArray(vehicle.tokens)) {
-    vehicle.tokens = vehicle.tokens.filter((token) => token.txId !== tokenObj.txId);
+    vehicle.tokens = vehicle.tokens.filter((token) => token.txID !== tokenObj.txID);
   }
 }
 function finalizeVotes(vehicle, concludedVotes, quorum, support) {

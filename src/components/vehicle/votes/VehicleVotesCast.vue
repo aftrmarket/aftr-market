@@ -220,7 +220,7 @@ export default {
         }
         // Create input
         let input = {};
-        let txId = "";
+        let txID = "";
         if (vote) {
             input = {
                 function: "vote",
@@ -237,7 +237,7 @@ export default {
         }
         // Call SmartWeave
         if (import.meta.env.VITE_ENV === "DEV") {
-            txId = await interactWrite(
+            txID = await interactWrite(
                 arweave,
                 wallet,
                 this.contractId,
@@ -250,7 +250,7 @@ export default {
               const response = await fetch(mineUrl);
             }            
         } else {
-            txId = await interactWrite(
+            txID = await interactWrite(
                 arweave,
                 "use_wallet",
                 this.contractId,
@@ -262,7 +262,7 @@ export default {
                 icon: "success",
                 html: "Thank you for casting your vote.  Your vote will be reflected in the next block.",
         })
-        this.$log.info("VehicleVotesCast : recordVote :: ", txId);
+        this.$log.info("VehicleVotesCast : recordVote :: ", txID);
         this.$router.push("../vehicles");
         // this.$emit("close");
         return

@@ -19,12 +19,13 @@
                                     <th v-if="allowTransfer" scope="col" class="py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Transfer Amount</th>
                                     <th v-if="allowTransfer" scope="col" class="px-4 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Transfer To Address</th>
                                     <th v-if="allowTransfer" scope="col" class="py-3 text-left font-medium text-gray-500 uppercase tracking-wider"> </th>
+                                    <th v-if="wds.length > 0" scope="col" class="py-3 text-left font-medium text-gray-500 uppercase tracking-wider"> </th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-for="(pst, index) in vehicle.tokens" :key="pst.txId" class="hover:bg-gray-50">
+                                <tr v-for="(pst, index) in vehicle.tokens" :key="pst.txID" class="hover:bg-gray-50">
                                     <td v-if="allowTransfer" class="text-center py-2 pl-3">
-                                        <input type="checkbox" :value="pst.txId" v-model="tokenSelected" :class="checkboxClass" />
+                                        <input type="checkbox" :value="pst.txID" v-model="tokenSelected" :class="checkboxClass" />
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center">
@@ -52,9 +53,16 @@
                                         </button>
                                     </td>
                                     <td v-if="allowTransfer" class="pt-1 px-3">
-                                        <button @click.prevent="onTransferPstClick(pst.txId, index)" type="submit" class="p-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrDarkGreen bg-white hover:bg-aftrDarkGreen hover:text-white focus:outline-none">
+                                        <button @click.prevent="onTransferPstClick(pst.txID, index)" type="submit" class="p-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                                                <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V8z" clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </td>
+                                    <td v-if="wds.length > 0 && wds.includes(pst.txID)" class="pt-1 px-3">
+                                        <button @click.prevent="" type="submit" class="p-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrDarkGreen bg-white hover:bg-aftrDarkGreen hover:text-white focus:outline-none">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                                             </svg>
                                         </button>
                                     </td>
@@ -103,7 +111,7 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    <tr v-for="(wd, index) in proposedChanges" :key="wd.txId" class="text-xs text-gray-500 hover:bg-gray-50">
+                    <tr v-for="(wd, index) in proposedChanges" :key="wd.txID" class="text-xs text-gray-500 hover:bg-gray-50">
                         <td class="px-4 py-2">
                             {{ index + 1 }}
                         </td>
@@ -156,6 +164,7 @@ export default {
             allowAdd: false,
             allowTransfer: false,
             showAddTokens: false,
+            wds: [],
             tokenSelected: [],
             transferAddrs: [],
             transferAmounts: [],
@@ -174,7 +183,7 @@ export default {
                 let selected = [];
                 if(value) {
                     for(let token of this.vehicle.tokens) {
-                        selected.push(token.txId);
+                        selected.push(token.txID);
                     }
                 }
                 this.tokenSelected = selected;
@@ -227,6 +236,16 @@ export default {
             } else {
                 this.allowTransfer = false;
             }
+            // Are there any withdrawals waiting to be processed?
+            this.vehicle.tokens.forEach ( token => {
+                if (token.withdrawals) {
+                    token.withdrawals.forEach( wd => {
+                        if (!wd.processed) {
+                            this.wds.push(token.txID);
+                        }
+                    });
+                }
+            });
         },
         pstLogo(id, logo) {
             let logoUrl = "";
@@ -273,24 +292,24 @@ export default {
                 return '';
             }
         },
-        onTransferPstClick(txId, index) {
-            const pst = this.vehicle.tokens.find( token => token.txId === txId);
+        onTransferPstClick(txID, index) {
+            const pst = this.vehicle.tokens.find( token => token.txID === txID);
 
             // Validate the amount
             if (this.transferAmounts[index] > 0 && this.transferAmounts[index] <= pst.balance && this.isAddrValid(this.transferAddrs[index])) {
-                const foundIndex = this.proposedChanges.findIndex( tx => tx.txId === txId);
+                const foundIndex = this.proposedChanges.findIndex( tx => tx.txID === txID);
                 if (foundIndex === -1) {
                     this.proposedChanges.push(
                         {
-                            txId: txId,
+                            txID: txID,
                             target: this.transferAddrs[index],
                             qty: this.transferAmounts[index]
                         }
                     );
-                    if (this.tokenSelected.includes(txId)) {
-                        this.tokenSelected = this.tokenSelected.filter( (id) => id !== txId);
+                    if (this.tokenSelected.includes(txID)) {
+                        this.tokenSelected = this.tokenSelected.filter( (id) => id !== txID);
                     } else {
-                        this.tokenSelected.push(txId);
+                        this.tokenSelected.push(txID);
                     }
 
                 } else {
@@ -303,7 +322,7 @@ export default {
             this.proposedChanges.splice(index, 1);
         },
         proposedText(withdrawal) {
-            const transObj = this.vehicle.tokens.find( trans =>  trans.txId === withdrawal.txId );
+            const transObj = this.vehicle.tokens.find( trans =>  trans.txID === withdrawal.txID );
             let rowText = "<span style='color:#FF6C8C'><b>Withdrawal</b></span> <b>" + this.formatNumber(withdrawal.qty) + "</b> " + transObj.name + " tokens and transfer to <b><span class='font-mono'>" + withdrawal.target + "</span></b><br/>";
             rowText += "Leaving a new balance of <b>" + this.formatNumber(transObj.balance - withdrawal.qty) + "</b> " + transObj.name + " tokens in the vehicle";
             return rowText
@@ -324,11 +343,11 @@ export default {
             let input = {};
             input.function = 'propose';
             input.type = 'withdrawal';
-            input.id = proposedChange.txId;
+            input.txID = proposedChange.txID;
             input.target = proposedChange.target;
             input.qty = proposedChange.qty;
 
-            const transObj = this.vehicle.tokens.find( trans =>  trans.txId === proposedChange.txId );
+            const transObj = this.vehicle.tokens.find( trans =>  trans.txID === proposedChange.txID );
             input.note = 'Withdrawal ' + this.formatNumber(proposedChange.qty) + ' ' + transObj.name + ' tokens and transfer to ' + proposedChange.target + ' leaving a new balance of ' + this.formatNumber(transObj.balance - proposedChange.qty) + ' ' + transObj.name + ' tokens in the vehicle';
 
             return input;
@@ -337,7 +356,7 @@ export default {
             /*** 
              * Need to propose a vote to call the Withdrawal function.
              * type = withdrawal??
-             * id = Transaction ID of the token in state.tokens
+             * txID = Transaction ID of the token in state.tokens
              * target = Arweave wallet address that the qty is being transferred to
              * qty = Amount of tokens being transferred
              * note = proposed change

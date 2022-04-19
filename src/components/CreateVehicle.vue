@@ -1074,8 +1074,8 @@ export default {
             //         };
             //         if (import.meta.env.VITE_ENV === "DEV") {
             //             let wallet = JSON.parse(this.keyFile);
-            //             let txId = await interactWrite(arweave, wallet, pst.id, transferInput);
-            //             this.$log.info("CreateVehicle : createVehicle :: ", "Transfer token = " + JSON.stringify(txId));
+            //             let txID = await interactWrite(arweave, wallet, pst.id, transferInput);
+            //             this.$log.info("CreateVehicle : createVehicle :: ", "Transfer token = " + JSON.stringify(txID));
             //             if(Boolean(this.arweaveMine)){
             //                 await fetch(this.mineUrl);
             //             }
@@ -1083,28 +1083,28 @@ export default {
             //             const inputDeposit = {
             //                 function: "deposit",
             //                 tokenId: pst.id,
-            //                 txId: txId,
+            //                 txID: txID,
             //             };
 
-            //             txId = await interactWrite(arweave, wallet, this.vehicle.id, inputDeposit);
-            //             this.$log.info("CreateVehicle : createVehicle :: ", txId);
+            //             txID = await interactWrite(arweave, wallet, this.vehicle.id, inputDeposit);
+            //             this.$log.info("CreateVehicle : createVehicle :: ", txID);
                         
             //             // if(Boolean(this.arweaveMine)){
             //             //     await fetch(this.mineUrl);
             //             // }
 
             //         } else {
-            //             let txId = await interactWrite(arweave, "use_wallet", pst.id, transferInput);
-            //             this.$log.info("CreateVehicle : createVehicle :: ", "Transfer tokens = " + JSON.stringify(txId));
+            //             let txID = await interactWrite(arweave, "use_wallet", pst.id, transferInput);
+            //             this.$log.info("CreateVehicle : createVehicle :: ", "Transfer tokens = " + JSON.stringify(txID));
 
             //             const inputDeposit = {
             //                 function: "deposit",
             //                 tokenId: pst.id,
-            //                 txId: txId,
+            //                 txID: txID,
             //             };
 
-            //             txId = await interactWrite(arweave, "use_wallet", this.vehicle.id, inputDeposit);
-            //             this.$log.info("CreateVehicle : createVehicle :: ", txId);
+            //             txID = await interactWrite(arweave, "use_wallet", this.vehicle.id, inputDeposit);
+            //             this.$log.info("CreateVehicle : createVehicle :: ", txID);
             //         }
 
             //         this.$log.info("CreateVehicle : createVehicle :: ", "TokenId: " + pst.id + " Name: " + pst.name + " Qty: " + pst.tokens);
