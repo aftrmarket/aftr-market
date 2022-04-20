@@ -6,7 +6,7 @@
                 <img class="w-20 h-20 bg-gray-300 rounded-full" :src="vehicleLogo" alt="">
             </div>
             <div class="col-span-2 min-w-full">
-                <h3 class="text-gray-900 text-2xl font-normal line-clamp-1 break-all">{{ vehicle.name }}</h3>
+                <h3 :class="actionRequiredClass">{{ vehicle.name }}</h3>
             </div>
             <div class="row-span-2 col-span-1">
                 <div v-if="vehicle.desc" class="mt-1 text-gray-500 text-sm line-clamp-3 break-words">{{ vehicle.desc }}</div>
@@ -33,7 +33,12 @@
                <span :class="vehicleStatusAlert">{{ vehicleStatusText }}</span>
             </div>
             <div class="justify-self-center">
-
+                <div v-if="anyWithdrawals" class="tooltip">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="#FF6C8C">
+                        <path fill-rule="evenodd" d="M10 1.944A11.954 11.954 0 012.166 5C2.056 5.649 2 6.319 2 7c0 5.225 3.34 9.67 8 11.317C14.66 16.67 18 12.225 18 7c0-.682-.057-1.35-.166-2.001A11.954 11.954 0 0110 1.944zM11 14a1 1 0 11-2 0 1 1 0 012 0zm0-7a1 1 0 10-2 0v3a1 1 0 102 0V7z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="tooltiptext">Action Required</span>
+                </div>
             </div>
             <div class="pr-3 justify-self-end">
                 <span class="capitalize px-2 sm:px-4 py-3 inline-flex leading-3 text-xs font-medium rounded-full bg-blue-100 text-blue-800">{{ vehicle.ticker }}</span>
@@ -59,9 +64,18 @@ import numeral from "numeral";
 export default {
     props: ["vehicle"],
     data() {
-        return {};
+        return {
+            anyWithdrawals: false
+        };
     },
     computed: {
+        actionRequiredClass() {
+            if (this.anyWithdrawals) {
+                return "text-aftrRed text-2xl font-normal line-clamp-1 break-all";
+            } else {
+                return "text-gray-900 text-2xl font-normal line-clamp-1 break-all";
+            }
+        },
         vehicleStatusAlert() {
             if (typeof this.vehicle.status === 'undefined' || this.vehicle.status === 'stopped' || this.vehicle.status === '') {
                 return "capitalize px-2 sm:px-4 py-3 inline-flex leading-3 text-xs font-medium rounded-full bg-red-100 text-red-800";
@@ -103,6 +117,57 @@ export default {
                 return numeral(num).format("0,0");
             }
         },
+    },
+    created() {
+        // Are there any withdrawals waiting to be processed?
+        for (let token of this.vehicle.tokens) {
+            if (token.withdrawals) {
+                this.anyWithdrawals = true;
+                break;
+            }
+        }
     }
 };
 </script>
+
+<style>
+/* Tooltip container */
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    bottom: 100%;
+    left: 50%;
+    margin-left: -60px;
+    background-color: #555555;
+    color: white;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+
+    /* Position the tooltip text*/
+    position: absolute;
+    z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
+
+.tooltip .tooltiptext::after {
+  content: " ";
+  position: absolute;
+  top: 100%; /* At the bottom of the tooltip */
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555555 transparent transparent transparent;
+}
+</style>
