@@ -474,14 +474,13 @@ export default {
             let txid = "";
             if (import.meta.env.VITE_ENV === "DEV") {
                 txid = await interactWrite(arweave, wallet, this.vehicle.id, input);
-                
-                /**** IN ORDER FOR THIS TO PROCESS, YOU NEED TO RUN http://localhost:1984/mine */
-                if(Boolean(this.arweaveMine)){
-                    const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
-                    const response = await fetch(mineUrl);
-                }
             } else {
                 txid = await interactWrite(arweave, "use_wallet", this.vehicle.id, input);
+            }
+
+            if(Boolean(this.arweaveMine)){
+                const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
+                const response = await fetch(mineUrl);
             }
             this.$log.info("VehicleMembers : sumbit :: ", "TX: " + txid);
 
