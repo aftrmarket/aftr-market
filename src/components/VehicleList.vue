@@ -120,7 +120,7 @@ export default {
             selectedMyVehicle: [],
             currentPage: 1,
             total: 1,
-            perPage: 3,
+            perPage: 9,
             paginatedData : [],
             selectedMyVehiclePaginatedData: []
         };
