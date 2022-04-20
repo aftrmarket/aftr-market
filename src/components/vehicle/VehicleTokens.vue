@@ -1,17 +1,63 @@
 <template>
     <div class="pt-4 w-full">
         <vehicle-tokens-add v-if="showAddTokens" :vehicle="vehicle" @close="closeModal"></vehicle-tokens-add>
+
+
+    <!--- Finalize Withdrawals Start --->
+    <div v-if="allowTransfer && wds.length > 0" class="pt-4 w-full grid grid-cols-4 gap-4">
+        <div class="col-span-3 shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th colspan="2" scope="col" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                           Approved Withdrawals
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <tr v-for="(wd, index) in wds" :key="wd.voteId" class="text-xs text-gray-500 hover:bg-gray-50">
+                        <td class="px-4 py-2">
+                            {{ index + 1 }}
+                        </td>
+                        <td class="px-4 py-2">
+                            <span v-html="wdText(wd)"></span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="flex flex-col justify-center px-2 py-4 text-left text-xs text-gray-500 tracking-wider">
+            <p class="text-aftrRed uppercase">TO DO: Process Withdrawals</p>
+            The withdrawals have been approved.  To initiate the transfer, click the Finalize button.
+        </div>
+        <div class="col-span-3"></div>
+        <div>
+            <button @click.prevent="processWithdrawalClick" type="button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrDarkGreen bg-white hover:bg-aftrDarkGreen hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrDarkGreen">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                <span class="pl-2">FINALIZE</span>
+            </button>
+        </div>
+    </div>
+    
+                
+    
+    <!--- Finalize Withdrawals End --->
+
+
         <!-- PSTs in Vehicle -->
-        <div v-if="vehicle.tokens.length > 0" class="pt-1">
+        <div v-if="vehicle.tokens.length > 0" class="pt-4">
             <div class="pt-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                 <div :class="editClass">
                     <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
                         <table class="w-full text-xs divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
+                                    <!--
                                     <th v-if="allowTransfer" scope="col" class="pl-3 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">
                                         <input type="checkbox" v-model="selectAll" :class="checkboxClass" />
-                                    </th>
+                                    </th>-->
                                     <th scope="col" class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Arweave Assets ({{ vehicle.tokens.length }})</th>
                                     <th scope="col" class="px-1 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Contributor</th>
                                     <th scope="col" class="px-1 py-3 text-right font-medium text-gray-500 uppercase tracking-wider">Tokens</th>
@@ -19,14 +65,14 @@
                                     <th v-if="allowTransfer" scope="col" class="py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Transfer Amount</th>
                                     <th v-if="allowTransfer" scope="col" class="px-4 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Transfer To Address</th>
                                     <th v-if="allowTransfer" scope="col" class="py-3 text-left font-medium text-gray-500 uppercase tracking-wider"> </th>
-                                    <th v-if="wds.length > 0" scope="col" class="py-3 text-left font-medium text-gray-500 uppercase tracking-wider"> </th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 <tr v-for="(pst, index) in vehicle.tokens" :key="pst.txID" class="hover:bg-gray-50">
+                                    <!--
                                     <td v-if="allowTransfer" class="text-center py-2 pl-3">
                                         <input type="checkbox" :value="pst.txID" v-model="tokenSelected" :class="checkboxClass" />
-                                    </td>
+                                    </td>-->
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center">
                                             <div class="flex-shrink-0 h-10 w-10">
@@ -44,7 +90,7 @@
                                     <td v-if="allowTransfer" class="pt-1">
                                         <input type="number" v-model="transferAmounts[index]" class="mt-1 mb-1 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
                                     </td>
-                                    <td v-if="allowTransfer" class="pt-4 pl-4 pr-1 flex items-center space-x-2">
+                                    <td v-if="allowTransfer" class="pt-4 flex items-center space-x-2">
                                         <input type="text" v-model="transferAddrs[index]" class="mt-1 mb-1 w-80 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
                                         <button v-if="index == 0" @click.prevent="onFillDownClick" type="button" class="p-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -52,17 +98,10 @@
                                             </svg>
                                         </button>
                                     </td>
-                                    <td v-if="allowTransfer" class="pt-1 px-3">
+                                    <td v-if="allowTransfer" class="pt-1 px-1">
                                         <button @click.prevent="onTransferPstClick(pst.txID, index)" type="submit" class="p-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                                 <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V8z" clip-rule="evenodd" />
-                                            </svg>
-                                        </button>
-                                    </td>
-                                    <td v-if="wds.length > 0 && wds.includes(pst.txID)" class="pt-1 px-3">
-                                        <button @click.prevent="" type="submit" class="p-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrDarkGreen bg-white hover:bg-aftrDarkGreen hover:text-white focus:outline-none">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                                             </svg>
                                         </button>
                                     </td>
@@ -94,7 +133,6 @@
             </div>
         </div>
     </div>
-
 
     <!--- Verify Proposal Start --->
     <div v-if="allowTransfer && numChanges > 0" class="pt-4 w-full grid grid-cols-4 gap-4">
@@ -139,7 +177,7 @@
     <div class="col-span-3 text-right">
         <div v-if="allowTransfer && numChanges > 0" class="inline-flex">
             <div class="text-right">
-                <button @click.prevent="submit" type="button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+                <button @click.prevent="updateVehicle" type="button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                         <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"></path>
                         <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"></path>
@@ -155,12 +193,21 @@
 import numeral from "numeral";
 import { mapGetters } from 'vuex';
 import VehicleTokensAdd from './VehicleTokensAdd.vue';
+import Arweave from "arweave";
+import { interactWrite } from "smartweave";
 
 export default {
     props: ['vehicle'],
     components: { VehicleTokensAdd },
     data() {
         return {
+            /** Smartweave variables */
+            arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
+            arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
+            arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
+            arweaveMine: import.meta.env.VITE_MINE,
+            /** */
+
             allowAdd: false,
             allowTransfer: false,
             showAddTokens: false,
@@ -216,7 +263,7 @@ export default {
                 return this.vehicle.creator;
             }
         },
-        ...mapGetters(['arConnected', 'getActiveAddress']),
+        ...mapGetters(['arConnected', 'getActiveAddress', 'keyFile']),
     },
     watch: {
         arConnected(value) {
@@ -241,7 +288,8 @@ export default {
                 if (token.withdrawals) {
                     token.withdrawals.forEach( wd => {
                         if (!wd.processed) {
-                            this.wds.push(token.txID);
+                            wd["name"] = token.name;
+                            this.wds.push(wd);
                         }
                     });
                 }
@@ -327,6 +375,10 @@ export default {
             rowText += "Leaving a new balance of <b>" + this.formatNumber(transObj.balance - withdrawal.qty) + "</b> " + transObj.name + " tokens in the vehicle";
             return rowText
         },
+        wdText(wd) {
+            let rowText = "<span style='color:#FF6C8C'><b>Withdrawal</b></span> <b>" + this.formatNumber(wd.invocation.qty) + "</b> " + wd.name + " tokens and transfer to <b><span class='font-mono'>" + wd.invocation.target + "</span></b><br/>";
+            return rowText
+        },
         onFillDownClick() {
             if (this.isAddrValid(this.transferAddrs[0])) {
                 this.transferAddrs.splice(1, this.transferAddrs.length);
@@ -352,19 +404,142 @@ export default {
 
             return input;
         },
-        submit() {
-            /*** 
-             * Need to propose a vote to call the Withdrawal function.
-             * type = withdrawal??
-             * txID = Transaction ID of the token in state.tokens
-             * target = Arweave wallet address that the qty is being transferred to
-             * qty = Amount of tokens being transferred
-             * note = proposed change
-             *** */
+        async processWithdrawalClick() {
+            const htmlText = "The following withdrawal has been approved.  Press Ok to complete the transfer.";
+            const result = await this.$swal.fire({
+                title: "Process Withdrawal",
+                html: htmlText,
+                showConfirmButton: true,
+                confirmButtonText: "Ok",
+                confirmButtonColor: "#6C8CFF",
+                showCancelButton: true,
+                cancelButtonColor: "#FF6C8C",
+            });
+
+            if (result.isConfirmed) {
+                this.$swal.fire("Transfer initiated", '', "success");
+
+                // Create inputs
+                let action = {
+                    input: {}
+                };
+
+                let action2 = {
+                    foreignContract: "",
+                    input: {}
+                };
+
+/**** CAN'T USE MULTI-INTERACTION FOR READOUTBOX
+ * Need to loop through wds and call each readOutbox call separately.
+ */
+
+                // Determine if multi-interaction is needed based on number of withdrawals
+                if (this.wds.length === 1) {
+                    action.input.function = "withdrawal";
+                    action.input.txID = wds[0].txID;
+                    action.input.voteId = wds[0].voteId;
+
+                    action2.input.function = "readOutbox";
+                    action2.input.contract = this.vehicle.id;
+                    action2.foreignContract = wds[0].foreignContract;
+                } else if (this.wds.length > 1) {
+                    action.input.function = 'multiInteraction';
+                    action.input.key = 'multi';
+                    action.input.note = 'Multi-Interaction';
+                    action.input.actions = [];
+
+                    action2.input.function = 'multiInteraction';
+                    action2.input.key = 'multi';
+                    action2.input.note = 'Multi-Interaction';
+                    action2.input.actions = [];
+                    for (let wd of this.wds) {
+                        let multiAction = {
+                            input: {}
+                        };
+                        let multiAction2 = {
+                            foreignContract: "",
+                            input: {}
+                        };
+                        multiAction.input.function = "withdrawal";
+                        multiAction.input.txID = wd.txID;
+                        multiAction.input.voteId = wd.voteId;
+                        action.input.actions.push(multiAction);
+
+                        multiAction2.input.function = "readOutbox";
+                        multiAction2.input.contract = this.vehicle.id;
+                        multiAction2.foreignContract = wd.foreignContract;
+                        action2.input.actions.push(multiAction2);
+                    }
+                }
+
+            //     /*** CALL SMARTWEAVE */
+            //     this.$log.info("VehicleTokens : processWithdrawal :: ", JSON.stringify(action));
+
+            //     let arweave = {};
+            //     arweave = await Arweave.init({
+            //         host: this.arweaveHost,
+            //         port: this.arweavePort,
+            //         protocol: this.arweaveProtocol,
+            //         timeout: 20000,
+            //         logging: true,
+            //     });
+
+            //     let wallet;
+            //     if (import.meta.env.VITE_ENV === "DEV") {
+            //         if(this.keyFile.length){
+            //             wallet =  JSON.parse(this.keyFile);
+            //         } else {
+            //             this.$swal({
+            //                 icon: 'warning',
+            //                 html: "Please attach your keyfile",
+            //             })
+            //         }        
+            //     }
+                
+            //     /**** SWEETALERT INFO POPUP - Performing Vehicle Invocation... 
+            //      * On screen until next popup
+            //     */
+            //     // FCP Part 1 - Invocation
+            //     let txid = "";
+            //     if (import.meta.env.VITE_ENV === "DEV") {
+            //         txid = await interactWrite(arweave, wallet, this.vehicle.id, action.input);
+            //     } else {
+            //         txid = await interactWrite(arweave, "use_wallet", this.vehicle.id, action.input);
+            //     }
+
+            //     /**** SWEETALERT INFO POPUP - Reading Outbox...  */
+            //     // FCP Part 2 - Read Outbox
+            //     if (import.meta.env.VITE_ENV === "DEV") {
+            //         txid = await interactWrite(arweave, wallet, this.vehicle.id, action2.input);
+            //     } else {
+            //         txid = await interactWrite(arweave, "use_wallet", this.vehicle.id, action2.input);
+            //     }
+
+            //     /*** Close SWEETALERT POPUP */
+            //     this.$router.push({
+            //         name: "vehicle",
+            //         params: { vehicleId: this.vehicle.id },
+            //     });
+
+
+            alert("STILL WORKING ON FUNCTIONALITY!");
+            }
+
+        },
+        async updateVehicle() {
             let action = {
                 input: {}
-                //caller: this.getActiveAddress
             };
+
+            let msg = "Your token withdrawals have been submitted to the Permaweb.  Your changes will be reflected in the next block.";
+            if (this.vehicle.ownership === "dao") {
+                msg = "Your token withdrawals have been proposed.  You'll be able to see the vote in the next block.";
+            }
+            this.$swal({
+                icon: 'info',
+                html: msg,
+            });
+
             // Determine if multi-interaction is needed based on number of changes
             if (this.numChanges === 1) {
                 // Single contract interaction
@@ -379,15 +554,52 @@ export default {
                 for (let proposedChange of this.proposedChanges) {
                     let multiAction = {
                         input: {}
-                        //caller: this.getActiveAddress
                     };
                     multiAction.input = this.buildInput(proposedChange);
                     action.input.actions.push(multiAction);
                 }
             }
 
+            await this.submit(action);
+        },
+        async submit(action) {
             /*** CALL SMARTWEAVE */
             this.$log.info("VehicleTokens : submit :: ", JSON.stringify(action));
+
+            let arweave = {};
+            arweave = await Arweave.init({
+                host: this.arweaveHost,
+                port: this.arweavePort,
+                protocol: this.arweaveProtocol,
+                timeout: 20000,
+                logging: true,
+            });
+
+
+            let wallet;
+            if (import.meta.env.VITE_ENV === "DEV") {
+                if(this.keyFile.length){
+                    wallet =  JSON.parse(this.keyFile);
+                } else {
+                    this.$swal({
+                        icon: 'warning',
+                        html: "Please attach your keyfile",
+                    })
+                }        
+            }
+            let txid = "";
+            if (import.meta.env.VITE_ENV === "DEV") {
+                txid = await interactWrite(arweave, wallet, this.vehicle.id, action.input);
+            } else {
+                txid = await interactWrite(arweave, "use_wallet", this.vehicle.id, action.input);
+            }
+            if(Boolean(this.arweaveMine)){
+                const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
+                const response = await fetch(mineUrl);
+            }
+            this.$log.info("VehicleTokens : sumbit :: ", "TX: " + txid);
+
+            this.$router.push("/vehicles");
         },
     },
     created() {
@@ -395,3 +607,45 @@ export default {
     },
 };
 </script>
+
+<style>
+/* Tooltip container */
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    bottom: 100%;
+    left: 50%;
+    margin-left: -60px;
+    background-color: #555555;
+    color: white;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+
+    /* Position the tooltip text*/
+    position: absolute;
+    z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
+
+.tooltip .tooltiptext::after {
+  content: " ";
+  position: absolute;
+  top: 100%; /* At the bottom of the tooltip */
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555555 transparent transparent transparent;
+}
+</style>
