@@ -44,7 +44,7 @@
                   Status
                 </th>
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Result (Y - N)
+                  Result <br/> (Y - N)
                 </th>
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Action
@@ -56,7 +56,7 @@
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {{ walletAddressSubstr(vote.id) }}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 break-all">
+                <td class="px-6 py-4 whitespace-normal text-sm text-gray-500 break-all">
                   {{ displayProposal(vote) }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
