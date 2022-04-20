@@ -49,6 +49,7 @@ async function handle(state, action) {
     let value = input.value;
     let lockLength = input.lockLength;
     let start = input.start;
+    let txID = input.txID;
     if (state.ownership === "single") {
       if (caller !== state.creator) {
         ThrowError("Caller is not the creator of the vehicle.");
@@ -135,6 +136,18 @@ async function handle(state, action) {
       let currentValue = String(getStateValue(state, key));
       note = "Change " + getStateProperty(key) + " from " + currentValue + " to " + String(value);
     } else if (voteType === "assetDirective") {
+    } else if (voteType === "withdrawal") {
+      if (!qty || !(qty > 0)) {
+        ThrowError("Error in input.  Quantity not supplied or is invalid.");
+      }
+      if (!input.txID) {
+        ThrowError("Error in input.  No Transaction ID found.");
+      }
+      txID = input.txID;
+      if (!target2) {
+        ThrowError("Error in input.  Target not supplied.");
+      }
+      target2 = isArweaveAddress(target2);
     } else {
       ThrowError("Vote Type not supported.");
     }
@@ -170,6 +183,9 @@ async function handle(state, action) {
     }
     if (note && note !== "") {
       vote.note = note;
+    }
+    if (txID && txID !== "") {
+      vote.txID = txID;
     }
     votes.push(vote);
   }
@@ -232,6 +248,32 @@ async function handle(state, action) {
     }
   }
   if (input.function === "withdrawal") {
+    if (!input.txID) {
+      ThrowError("Missing Transaction ID.");
+    }
+    if (!input.voteId) {
+      ThrowError("Missing Vote ID.");
+    }
+    const tokenIndex = state.tokens.findIndex((token) => token.txID === input.txID);
+    if (tokenIndex !== -1) {
+      if (state.tokens[tokenIndex].withdrawals) {
+        const wdIndex = state.tokens[tokenIndex].withdrawals.findIndex((wd) => wd.voteId === input.voteId);
+        if (wdIndex !== -1) {
+          let invokeInput = state.tokens[tokenIndex].withdrawals[wdIndex];
+          delete invokeInput.voteId;
+          delete invokeInput.txID;
+          delete invokeInput.processed;
+          invoke(state, invokeInput);
+          state.tokens[tokenIndex].balance -= input.invocation.qty;
+          const wdObj = state.tokens[tokenIndex].withdrawals.filter((wd) => wd.voteId !== input.voteId);
+          state.tokens[tokenIndex].withdrawals = wdObj;
+        }
+      } else {
+        ThrowError("Withdrawal not found.");
+      }
+    } else {
+      ThrowError("Invalid withdrawal transaction.");
+    }
   }
   if (input.function === "deposit") {
     if (!input.txID) {
@@ -257,31 +299,6 @@ async function handle(state, action) {
       state["tokens"] = [];
     }
     state.tokens.push(txObj);
-  }
-  if (input.function === "invoke") {
-    if (!input.invocation) {
-      ThrowError("Missing function invocation.");
-    }
-    if (!input.invocation.function) {
-        ThrowError("Invalid invocation.");
-    }
-    if (!input.foreignContract) {
-      ThrowError("Missing Foreign Contract ID.");
-    }
-    if (typeof input.foreignContract !== "string") {
-      ThrowError("Invalid Foreign Contract ID.");
-    }
-    if (typeof input.foreignContract !== "string") {
-      ThrowError("Invalid input.");
-    }
-    if (input.foreignContract === SmartWeave.contract.id) {
-      ThrowError("A Foreign Call cannot call itself.");
-    }
-    state.foreignCalls.push({
-      txID: SmartWeave.transaction.id,
-      contract: input.foreignContract,
-      input: input.invocation
-    });
   }
   if (input.function === "readOutbox") {
     if (!input.contract) {
@@ -444,6 +461,31 @@ function processWithdrawal(vehicle, tokenObj) {
     vehicle.tokens = vehicle.tokens.filter((token) => token.txID !== tokenObj.txID);
   }
 }
+function invoke(state, input) {
+  if (!input.invocation) {
+    ThrowError("Missing function invocation.");
+  }
+  if (!input.invocation.function) {
+    ThrowError("Invalid invocation.");
+  }
+  if (!input.foreignContract) {
+    ThrowError("Missing Foreign Contract ID.");
+  }
+  if (typeof input.foreignContract !== "string") {
+    ThrowError("Invalid Foreign Contract ID.");
+  }
+  if (typeof input.foreignContract !== "string") {
+    ThrowError("Invalid input.");
+  }
+  if (input.foreignContract === SmartWeave.contract.id) {
+    ThrowError("A Foreign Call cannot call itself.");
+  }
+  state.foreignCalls.push({
+    txID: SmartWeave.transaction.id,
+    contract: input.foreignContract,
+    input: input.invocation
+  });
+}
 function finalizeVotes(vehicle, concludedVotes, quorum, support) {
   concludedVotes.forEach((vote) => {
     if (vehicle.ownership === "single") {
@@ -488,6 +530,24 @@ function modifyVehicle(vehicle, vote) {
     } else {
       vehicle[vote.key] = vote.value;
     }
+  } else if (vote.type === "withdrawal") {
+    const tokenObj = vehicle.tokens.find((token) => token.txID === vote.txID);
+    const input = {
+      voteId: vote.id,
+      processed: false,
+      txID: vote.txID,
+      function: "invoke",
+      foreignContract: tokenObj.tokenId,
+      invocation: {
+        function: "transfer",
+        target: vote.target,
+        qty: vote.qty
+      }
+    };
+    if (!tokenObj.withdrawals) {
+      tokenObj["withdrawals"] = [];
+    }
+    tokenObj.withdrawals.push(input);
   }
 }
 function updateSetting(vehicle, key, value) {
