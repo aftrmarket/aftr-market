@@ -44,7 +44,7 @@ async function handle(state, action) {
     const voteType = input.type;
     let note = input.note;
     let target2 = input.target;
-    let qty = input.qty;
+    let qty = +input.qty;
     let key = input.key;
     let value = input.value;
     let lockLength = input.lockLength;
@@ -259,14 +259,13 @@ async function handle(state, action) {
       if (state.tokens[tokenIndex].withdrawals) {
         const wdIndex = state.tokens[tokenIndex].withdrawals.findIndex((wd) => wd.voteId === input.voteId);
         if (wdIndex !== -1) {
-          let invokeInput = state.tokens[tokenIndex].withdrawals[wdIndex];
+          let invokeInput = JSON.parse(JSON.stringify(state.tokens[tokenIndex].withdrawals[wdIndex]));
           delete invokeInput.voteId;
           delete invokeInput.txID;
           delete invokeInput.processed;
           invoke(state, invokeInput);
-          state.tokens[tokenIndex].balance -= input.invocation.qty;
-          const wdObj = state.tokens[tokenIndex].withdrawals.filter((wd) => wd.voteId !== input.voteId);
-          state.tokens[tokenIndex].withdrawals = wdObj;
+          state.tokens[tokenIndex].balance -= invokeInput.invocation.qty;
+          state.tokens[tokenIndex].withdrawals = state.tokens[tokenIndex].withdrawals.filter((wd) => wd.voteId !== input.voteId);
         }
       } else {
         ThrowError("Withdrawal not found.");
@@ -532,11 +531,8 @@ function modifyVehicle(vehicle, vote) {
     }
   } else if (vote.type === "withdrawal") {
     const tokenObj = vehicle.tokens.find((token) => token.txID === vote.txID);
-    const input = {
-      voteId: vote.id,
-      processed: false,
-      txID: vote.txID,
-      function: "invoke",
+    let input = {
+      function: "withdrawal",
       foreignContract: tokenObj.tokenId,
       invocation: {
         function: "transfer",
@@ -544,10 +540,18 @@ function modifyVehicle(vehicle, vote) {
         qty: vote.qty
       }
     };
-    if (!tokenObj.withdrawals) {
-      tokenObj["withdrawals"] = [];
+    if (vehicle.ownership === "single") {
+      invoke(vehicle, input);
+      tokenObj.balance -= vote.qty;
+    } else {
+      input["voteId"] = vote.id;
+      input["processed"] = false;
+      input["txID"] = vote.txID;
+      if (!tokenObj.withdrawals) {
+        tokenObj["withdrawals"] = [];
+      }
+      tokenObj.withdrawals.push(input);
     }
-    tokenObj.withdrawals.push(input);
   }
 }
 function updateSetting(vehicle, key, value) {
