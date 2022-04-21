@@ -88,18 +88,18 @@
                                     <td class="text-right px-1 py-3 text-gray-500">{{ formatNumber(pst.balance) }}</td>
                                     <td class="text-right px-6 py-3 text-gray-500">{{ formatNumber(pst.total, true) }}</td>
                                     <td v-if="allowTransfer" class="pt-1">
-                                        <input type="number" v-model="transferAmounts[index]" class="mt-1 mb-1 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
+                                        <input type="number" v-model="transferAmounts[index]" :class="transferAmtInput" />
                                     </td>
                                     <td v-if="allowTransfer" class="pt-4 flex items-center space-x-2">
-                                        <input type="text" v-model="transferAddrs[index]" class="mt-1 mb-1 w-80 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
+                                        <input type="text" v-model="transferAddrs[index]" :class="transferAddrInput" />
                                         <button v-if="index == 0" @click.prevent="onFillDownClick" type="button" class="p-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                                 <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                                             </svg>
                                         </button>
                                     </td>
-                                    <td v-if="allowTransfer" class="pt-1 px-1">
-                                        <button @click.prevent="onTransferPstClick(pst.txID, index)" type="submit" class="p-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none">
+                                    <td v-if="allowTransfer" class="pt-1">
+                                        <button @click.prevent="onTransferPstClick(pst.txID, index, pst.tokenId)" type="button" class="p-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                                 <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V8z" clip-rule="evenodd" />
                                             </svg>
@@ -212,35 +212,51 @@ export default {
             allowTransfer: false,
             showAddTokens: false,
             wds: [],
-            tokenSelected: [],
+            //tokenSelected: [],
             transferAddrs: [],
             transferAmounts: [],
             proposedChanges: [],
+            transferAmtValid: true,
+            transferAddrValid: true,
 
 /*** TODO: HANDLE TOKENS THAT ARE LOCKED! */
 /**************************************** */
         };
     },
     computed: {
-        selectAll: {
-            get() {
-                return this.vehicle.tokens ? this.tokenSelected.length == Object.keys(this.vehicle.tokens).length : false;
-            },
-            set(value) {
-                let selected = [];
-                if(value) {
-                    for(let token of this.vehicle.tokens) {
-                        selected.push(token.txID);
-                    }
-                }
-                this.tokenSelected = selected;
-            }
-        },
+        // selectAll: {
+        //     get() {
+        //         return this.vehicle.tokens ? this.tokenSelected.length == Object.keys(this.vehicle.tokens).length : false;
+        //     },
+        //     set(value) {
+        //         let selected = [];
+        //         if(value) {
+        //             for(let token of this.vehicle.tokens) {
+        //                 selected.push(token.txID);
+        //             }
+        //         }
+        //         this.tokenSelected = selected;
+        //     }
+        // },
         checkboxClass() {
             return "focus:ring-aftrBlue h-4 w-4 text-aftrBlue border-gray-300 rounded";
         },
         numChanges() {
             return this.proposedChanges.length;
+        },
+        transferAddrInput() {
+            if (this.transferAddrValid) {
+                return "mt-1 mb-1 w-80 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md";
+            } else {
+                return "mt-1 mb-1 w-80 text-xs text-right focus:ring-aftrRed focus:border-aftrRed shadow-sm border-gray-300 rounded-md";
+            }
+        },
+        transferAmtInput() {
+            if (this.transferAmtValid) {
+                return "mt-1 mb-1 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md";
+            } else {
+                return "mt-1 mb-1 w-36 text-xs text-right focus:ring-aftrRed focus:border-aftrRed shadow-sm border-gray-300 rounded-md";
+            }
         },
         editClass() {
             if (this.allowTransfer) {
@@ -320,9 +336,11 @@ export default {
             }
         },
         isAddrValid(addr) {
-            if (typeof addr == 'string' && addr.length == 43) {
+            if (typeof addr == 'string' && addr.length == 43 && addr !== this.vehicle.id) {
+                this.transferAddrValid = true;
                 return true;
             } else {
+                this.transferAddrValid = false;
                 return false;
             }
         },
@@ -340,25 +358,32 @@ export default {
                 return '';
             }
         },
-        onTransferPstClick(txID, index) {
+        onTransferPstClick(txID, index, tokenId) {
             const pst = this.vehicle.tokens.find( token => token.txID === txID);
 
             // Validate the amount
-            if (this.transferAmounts[index] > 0 && this.transferAmounts[index] <= pst.balance && this.isAddrValid(this.transferAddrs[index])) {
+            if (this.transferAmounts[index] > 0 && this.transferAmounts[index] <= pst.balance) {
+                this.transferAmtValid = true;
+            } else {
+                this.transferAmtValid = false;
+            }
+
+            if (this.transferAmtValid && this.isAddrValid(this.transferAddrs[index])) {
                 const foundIndex = this.proposedChanges.findIndex( tx => tx.txID === txID);
                 if (foundIndex === -1) {
                     this.proposedChanges.push(
                         {
                             txID: txID,
+                            tokenId: tokenId,
                             target: this.transferAddrs[index],
                             qty: this.transferAmounts[index]
                         }
                     );
-                    if (this.tokenSelected.includes(txID)) {
-                        this.tokenSelected = this.tokenSelected.filter( (id) => id !== txID);
-                    } else {
-                        this.tokenSelected.push(txID);
-                    }
+                    // if (this.tokenSelected.includes(txID)) {
+                    //     this.tokenSelected = this.tokenSelected.filter( (id) => id !== txID);
+                    // } else {
+                    //     this.tokenSelected.push(txID);
+                    // }
 
                 } else {
                     this.proposedChanges[foundIndex].qty = this.transferAmounts[index];
@@ -424,106 +449,99 @@ export default {
                     input: {}
                 };
 
-                let action2 = {
+                // Array of readOutbox inputs
+                let action2 = [{
                     foreignContract: "",
                     input: {}
-                };
-
-/**** CAN'T USE MULTI-INTERACTION FOR READOUTBOX
- * Need to loop through wds and call each readOutbox call separately.
- */
+                }];
 
                 // Determine if multi-interaction is needed based on number of withdrawals
                 if (this.wds.length === 1) {
                     action.input.function = "withdrawal";
-                    action.input.txID = wds[0].txID;
-                    action.input.voteId = wds[0].voteId;
+                    action.input.txID = this.wds[0].txID;
+                    action.input.voteId = this.wds[0].voteId;
 
-                    action2.input.function = "readOutbox";
-                    action2.input.contract = this.vehicle.id;
-                    action2.foreignContract = wds[0].foreignContract;
+                    action2[0].input.function = "readOutbox";
+                    action2[0].input.contract = this.vehicle.id;
+                    action2[0].foreignContract = this.wds[0].foreignContract;
                 } else if (this.wds.length > 1) {
                     action.input.function = 'multiInteraction';
                     action.input.key = 'multi';
                     action.input.note = 'Multi-Interaction';
                     action.input.actions = [];
 
-                    action2.input.function = 'multiInteraction';
-                    action2.input.key = 'multi';
-                    action2.input.note = 'Multi-Interaction';
-                    action2.input.actions = [];
                     for (let wd of this.wds) {
                         let multiAction = {
                             input: {}
                         };
-                        let multiAction2 = {
-                            foreignContract: "",
-                            input: {}
-                        };
+
                         multiAction.input.function = "withdrawal";
                         multiAction.input.txID = wd.txID;
                         multiAction.input.voteId = wd.voteId;
                         action.input.actions.push(multiAction);
 
-                        multiAction2.input.function = "readOutbox";
-                        multiAction2.input.contract = this.vehicle.id;
-                        multiAction2.foreignContract = wd.foreignContract;
-                        action2.input.actions.push(multiAction2);
+                        let roAction = {
+                            foreignContract: wd.foreignContract,
+                            input: {
+                                function: "readOutbox",
+                                contract: this.vehicle.id
+                            }
+                        };
+                        action2.push(roAction);
                     }
                 }
 
-            //     /*** CALL SMARTWEAVE */
-            //     this.$log.info("VehicleTokens : processWithdrawal :: ", JSON.stringify(action));
+                /*** CALL SMARTWEAVE */
+                this.$log.info("VehicleTokens : processWithdrawal :: ", JSON.stringify(action));
 
-            //     let arweave = {};
-            //     arweave = await Arweave.init({
-            //         host: this.arweaveHost,
-            //         port: this.arweavePort,
-            //         protocol: this.arweaveProtocol,
-            //         timeout: 20000,
-            //         logging: true,
-            //     });
+                let arweave = {};
+                arweave = await Arweave.init({
+                    host: this.arweaveHost,
+                    port: this.arweavePort,
+                    protocol: this.arweaveProtocol,
+                    timeout: 20000,
+                    logging: true,
+                });
 
-            //     let wallet;
-            //     if (import.meta.env.VITE_ENV === "DEV") {
-            //         if(this.keyFile.length){
-            //             wallet =  JSON.parse(this.keyFile);
-            //         } else {
-            //             this.$swal({
-            //                 icon: 'warning',
-            //                 html: "Please attach your keyfile",
-            //             })
-            //         }        
-            //     }
+                let wallet;
+                if (import.meta.env.VITE_ENV === "DEV") {
+                    if(this.keyFile.length){
+                        wallet =  JSON.parse(this.keyFile);
+                    } else {
+                        this.$swal({
+                            icon: 'warning',
+                            html: "Please attach your keyfile",
+                        })
+                    }        
+                } else {
+                    wallet = "use_wallet";
+                }
                 
-            //     /**** SWEETALERT INFO POPUP - Performing Vehicle Invocation... 
-            //      * On screen until next popup
-            //     */
-            //     // FCP Part 1 - Invocation
-            //     let txid = "";
-            //     if (import.meta.env.VITE_ENV === "DEV") {
-            //         txid = await interactWrite(arweave, wallet, this.vehicle.id, action.input);
-            //     } else {
-            //         txid = await interactWrite(arweave, "use_wallet", this.vehicle.id, action.input);
-            //     }
+                /**** SWEETALERT INFO POPUP - Performing Vehicle Invocation... 
+                 * On screen until next popup
+                */
+                // FCP Part 1 - Invocation
+                // 1 call to the vehicle contract (will either be single or multi-interaction)
+                let txid = await interactWrite(arweave, wallet, this.vehicle.id, action.input);
 
-            //     /**** SWEETALERT INFO POPUP - Reading Outbox...  */
-            //     // FCP Part 2 - Read Outbox
-            //     if (import.meta.env.VITE_ENV === "DEV") {
-            //         txid = await interactWrite(arweave, wallet, this.vehicle.id, action2.input);
-            //     } else {
-            //         txid = await interactWrite(arweave, "use_wallet", this.vehicle.id, action2.input);
-            //     }
+                /**** SWEETALERT INFO POPUP - Reading Outbox...  */
+                // FCP Part 2 - Read Outbox
+                // Will need a call for every token that is being transferred.
+                for (let roAction of action2) {
+                    this.$log.info("VehicleTokens : readContract :: ", JSON.stringify(roAction));
+                    txid = await interactWrite(arweave, wallet, roAction.foreignContract, roAction.input);
+                    this.$log.info("VehicleTokens : readContract :: ", txid);
+                }
+                
+                /*** Close SWEETALERT POPUP */
+                if(Boolean(this.arweaveMine)){
+                    const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
+                    const response = await fetch(mineUrl);
+                }
+                this.$log.info("VehicleTokens : sumbit :: ", "TX: " + txid);
 
-            //     /*** Close SWEETALERT POPUP */
-            //     this.$router.push({
-            //         name: "vehicle",
-            //         params: { vehicleId: this.vehicle.id },
-            //     });
-
-
-            alert("STILL WORKING ON FUNCTIONALITY!");
-            }
+                this.$router.push("/vehicles");
+                }
 
         },
         async updateVehicle() {
@@ -575,7 +593,6 @@ export default {
                 logging: true,
             });
 
-
             let wallet;
             if (import.meta.env.VITE_ENV === "DEV") {
                 if(this.keyFile.length){
@@ -586,18 +603,31 @@ export default {
                         html: "Please attach your keyfile",
                     })
                 }        
+            } else {
+                wallet = "use_wallet";
             }
             let txid = "";
-            if (import.meta.env.VITE_ENV === "DEV") {
-                txid = await interactWrite(arweave, wallet, this.vehicle.id, action.input);
-            } else {
-                txid = await interactWrite(arweave, "use_wallet", this.vehicle.id, action.input);
+            txid = await interactWrite(arweave, wallet, this.vehicle.id, action.input);
+            this.$log.info("VehicleTokens : submit :: ", "TX: " + txid);
+
+            if (this.vehicle.ownership === "single") {
+                // If the vehicle is a single owned vehicle, the Part 2 of the FCP (i.e. readOutbox) needs to be called right away.
+                let input = {
+                    function: "readOutbox",
+                    contract: this.vehicle.id
+                };
+
+                for (let proposedChange of this.proposedChanges) {                
+                    txid = await interactWrite(arweave, wallet, proposedChange.tokenId, input);
+                    this.$log.info("VehicleTokens : readOutbox :: ", "TX: " + txid + " for contract: " + proposedChange.tokenId);
+                }
             }
+
             if(Boolean(this.arweaveMine)){
                 const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
                 const response = await fetch(mineUrl);
             }
-            this.$log.info("VehicleTokens : sumbit :: ", "TX: " + txid);
+            this.$log.info("VehicleTokens : submit :: ", "TX: " + txid);
 
             this.$router.push("/vehicles");
         },
