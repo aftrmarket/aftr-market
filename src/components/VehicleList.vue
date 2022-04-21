@@ -74,6 +74,7 @@ import VehicleCard from "./vehicle/VehicleCard.vue";
 import VehicleCardPlaceholder from "./vehicle/VehicleCardPlaceholder.vue";
 import { mapGetters } from "vuex";
 import VueTailwindPagination from "@ocrv/vue-tailwind-pagination";
+import "@ocrv/vue-tailwind-pagination";
 
 export default {
     components: { VehicleCard, VehicleCardPlaceholder, VueTailwindPagination },
