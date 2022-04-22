@@ -70,6 +70,7 @@
 
 <script>
 import { readContract } from "smartweave";
+import { executeContract } from "@three-em/js";
 import VehicleCard from "./vehicle/VehicleCard.vue";
 import VehicleCardPlaceholder from "./vehicle/VehicleCardPlaceholder.vue";
 import { mapGetters } from "vuex";
@@ -84,6 +85,11 @@ export default {
             arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
             arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
             arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
+            gatewayConfig: {
+                host: import.meta.env.VITE_ARWEAVE_HOST,
+                port: import.meta.env.VITE_ARWEAVE_PORT,
+                protocol: import.meta.env.VITE_ARWEAVE_PROTOCOL
+            },
             initTags: [
                 {
                     name: "Protocol",
@@ -186,8 +192,14 @@ export default {
         },
         async loadAllVehicles(contractId) {
             try {
-                let vehicle = await readContract(this.arweave, contractId);
+                //let vehicle = await readContract(this.arweave, contractId);
+console.log("*** BEFORE EXECUTE - " + contractId);
+if (!contractId) {
+    return;
+}
 
+                let vehicle = await executeContract(contractId, undefined, this.gatewayConfig);
+console.log("*** DID I GET HERE?");
                 // Check to make sure contract source matches AFTR Contract Source
                 let isAftrVehicle = true;
                 const contractSrc = await this.returnContractSrc(contractId);
@@ -325,7 +337,10 @@ export default {
         }
 
         // Load each Vehicle
+        let i = 1;
         for (let edge of response.data.data.transactions.edges) {
+            console.log(i + ": " + edge.node.id);
+            i++;
             await this.loadAllVehicles(edge.node.id);
         }
         
