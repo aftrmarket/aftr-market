@@ -365,6 +365,7 @@ async function handle(state, action) {
 /*** PLAYGROUND FUNCTIONS END */
 
 
+
   if (input.function === "multiInteraction") {
     if (typeof input.actions === "undefined") {
       ThrowError("Invalid Multi-interaction input.");
@@ -592,7 +593,7 @@ async function validateTransfer(tokenId, transferTx) {
       }
     });
   } catch (err) {
-    throw new ThrowError("Error validating tags during 'deposit'.  " + err);
+    ThrowError("Error validating tags during 'deposit'.  " + err);
   }
   return txObj;
 }

@@ -75,7 +75,7 @@ import { ExclamationIcon } from '@heroicons/vue/outline'
 import { mapGetters } from 'vuex';
 import numeral from "numeral";
 //import Arweave from "arweave";
-import { interactWrite, interactWriteDryRun, readContract } from "smartweave";
+import { interactWrite, interactWriteDryRun } from "smartweave";
 import VehicleAlert from './VehicleAlert.vue';
 
 export default {

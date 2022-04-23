@@ -42,7 +42,8 @@
 </template>
 
 <script>
-import { readContract } from 'smartweave';
+//import { readContract } from 'smartweave';
+import { executeContract } from "@three-em/js";
 import VehicleCard from './vehicle/VehicleCard.vue';
 import VehicleCardPlaceholder from './vehicle/VehicleCardPlaceholder.vue';
 import { run, all } from 'ar-gql';
@@ -58,6 +59,11 @@ export default {
         arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
         arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
         arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
+        gatewayConfig: {
+            host: import.meta.env.VITE_ARWEAVE_HOST,
+            port: import.meta.env.VITE_ARWEAVE_PORT,
+            protocol: import.meta.env.VITE_ARWEAVE_PROTOCOL
+        },
         /** */
 
         isLoading: true,
@@ -88,7 +94,9 @@ export default {
     },
     async loadAllVehicles(contractId) {
         try {
-            let vehicle = await readContract(this.arweave, contractId);
+            //let vehicle = await readContract(this.arweave, contractId);
+            const state = await executeContract(contractId, undefined, true, this.gatewayConfig);
+            let vehicle = state.state;
             vehicle.id = contractId;
 
             // Filter for current wallet
