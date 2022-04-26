@@ -30,21 +30,21 @@
                         </li>
                     </ul>
                     <ul v-else-if="getVehicleList" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        <li v-for="vehicle in selectedMyVehicle" :key="vehicle.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
+                        <li v-for="vehicle in selectedMyVehiclePaginatedData" :key="vehicle.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
                             <router-link :to="{ name: 'vehicle', params: { vehicleId: vehicle.id } }">
                                 <vehicle-card :vehicle="vehicle"></vehicle-card>
                             </router-link>
                         </li>
                     </ul>
-                    <ul v-else-if="!isLoading && vehicles.length > 0" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        <li v-for="vehicle in vehicles" :key="vehicle.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
+                    <ul v-else-if="!isLoading && paginatedData.length > 0" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        <li v-for="vehicle in paginatedData" :key="vehicle.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
                             <router-link :to="{ name: 'vehicle', params: { vehicleId: vehicle.id } }">
                                 <vehicle-card :vehicle="vehicle"></vehicle-card>
                             </router-link>
                         </li>
                     </ul>
                     <ul v-else-if="
-              !isLoading && vehicles.length == 0 && selectedVehicle.length == 0
+              !isLoading && paginatedData.length == 0 && selectedMyVehiclePaginatedData.length == 0
             " class="">
                         No vehicles found...
                     </ul>
@@ -55,6 +55,14 @@
                     </ul>
                 </div>
                 <!-- /End replace -->
+                <VueTailwindPagination
+                v-if="!getMyVehicle"
+                :current="currentPage"
+                :total="total"
+                :per-page="perPage"
+                @page-changed="pageChange($event)"
+                />
+               
             </div>
         </main>
     </div>
@@ -65,9 +73,11 @@ import { readContract } from "smartweave";
 import VehicleCard from "./vehicle/VehicleCard.vue";
 import VehicleCardPlaceholder from "./vehicle/VehicleCardPlaceholder.vue";
 import { mapGetters } from "vuex";
+import VueTailwindPagination from "@ocrv/vue-tailwind-pagination";
+import "@ocrv/vue-tailwind-pagination";
 
 export default {
-    components: { VehicleCard, VehicleCardPlaceholder },
+    components: { VehicleCard, VehicleCardPlaceholder, VueTailwindPagination },
     data() {
         return {
             /** Smartweave variables */
@@ -109,12 +119,30 @@ export default {
             vehicles: [],
             selectedVehicle: [],
             selectedMyVehicle: [],
+            currentPage: 1,
+            total: 1,
+            perPage: 9,
+            paginatedData : [],
+            selectedMyVehiclePaginatedData: []
         };
     },
     computed: {
         ...mapGetters(["getAftrContractSrcId"]),
     },
+     mounted() {
+        this.currentPage = 1;
+        this.loadAllVehicles();
+    },
     methods: {
+        pageChange(pageNumber) {
+            this.currentPage = pageNumber;
+            let data = this.vehicles
+            let val = data.slice((this.currentPage - 1) * this.perPage, this.currentPage * this.perPage)
+            this.paginatedData = val;
+
+            let selectedMyVehicleData = this.selectedMyVehicle
+            this.selectedMyVehiclePaginatedData = selectedMyVehicleData.slice((this.currentPage - 1) * this.perPage, this.currentPage * this.perPage);
+        },
         async getVehicle(event) {
             if (
                 event.target.value != "all_vehicle" &&
@@ -228,6 +256,9 @@ export default {
                             if (walletId == this.$store.getters.getActiveAddress) {
                                 if (vehicle.balances[walletId] > 0) {
                                     this.selectedMyVehicle.push(vehicle);
+                                    let data = this.selectedMyVehicle
+                                    this.selectedMyVehiclePaginatedData = data.slice((this.currentPage - 1) * this.perPage, this.currentPage * this.perPage);
+                                    
                                 }
                             } else {
                                 Object.keys(vehicle.vault).some((walletId) => {
@@ -237,6 +268,9 @@ export default {
                                     ) {
                                         if (vehicle.vault[walletId] > 0) {
                                             this.selectedMyVehicle.push(vehicle);
+                                            let data = this.selectedMyVehicle
+                                            this.selectedMyVehiclePaginatedData = data.slice((this.currentPage - 1) * this.perPage, this.currentPage * this.perPage);
+                                            
                                         }
                                     }
                                 });
@@ -247,7 +281,9 @@ export default {
                     if (this.getMyVehicle) {
                         this.selectedVehicle.push(vehicle);
                     } else {
-                        this.vehicles.push(vehicle); 
+                        this.vehicles.push(vehicle);
+                        let data = this.vehicles
+                        this.paginatedData = data.slice((this.currentPage - 1) * this.perPage, this.currentPage * this.perPage);
                     }
                 }
             } catch (error) {
@@ -293,6 +329,10 @@ export default {
         for (let edge of response.data.data.transactions.edges) {
             await this.loadAllVehicles(edge.node.id);
         }
+        
+        let arrayLen = JSON.parse(JSON.stringify(this.vehicles))
+        this.total = arrayLen.length
+        
         this.isLoading = false;
 
         // for (let index = 1; index < 12; index++) {

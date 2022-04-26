@@ -68,7 +68,7 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-for="(pst, index) in vehicle.tokens" :key="pst.txID" class="hover:bg-gray-50">
+                                <tr v-for="(pst, index) in vehicle.tokens" :key="pst.txID" class="hover:bg-gray-50" @click.prevent="showTokenState( pst.tokenId, pstLogo(pst.tokenId, pst.logo) )">
                                     <!--
                                     <td v-if="allowTransfer" class="text-center py-2 pl-3">
                                         <input type="checkbox" :value="pst.txID" v-model="tokenSelected" :class="checkboxClass" />
@@ -194,7 +194,8 @@ import numeral from "numeral";
 import { mapGetters } from 'vuex';
 import VehicleTokensAdd from './VehicleTokensAdd.vue';
 import Arweave from "arweave";
-import { interactWrite } from "smartweave";
+import { interactWrite, readContract } from "smartweave";
+
 
 export default {
     props: ['vehicle'],
@@ -218,6 +219,7 @@ export default {
             proposedChanges: [],
             transferAmtValid: true,
             transferAddrValid: true,
+            state: {}
 
 /*** TODO: HANDLE TOKENS THAT ARE LOCKED! */
 /**************************************** */
@@ -287,6 +289,29 @@ export default {
         }
     },
     methods: {
+        async showTokenState(id, logo){
+            let arweave = {};
+            arweave = await Arweave.init({
+                host: this.arweaveHost,
+                port: this.arweavePort,
+                protocol: this.arweaveProtocol,
+                timeout: 20000,
+                logging: true,
+            });
+
+            let vehicle = await readContract(arweave, id);
+            this.state = vehicle;
+            let title = JSON.stringify(this.state.name)
+            
+            this.$swal({
+                title: '<span style="vertical-align:middle" >' + title.replace(/^"(.*)"$/, '$1') + '</span><hr size="8">',
+                html: "<pre style= 'text-align:left'> <code>" + "<p style='color:green'> Balances : </p>" + JSON.stringify(this.state.balances,null, 3) + "</code> </pre>",
+                imageUrl: logo,
+                imageWidth: 600,
+                imageHeight: 200,
+                width: 800,
+            })            
+        },
         setFlags() {
             if (this.arConnected) {
                 this.allowAdd = true;

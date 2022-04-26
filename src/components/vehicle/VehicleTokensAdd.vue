@@ -225,7 +225,10 @@ export default {
                 updatedPst.balance = this.pstBalance - this.pstInputTokens;
                 /***  */
             }
-
+            this.$swal({
+                icon: 'info',
+                html: "Please wait a few minutes..",
+            })
             this.$router.push("../vehicles");
             this.$emit("close");
         },
