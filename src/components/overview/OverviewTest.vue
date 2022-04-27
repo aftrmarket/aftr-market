@@ -225,11 +225,12 @@ import aftrInitStatePlayground from "./../../testnet/contracts/aftrInitStatePlay
 
 import Arweave from "arweave";
 import { mapGetters } from "vuex";
+import { executeContract } from "@three-em/js";
 import {
     createContractFromTx,
     createContract,
     interactWrite,
-    readContract,
+    //readContract,
 } from "smartweave";
 
 const initProcess = [
@@ -272,6 +273,11 @@ export default {
             arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
             arweaveMine: import.meta.env.VITE_MINE,
             mineUrl: import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine",
+            gatewayConfig: {
+                host: import.meta.env.VITE_ARWEAVE_HOST,
+                port: import.meta.env.VITE_ARWEAVE_PORT,
+                protocol: import.meta.env.VITE_ARWEAVE_PROTOCOL
+            },
             /** */
 
             // Saved logos on Arweave
@@ -509,8 +515,10 @@ export default {
                     allowOutsideClick: false,
                 });
 
-                const blueVeh = await readContract(arweave, blueContractId);
-                if (!(addr in blueVeh.balances)) {
+                //const blueVeh = await readContract(arweave, blueContractId);
+                const blueVeh = await executeContract(blueContractId, undefined, true, this.gatewayConfig);
+
+                if (!(addr in blueVeh.state.balances)) {
                     input = {
                         function: "plygnd-mint",
                         qty: 100000,
@@ -568,7 +576,10 @@ export default {
 
                 for (let edge of responseValue.data.data.transactions.edges) {
                     try {
-                        let vehicle = await readContract(arweave, edge.node.id);
+                        //let vehicle = await readContract(arweave, edge.node.id);
+                        const state = await executeContract(edge.node.id, undefined, true, this.gatewayConfig);
+                        let vehicle = state.state;
+
                         if (vehicle && Object.keys(vehicle.balances).length != 0 && vehicle.name) {
                             let data = {
                                 id: edge.node.id,

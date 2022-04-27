@@ -73,6 +73,7 @@
 
 <script>
 import { readContract } from 'smartweave';
+import { executeContract } from "@three-em/js";
 import VehicleInfo from './vehicle/VehicleInfo.vue';
 import VehicleMembers from './vehicle/VehicleMembers.vue';
 import VehicleTokens from './vehicle/VehicleTokens.vue';
@@ -110,7 +111,12 @@ export default {
 
             arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
             arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
-            arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL
+            arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
+            gatewayConfig: {
+                host: import.meta.env.VITE_ARWEAVE_HOST,
+                port: import.meta.env.VITE_ARWEAVE_PORT,
+                protocol: import.meta.env.VITE_ARWEAVE_PROTOCOL
+            },
         };
     },
     computed: {
@@ -225,9 +231,21 @@ export default {
 
         try {
             //this.vehicle = await readContract(arweave, this.contractId);
-            const stateInteractions = await readContract(this.arweave, this.contractId, undefined, true);
+            //const stateInteractions = await readContract(this.arweave, this.contractId, undefined, true);
+
+            //const { state, validity } = await executeContract(this.contractId, undefined, true, this.gatewayConfig);
+            const stateInteractions = await executeContract(this.contractId, undefined, true, this.gatewayConfig);
+            //console.log(JSON.stringify(state));
+            // console.log(JSON.stringify(state));
+            // console.log(JSON.stringify(validity));
+
+            //this.vehicle = state.state;
+            //this.interactions = state.validity;
+            
+
             this.vehicle = stateInteractions.state;
             this.interactions = stateInteractions.validity;
+            //console.log(JSON.stringify(this.interactions));
 
             
             // Ensure AFTR Vehicle

@@ -1,5 +1,4 @@
 import {createStore } from 'vuex';
-import { readContract } from 'smartweave';
 
 const store = createStore({
     state() {

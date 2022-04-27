@@ -61,7 +61,8 @@
 </template>
 
 <script>
-import { readContract } from "smartweave";
+//import { readContract } from "smartweave";
+import { executeContract } from "@three-em/js";
 import VehicleCard from "./vehicle/VehicleCard.vue";
 import VehicleCardPlaceholder from "./vehicle/VehicleCardPlaceholder.vue";
 import { mapGetters } from "vuex";
@@ -75,6 +76,11 @@ export default {
             arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
             arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
             arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
+            gatewayConfig: {
+                host: import.meta.env.VITE_ARWEAVE_HOST,
+                port: import.meta.env.VITE_ARWEAVE_PORT,
+                protocol: import.meta.env.VITE_ARWEAVE_PROTOCOL
+            },
             initTags: [
                 {
                     name: "Protocol",
@@ -159,7 +165,15 @@ export default {
         },
         async loadAllVehicles(contractId) {
             try {
-                let vehicle = await readContract(this.arweave, contractId);
+                //let vehicle = await readContract(this.arweave, contractId);
+// Added this b/c of the mount call to loadAllVehicles.  Not sure why that was added.
+if (!contractId) {
+    return;
+}
+
+                //let state = await executeContract(contractId, undefined, true, {host:"localhost",port:1984,protocol:"http"});
+                const state = await executeContract(contractId, undefined, true, this.gatewayConfig);
+                let vehicle = state.state;
 
                 // Check to make sure contract source matches AFTR Contract Source
                 let isAftrVehicle = true;
