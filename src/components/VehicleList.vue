@@ -21,6 +21,9 @@
                     </button>
                 </div>
                 <!-- List -->
+                <infinite-scroll 
+                @infinite-scroll="created"
+                >
                 <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6">
                     <ul v-if="getMyVehicle" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                         <li v-for="vehicle in selectedVehicle" :key="vehicle.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
@@ -35,8 +38,8 @@
                                 <vehicle-card :vehicle="vehicle"></vehicle-card>
                             </router-link>
                         </li>
-                    </ul>
-                    <ul v-else-if="!isLoading && vehicles.length > 0" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    </ul> 
+                    <ul v-else-if="!isLoading && vehicles.length > 0 && !getMyVehicle && !getVehicleList" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                         <li v-for="vehicle in vehicles" :key="vehicle.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
                             <router-link :to="{ name: 'vehicle', params: { vehicleId: vehicle.id } }">
                                 <vehicle-card :vehicle="vehicle"></vehicle-card>
@@ -54,6 +57,12 @@
                         </li>
                     </ul>
                 </div>
+                <!-- <div v-if="!isLoading && noResult" class="">
+                    <p>
+                        No more data...
+                    </p>
+                </div> -->
+                </infinite-scroll>
                 <!-- /End replace -->
             </div>
         </main>
@@ -66,9 +75,10 @@ import { executeContract } from "@three-em/js";
 import VehicleCard from "./vehicle/VehicleCard.vue";
 import VehicleCardPlaceholder from "./vehicle/VehicleCardPlaceholder.vue";
 import { mapGetters } from "vuex";
+import InfiniteScroll from "infinite-loading-vue3";
 
 export default {
-    components: { VehicleCard, VehicleCardPlaceholder },
+    components: { VehicleCard, VehicleCardPlaceholder, InfiniteScroll },
     data() {
         return {
             /** Smartweave variables */
@@ -115,8 +125,15 @@ export default {
             vehicles: [],
             selectedVehicle: [],
             selectedMyVehicle: [],
+            cursor: "",
+            noResult: false,
+            message: "",
+            showResult: true
         };
     },
+    mounted() {
+    this.created()
+  },
     computed: {
         ...mapGetters(["getAftrContractSrcId"]),
     },
@@ -166,10 +183,10 @@ export default {
         async loadAllVehicles(contractId) {
             try {
                 //let vehicle = await readContract(this.arweave, contractId);
-// Added this b/c of the mount call to loadAllVehicles.  Not sure why that was added.
-if (!contractId) {
-    return;
-}
+                // Added this b/c of the mount call to loadAllVehicles.  Not sure why that was added.
+                if (!contractId) {
+                    return;
+                }
 
                 //let state = await executeContract(contractId, undefined, true, {host:"localhost",port:1984,protocol:"http"});
                 const state = await executeContract(contractId, undefined, true, this.gatewayConfig);
@@ -268,9 +285,13 @@ if (!contractId) {
                 this.$log.error("VehicleList : loadAllVehicles :: ", "ERROR calling SmartWeave: " + error);
             }
         },
-    },
-    async created() {
+        async created() {
         this.isLoading = true;
+
+        if(this.noResult){
+            this.isLoading = false;
+            return
+        }
 
         // Get the AFTR Contract Source ID for Prod
         if (import.meta.env.VITE_ENV === "PROD") {
@@ -292,6 +313,9 @@ if (!contractId) {
 
             response = await this.arweave.api.post("graphql", {
                 query: this.query,
+                variables: {
+                "cursor": this.cursor
+                }
             });
 
             if (response.status !== 200) {
@@ -303,10 +327,34 @@ if (!contractId) {
             this.$log.error("VehicleList : created :: ", "ERROR while fetching from gateway: " + error);
         }
 
-        // Load each Vehicle
-        for (let edge of response.data.data.transactions.edges) {
-            await this.loadAllVehicles(edge.node.id);
+        if(response.data.data.transactions.pageInfo.hasNextPage) {
+            const [lastNumber] = response.data.data.transactions.edges.slice(-1);
+            this.cursor = lastNumber.cursor;
+        } else {
+            if(this.showResult){
+                this.showResult = false;
+                for (let edge of response.data.data.transactions.edges) {
+                    await this.loadAllVehicles(edge.node.id);
+                }
+                 this.isLoading = false;
+            }
+            
+            this.cursor = ""
+            this.noResult = true;
+            // this.message = "No result found";
+            this.isLoading = false;
+            
+            return;
         }
+
+        // Load each Vehicle'
+        
+        if(!this.noResult && this.showResult){
+            for (let edge of response.data.data.transactions.edges) {
+                await this.loadAllVehicles(edge.node.id);
+            }
+        }
+        
         this.isLoading = false;
 
         // for (let index = 1; index < 12; index++) {
@@ -314,5 +362,7 @@ if (!contractId) {
         //     this.vehicles.push(this.vehicles[0]);
         // }
     },
+    },
+    
 };
 </script>

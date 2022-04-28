@@ -16,6 +16,7 @@
     "ar-gql": "^0.0.6",
     "arweave": "^1.10.18",
     "dotenv": "^16.0.0",
+    "infinite-loading-vue3": "^1.0.1",
     "install": "^0.13.0",
     "material-design-icons": "^3.0.1",
     "number-abbreviate": "^2.0.0",

@@ -306,9 +306,6 @@ export default {
             this.$swal({
                 title: '<span style="vertical-align:middle" >' + title.replace(/^"(.*)"$/, '$1') + '</span><hr size="8">',
                 html: "<pre style= 'text-align:left'> <code>" + "<p style='color:green'> Balances : </p>" + JSON.stringify(this.state.balances,null, 3) + "</code> </pre>",
-                imageUrl: logo,
-                imageWidth: 600,
-                imageHeight: 200,
                 width: 800,
             })            
         },

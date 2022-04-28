@@ -1,5 +1,5 @@
 <template>
-    <div v-for="(activity, index) in activities" :key="activity.id" class="flex flex-col p-2 pt-4 gap-y-2 bg-white shadow overflow-hidden">
+    <div v-for="(activity, index) in activities" :key="activity.id" class="pt-4 w-full">
         <div class="">
             <span class="text-aftrBlue text-md font-medium uppercase tracking-wide">{{ activities.length - index }}. {{ interactionText(activity.input.function) }}</span>
             <span class="font-mono text-xs text-gray-500">({{ activity.id }})</span>
