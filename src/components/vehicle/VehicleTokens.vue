@@ -307,6 +307,7 @@ export default {
                 title: '<span style="vertical-align:middle" >' + title.replace(/^"(.*)"$/, '$1') + '</span><hr size="8">',
                 html: "<pre style= 'text-align:left'> <code>" + "<p style='color:green'> Balances : </p>" + JSON.stringify(this.state.balances,null, 3) + "</code> </pre>",
                 width: 800,
+                customClass: 'swal-height'
             })            
         },
         setFlags() {
@@ -661,6 +662,10 @@ export default {
 </script>
 
 <style>
+.swal-height {
+  height: 60vh;
+}
+
 /* Tooltip container */
 .tooltip {
     position: relative;
