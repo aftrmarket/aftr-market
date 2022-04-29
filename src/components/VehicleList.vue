@@ -70,8 +70,8 @@
 </template>
 
 <script>
-//import { readContract } from "smartweave";
-import { executeContract } from "@three-em/js";
+import { readContract } from "smartweave";
+//import { executeContract } from "@three-em/js";
 import VehicleCard from "./vehicle/VehicleCard.vue";
 import VehicleCardPlaceholder from "./vehicle/VehicleCardPlaceholder.vue";
 import { mapGetters } from "vuex";
@@ -182,15 +182,14 @@ export default {
         },
         async loadAllVehicles(contractId) {
             try {
-                //let vehicle = await readContract(this.arweave, contractId);
                 // Added this b/c of the mount call to loadAllVehicles.  Not sure why that was added.
                 if (!contractId) {
                     return;
                 }
-
+                let vehicle = await readContract(this.arweave, contractId);
                 //let state = await executeContract(contractId, undefined, true, {host:"localhost",port:1984,protocol:"http"});
-                const state = await executeContract(contractId, undefined, true, this.gatewayConfig);
-                let vehicle = state.state;
+                //const state = await executeContract(contractId, undefined, true, this.gatewayConfig);
+                //let vehicle = state.state;
 
                 // Check to make sure contract source matches AFTR Contract Source
                 let isAftrVehicle = true;
