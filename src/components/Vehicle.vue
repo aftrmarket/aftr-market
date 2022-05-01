@@ -72,8 +72,8 @@
 </template>
 
 <script>
-import { readContract } from 'smartweave';
-//import { executeContract } from "@three-em/js";
+//import { readContract } from 'smartweave';
+import { executeContract } from "@three-em/js";
 import VehicleInfo from './vehicle/VehicleInfo.vue';
 import VehicleMembers from './vehicle/VehicleMembers.vue';
 import VehicleTokens from './vehicle/VehicleTokens.vue';
@@ -231,10 +231,10 @@ export default {
 
         try {
             //this.vehicle = await readContract(arweave, this.contractId);
-            const stateInteractions = await readContract(this.arweave, this.contractId, undefined, true);
+            //const stateInteractions = await readContract(this.arweave, this.contractId, undefined, true);
 
             //const { state, validity } = await executeContract(this.contractId, undefined, true, this.gatewayConfig);
-            //const stateInteractions = await executeContract(this.contractId, undefined, true, this.gatewayConfig);
+            const stateInteractions = await executeContract(this.contractId, undefined, true, this.gatewayConfig);
             //console.log(JSON.stringify(state));
             // console.log(JSON.stringify(state));
             // console.log(JSON.stringify(validity));

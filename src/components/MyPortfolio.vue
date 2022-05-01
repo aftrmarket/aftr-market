@@ -42,8 +42,8 @@
 </template>
 
 <script>
-//import { readContract } from 'smartweave';
-import { executeContract } from "@three-em/js";
+import { readContract } from 'smartweave';
+//import { executeContract } from "@three-em/js";
 import VehicleCard from './vehicle/VehicleCard.vue';
 import VehicleCardPlaceholder from './vehicle/VehicleCardPlaceholder.vue';
 import { run, all } from 'ar-gql';

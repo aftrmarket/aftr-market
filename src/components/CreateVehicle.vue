@@ -367,7 +367,7 @@
 import Arweave from "arweave";
 import numeral from "numeral";
 import numberAbbreviate from "number-abbreviate";
-import { createContractFromTx, interactWrite, readContract } from "smartweave";
+import { createContractFromTx, interactWrite } from "smartweave";
 
 // @ts-expect-error
 import FormContainer from "./layouts/FormContainer.vue";
