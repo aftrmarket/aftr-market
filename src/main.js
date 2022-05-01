@@ -40,7 +40,6 @@ const options = {
 const router = createRouter({
     history: createWebHistory(),
     routes: [
-        //{ path: '/', redirect: '/vehicles'},
         { name: 'vehicles', path: '/vehicles', component: VehicleList },
         { name: 'myPortfolio', path: '/MyPortfolio', component: MyPortfolio},
         //{ name: 'vehicle-info', path: '/vehicles/:vehicleId', component: VehicleInfo, props: true },
