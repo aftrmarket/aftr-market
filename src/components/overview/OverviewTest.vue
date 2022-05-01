@@ -38,7 +38,7 @@
                         </div>
                     </div>
                     <div class="mt-3 text-base text-gray-300 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
-                        <button @click.prevent="readContract" type="submit">SW vs. 3EM</button>
+                        <button @click.prevent="readContract" type="submit">SW vs. 3EM</button><br/>
                         For more information, see below 👇
                     </div>
                 </div>
@@ -306,7 +306,11 @@ export default {
             }
         },
         readContract() {
-            this.$router.push({ name: "read", params: { contractId: "Vjt13JlvOzaOs4St_Iy2jmanxa7dc-Z3pDk3ktwEQNA" } });
+            if (import.meta.env.VITE_ENV === "TEST") {
+                this.$router.push({ name: "read", params: { contractId: "Vjt13JlvOzaOs4St_Iy2jmanxa7dc-Z3pDk3ktwEQNA" } });
+            } else if (import.meta.env.VITE_ENV === "DEV") {
+                this.$router.push({ name: "read", params: { contractId: "33AgaVLoMNkhnXBeBmcnKRBE4D42Hxf6acSxp2CD6nc" } });
+            }
         },
         async init() {
             try {
