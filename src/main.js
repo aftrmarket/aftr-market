@@ -42,16 +42,6 @@ const router = createRouter({
     routes: [
         { name: 'vehicles', path: '/vehicles', component: VehicleList },
         { name: 'myPortfolio', path: '/MyPortfolio', component: MyPortfolio},
-        //{ name: 'vehicle-info', path: '/vehicles/:vehicleId', component: VehicleInfo, props: true },
-        // { 
-        //     name: 'vehicle', 
-        //     path: '/vehicles/:vehicleId', 
-        //     component: Vehicle, 
-        //     props: (route) => ({
-        //         vehicle: vehicle,
-        //         ...route.params
-        //     })
-        // },
         { name: 'vehicle', path: '/vehicles/:vehicleId', component: Vehicle, props: true },
         { name: 'create', path: '/create', component: CreateVehicle },
         { name: 'ui-test', path: '/ui-test', component: UiTest },
