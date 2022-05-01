@@ -11,11 +11,13 @@ import VehicleList from './components/VehicleList.vue';
 import CreateVehicle from './components/CreateVehicle.vue';
 import Vehicle from './components/Vehicle.vue';
 import UiTest from './components/UiTest.vue';
+import ContractRead from './components/ContractRead.vue';
 import Overview from './components/Overview.vue';
 import MyPortfolio from './components/MyPortfolio.vue';
 import Chat from './components/utils/Chat.vue';
 import VueSweetalert2 from 'vue-sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
+import { readContract } from 'smartweave';
 
 let logLevel = "";
 if (import.meta.env.VITE_ENV === 'PROD') {
@@ -54,6 +56,7 @@ const router = createRouter({
         { name: 'vehicle', path: '/vehicles/:vehicleId', component: Vehicle, props: true },
         { name: 'create', path: '/create', component: CreateVehicle },
         { name: 'ui-test', path: '/ui-test', component: UiTest },
+        { name: 'read', path: '/read/:contractId', component: ContractRead, props: true },
         { name: 'overview', path: '/overview', component: Overview, props: true, alias: '/' },
         { 
             path: '/chat',
