@@ -17,7 +17,7 @@ import MyPortfolio from './components/MyPortfolio.vue';
 import Chat from './components/utils/Chat.vue';
 import VueSweetalert2 from 'vue-sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
-import { readContract } from 'smartweave';
+//import { readContract } from 'smartweave';
 
 let logLevel = "";
 if (import.meta.env.VITE_ENV === 'PROD') {

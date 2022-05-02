@@ -226,12 +226,12 @@ import aftrInitStatePlayground from "./../../testnet/contracts/aftrInitStatePlay
 
 import Arweave from "arweave";
 import { mapGetters } from "vuex";
-import { executeContract } from "@three-em/js";
+//import { executeContract } from "@three-em/js";
 import {
     createContractFromTx,
     createContract,
     interactWrite,
-    //readContract,
+    readContract,
 } from "smartweave";
 
 const initProcess = [
@@ -523,11 +523,11 @@ export default {
                     allowOutsideClick: false,
                 });
 
-                //const blueVeh = await readContract(arweave, blueContractId);
-                const blueVeh = await executeContract(blueContractId, undefined, true, this.gatewayConfig);
+                const blueVeh = await readContract(arweave, blueContractId);
+                //const blueVeh = await executeContract(blueContractId, undefined, true, this.gatewayConfig);
 
-                if (!(addr in blueVeh.state.balances)) {
-                //if (!(addr in blueVeh.balances)) {
+                //if (!(addr in blueVeh.state.balances)) {
+                if (!(addr in blueVeh.balances)) {
                     input = {
                         function: "plygnd-mint",
                         qty: 100000,
@@ -585,9 +585,9 @@ export default {
 
                 for (let edge of responseValue.data.data.transactions.edges) {
                     try {
-                        //let vehicle = await readContract(arweave, edge.node.id);
-                        const state = await executeContract(edge.node.id, undefined, true, this.gatewayConfig);
-                        let vehicle = state.state;
+                        let vehicle = await readContract(arweave, edge.node.id);
+                        //const state = await executeContract(edge.node.id, undefined, true, this.gatewayConfig);
+                        //let vehicle = state.state;
 
                         if (vehicle && Object.keys(vehicle.balances).length != 0 && vehicle.name) {
                             let data = {
