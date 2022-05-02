@@ -68,23 +68,23 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-for="(pst, index) in vehicle.tokens" :key="pst.txID" class="hover:bg-gray-50" @click.prevent="showTokenState( pst.tokenId, pstLogo(pst.tokenId, pst.logo) )">
+                                <tr v-for="(pst, index) in vehicle.tokens" :key="pst.txID" class="hover:bg-gray-50" >
                                     <!--
                                     <td v-if="allowTransfer" class="text-center py-2 pl-3">
                                         <input type="checkbox" :value="pst.txID" v-model="tokenSelected" :class="checkboxClass" />
                                     </td>-->
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <td class="px-6 py-4 whitespace-nowrap cursor-pointer">
                                         <div class="flex items-center">
-                                            <div class="flex-shrink-0 h-10 w-10">
+                                            <div class="flex-shrink-0 h-10 w-10" @click.prevent="showTokenState( pst.tokenId, pstLogo(pst.tokenId, pst.logo) )">
                                                 <img class="h-10 w-10 rounded-full" :src="pstLogo(pst.tokenId, pst.logo)" alt="" />
                                             </div>
                                             <div class="ml-4">
                                                 <div class="font-medium text-gray-900"> {{ pst.name + " (" + pst.ticker + ")" }} </div>
-                                                <div class="text-gray-500 font-mono"> {{ idSubstr(pst.tokenId) }}</div>
+                                                <div class="text-gray-500 font-mono" @click.prevent="showWalletAddress(pst.tokenId)"> {{ idSubstr(pst.tokenId) }}</div>
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="px-1 py-3 text-gray-500 font-mono">{{ idSubstr(pst.source) }}</td>
+                                    <td class="px-1 py-3 text-gray-500 font-mono cursor-pointer" @click.prevent="showWalletAddress(pst.source)">{{ idSubstr(pst.source) }}</td>
                                     <td class="text-right px-1 py-3 text-gray-500">{{ formatNumber(pst.balance) }}</td>
                                     <td class="text-right px-6 py-3 text-gray-500">{{ formatNumber(pst.total, true) }}</td>
                                     <td v-if="allowTransfer" class="pt-1">
@@ -289,6 +289,12 @@ export default {
         }
     },
     methods: {
+        async showWalletAddress(walletAddress){
+            this.$swal({
+                html: walletAddress,
+                showConfirmButton: false,
+            })  
+        },
         async showTokenState(id, logo){
             let arweave = {};
             arweave = await Arweave.init({
