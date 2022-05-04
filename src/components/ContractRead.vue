@@ -33,9 +33,9 @@ export default {
             arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
             arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
             gatewayConfig: {
-                host: import.meta.env.VITE_ARWEAVE_HOST,
-                port: import.meta.env.VITE_ARWEAVE_PORT,
-                protocol: import.meta.env.VITE_ARWEAVE_PROTOCOL
+                ARWEAVE_HOST: import.meta.env.VITE_ARWEAVE_HOST,
+                ARWEAVE_PORT: import.meta.env.VITE_ARWEAVE_PORT,
+                ARWEAVE_PROTOCOL: import.meta.env.VITE_ARWEAVE_PROTOCOL
             },
         };
     },
@@ -47,13 +47,21 @@ export default {
             try{
                 // Using 3EM
                 //this.contract3 = await executeContract(this.contractId, undefined, true, this.gatewayConfig);
-                const { state, validity } = await executeContract("Vjt13JlvOzaOs4St_Iy2jmanxa7dc-Z3pDk3ktwEQNA", undefined, true, 
-                    {
-                        host: "www.arweave.run",
-                        port: "443",
-                        protocol: "https"
-                    }
-                );
+                //const { state, validity } = await executeContract(this.contractId, undefined, true, this.gatewayConfig);
+                //const { state, validity } = await executeContract("Vjt13JlvOzaOs4St_Iy2jmanxa7dc-Z3pDk3ktwEQNA", undefined, true, 
+                // const { state, validity } = await executeContract(this.contractId, undefined, true, 
+                //     {
+                //         ARWEAVE_HOST: "localhost",
+                //         ARWEAVE_PORT: "1984",
+                //         ARWEAVE_PROTOCOL: "http"
+                //     }
+                // );
+                this.contract3 = await executeContract(this.contractId, undefined, true,
+                {
+                    ARWEAVE_HOST: import.meta.env.VITE_ARWEAVE_HOST,
+                    ARWEAVE_PORT: import.meta.env.VITE_ARWEAVE_PORT,
+                    ARWEAVE_PROTOCOL: import.meta.env.VITE_ARWEAVE_PROTOCOL
+                });
                 console.log(JSON.stringify(state));
                 this.contract3 = state;
             } catch(e) {

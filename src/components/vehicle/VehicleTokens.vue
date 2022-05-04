@@ -194,7 +194,8 @@ import numeral from "numeral";
 import { mapGetters } from 'vuex';
 import VehicleTokensAdd from './VehicleTokensAdd.vue';
 import Arweave from "arweave";
-import { interactWrite, readContract } from "smartweave";
+import { interactWrite } from "smartweave";
+import { executeContract } from "@three-em/js";
 
 
 export default {
@@ -305,8 +306,15 @@ export default {
                 logging: true,
             });
 
-            let vehicle = await readContract(arweave, id);
-            this.state = vehicle;
+
+            const { state, validity } = await executeContract(id, undefined, true, {
+                ARWEAVE_HOST: import.meta.env.VITE_ARWEAVE_HOST,
+                ARWEAVE_PORT: import.meta.env.VITE_ARWEAVE_PORT,
+                ARWEAVE_PROTOCOL: import.meta.env.VITE_ARWEAVE_PROTOCOL
+            });
+
+            //let vehicle = await readContract(arweave, id);
+            this.state = state;
             let title = JSON.stringify(this.state.name)
             
             this.$swal({

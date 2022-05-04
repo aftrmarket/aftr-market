@@ -274,11 +274,6 @@ export default {
             arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
             arweaveMine: import.meta.env.VITE_MINE,
             mineUrl: import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine",
-            gatewayConfig: {
-                host: import.meta.env.VITE_ARWEAVE_HOST,
-                port: import.meta.env.VITE_ARWEAVE_PORT,
-                protocol: import.meta.env.VITE_ARWEAVE_PROTOCOL
-            },
             /** */
 
             // Saved logos on Arweave
@@ -309,7 +304,7 @@ export default {
             if (import.meta.env.VITE_ENV === "TEST") {
                 this.$router.push({ name: "read", params: { contractId: "Vjt13JlvOzaOs4St_Iy2jmanxa7dc-Z3pDk3ktwEQNA" } });
             } else if (import.meta.env.VITE_ENV === "DEV") {
-                this.$router.push({ name: "read", params: { contractId: "Iiqh0mNVXHug0jfbFQhQnoCqnUoNdpDFQ_-BWpJVIQU" } });
+                this.$router.push({ name: "read", params: { contractId: "iO3STQWIOyj4V1kdojb6onaLO7QD7qoeMMyatk3mISQ" } });
             }
         },
         async init() {
@@ -525,7 +520,11 @@ export default {
 
                 //const blueVeh = await readContract(arweave, blueContractId);
                 //const blueVeh = await executeContract(blueContractId, undefined, true, this.gatewayConfig);
-                const { state, validity } = await executeContract(blueContractId, undefined, true, this.gatewayConfig);
+                const { state, validity } = await executeContract(blueContractId, undefined, true, {
+                    ARWEAVE_HOST: import.meta.env.VITE_ARWEAVE_HOST,
+                    ARWEAVE_PORT: import.meta.env.VITE_ARWEAVE_PORT,
+                    ARWEAVE_PROTOCOL: import.meta.env.VITE_ARWEAVE_PROTOCOL
+                });
                 const blueVeh = state;
 
                 //if (!(addr in blueVeh.state.balances)) {
@@ -589,7 +588,11 @@ export default {
                     try {
                         //let vehicle = await readContract(arweave, edge.node.id);
                         //const state = await executeContract(edge.node.id, undefined, true, this.gatewayConfig);
-                        const { state, validity } = await executeContract(blueContractId, undefined, true, this.gatewayConfig);
+                        const { state, validity } = await executeContract(blueContractId, undefined, true, {
+                            ARWEAVE_HOST: import.meta.env.VITE_ARWEAVE_HOST,
+                            ARWEAVE_PORT: import.meta.env.VITE_ARWEAVE_PORT,
+                            ARWEAVE_PROTOCOL: import.meta.env.VITE_ARWEAVE_PROTOCOL
+                        });
                         let vehicle = state.state;
 
                         if (vehicle && Object.keys(vehicle.balances).length != 0 && vehicle.name) {

@@ -112,11 +112,6 @@ export default {
             arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
             arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
             arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
-            gatewayConfig: {
-                host: import.meta.env.VITE_ARWEAVE_HOST,
-                port: import.meta.env.VITE_ARWEAVE_PORT,
-                protocol: import.meta.env.VITE_ARWEAVE_PROTOCOL
-            },
         };
     },
     computed: {
@@ -234,7 +229,11 @@ export default {
             //const stateInteractions = await readContract(this.arweave, this.contractId, undefined, true);
 
             //const { state, validity } = await executeContract(this.contractId, undefined, true, this.gatewayConfig);
-            const stateInteractions = await executeContract(this.contractId, undefined, true, this.gatewayConfig);
+            const stateInteractions = await executeContract(this.contractId, undefined, true, {
+                ARWEAVE_HOST: import.meta.env.VITE_ARWEAVE_HOST,
+                ARWEAVE_PORT: import.meta.env.VITE_ARWEAVE_PORT,
+                ARWEAVE_PROTOCOL: import.meta.env.VITE_ARWEAVE_PROTOCOL
+            });
             //console.log(JSON.stringify(state));
             // console.log(JSON.stringify(state));
             // console.log(JSON.stringify(validity));
