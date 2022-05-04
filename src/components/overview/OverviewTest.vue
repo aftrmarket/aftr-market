@@ -675,10 +675,9 @@ export default {
                     query = `query($cursor: String) {
                         transactions(
                             tags: [
-                                { name: "Protocol", values: ["${
-                                    import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL
-                                }"] },
-                                { name: "Aftr-Playground", values: ["${ticker}"] }
+                                { name: "Protocol", values: ["${import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL}"] },
+                                { name: "Aftr-Playground", values: ["${ticker}"] },
+                                { name: "Aftr-Playground-Version", values: ["${import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL}"] }
                             ]
                             after: $cursor
                         )
@@ -691,7 +690,8 @@ export default {
                         transactions(
                             tags: [ 
                                 { name: "Aftr-Playground", values: ["${ticker}"] },
-                                { name: "Aftr-Playground-Type", values: ["PST"] }
+                                { name: "Aftr-Playground-Type", values: ["PST"] },
+                                { name: "Aftr-Playground-Version", values: ["${import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL}"] }
                         ]
                             after: $cursor
                         )
