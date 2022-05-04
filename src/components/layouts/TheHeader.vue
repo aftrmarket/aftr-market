@@ -130,7 +130,8 @@ export default {
         }
     },
     walletAddressSubstr() {
-        return this.$store.getters.getActiveAddress.substr(0, 10) + '...';
+        const addr = this.$store.getters.getActiveAddress;
+        return addr.substr(0, 5) + '...' + addr.substr(-5);
     },
     launchSetupCorrect() {
         return this.$store.getters.getTestLaunchConfigState;
