@@ -33,7 +33,8 @@
                             <img class="w-full lg:absolute lg:inset-y-0 lg:left-0 lg:h-full lg:w-auto lg:max-w-none" src="../../assets/overview-test-launch.png" alt="" />
                         </div>
                     </div>
-                    <div class="mt-3 text-base text-gray-300 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">            
+                    <div class="mt-3 text-base text-gray-300 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
+                        <!--<button @click.prevent="contractRead" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">SW vs 3EM</button>-->
                         For more information, see below 👇
                     </div>
                 </div>
@@ -581,12 +582,12 @@ export default {
                     try {
                         //let vehicle = await readContract(arweave, edge.node.id);
                         //const state = await executeContract(edge.node.id, undefined, true, this.gatewayConfig);
-                        const { state, validity } = await executeContract(blueContractId, undefined, true, {
+                        const { state, validity } = await executeContract(edge.node.id, undefined, true, {
                             ARWEAVE_HOST: import.meta.env.VITE_ARWEAVE_HOST,
                             ARWEAVE_PORT: import.meta.env.VITE_ARWEAVE_PORT,
                             ARWEAVE_PROTOCOL: import.meta.env.VITE_ARWEAVE_PROTOCOL
                         });
-                        let vehicle = state.state;
+                        let vehicle = state;
 
                         if (vehicle && Object.keys(vehicle.balances).length != 0 && vehicle.name) {
                             let data = {
