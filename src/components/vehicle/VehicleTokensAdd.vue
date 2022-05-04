@@ -227,8 +227,14 @@ export default {
             }
             this.$swal({
                 icon: 'info',
-                html: "Please wait a few minutes..",
-            })
+                html: "Please wait for deposit into vehicle to complete...",
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    this.$swal.showLoading()
+                },
+            });
+            this.$swal.close();
             this.$router.push("../vehicles");
             this.$emit("close");
         },
