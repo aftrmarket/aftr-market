@@ -11,48 +11,9 @@
     "vault": {},
     "invocations": [],
     "foreignCalls": [],
-    "votes": [
-      {
-        "status": "active",
-        "type": "set",
-        "id": "11DSWHvj8uk472-xyG3ZQmyouFspOxpicmhXQPZjsFKlY1",
-        "totalWeight": 5,
-        "yays": 0,
-        "nays": 0,
-        "voted": [],
-        "key": "ticker",
-        "value": "@BLUE",
-        "note": "Change ticker from AFTR-BLUE to @BLUE"
-      },
-      {
-        "status": "active",
-        "type": "set",
-        "id": "11DSWHvj8uk472-xyG3ZQmyouFspOxpicmhXQPZjsFKlY2",
-        "totalWeight": 5,
-        "yays": 0,
-        "nays": 0,
-        "voted": [],
-        "key": "settings.quorum",
-        "value": ".5",
-        "note": "Change quorum from 0.6 to .5"
-      },
-      {
-        "status": "active",
-        "type": "set",
-        "id": "8XFmPGy6PF25T87OTUDyTcEkJkgciI8ICohlixu8sHjU1",
-        "totalWeight": 5,
-        "yays": 0,
-        "nays": 0,
-        "voted": [],
-        "key": "votingSystem",
-        "value": "weighted",
-        "note": "Change votingSystem from undefined to weighted"
-      }
-    ],
+    "votes": [],
     "tokens": [],
     "status": "started",
-    "tipsAr": 100,
-    "tipsMisc": 1000,
     "creator": "ewTkY6Mytg6C0AtYU6QlkEg1oH-9J2PPS0CM83RL9rk",
     "ownership": "dao",
     "settings": [

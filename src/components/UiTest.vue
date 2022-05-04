@@ -15,6 +15,17 @@ export default {
         return {
 
         }
+    },
+    created() {
+        this.$swal({
+            // icon: "success",
+            didOpen: () => {
+                this.$swal.showLoading()
+            },
+            html: "Checking balances on Blue Horizon vehicle.",
+            showConfirmButton: true,
+            allowOutsideClick: false,
+        });
     }
 };
 </script>

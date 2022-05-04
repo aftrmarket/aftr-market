@@ -1,9 +1,5 @@
 <template>
     <main class="-mt-40">
-        <!-- <div v-if="getMyVehicle" class="flex items-center justify-center ">
-            {{isLoading}}
-            <div class="w-12 h-12 border-b-2 border-gray-500 rounded-full animate-spin"></div>
-        </div> -->
         <div class="pt-10 bg-aftrDarkGrey sm:pt-16 lg:pt-8 lg:pb-14 lg:overflow-hidden">
             <div class="mx-auto max-w-7xl lg:px-8">
                 <div class="lg:grid lg:grid-cols-2 lg:gap-8">
@@ -37,8 +33,7 @@
                             <img class="w-full lg:absolute lg:inset-y-0 lg:left-0 lg:h-full lg:w-auto lg:max-w-none" src="../../assets/overview-test-launch.png" alt="" />
                         </div>
                     </div>
-                    <div class="mt-3 text-base text-gray-300 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
-                        <button @click.prevent="contractRead" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">SW vs. 3EM</button><br/>
+                    <div class="mt-3 text-base text-gray-300 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">            
                         For more information, see below 👇
                     </div>
                 </div>
@@ -55,7 +50,6 @@
                 <div class="mt-8 lg:grid lg:grid-cols-2 lg:gap-8">
                     <div class="relative lg:row-start-1 lg:col-start-2">
                         <div class="aspect-w-12 aspect-h-7 lg:aspect-none">
-                            <!--<img class="rounded-lg shadow-lg object-cover object-center" src="../../assets/overview-test-whatis.svg" alt="" width="1184" height="1376" />-->
                             <img class="object-cover object-center" src="../../assets/overview-test-whatis.svg" alt="" width="1184" height="1376" />
                         </div>
                     </div>
@@ -81,9 +75,7 @@
                 <div class="relative max-w-xl mx-auto px-4 sm:px-6 lg:px-8 lg:max-w-7xl">
                     <h3 class="text-2xl font-extrabold text-gray-900 text-right tracking-tight sm:text-3xl">What Happens When I Press the Launch Button?</h3>
                     <div class="lg:grid lg:grid-flow-row-dense lg:grid-cols-2 lg:gap-8 lg:items-center">
-
                         <div class="lg:col-start-2">
-
                             <p class="mt-3 text-lg text-gray-500">
                                 AFTR Playground uses a test gateway supported by the <a href="https://verto.exchange" target="_blank" style="color:#6C8CFF">Verto Exchange</a> team. As such, the test instance will be periodically refreshed. When you press the Launch button,
                                 AFTR Playground checks to make sure it has what it needs to ensure that you can properly play in the our sandbox. So, note that any vehicles that you create in the Playground
@@ -291,8 +283,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters(["arConnected","keyFile","arConnectConfig","getTestLaunchFlag",
-        ]),
+        ...mapGetters(["arConnected","keyFile","arConnectConfig","getTestLaunchFlag",]),
     },
     methods: {
         routeUser(site) {
@@ -510,12 +501,14 @@ export default {
                 // Only add if user is not already there
                 this.isLoading = "Checking balances on Blue Horizon vehicle.";
 
-                 this.$swal({
+                this.$swal({
                     icon: "success",
-                    html: "Checking balances on Blue Horizon vehicle.",
+                    html: "Ensure Blue Horizon is ready for testing.",
                     showConfirmButton: false,
-                    // timer: 2500,
                     allowOutsideClick: false,
+                    didOpen: () => {
+                        this.$swal.showLoading()
+                    },
                 });
 
                 //const blueVeh = await readContract(arweave, blueContractId);
