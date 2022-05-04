@@ -38,7 +38,7 @@
                         </div>
                     </div>
                     <div class="mt-3 text-base text-gray-300 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
-                        <button @click.prevent="readContract" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">SW vs. 3EM</button><br/>
+                        <button @click.prevent="contractRead" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">SW vs. 3EM</button><br/>
                         For more information, see below 👇
                     </div>
                 </div>
@@ -226,7 +226,7 @@ import aftrInitStatePlayground from "./../../testnet/contracts/aftrInitStatePlay
 
 import Arweave from "arweave";
 import { mapGetters } from "vuex";
-//import { executeContract } from "@three-em/js";
+import { executeContract } from "@three-em/js";
 import {
     createContractFromTx,
     createContract,
@@ -305,11 +305,11 @@ export default {
                 window.location.href = import.meta.env.VITE_AFTR_PROD;
             }
         },
-        readContract() {
+        contractRead() {
             if (import.meta.env.VITE_ENV === "TEST") {
                 this.$router.push({ name: "read", params: { contractId: "Vjt13JlvOzaOs4St_Iy2jmanxa7dc-Z3pDk3ktwEQNA" } });
             } else if (import.meta.env.VITE_ENV === "DEV") {
-                this.$router.push({ name: "read", params: { contractId: "33AgaVLoMNkhnXBeBmcnKRBE4D42Hxf6acSxp2CD6nc" } });
+                this.$router.push({ name: "read", params: { contractId: "Iiqh0mNVXHug0jfbFQhQnoCqnUoNdpDFQ_-BWpJVIQU" } });
             }
         },
         async init() {
@@ -523,8 +523,10 @@ export default {
                     allowOutsideClick: false,
                 });
 
-                const blueVeh = await readContract(arweave, blueContractId);
+                //const blueVeh = await readContract(arweave, blueContractId);
                 //const blueVeh = await executeContract(blueContractId, undefined, true, this.gatewayConfig);
+                const { state, validity } = await executeContract(blueContractId, undefined, true, this.gatewayConfig);
+                const blueVeh = state;
 
                 //if (!(addr in blueVeh.state.balances)) {
                 if (!(addr in blueVeh.balances)) {
@@ -585,9 +587,10 @@ export default {
 
                 for (let edge of responseValue.data.data.transactions.edges) {
                     try {
-                        let vehicle = await readContract(arweave, edge.node.id);
+                        //let vehicle = await readContract(arweave, edge.node.id);
                         //const state = await executeContract(edge.node.id, undefined, true, this.gatewayConfig);
-                        //let vehicle = state.state;
+                        const { state, validity } = await executeContract(blueContractId, undefined, true, this.gatewayConfig);
+                        let vehicle = state.state;
 
                         if (vehicle && Object.keys(vehicle.balances).length != 0 && vehicle.name) {
                             let data = {

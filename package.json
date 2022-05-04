@@ -12,7 +12,7 @@
     "@ocrv/vue-tailwind-pagination": "^0.0.4",
     "@tailwindcss/forms": "^0.2.1",
     "@tailwindcss/line-clamp": "^0.3.1",
-    "@three-em/js": "^0.2.11",
+    "@three-em/js": "^0.2.12",
     "ar-gql": "^0.0.6",
     "arweave": "^1.10.18",
     "dotenv": "^16.0.0",

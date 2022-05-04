@@ -44,11 +44,22 @@ export default {
     },
     methods: {
         async readContracts() {
-            // Using 3EM
-            this.contract3 = await executeContract(this.contractId, undefined, true, this.gatewayConfig);
+            try{
+                // Using 3EM
+                //this.contract3 = await executeContract(this.contractId, undefined, true, this.gatewayConfig);
+                const { state, validity } = await executeContract(this.contractId, undefined, true, this.gatewayConfig);
+                console.log(JSON.stringify(state));
+                this.contract3 = state;
+            } catch(e) {
+                console.log(e);
+            }
 
-            // Using Smartweave
-            this.contract = await readContract(this.arweave, this.contractId, undefined, true);
+            try {
+                // Using Smartweave
+                this.contract = await readContract(this.arweave, this.contractId, undefined, true);
+            } catch (e) {
+                console.log(e);
+            }
         }
     },
     async created() {
