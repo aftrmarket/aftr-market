@@ -47,7 +47,13 @@ export default {
             try{
                 // Using 3EM
                 //this.contract3 = await executeContract(this.contractId, undefined, true, this.gatewayConfig);
-                const { state, validity } = await executeContract(this.contractId, undefined, true, this.gatewayConfig);
+                const { state, validity } = await executeContract("Vjt13JlvOzaOs4St_Iy2jmanxa7dc-Z3pDk3ktwEQNA", undefined, true, 
+                    {
+                        host: "www.arweave.run",
+                        port: "443",
+                        protocol: "https"
+                    }
+                );
                 console.log(JSON.stringify(state));
                 this.contract3 = state;
             } catch(e) {
