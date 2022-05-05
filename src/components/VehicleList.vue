@@ -24,7 +24,7 @@
                 <infinite-scroll 
                 @infinite-scroll="created"
                 >
-                <div v-if="isDataAvaliable" class="bg-white rounded-lg shadow px-5 py-6 sm:px-6">
+                <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6">
                     <ul v-if="getMyVehicle" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                         <li v-for="vehicle in selectedVehicle" :key="vehicle.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
                             <router-link :to="{ name: 'vehicle', params: { vehicleId: vehicle.id } }">
@@ -95,7 +95,6 @@ export default {
             /** */
 
             isLoading: true,
-            isDataAvaliable: false,
             getMyVehicle: false,
             vehicleId: null,
             all_vehicle: "all_vehicle",
@@ -341,7 +340,6 @@ export default {
             this.noResult = true;
             // this.message = "No result found";
             this.isLoading = false;
-            this.isDataAvaliable = true
             
             return;
         }
@@ -353,7 +351,7 @@ export default {
                 await this.loadAllVehicles(edge.node.id);
             }
         }
-        this.isDataAvaliable = true
+        
         this.isLoading = false;
 
         // for (let index = 1; index < 12; index++) {
