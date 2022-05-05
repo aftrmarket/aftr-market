@@ -565,7 +565,10 @@ export default {
                     query: `
                         query($cursor: String) {
                             transactions(
-                                tags: [{ name: "App-Name", values: ["SmartWeaveContract"] }]
+                                tags: [
+                                    { name: "App-Name", values: ["SmartWeaveContract"] },
+                                    { name: "Aftr-Playground-Version", values: ["${import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL}"] }
+                                ]
                                 after: $cursor
                             ) {
                                 pageInfo {
