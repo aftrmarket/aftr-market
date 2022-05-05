@@ -378,6 +378,9 @@ export default {
                     html: "Checking user wallet.",
                     showConfirmButton: false,
                     allowOutsideClick: false,
+                    didOpen: () => {
+                        this.$swal.showLoading()
+                    },
                 });
 
                 this.$log.info("OverviewTest : init :: ", "1. Ensure wallet has some AR to make transactions");
@@ -417,14 +420,15 @@ export default {
                     html: "Finding AFTR contract.",
                     showConfirmButton: false,
                     allowOutsideClick: false,
+                    didOpen: () => {
+                        this.$swal.showLoading()
+                    },
                 });
                 this.$log.info("OverviewTest : init :: ", "2. AFTR Base Contract");
 
                 let query = `query($cursor: String) {
                             transactions(
-                                tags: [ { name: "Protocol", values: ["${
-                                    import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL
-                                }"] } ]
+                                tags: [ { name: "Protocol", values: ["${import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL}"] } ]
                                 after: $cursor
                             )
                             { pageInfo { hasNextPage }
@@ -464,6 +468,9 @@ export default {
                     html: "Initializing PSTs",
                     showConfirmButton: false,
                     allowOutsideClick: false,
+                    didOpen: () => {
+                        this.$swal.showLoading()
+                    },
                 });
 
                 // Ensure that PST Source State's have balance from user so that they can transfer tokens into the new AFTR vehicles
@@ -485,6 +492,9 @@ export default {
                     html: "Creating sample AFTR Vehicles.",
                     showConfirmButton: false,
                     allowOutsideClick: false,
+                    didOpen: () => {
+                        this.$swal.showLoading()
+                    },
                 });
 
                 let chillContractId = await this.createSampleAftrVehicle(arweave, use_wallet, aftrContractSrcId, "aftr", "Chillin Treasury", "CHILL", this.logoChillin, aftrChillinInitState, vintContractId, arhdContractId);
@@ -675,10 +685,9 @@ export default {
                     query = `query($cursor: String) {
                         transactions(
                             tags: [
-                                { name: "Protocol", values: ["${
-                                    import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL
-                                }"] },
-                                { name: "Aftr-Playground", values: ["${ticker}"] }
+                                { name: "Protocol", values: ["${import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL}"] },
+                                { name: "Aftr-Playground", values: ["${ticker}"] },
+                                { name: "Aftr-Playground-Version", values: ["${import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL}"] }                                
                             ]
                             after: $cursor
                         )
@@ -691,7 +700,8 @@ export default {
                         transactions(
                             tags: [ 
                                 { name: "Aftr-Playground", values: ["${ticker}"] },
-                                { name: "Aftr-Playground-Type", values: ["PST"] }
+                                { name: "Aftr-Playground-Type", values: ["PST"] },
+                                { name: "Aftr-Playground-Version", values: ["${import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL}"] }
                         ]
                             after: $cursor
                         )
@@ -782,16 +792,15 @@ export default {
             let swTags = [];
             if (type === "aftr") {
                 swTags = [
-                    {
-                        name: "Protocol",
-                        value: import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL,
-                    },
+                    { name: "Protocol", value: import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL },
                     { name: "Aftr-Playground", value: name },
+                    { name: "Aftr-Playground-Version", value: import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL }  
                 ];
             } else {
                 swTags = [
                     { name: "Aftr-Playground", value: name },
                     { name: "Aftr-Playground-Type", value: "PST" },
+                    { name: "Aftr-Playground-Version", value: import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL }
                 ];
             }
             this.$log.info("OverviewTest : createSampleContract :: ", "initState", initState);
