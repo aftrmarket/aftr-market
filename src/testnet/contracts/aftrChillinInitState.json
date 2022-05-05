@@ -1,0 +1,48 @@
+{
+    "name": "Chillin Treasury",
+    "ticker": "CHILL",
+    "balances": {
+        "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8": 10000,
+        "9h1TtwLLt0gZzvtxZAyzWaAsKze9ni71TYqkIfZ4Mgw": 2000,
+        "ewTkY6Mytg6C0AtYU6QlkEg1oH-9J2PPS0CM83RL9rk": 1050,
+        "zVNaaPGR8yL5Dp5x4Jb-XPH4hlvB7ZoAvVFquw7J58w": 100,
+        "ffOomWmOgtmJ816U_l5hsMpmEFsx5DUDxUEAcoLOy7Q": 200,
+        "j12D8FZU-EBbIdCSkx6vO2shHlqbv5-5Ufl4jOuzGQw": 588,
+        "h-Bgr13OWUOkRGWrnMT0LuUKfJhRss5pfTdxHmNcXyw": 9970
+    },
+    "invocations": [],
+    "foreignCalls": [],
+    "tokens": [],
+    "vault": {},
+    "votes": [],
+    "status": "started",
+    "creator" : "ewTkY6Mytg6C0AtYU6QlkEg1oH-9J2PPS0CM83RL9rk",
+    "ownership" : "single",
+    "votingSystem" : "equal",
+    "settings": [
+        [
+            "quorum",
+            0.5
+        ],
+                [
+            "support",
+            0.5
+        ],
+        [
+            "voteLength",
+            2000
+        ],
+        [
+            "lockMinLength",
+            100
+        ],
+        [
+            "lockMaxLength",
+            10000
+        ],
+        [
+            "communityLogo",
+            "aM7YfRnd97mTGLn_3vjLfWp2TgtBKRyDsBnlDhA1e-s"
+        ]
+    ]
+}

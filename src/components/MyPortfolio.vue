@@ -19,12 +19,15 @@
         </div>
         <!-- List -->
         <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6">
-          <ul v-if="!isLoading" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <ul v-if="!isLoading && vehicles.length > 0" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <li v-for="vehicle in vehicles" :key="vehicle.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
                 <router-link :to="{ name: 'vehicle', params: { vehicleId: vehicle.id } }">
                     <vehicle-card :vehicle="vehicle"></vehicle-card>
                 </router-link>
             </li>
+          </ul>
+          <ul v-else-if="!isLoading && vehicles.length == 0" class="">
+            No vehicles found...
           </ul>
           <ul v-else class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <li v-for="index in 12" :key=index class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
@@ -39,7 +42,8 @@
 </template>
 
 <script>
-import { readContract } from 'smartweave';
+//import { readContract } from 'smartweave';
+import { executeContract } from "@three-em/js";
 import VehicleCard from './vehicle/VehicleCard.vue';
 import VehicleCardPlaceholder from './vehicle/VehicleCardPlaceholder.vue';
 import { run, all } from 'ar-gql';
@@ -49,6 +53,7 @@ export default {
   components: { VehicleCard, VehicleCardPlaceholder },
   data() {
     return {
+        arweave: {},
         /** Smartweave variables */
         contractSourceId: import.meta.env.VITE_SMARTWEAVE_CONTRACT_SOURCE_ID,
         arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
@@ -73,53 +78,6 @@ export default {
                 }
         }`,
         vehicles: [],
-    //     vehicles: [
-    //     {
-    //         id: '6adfd3a1-cb33-4970-8e88-c2d0defa66ec',
-    //         name: 'Investment Bus',
-    //         ticker: 'IBUS',
-    //         status: 'stopped',
-    //         desc: '',
-    //         logo: '',
-    //         creator: 'Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I',
-    //         ownership: 'single',
-    //         leasedSeats: 143,
-    //         perf1m: -2.43,
-    //         perf3m: 20.40,
-    //         perfMax: 140.29,
-    //         tips: 'A+',
-    //         balances: {
-    //                 "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8": 12300,
-    //                 "Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-I": 1000
-    //         },
-    //         tokens: [
-    //             {
-    //                 "tokenId": "46c0bdd1-56a9-4179-8a56-164b702a5cb8",
-    //                 "source": "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
-    //                 "txId": "tx154545454",
-    //                 "balance": 2500,
-    //                 "depositBlock": 123,
-    //                 "lockLength": 5
-    //             },
-    //             {
-    //                 "tokenId": "VRT",
-    //                 "source": "joe7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
-    //                 "txId" : "tx2fasdfoijeo8547",
-    //                 "balance": 1000,
-    //                 "depositBlock": 123,
-    //                 "lockLength": 10
-    //             },
-    //             {
-    //                 "tokenId": "XYZ",
-    //                 "source": "joe7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
-    //                 "txId" : "tx3fasdfoijeo8547",
-    //                 "balance": 3400,
-    //                 "depositBlock": 123,
-    //                 "lockLength": 5
-    //             }
-    //         ]
-    //     }
-    //   ]
     }
   },
   methods: {
@@ -130,24 +88,33 @@ export default {
       this.$router.push({ name: 'vehicle', params: { vehicle: 'joe' } });
     },
     async loadAllVehicles(contractId) {
-        console.log("Contract: " + contractId);
-        let arweave = {};
         try {
-            arweave = await Arweave.init({
-                host: this.arweaveHost,
-                port: this.arweavePort,
-                protocol: this.arweaveProtocol,
-                timeout: 20000,
-                logging: true,
+            //let vehicle = await readContract(this.arweave, contractId);
+            const state = await executeContract(contractId, undefined, true, {
+                ARWEAVE_HOST: import.meta.env.VITE_ARWEAVE_HOST,
+                ARWEAVE_PORT: import.meta.env.VITE_ARWEAVE_PORT,
+                ARWEAVE_PROTOCOL: import.meta.env.VITE_ARWEAVE_PROTOCOL
             });
-        } catch (error) {
-            console.log("ERROR connecting to Arweave: " + error);
-            return false;
-        }
-
-        try {
-            let vehicle = await readContract(arweave, contractId);
+            let vehicle = state.state;
             vehicle.id = contractId;
+
+            // Filter for current wallet
+            Object.keys(vehicle.balances).some( walletId => {
+                if(walletId == this.$store.getters.getActiveAddress){
+                    if(vehicle.balances[walletId] > 0 ) {
+                        this.vehicles.push(vehicle);
+                    }
+                } else {
+                    Object.keys(vehicle.vault).some( walletId=> {
+                        if(walletId == this.$store.getters.getActiveAddress) {
+                            if(vehicle.vault[walletId] > 0 ) {
+                                this.vehicles.push(vehicle);
+                            }
+                        }
+                    });
+                }
+            });
+
             if (!vehicle.tokens) {
                 vehicle.tokens = [];
             }
@@ -163,14 +130,13 @@ export default {
 
             for (let token of vehicle.tokens) {
                 try {
-                    const response = await fetch("http://v2.cache.verto.exchange/token/" + token.id + "/price");
+                    const response = await fetch(import.meta.env.VITE_VERTO_CACHE_URL + "token/" + token.tokenId + "/price");
                     const responseObj = await response.json();
                     const pricePerToken = responseObj.price;
                     const tokenValue = pricePerToken * token.balance;
                     treasuryTotal += tokenValue;
                 } catch(error) {
-                    console.log("ERROR calling Verto cache: " + error);
-                    return false;
+                    this.$log.error("MyPortfolio : loadAllVehicles :: ", "ERROR calling Verto cache on " + token.name + ": " + error);
                 }
             }
             vehicle.treasury = treasuryTotal;
@@ -184,31 +150,67 @@ export default {
             //vehicle.tipsMisc = 142545
 
             // Votes Opened
-            vehicle.votes = 0;
-
-
-            this.vehicles.push(vehicle);
-            this.isLoading = false;
+            if (typeof vehicle.votes !== 'undefined' && vehicle.votes.length !== 0) {
+                const activeVotes = vehicle.votes.filter(vote => vote.status === 'active');
+                vehicle.totalActiveVotes = activeVotes.length;
+            } else {
+                vehicle.totalActiveVotes = 0;
+            }
+            
         } catch (error) {
-            console.log("ERROR calling SmartWeave: " + error);
-            return false;
+            this.$log.error("MyPortfolio : loadAllVehicles :: ", "ERROR calling SmartWeave: " + error);
         }
     }
   },
   async created() {
     this.isLoading = true;
+    if(!this.$store.getters.arConnected) {
+        // alert("Please login to Aftr-Market")
+        this.$swal({
+            icon: 'error',
+            html: "Please login to Aftr-Market",
+        })
+    }
     
     // Use GraphQL to find all vehicle contracts, then load all vehicles
-    const txs = await run(this.query);
+    //const txs = await run(this.query);
 
-    for(let edge of txs.data.transactions.edges) {
-        await this.loadAllVehicles(edge.node.id);
-    }
+    //for(let edge of txs.data.transactions.edges) {
+    //    await this.loadAllVehicles(edge.node.id);
+    //}
 
     // for (let index = 1; index < 12; index++) {
     //     /*** FOR NOW JUST LOAD A FAKE SCREEN OF VEHICLES */
     //     this.vehicles.push(this.vehicles[0]);
     // }
+    let response = {};
+    let totalVehicles = 0;
+    try {
+        this.arweave = await Arweave.init({
+            host: this.arweaveHost,
+            port: this.arweavePort,
+            protocol: this.arweaveProtocol,
+            timeout: 20000,
+            logging: true,
+        });
+
+        response = await this.arweave.api.post('graphql', { query: this.query });
+
+        if (response.status !== 200) {
+            throw response.status + " - " + response.statusText;
+        }
+
+        totalVehicles = response.data.data.transactions.edges.length;
+    } catch (error) {
+        this.$log.error("MyPortfolio : created :: ", "ERROR while fetching from gateway: " + error);
+    }
+
+    // Load each Vehicle
+    for(let edge of response.data.data.transactions.edges) {
+        await this.loadAllVehicles(edge.node.id);
+    }
+    this.isLoading = false;
+
   }
 }
 </script>

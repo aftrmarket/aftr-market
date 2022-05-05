@@ -13,48 +13,6 @@
     </div>
     <div v-if="!uiEditMode" class="pt-2">
         <vehicle-info-read :vehicle="vehicle"></vehicle-info-read>
-        <div class="flex items-center justify-between">
-            <div class="px-4 py-5 sm:px-6">
-                <h2 id="applicant-information-title" class="text-lg leading-6 font-medium text-gray-900">
-                    {{ vehicle.name }}
-                </h2>
-                <p class="mt-1 max-w-2xl text-sm text-gray-500">
-                    <span class="text-lg text-black">{{ vehicle.ticker }}</span>
-                </p>
-            </div>
-            <div class="pr-6">
-                <p class="text-gray-900">Current Value: <span class="px-2 py-3 sm:px-6 inline-flex leading-5 font-semibold rounded-full bg-green-100 text-green-800">{{ formatNumber(vehicle.treasury, true) }} AR</span></p>
-            </div>
-        </div>
-        <div class="flex items-start justify-between">
-            <div>
-                <div class="px-4 sm:px-6 max-w-2xl text-sm text-gray-500">Status</div>
-                <div v-if="!allowVehicleEdits" class="flex items-center justify-between pb-4">
-                    <div class="px-4 sm:px-6"><span :class="vehicleStatusAlert">{{ vehicleStatusText }}</span></div>
-                </div>
-                <div v-else class="px-4 sm:px-6">
-                    <SwitchGroup as="div" class="flex items-center">
-                        <Switch v-model="statusSwitchEnabled" @click="statusChange" :class="[statusSwitchEnabled ? 'bg-green-600' : 'bg-gray-200', 'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2']">
-                            <span aria-hidden="true" :class="[statusSwitchEnabled ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200']" />
-                        </Switch>
-                        <SwitchLabel as="span" class="ml-3">
-                            <span :class="vehicleStatusAlert">{{ vehicleStatusText }}</span>
-                        </SwitchLabel>
-                    </SwitchGroup>
-                </div>
-            </div>
-            <vehicle-status-text 
-                :headerText="'Editing'" 
-                :item1="'Creator'" 
-                :item1Status="getActiveAddress === creatorAddress ? true : false" 
-                :item2="'Status = Not Running'" 
-                :item2Status="vehicle.status === 'stopped' || typeof vehicle.status === 'undefined' ? true : false"
-                :item3="'Single Ownership'"
-                :item3Status="vehicle.ownership === 'single' ? true : false"
-                :footerMessage="allowVehicleEdits ? 'Edits allowed' : 'Votes must be passed to edit'"
-                :footerStatus="allowVehicleEdits ? true : false">
-            </vehicle-status-text>
-        </div>
     </div>
     <!-- EDIT MODE -->
     <div v-else>
@@ -82,12 +40,15 @@
                     <label for="newLogo" class="py-2 block text-sm font-medium text-gray-700">Logo</label>
                     <div class="mt-2 sm:mt-0 sm:col-span-2 pl-6">
                         <div class="flex text-sm text-gray-600">
-                            <label for="newLogo" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
-                                <span>Upload a file</span>
-                                <input @change="onFileChange" id="newLogo" name="newLogo" type="file" class="sr-only" />
+                            <label for="newLogo" class="relative cursor-pointer bg-white rounded-md font-medium text-aftrBlue hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                                <span>Change the Logo</span>
+                                <input @change="onFileChange" id="newLogo" name="newLogo" type="file" accept="image/png, image/gif, image/jpeg" class="sr-only" />
                             </label>
                         </div>
                         <p class="text-xs text-gray-500">200 x 200 PNG, JPG, or GIF</p>
+                        <p class="text-xs text-aftrRed">
+                            {{ fileMessage }}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -111,10 +72,13 @@
                         <input @change="formDirty" type="radio" v-model="newVotingSystem" id="weighted" value="weighted" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">Weighted</label>
                     </div>
                     <label class="pt-4 pb-2  block text-sm font-medium text-gray-700">Quorum (between 0.01 - 0.99)</label>
+                    <label class="pt-4 pb-2  block text-sm font-medium text-gray-700">Support (between 0.01 - 0.99)</label>
                     <label class="pt-4 pb-2  block text-sm font-medium text-gray-700">Vote Length (blocks)</label>
-                    <div/>
+                    
                     <input @change="formDirty" v-model="newQuorum" class="w-3/4" type="number" name="newQuorum" :class="inputBox(quorumIsValid)" />
+                    <input @change="formDirty" v-model="newSupport" class="w-3/4" type="number" name="newSupport" :class="inputBox(supportIsValid)" />
                     <input @change="formDirty" v-model="newVoteLength" class="w-3/4" type="number" name="newVoteLength" :class="inputBox(voteLengthIsValid)" />
+                    <div/>
                     <div/>
                     <label class="pt-4 pb-2 grid col-span-2 block text-sm font-medium text-gray-700">Creator (transferring ownership not recommended!)</label>
                     <div/>
@@ -132,7 +96,6 @@
             </div>
         </form>
     </div>
-    {{ vehicle }}
 </template>
 
 <script>
@@ -142,6 +105,8 @@ import { mapGetters } from 'vuex';
 import numeral from "numeral";
 import VehicleInfoRead from './VehicleInfoRead.vue';
 import VehicleStatusText from './VehicleStatusText.vue';
+import { interactWrite } from "smartweave";
+//import { A } from '../../../dist/assets/vendor.62e455b6';
 
 
 export default {
@@ -149,6 +114,14 @@ export default {
     components: { Switch, SwitchGroup, SwitchLabel, VehicleInfoRead, VehicleStatusText },
     data() {
         return {
+            /** Smartweave variables */
+            contractSourceId: import.meta.env.VITE_SMARTWEAVE_CONTRACT_SOURCE_ID,
+            tagProtocol: import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL,
+            arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
+            arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
+            arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
+            arweaveMine: import.meta.env.VITE_MINE,
+            /** */
             allowVehicleEdits: false,
             statusSwitchEnabled: false,
             allowEdits: false,
@@ -164,10 +137,16 @@ export default {
             newVotingSystem: '',
             newVoteLength: 0,
             newQuorum: 0,
+            newSupport: 0,
             newCreator: '',
             quorumIsValid: true,
+            supportIsValid: true,
             voteLengthIsValid: true,
-            creatorIsValid: true
+            creatorIsValid: true,
+            totalSize: 0,
+            fileInvalid: false,
+            fileUpload: false,
+            files: [],
         };
     },
     watch: {
@@ -215,7 +194,16 @@ export default {
                 return this.vehicle.creator;
             }
         },
-        ...mapGetters(['arConnected', 'getActiveAddress']),
+        fileMessage() {
+            if (this.fileInvalid) {
+                return "Not a valid image. Please try again."
+            } else if (this.totalSize === 0) {
+                return "If file size is less than 100kb, upload is free.  Overwise AR fees apply.";
+            } else {
+                return "File size: " + this.formatNumber(this.totalSize);
+            }
+        },
+        ...mapGetters(['arConnected', 'getActiveAddress', 'keyFile']),
     },
     methods: {
         formatNumber(num, dec = false) {
@@ -294,6 +282,7 @@ export default {
 
                 // Get the settings map values
                 this.newQuorum = this.currentVehicleSettings.get('quorum');
+                this.newSupport = this.currentVehicleSettings.get('support');
                 this.newVoteLength = this.currentVehicleSettings.get('voteLength');
                 this.newLogo = this.currentVehicleSettings.get('communityLogo');
             }
@@ -301,6 +290,7 @@ export default {
         formDirty() {
             this.isFormValid = true;
             this.quorumIsValid = true;
+            this.supportIsValid = true;
             this.voteLengthIsValid = true;
             this.creatorIsValid = true;
 
@@ -316,6 +306,11 @@ export default {
                 this.isFormValid = false;
                 this.quorumIsValid = false;
             }
+            if (!this.newSupport || this.newSupport === '' || +this.newSupport < 0.01 || +this.newSupport > 0.99) {
+                // Quarum needs to be in the following range:  0.01 - 0.99
+                this.isFormValid = false;
+                this.supportIsValid = false;
+            }
             if (!this.newVoteLength || this.newVoteLength === '' || !Number.isInteger(+this.newVoteLength) || +this.newVoteLength < 0) {
                 // Is there a range that the vote needs to be in?
                 this.isFormValid = false;
@@ -326,7 +321,38 @@ export default {
                 this.creatorIsValid = false;
             }
         },
-        updateVehicle() {
+       async updateVehicle() {
+        let arweave = {};
+       
+        arweave = await Arweave.init({
+                  host: this.arweaveHost,
+                  port: this.arweavePort,
+                  protocol: this.arweaveProtocol,
+                  timeout: 20000,
+                  logging: true,
+                });
+
+            if (this.fileUpload){
+                if (import.meta.env.VITE_ENV === "DEV") {
+                    await this.deployFile(this.files, arweave, JSON.parse(this.keyFile));
+                    const mineUrl =
+                            import.meta.env.VITE_ARWEAVE_PROTOCOL +
+                            "://" +
+                            import.meta.env.VITE_ARWEAVE_HOST +
+                            ":" +
+                            import.meta.env.VITE_ARWEAVE_PORT +
+                            "/mine"; 
+                    if(Boolean(this.arweaveMine)){                           
+                        this.$log.info("VehicleInfo : updateVehicle :: ","mineUrl ",mineUrl);    
+                        let response = await fetch(mineUrl);
+                    }
+                } else {
+                    await this.deployFile(this.files, arweave, "use_wallet");
+                }
+            }
+
+                this.$log.info("VehicleInfo : updateVehicle :: ", "this.newLogo ",this.newLogo)
+
             if (this.isFormValid) {
                 // Determine what fields have changed
                 let changeMap = new Map();
@@ -360,11 +386,14 @@ export default {
                 if (this.newQuorum !== this.currentVehicleSettings.get('quorum')) {
                     changeMap.set('settings.quorum', this.newQuorum);
                 }
+                if (this.newSupport !== this.currentVehicleSettings.get('support')) {
+                    changeMap.set('settings.quorum', this.newSupport);
+                }
                 if (this.newVoteLength !== this.currentVehicleSettings.get('voteLength')) {
                     changeMap.set('settings.voteLength', this.newVoteLength);
                 }
 
-                console.log([...changeMap.entries()]);
+                this.$log.info("VehicleInfo : updateVehicle :: ", [...changeMap.entries()]);
 
                 /**** Tip to AFTR for change */
                 /*** TODO */
@@ -376,7 +405,10 @@ export default {
                     type: 'set',
                     recipient: '',
                     target: '',
-                    qty: 0
+                    qty: 0,
+                    key: '',
+                    value: '',
+                    note: ''
                 };
                 
                 // If more than one change, build multi-interaction input
@@ -393,8 +425,7 @@ export default {
                                 type: 'set',
                                 key: key,
                                 value: value
-                            },
-                            caller: this.getActiveAddress
+                            }
                         }
                         actions.push(multiAction);
                     }
@@ -409,16 +440,111 @@ export default {
                     // Invalid
                     return;
                 }
-                const action = {
-                    input: input,
-                    caller: this.getActiveAddress
-                }
+
                 // Call Smartweave
-                console.log("CALL TO SMARTWEAVE");
-                console.log(JSON.stringify(action));
-                /**** */
+                this.$log.info("VehicleInfo : updateVehicle :: ", "CALL TO SMARTWEAVE");
+                this.$log.info("VehicleInfo : updateVehicle :: ", JSON.stringify(input));
+                this.$log.info("VehicleInfo : updateVehicle :: ", "Contract ID: " + this.contractId);
+                
+                //const txid = await interactWrite(arweave, "use_wallet", this.contractId, JSON.stringify(action));
+                /**** INSTEAD OF USING "use_wallet", copy the information out of your keyfile.json file and hardcode it below until I can figure out what's going on with ArConnect. */
+                let wallet;
+                if (import.meta.env.VITE_ENV === "DEV") {
+                    if(this.keyFile.length){
+                        wallet =  JSON.parse(this.keyFile)
+                    } else {
+                        // alert("Please attach your keyfile")
+                        this.$swal({
+                            icon: 'warning',
+                            html: "Please attach your keyfile",
+                        })
+                    }        
+                } 
+                if (import.meta.env.VITE_ENV === "DEV") {
+                    const txid = await interactWrite(arweave, wallet, this.contractId, input);
+                    this.$log.info("VehicleInfo : updateVehicle :: ", "TX: " + txid);
+
+                    /**** IN ORDER FOR THIS TO PROCESS, YOU NEED TO RUN http://localhost:1984/mine */
+                    if(Boolean(this.arweaveMine)){
+                        const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
+                        const response = await fetch(mineUrl);
+                    }
+                } else {
+                    const txid = await interactWrite(arweave, "use_wallet", this.contractId, input);
+                    this.$log.info("VehicleInfo : updateVehicle :: ", "TX: " + txid);
+                }
+
+                this.$router.push("/vehicles");
             }
-        }
+        },
+        async onFileChange(e) {
+            this.fileUpload = true
+            const file = e.target.files[0];
+            this.files = file;
+
+            // Error Handling
+            // if (file.type.substring(0, 6) !== "image/") {
+            //     // Write file error message
+            //     this.fileInvalid = true;
+            //     this.$log.info("FILE IS NOT IMAGE");
+            //     return;
+            // } else {
+            //     this.fileInvalid = false;
+            // }
+
+
+            if (this.vehicleLogo) {
+                // Release the memory of the old file
+                URL.revokeObjectURL(this.vehicleLogo);
+            }
+            this.vehicleLogo = URL.createObjectURL(file);
+            this.fileInfo = file.size + ", " + file.name + ", " + file.type;
+            const filename = file.name.replace(/ /g, "") + file.lastModified;
+
+            // Total size should be < ? so that it's a free transaction
+            this.totalSize += file.size;
+            this.isFormValid = true
+            this.$log.info("VehicleInfo : onFileChange :: ", "totalSize", this.totalSize, this.balance);
+
+            /**** SHOULD THIS BE > 0? */
+            if (this.totalSize != 0) {
+
+            }
+        },
+        readFile(file) {
+            // Thanks to https://dilshankelsen.com/convert-file-to-byte-array/
+            return new Promise((resolve, reject) => {
+                // Create file reader
+                let reader = new FileReader();
+
+                // Register event listeners
+                reader.addEventListener("loadend", e => resolve(e.target.result));
+                reader.addEventListener("error", reject);
+
+                this.$log.info("VehicleInfo : readFile :: ", "readAsArrayBuffer",file)
+                // Read file
+                reader.readAsArrayBuffer(file);
+            });
+        },
+        async getAsByteArray(file) {
+            return new Uint8Array(await this.readFile(file));
+        },
+        async deployFile(file, arweave, wallet) {
+
+            const tx = await arweave.createTransaction({
+                data: await this.getAsByteArray(file)
+            }, wallet);
+
+            tx.addTag("Content-Type", file.type);
+            //tx.addTag("User-Agent", `AFTR.Market/this.version`);
+            tx.addTag("User-Agent", "AFTR.Market")
+
+            await arweave.transactions.sign(tx, wallet);
+            await arweave.transactions.post(tx);
+            this.newLogo = tx.id;
+            
+            this.$log.info("VehicleInfo : deployFile :: ", "txid", tx.id);
+        },
     },
     created() {
         this.checkEditStatus();

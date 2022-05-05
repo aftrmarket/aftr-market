@@ -56,8 +56,9 @@
                                 <!--<vehicle-leases v-else-if="activeTab === 'Leases'" :leases="vehicles.leases"></vehicle-leases>-->
                                 <!--<vehicle-leases v-else-if="activeTab === 'Leases'"></vehicle-leases>-->
                                 <!--<vehicle-fractions v-else-if="activeTab === 'Fractions'"></vehicle-fractions>-->
-                                <vehicle-votes v-else-if="activeTab === 'Votes'" :vehicle="vehicle"></vehicle-votes>
-                                <vehicle-activity v-else-if="activeTab === 'Activity'"></vehicle-activity>
+                                <vehicle-votes v-else-if="activeTab === 'Votes'" :vehicle="vehicle" :contractId="contractId"></vehicle-votes>
+                                <vehicle-state v-else-if="activeTab === 'State'" :vehicle="vehicle"></vehicle-state>
+                                <vehicle-activity v-else-if="activeTab === 'Activity'" :arweave="arweave" :interactions="interactions"></vehicle-activity>
 
                             </div>
                         </section>
@@ -71,7 +72,8 @@
 </template>
 
 <script>
-import { readContract } from 'smartweave';
+//import { readContract } from 'smartweave';
+import { executeContract } from "@three-em/js";
 import VehicleInfo from './vehicle/VehicleInfo.vue';
 import VehicleMembers from './vehicle/VehicleMembers.vue';
 import VehicleTokens from './vehicle/VehicleTokens.vue';
@@ -79,11 +81,13 @@ import VehicleTokens from './vehicle/VehicleTokens.vue';
 //import VehicleLeases from './vehicle/VehicleLeases.vue';
 //import VehicleFractions from './vehicle/VehicleFractions.vue';
 import VehicleVotes from './vehicle/VehicleVotes.vue';
+import VehicleState from './vehicle/VehicleState.vue';
 import VehicleActivity from './vehicle/VehicleActivity.vue';
 import VehiclePlaceholder from './vehicle/VehiclePlaceholder.vue';
+import { mapGetters } from "vuex";
 
 export default {
-    components: { VehicleInfo, VehicleMembers, VehicleTokens, VehicleVotes, VehicleActivity, VehiclePlaceholder },
+    components: { VehicleInfo, VehicleMembers, VehicleTokens, VehicleVotes, VehicleState, VehicleActivity, VehiclePlaceholder },
     props: ['vehicleId'],
     data() {
         return {
@@ -95,30 +99,41 @@ export default {
                 //{ name: 'Fractions', href: '#', current: false },
                 //{ name: 'Leases', href: '#', current: false },
                 { name: 'Votes', href: '#', current: false },
+                { name: 'State', href: '#', current: false },
                 { name: 'Activity', href: '#', current: false },
             ],
+            arweave: {},
             activeTab: "Info",
             pageStatus: "",
             contractId: this.vehicleId,
             vehicle: {},
+            interations: {},
 
             arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
             arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
-            arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL
+            arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
         };
     },
     computed: {
         vehicleLogo() {
+            let logoUrl =""
             if (this.vehicle.logo) {
-                return "https://arweave.net/" + this.vehicle.logo;
+                if(import.meta.env.VITE_ARWEAVE_PORT){
+                    logoUrl = `${import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/" + this.vehicle.logo}`;
+                } else {
+                    logoUrl = `${import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + "/" + this.vehicle.logo}`;
+                }
+                return logoUrl;
             } else {
-                return "/src/assets/logo-placeholder.png";
+                logoUrl = "https://avatars.dicebear.com/api/pixel-art-neutral/:" + this.vehicle.id + ".svg";
+                return logoUrl;
             }
-        }
+        },
+        ...mapGetters(["getAftrContractSrcId"]),
     },
     methods: {
         viewVehicles() {
-            console.log("View Clicked");
+            this.$log.info("Vehicle : viewVehicles :: " ,"View Clicked");
             this.$router.push("../vehicles");
         },
         tabClick(name) {
@@ -128,21 +143,31 @@ export default {
             this.tabs[activeTabIndex].current = true;
             this.activeTab = this.tabs[activeTabIndex].name;
         },
+        async returnContractSrc(arweave, contractId) {
+            let tx = await arweave.transactions.get(contractId);
+            let contractSrcId = "";
+
+            tx.get('tags').every(tag => {
+                let key = tag.get('name', {decode: true, string: true});
+                let value = tag.get('value', {decode: true, string: true});
+                if (key === "Contract-Src") {
+                    contractSrcId = value;
+                    return false;
+                }
+                return true;
+            });
+            return contractSrcId;
+        },
         async loadVehicle() {
             // Add contractId to vehicle object
             this.vehicle.id = this.contractId;
 
-            // Logo
+            // Logo and Description
             this.vehicle.settings.forEach(setting => {
                 if (setting[0] === 'communityLogo') {
                     this.vehicle.logo = setting[1];
-
-                    /*** For DEMO Purposes ONLY */
-                    /*** Fixing Chillin's logo */
-                    if (this.vehicleId === "PFGb4J3IyeYFcNwtuHs94SDruqQOJ_6R3FywE0-PJkY") {
-                        this.vehicle.logo = "aM7YfRnd97mTGLn_3vjLfWp2TgtBKRyDsBnlDhA1e-s";
-                    }
-                    /*** */
+                } else if (setting[0] === "communityDescription") {
+                    this.vehicle.desc = setting[1];
                 }
             });
             // Tokens
@@ -151,15 +176,14 @@ export default {
             if (this.vehicle.tokens) {
                 for (let token of this.vehicle.tokens) {
                     try {
-                        const response = await fetch("http://v2.cache.verto.exchange/token/" + token.id + "/price");
+                        const response = await fetch(import.meta.env.VITE_VERTO_CACHE_URL + "token/" + token.tokenId + "/price");
                         const responseObj = await response.json();
                         const pricePerToken = responseObj.price;
                         token.name = responseObj.name;
                         token.total = pricePerToken * token.balance;
                         treasuryTotal += token.total;
                     } catch(error) {
-                        console.log("ERROR calling Verto cache: " + error);
-                        return false;
+                        this.$log.info("Vehicle : loadVehicle :: ", "ERROR calling Verto cache on " + token.name + ": " + error);
                     }
                 }
             } else {
@@ -180,9 +204,9 @@ export default {
     async created() {
         this.pageStatus = "in-progress";
 
-        let arweave = {};
+        //let arweave = {};
         try {
-            arweave = await Arweave.init({
+            this.arweave = await Arweave.init({
                 host: this.arweaveHost,
                 port: this.arweavePort,
                 protocol: this.arweaveProtocol,
@@ -190,17 +214,54 @@ export default {
                 logging: true,
             });
         } catch (error) {
-            console.log("ERROR connecting to Arweave: " + error);
+            this.$log.error("Vehicle : created :: ", "ERROR connecting to Arweave: " + error);
             this.pageStatus = "error";
+            this.$swal({
+                logo: "error",
+                html: "ERROR to load vehicle. Please click the Launch button again",
+            })
+            this.$router.push("../overview");
             return false;
         }
 
         try {
-            this.vehicle = await readContract(arweave, this.contractId);
+            //this.vehicle = await readContract(arweave, this.contractId);
+            //const stateInteractions = await readContract(this.arweave, this.contractId, undefined, true);
+
+            //const { state, validity } = await executeContract(this.contractId, undefined, true, this.gatewayConfig);
+            const stateInteractions = await executeContract(this.contractId, undefined, true, {
+                ARWEAVE_HOST: import.meta.env.VITE_ARWEAVE_HOST,
+                ARWEAVE_PORT: import.meta.env.VITE_ARWEAVE_PORT,
+                ARWEAVE_PROTOCOL: import.meta.env.VITE_ARWEAVE_PROTOCOL
+            });
+            //console.log(JSON.stringify(state));
+            // console.log(JSON.stringify(state));
+            // console.log(JSON.stringify(validity));
+
+            this.vehicle = stateInteractions.state;
+            this.interactions = stateInteractions.validity;
+            
+
+            //this.vehicle = stateInteractions.state;
+            //this.interactions = stateInteractions.validity;
+            //console.log(JSON.stringify(this.interactions));
+
+            
+            // Ensure AFTR Vehicle
+            const contractSrc = await this.returnContractSrc(this.arweave, this.contractId);
+            if (contractSrc !== this.getAftrContractSrcId) {
+                throw "Not valid AFTR Vehicle";
+            }
+
             await this.loadVehicle();
         } catch (error) {
-            console.log("ERROR calling SmartWeave: " + error);
+            this.$log.info("Vehicle : created :: ", "ERROR calling SmartWeave: " + error);
             this.pageStatus = "error";
+            this.$swal({
+                logo: "error",
+                html: "ERROR to load vehicle. Please click the Launch button again",
+            })
+            this.$router.push("../overview");
             return false;
         }
 

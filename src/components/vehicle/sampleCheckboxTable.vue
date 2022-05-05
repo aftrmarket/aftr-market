@@ -481,7 +481,7 @@ export default {
                 }
             }
             /*** CALL SMARTWEAVE */
-            console.log(JSON.stringify(action));
+            this.$log.info("sampleCheckboxTable : submit :: ", JSON.stringify(action));
         },
         addMemberRow() {
             this.addRow = !this.addRow;
@@ -527,7 +527,7 @@ export default {
         //     }
             
         //     /*** CALL SMARTWEAVE */
-        //     console.log(JSON.stringify(action));
+        //     this.$log.info(JSON.stringify(action));
         // },
         // updateAllocations() {
         //     let recipient = '';
@@ -562,7 +562,7 @@ export default {
         //     }
 
         //     /*** CALL SMARTWEAVE */
-        //     console.log(JSON.stringify(action));
+        //     this.$log.info(JSON.stringify(action));
         // },
     },
     created() {

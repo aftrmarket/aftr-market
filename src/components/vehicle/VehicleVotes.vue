@@ -1,13 +1,18 @@
 <template>
     <div class="pt-4 w-full">
         <vehicle-votes-add v-if="showAddVotes" :vehicle="vehicle" @close="closeModal('add')"></vehicle-votes-add>
-        <vehicle-votes-cast v-if="showCastVotes" :vehicle="vehicle" :voteId="voteId" @close="closeModal('cast')"></vehicle-votes-cast>
+        <vehicle-votes-cast v-if="showCastVotes" :vehicle="vehicle" :voteId="voteId" :voteData="voteData" :contractId="contractId" :currentBlock="currentBlock.height"  @close="closeModal('cast')"></vehicle-votes-cast>
     </div>
     <div class="flex flex-col">
         <div class="flex justify-between">
-            <div class="mt-2 pb-3 text-sm text-gray-700">Current Block: {{ currentBlock }}</div>
             
+            <div class="mt-2 pb-3 text-sm text-gray-700">Current Block: {{ currentBlock.height  }}</div>
             <div>
+                <input type="radio" v-model="selectedVoteCategory" value="Active" class="form-radio text-aftrBlue" /><label class="px-2 text-sm text-gray-700">Active Votes</label>
+                <input type="radio" v-model="selectedVoteCategory" value="Concluded" class="form-radio text-aftrBlue" /><label class="px-2 text-sm text-gray-700">Concluded Votes</label>
+            </div>
+
+            <div v-if="false">
                 <button v-if="allowAdd" @click.prevent="openModal('add')" type="button" class="inline-flex items-center px-4 py-2 mb-3 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
@@ -26,7 +31,7 @@
                 </div>
             </div>
         </div>
-        <table v-if="votes.length > 0" class="min-w-full divide-y divide-gray-200">
+        <table v-if="filteredVotes.length > 0" class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -39,19 +44,19 @@
                   Status
                 </th>
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Result (Y - N)
+                  Result <br/> (Y - N)
                 </th>
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Action
                 </th>
               </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="vote in votes" :key="vote.id">
+            <tbody class="bg-white divide-y divide-gray-200" v-for="vote in filteredVotes" :key="vote.id">
+              <tr >
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {{ vote.id }}
+                  {{ walletAddressSubstr(vote.id) }}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td class="px-6 py-4 whitespace-normal text-sm text-gray-500 break-all">
                   {{ displayProposal(vote) }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -61,7 +66,7 @@
                   {{ vote.yays }} - {{ vote.nays }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-500">
-                    <button v-if="canVote(vote) && vote.status === 'active'" @click.prevent="openModal('cast', vote.id)" type="button" class="text-aftrBlue hover:text-indigo-900">
+                    <button v-if="canVote(vote) && vote.status === 'active'" @click.prevent="openModal('cast', vote.id, vote)" type="button" class="text-aftrBlue hover:text-indigo-900">
                         Vote
                     </button>
                     <div v-else-if="votedText(vote) === 'voted'" class="flex content-center">
@@ -73,6 +78,9 @@
               </tr>
             </tbody>
         </table>
+        <div v-if="filteredVotes.length == 0">
+            No Votes to show.
+        </div>
     </div>
 </template>
 
@@ -80,11 +88,11 @@
 
 import VehicleVotesAdd from './votes/VehicleVotesAdd.vue';
 import VehicleVotesCast from './votes/VehicleVotesCast.vue';
-import { mapGetters } from 'vuex';
+import { mapGetters,mapState } from 'vuex';
 import capitalize from '../utils/shared.js';
 
 export default {
-    props: ['vehicle'],
+    props: ['vehicle', 'contractId'],
     components: { VehicleVotesAdd, VehicleVotesCast },
     data() {
         return {
@@ -92,26 +100,28 @@ export default {
             showCastVotes: false,
             allowAdd: false,
             voteId: 0,
-            currentBlock: 110,  // TEMP, GET CURRENT BLOCK
-            votes: [
-                {
-                    id: 101,
-                    status: "active",
-                    type: "set",
-                    note: "Change something",
-                    key: "Key Name",
-                    value: "Value",
-                    start: 100,
-                    lockLength: 50,
-                    yays: 2,
-                    nays: 1,
-                    voted: ["Fof_-BNkZN_nQp0VsD_A9iGb-Y4zOeFKHA8_GK2ZZ-"]
-                }
-            ]
+            voteData : {},
+            votes: this.vehicle.votes,
+            selectedVoteCategory: "Active"
         };
     },
     computed: {
-        ...mapGetters(['arConnected', 'getActiveAddress']),
+        ...mapGetters(['arConnected', 'getActiveAddress', 'getCurrentBlockValue']),
+        ...mapState(['currentBlock']),
+        filteredVotes() {
+			let status = this.selectedVoteCategory;
+            let vote = this.votes
+            if(status == "active" || status == "Active"){
+                    let voteArray = vote.filter(voteVal => voteVal.status === 'active');
+                    return voteArray;
+            } else {
+                    let voteArray = vote.filter(voteVal => voteVal.status != 'active');
+                    return voteArray;
+            }
+        },
+    },
+    mounted () {
+        this.$store.dispatch('loadCurrentBlock')
     },
     watch: {
         arConnected(value) {
@@ -119,6 +129,17 @@ export default {
         }
     },
     methods: {
+    arConnect() {
+        this.$store.dispatch('getCurrentBlockValue');
+    },
+     walletAddressSubstr(addr, chars = 10) {
+            if (typeof addr === 'string') {
+                let len = parseInt(chars/2);
+                return addr.substr(0, len) + '...' + addr.substr(-len);
+            } else {
+                return '';
+            }
+        },
         setFlags() {
             /*** 
                 In order to create a vote, you must 
@@ -142,12 +163,12 @@ export default {
                 return vote.note;
             } else if (vote.type=== 'set') {
                 return "Change " + capitalize(vote.key) + " to " + capitalize(vote.value);
-            } else if (vote.type === 'mint') {
-                return "Mint " + vote.qty;
             } else if (vote.type === '?') {
                 return "?";
             } else if (vote.type === '???') {
                 return "???";
+            } else {
+                return capitalize(vote.note);
             }
         },
         calculateStatus(vote) {
@@ -180,11 +201,12 @@ export default {
                 return 'eligible'
             }
         },
-        openModal(modalType = 'add', id = 0) {
+        openModal(modalType = 'add', id = 0, vote ={}) {
             if (modalType === 'add') {
                 this.showAddVotes = true;
             } else {
                 this.voteId = id;
+                this.voteData = vote;
                 this.showCastVotes = true;
             }
         },
@@ -195,9 +217,16 @@ export default {
                 this.showCastVotes = false;
             }
         },
+        initVotes() {
+            if (!('votes' in this.vehicle)) {
+                this.vehicle.votes = [];
+            }
+
+        }
     },
     created() {
         this.setFlags();
+        this.initVotes();
     }
 };
 </script>

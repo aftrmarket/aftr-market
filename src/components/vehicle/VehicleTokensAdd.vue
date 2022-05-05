@@ -26,7 +26,7 @@
                             <option value="" disabled selected>
                                 Select Token
                             </option>
-                            <option v-for="pst in $store.getters.getActiveWallet.psts" :key="pst.id" :value="pst.id">
+                            <option v-for="pst in $store.getters.getActiveWallet.psts" :key="pst.id" :value="pst.id" :disabled="!pst.fcp">
                                 {{ pst.name }} ({{ pst.id }})
                             </option>
                         </select>
@@ -34,28 +34,33 @@
                     <div v-if="selectedPstId !== ''">
                         <div class="pt-6 pb-4">
                             <label class="block text-sm font-medium text-gray-700">
-                                You have <span class="font-bold text-aftrBlue">{{ pstBalance }} {{ pstTicker }}</span><span> available to use in your vehicle.</span>
+                                You have <span class="font-bold text-aftrBlue">{{ formatNumber(pstBalance - pstInputTokens) }} {{ pstTicker }}</span><span> available to use in your vehicle.</span>
                             </label>
                         </div>
                         <input type="number" placeholder="Amount" v-model="pstInputTokens" @input="calcPstPrice" :class="inputBox(pstInputValid)" />
-                        <span v-if="pstInputTokens" class="block text-xs pt-2 pl-4 pr-6">@ {{ formatNumber( pricePerToken, true) }} AR {{ pstInputTokens ? " = " + formatNumber(pstValue, true) + " AR" : "" }}</span>
+                        <span v-if="pstInputTokens && false" class="block text-xs pt-2 pl-4 pr-6">@ {{ formatNumber( pricePerToken, true) }} AR {{ pstInputTokens ? " = " + formatNumber(pstValue, true) + " AR" : "" }}</span>
                     </div>
+                    <!--
                   <div class="mt-2">
                     <p class="text-sm text-gray-500">
-                      Are you sure you want to transfer these tokens from your wallet to the vehicle? This action cannot be undone.
+                      Are you sure you want to transfer these tokens from your
+                      wallet to the vehicle? This action cannot be undone.
                     </p>
                   </div>
+                  -->
                 </div>
               </div>
             </div>
             <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-              <button type="button" v-if="pstInputValid && pstInputTokens" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm" @click="transferTokens">
+              <button type="button" v-if="pstInputValid && pstInputTokens" 
+              class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm" @click="transferTokens">
                 Transfer
               </button>
               <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-aftrRed hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" @click="$emit('close')" ref="cancelButtonRef">
                 Cancel
               </button>
             </div>
+             <Vehicle-Alert v-if="pstInputValid && pstInputTokens" :vehicle="msg"></Vehicle-Alert>
           </div>
         </TransitionChild>
       </div>
@@ -69,6 +74,9 @@ import { Dialog, DialogOverlay, DialogTitle, TransitionChild, TransitionRoot } f
 import { ExclamationIcon } from '@heroicons/vue/outline'
 import { mapGetters } from 'vuex';
 import numeral from "numeral";
+//import Arweave from "arweave";
+import { interactWrite, interactWriteDryRun } from "smartweave";
+import VehicleAlert from './VehicleAlert.vue';
 
 export default {
     props : ['vehicle'],
@@ -79,6 +87,7 @@ export default {
         TransitionChild,
         TransitionRoot,
         ExclamationIcon,
+        VehicleAlert
     },
     data() {
         return {
@@ -92,12 +101,19 @@ export default {
             pricePerToken: null,                            // Selected PST's price
             pstValue: null,                                 // pricePerShare * inputShares
             totalValue: null,
+            /** Smartweave variables */
+            arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
+            arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
+            arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
+            arweaveMine: import.meta.env.VITE_MINE,
+            /** */
+            msg: ""
         }
     },
     computed : {
         pstBalance() {
             const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.id === this.selectedPstId);
-            return this.formatNumber(currentPst.balance);
+            return currentPst.balance;
         },
         pstTicker() {
             const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.id === this.selectedPstId);
@@ -124,7 +140,7 @@ export default {
                 return false;
             }
         },
-        ...mapGetters(['arConnected', 'getActiveAddress']),
+        ...mapGetters(['arConnected', 'getActiveAddress', 'keyFile']),
     },
     methods: {
         formatNumber(num, dec = false) {
@@ -148,9 +164,79 @@ export default {
                 return "mt-1 focus:ring-aftrRed focus:border-aftrRed shadow-sm sm:text-sm border-gray-300 rounded-md";
             }
         },
-        transferTokens() {
-            console.log("TRANSFER");
-            this.$emit('close');
+        async transferTokens() {
+            this.msg = "Please wait for deposit into vehicle to complete..."
+            let arweave = {};
+
+            arweave = await Arweave.init({
+                host: this.arweaveHost,
+                port: this.arweavePort,
+                protocol: this.arweaveProtocol,
+                timeout: 20000,
+                logging: true,
+            });
+
+            const inputTransfer = {
+                function: "transfer",
+                target: this.vehicle.id,
+                qty: Number(this.pstInputTokens),
+            };
+            const currentPst = this.$store.getters.getActiveWallet.psts.find(
+                (item) => item.id === this.selectedPstId
+            );
+
+            let wallet;
+            if (import.meta.env.VITE_ENV === "DEV") {
+                wallet = JSON.parse(this.keyFile);
+            } else {
+                wallet = "use_wallet";
+            }
+            const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
+
+            await interactWrite(arweave, wallet, currentPst.id, inputTransfer)
+            .then(async (id) => {
+                this.$log.info("VehicleTokensAdd : interactWrite :: ", "Transfer ID = " + JSON.stringify(id));
+
+                const inputDeposit = {
+                    function: "deposit",
+                    tokenId: currentPst.id,
+                    txID: id,
+                };
+                this.$log.info("VehicleTokensAdd : interactWrite :: ", "INPUT DEP: " + JSON.stringify(inputDeposit));
+                await interactWrite(arweave, wallet, this.vehicle.id, inputDeposit)
+                .then(async (txID) => {
+                    this.msg = "Deposit Successful : " + txID
+                    if(Boolean(this.arweaveMine)){
+                        await fetch(mineUrl);
+                    }
+                })
+                .catch((error) => {
+                    this.msg = error;
+                });
+            })
+            .catch((error) => {
+                this.msg = error;
+            });
+
+            if (import.meta.env.VITE_ENV !== "PROD") {
+                /*** This will not be needed when ArConnect is automatically updated on TESTNET */
+                // Update user's PST balance 
+                const updatedPst = this.$store.getters.getActiveWallet.psts.find((item) => item.id === this.selectedPstId);
+                updatedPst.balance = this.pstBalance - this.pstInputTokens;
+                /***  */
+            }
+            this.$swal({
+                icon: 'info',
+                html: "Please wait for deposit into vehicle to complete...",
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    this.$swal.showLoading()
+                },
+            });
+            this.$swal.close();
+            this.$router.push("../vehicles");
+            this.$emit("close");
         },
         pstChange() {
             this.pstInputTokens = null;
@@ -158,12 +244,13 @@ export default {
         },
         calcPstPrice() {
             const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.id === this.selectedPstId);
-            this.pricePerToken = currentPst.price;
-            this.pstValue = currentPst.price * this.pstInputTokens;
+            this.pricePerToken = currentPst.balance;
+            this.pstValue = currentPst.balance * this.pstInputTokens;
             this.updatePstInputValid(currentPst.balance);
+            this.msg = "WARNING: Are you sure you want to transfer these tokens from your wallet to the vehicle? This action cannot be undone."
         },
         updatePstInputValid(balance) {
-            if (Number(this.pstInputTokens) <= balance) {
+            if (Number(this.pstInputTokens) <= balance && Number(this.pstInputTokens > 0)) {
                 this.pstInputValid = true;
             } else {
                 this.pstInputValid = false;

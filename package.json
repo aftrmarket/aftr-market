@@ -3,33 +3,38 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "vite",
-    "build": "vite build --mode development",
+    "build": "vite build",
     "serve": "vite preview"
   },
   "dependencies": {
     "@headlessui/vue": "^1.4.0",
     "@heroicons/vue": "^1.0.1",
+    "@ocrv/vue-tailwind-pagination": "^0.0.4",
     "@tailwindcss/forms": "^0.2.1",
-    "arweave": "^1.10.16",
-    "esbuild": "^0.12.20",
+    "@tailwindcss/line-clamp": "^0.3.1",
+    "@three-em/js": "^0.2.12",
+    "ar-gql": "^0.0.6",
+    "arweave": "^1.10.18",
+    "dotenv": "^16.0.0",
+    "infinite-loading-vue3": "^1.0.1",
     "install": "^0.13.0",
     "material-design-icons": "^3.0.1",
-    "npm": "^7.7.0",
     "number-abbreviate": "^2.0.0",
     "numeral": "^2.0.6",
-    "smartweave": "^0.4.29",
-    "typescript": "^4.2.4",
-    "vue": "^3.0.5",
+    "smartweave": "^0.4.46",
+    "vue": "^3.2.33",
+    "vue-json-pretty": "^2.0.6",
     "vue-router": "^4.0.5",
+    "vue-sweetalert2": "^5.0.2",
     "vue-uuid": "^2.0.2",
+    "vuejs3-logger": "1.0.0",
     "vuex": "^4.0.2"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^1.1.5",
-    "@vue/compiler-sfc": "^3.0.5",
+    "@vitejs/plugin-vue": "^2.3.1",
     "autoprefixer": "^10.2.5",
     "postcss": "^8.2.8",
     "tailwindcss": "^2.0.4",
-    "vite": "^2.1.0"
+    "vite": "^2.9.7"
   }
 }
