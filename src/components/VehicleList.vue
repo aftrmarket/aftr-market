@@ -217,18 +217,18 @@ export default {
 
                     // Treasury
                     let treasuryTotal = 0;
-
-                    for (let token of vehicle.tokens) {
-                        try {
-                            const response = await fetch(import.meta.env.VITE_VERTO_CACHE_URL + "token/" + token.tokenId + "/price");
-                            const responseObj = await response.json();
-                            const pricePerToken = responseObj.price;
-                            const tokenValue = pricePerToken * token.balance;
-                            treasuryTotal += tokenValue;
-                        } catch (error) {
-                            this.$log.error("VehicleList : loadAllVehicles :: ", "ERROR calling Verto cache on " + token.name + ": " + error);
-                        }
-                    }
+                    /*** TAKING THIS OUT B/C IT FAILS ON TESTNET */
+                    // for (let token of vehicle.tokens) {
+                    //     try {
+                    //         const response = await fetch(import.meta.env.VITE_VERTO_CACHE_URL + "token/" + token.tokenId + "/price");
+                    //         const responseObj = await response.json();
+                    //         const pricePerToken = responseObj.price;
+                    //         const tokenValue = pricePerToken * token.balance;
+                    //         treasuryTotal += tokenValue;
+                    //     } catch (error) {
+                    //         this.$log.error("VehicleList : loadAllVehicles :: ", "ERROR calling Verto cache on " + token.name + ": " + error);
+                    //     }
+                    // }
                     vehicle.treasury = treasuryTotal;
 
                     // Tips (AR)

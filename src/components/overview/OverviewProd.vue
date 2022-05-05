@@ -4,7 +4,7 @@
             <div class="mx-auto max-w-7xl lg:px-8">
                 <div class="lg:grid lg:grid-cols-2 lg:gap-8">
                     <div class="mx-auto max-w-md px-4 sm:max-w-2xl sm:px-6 sm:text-center lg:px-0 lg:text-left lg:flex lg:items-center">
-                        <div class="lg:py-24">
+                        <div class="">
                             <h1 class="mt-4 text-4xl tracking-tight font-bold text-white sm:mt-5 sm:text-6xl lg:mt-6 xl:text-5xl">
                                 <span class="block">A better way to store</span>
                                 <span class="block text-aftrYellow">Arweave assets</span>
@@ -12,24 +12,32 @@
                             <p class="mt-3 text-base text-gray-300 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
                                 AFTR Market provides treasury management and governance on-chain for <a href="https://arweave.org" target="_blank" style="color:#FFFC79;">Arweave</a> assets.
                             </p>
+                            <p class="mt-3 text-base text-gray-300 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
+                                Our <a href="https://test.aftr.market" style="color:#FFFC79;">Playground</a> is live!  Come learn more about how to create and manage treasuries on Arweave in our test environment.
+                            </p>
                             <div class="mt-10 sm:mt-12">
                                 <form action="#" class="sm:max-w-xl sm:mx-auto lg:mx-0">
                                     <div class="sm:flex">
+                                        <!--
                                         <div class="mt-3 sm:mt-0 sm:ml-3">
                                             <button @click.prevent="routeUser('PROD')" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Get Started</button>
                                         </div>
+                                        -->
                                         <div class="mt-3 sm:mt-0 sm:ml-3">
-                                            <button @click.prevent="routeUser('TEST')" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Play & Learn</button>
+                                            <button @click.prevent="routeUser('TEST')" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Playground</button>
                                         </div>
                                     </div>
                                 </form>
                             </div>
                         </div>
                     </div>
-                    <div class="mt-12 -mb-16 sm:-mb-48 lg:m-0 lg:relative">
+                    <div class="sm:-mb-32 lg:relative">
                         <div class="mx-auto max-w-md px-4 sm:max-w-2xl sm:px-6 lg:max-w-none lg:px-0">
                             <img class="w-full lg:absolute lg:inset-y-0 lg:left-0 lg:h-full lg:w-auto lg:max-w-none" src="../../assets/overview-3d-illustration.svg" alt="" />
                         </div>
+                    </div>
+                    <div class="mt-3 mb-6 text-base text-gray-300 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
+                        For more information, see below 👇
                     </div>
                 </div>
             </div>

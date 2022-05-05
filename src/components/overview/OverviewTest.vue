@@ -514,7 +514,7 @@ export default {
 
                 this.$swal({
                     icon: "success",
-                    html: "Ensure Blue Horizon is ready for testing.",
+                    html: "Ensuring Blue Horizon Vehicle is ready for testing.",
                     showConfirmButton: false,
                     allowOutsideClick: false,
                     didOpen: () => {
