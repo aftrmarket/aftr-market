@@ -7,7 +7,7 @@
         </div>
     </div>
     <div v-else>
-        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 lg:max-w-7xl">
+        <div class="max-w-3xl mx-auto px-4 py-8 sm:px-6 lg:px-8 lg:max-w-7xl">
             <div class="flex justify-end px-4 text-black font-sans text-lg gap-x-4 gap-y-0">
                 <div>Join our community</div>
                 <a href="https://twitter.com/AftrMarket" target="_blank"><img src="../../assets/Twitter-Logo-Blue.svg" width="40"></a>
