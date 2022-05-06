@@ -294,7 +294,7 @@ export default {
         },
         contractRead() {
             if (import.meta.env.VITE_ENV === "TEST") {
-                this.$router.push({ name: "read", params: { contractId: "Vjt13JlvOzaOs4St_Iy2jmanxa7dc-Z3pDk3ktwEQNA" } });
+                this.$router.push({ name: "read", params: { contractId: "xZkUQuOBUslZ_W_HIaxqcZiYmP2sjDJ7WJLNcLhuyRs" } });
             } else if (import.meta.env.VITE_ENV === "DEV") {
                 this.$router.push({ name: "read", params: { contractId: "iO3STQWIOyj4V1kdojb6onaLO7QD7qoeMMyatk3mISQ" } });
             }
