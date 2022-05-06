@@ -1,6 +1,8 @@
 <template> 
     <div class="pt-4 w-full">
-        <vue-json-pretty :path="'res'" :data="state" :showDoubleQuotes="keyQuotes" :deep=depth :deepCollapseChildren="false" :showLength="true" :showSelectController="true"> </vue-json-pretty>
+        <perfect-scrollbar>
+            <vue-json-pretty :path="'res'" :data="state" :showDoubleQuotes="keyQuotes" :deep=depth :deepCollapseChildren="false" :showLength="true" :showSelectController="true"> </vue-json-pretty>
+        </perfect-scrollbar>
     </div>
 </template>
 
@@ -38,3 +40,10 @@ export default {
     }
 }
 </script>
+
+<style src="vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css"/>
+<style scoped>
+    .ps {
+        height: 750px;
+    }   
+</style>

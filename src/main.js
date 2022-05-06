@@ -18,6 +18,9 @@ import Chat from './components/utils/Chat.vue';
 import VueSweetalert2 from 'vue-sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
 //import { readContract } from 'smartweave';
+import PerfectScrollbar from 'vue3-perfect-scrollbar'
+import 'vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css'
+
 
 let logLevel = "";
 if (import.meta.env.VITE_ENV === 'PROD') {
@@ -47,13 +50,13 @@ const router = createRouter({
         { name: 'ui-test', path: '/ui-test', component: UiTest },
         { name: 'read', path: '/read/:contractId', component: ContractRead, props: true },
         { name: 'overview', path: '/overview', component: Overview, props: true, alias: '/' },
-        { 
-            path: '/chat',
-            component: Chat,
-            beforeEnter(to, from, next) {
-                window.location.href = 'https://discord.gg/YEy8VpuNXR'
-            }
-        },
+        // { 
+        //     path: '/chat',
+        //     component: Chat,
+        //     beforeEnter(to, from, next) {
+        //         window.location.href = 'https://discord.gg/YEy8VpuNXR'
+        //     }
+        // },
         { path: '/:notFound(.*)', redirect: '/' }
     ],
     linkActiveClass: 'active'
@@ -64,6 +67,7 @@ app.use(store);
 app.use(router);
 app.use(VueLogger, options);
 app.use(VueSweetalert2);
+app.use(PerfectScrollbar)
 //app.use(uuid);
 
 app.mount('#app');

@@ -11,6 +11,7 @@
             </SwitchGroup>
         </div>
     </div>
+    <perfect-scrollbar>
     <div :class="editClass">
         <!-- Member Table -->
         <div class="col-span-3 shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
@@ -158,6 +159,7 @@
             </div>
         </div>
     </div>
+    </perfect-scrollbar>
 </template>
 
 <script>
@@ -586,3 +588,10 @@ export default {
     },
 };
 </script>
+
+<style src="vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css"/>
+<style scoped>
+    .ps {
+        height: 250px;
+    }   
+</style>

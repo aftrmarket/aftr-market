@@ -87,6 +87,9 @@ const store = createStore({
                 state.testLaunchConfigCorrect = false;
             }
         },
+        addWalletPst(state, pst) {
+            state.activeWallet.psts.push(pst);
+        },
     },
     actions: {
         async loadCurrentBlock ({ commit }) {

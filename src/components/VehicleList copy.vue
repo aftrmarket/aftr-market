@@ -21,7 +21,10 @@
                     </button>
                 </div>
                 <!-- List -->
-                <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6">
+                <infinite-scroll 
+                @infinite-scroll="created"
+                >
+                <div v-if="isDataAvaliable" class="bg-white rounded-lg shadow px-5 py-6 sm:px-6">
                     <ul v-if="getMyVehicle" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                         <li v-for="vehicle in selectedVehicle" :key="vehicle.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
                             <router-link :to="{ name: 'vehicle', params: { vehicleId: vehicle.id } }">
@@ -30,21 +33,21 @@
                         </li>
                     </ul>
                     <ul v-else-if="getVehicleList" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        <li v-for="vehicle in selectedMyVehiclePaginatedData" :key="vehicle.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
+                        <li v-for="vehicle in selectedMyVehicle" :key="vehicle.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
                             <router-link :to="{ name: 'vehicle', params: { vehicleId: vehicle.id } }">
                                 <vehicle-card :vehicle="vehicle"></vehicle-card>
                             </router-link>
                         </li>
-                    </ul>
-                    <ul v-else-if="!isLoading && paginatedData.length > 0" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        <li v-for="vehicle in paginatedData" :key="vehicle.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
+                    </ul> 
+                    <ul v-else-if="!isLoading && vehicles.length > 0 && !getMyVehicle && !getVehicleList" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        <li v-for="vehicle in vehicles" :key="vehicle.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
                             <router-link :to="{ name: 'vehicle', params: { vehicleId: vehicle.id } }">
                                 <vehicle-card :vehicle="vehicle"></vehicle-card>
                             </router-link>
                         </li>
                     </ul>
                     <ul v-else-if="
-              !isLoading && paginatedData.length == 0 && selectedMyVehiclePaginatedData.length == 0
+              !isLoading && vehicles.length == 0 && selectedVehicle.length == 0
             " class="">
                         No vehicles found...
                     </ul>
@@ -54,30 +57,28 @@
                         </li>
                     </ul>
                 </div>
+                <!-- <div v-if="!isLoading && noResult" class="">
+                    <p>
+                        No more data...
+                    </p>
+                </div> -->
+                </infinite-scroll>
                 <!-- /End replace -->
-                <VueTailwindPagination
-                v-if="!getMyVehicle"
-                :current="currentPage"
-                :total="total"
-                :per-page="perPage"
-                @page-changed="pageChange($event)"
-                />
-               
             </div>
         </main>
     </div>
 </template>
 
 <script>
-import { readContract } from "smartweave";
+//import { readContract } from "smartweave";
+import { executeContract } from "@three-em/js";
 import VehicleCard from "./vehicle/VehicleCard.vue";
 import VehicleCardPlaceholder from "./vehicle/VehicleCardPlaceholder.vue";
 import { mapGetters } from "vuex";
-import VueTailwindPagination from "@ocrv/vue-tailwind-pagination";
-import "@ocrv/vue-tailwind-pagination";
+import InfiniteScroll from "infinite-loading-vue3";
 
 export default {
-    components: { VehicleCard, VehicleCardPlaceholder, VueTailwindPagination },
+    components: { VehicleCard, VehicleCardPlaceholder, InfiniteScroll },
     data() {
         return {
             /** Smartweave variables */
@@ -94,6 +95,7 @@ export default {
             /** */
 
             isLoading: true,
+            isDataAvaliable: false,
             getMyVehicle: false,
             vehicleId: null,
             all_vehicle: "all_vehicle",
@@ -119,30 +121,19 @@ export default {
             vehicles: [],
             selectedVehicle: [],
             selectedMyVehicle: [],
-            currentPage: 1,
-            total: 1,
-            perPage: 9,
-            paginatedData : [],
-            selectedMyVehiclePaginatedData: []
+            cursor: "",
+            noResult: false,
+            message: "",
+            showResult: true
         };
     },
+    mounted() {
+    this.created()
+  },
     computed: {
         ...mapGetters(["getAftrContractSrcId"]),
     },
-     mounted() {
-        this.currentPage = 1;
-        this.loadAllVehicles();
-    },
     methods: {
-        pageChange(pageNumber) {
-            this.currentPage = pageNumber;
-            let data = this.vehicles
-            let val = data.slice((this.currentPage - 1) * this.perPage, this.currentPage * this.perPage)
-            this.paginatedData = val;
-
-            let selectedMyVehicleData = this.selectedMyVehicle
-            this.selectedMyVehiclePaginatedData = selectedMyVehicleData.slice((this.currentPage - 1) * this.perPage, this.currentPage * this.perPage);
-        },
         async getVehicle(event) {
             if (
                 event.target.value != "all_vehicle" &&
@@ -187,7 +178,17 @@ export default {
         },
         async loadAllVehicles(contractId) {
             try {
-                let vehicle = await readContract(this.arweave, contractId);
+                // Added this b/c of the mount call to loadAllVehicles.  Not sure why that was added.
+                if (!contractId) {
+                    return;
+                }
+
+                const { state, validity } = await executeContract(contractId, undefined, true, {
+                    ARWEAVE_HOST: import.meta.env.VITE_ARWEAVE_HOST,
+                    ARWEAVE_PORT: import.meta.env.VITE_ARWEAVE_PORT,
+                    ARWEAVE_PROTOCOL: import.meta.env.VITE_ARWEAVE_PROTOCOL
+                });
+                let vehicle = state;
 
                 // Check to make sure contract source matches AFTR Contract Source
                 let isAftrVehicle = true;
@@ -217,18 +218,18 @@ export default {
 
                     // Treasury
                     let treasuryTotal = 0;
-
-                    for (let token of vehicle.tokens) {
-                        try {
-                            const response = await fetch(import.meta.env.VITE_VERTO_CACHE_URL + "token/" + token.tokenId + "/price");
-                            const responseObj = await response.json();
-                            const pricePerToken = responseObj.price;
-                            const tokenValue = pricePerToken * token.balance;
-                            treasuryTotal += tokenValue;
-                        } catch (error) {
-                            this.$log.error("VehicleList : loadAllVehicles :: ", "ERROR calling Verto cache on " + token.name + ": " + error);
-                        }
-                    }
+                    /*** TAKING THIS OUT B/C IT FAILS ON TESTNET */
+                    // for (let token of vehicle.tokens) {
+                    //     try {
+                    //         const response = await fetch(import.meta.env.VITE_VERTO_CACHE_URL + "token/" + token.tokenId + "/price");
+                    //         const responseObj = await response.json();
+                    //         const pricePerToken = responseObj.price;
+                    //         const tokenValue = pricePerToken * token.balance;
+                    //         treasuryTotal += tokenValue;
+                    //     } catch (error) {
+                    //         this.$log.error("VehicleList : loadAllVehicles :: ", "ERROR calling Verto cache on " + token.name + ": " + error);
+                    //     }
+                    // }
                     vehicle.treasury = treasuryTotal;
 
                     // Tips (AR)
@@ -256,9 +257,6 @@ export default {
                             if (walletId == this.$store.getters.getActiveAddress) {
                                 if (vehicle.balances[walletId] > 0) {
                                     this.selectedMyVehicle.push(vehicle);
-                                    let data = this.selectedMyVehicle
-                                    this.selectedMyVehiclePaginatedData = data.slice((this.currentPage - 1) * this.perPage, this.currentPage * this.perPage);
-                                    
                                 }
                             } else {
                                 Object.keys(vehicle.vault).some((walletId) => {
@@ -268,9 +266,6 @@ export default {
                                     ) {
                                         if (vehicle.vault[walletId] > 0) {
                                             this.selectedMyVehicle.push(vehicle);
-                                            let data = this.selectedMyVehicle
-                                            this.selectedMyVehiclePaginatedData = data.slice((this.currentPage - 1) * this.perPage, this.currentPage * this.perPage);
-                                            
                                         }
                                     }
                                 });
@@ -281,18 +276,20 @@ export default {
                     if (this.getMyVehicle) {
                         this.selectedVehicle.push(vehicle);
                     } else {
-                        this.vehicles.push(vehicle);
-                        let data = this.vehicles
-                        this.paginatedData = data.slice((this.currentPage - 1) * this.perPage, this.currentPage * this.perPage);
+                        this.vehicles.push(vehicle); 
                     }
                 }
             } catch (error) {
                 this.$log.error("VehicleList : loadAllVehicles :: ", "ERROR calling SmartWeave: " + error);
             }
         },
-    },
-    async created() {
+        async created() {
         this.isLoading = true;
+
+        if(this.noResult){
+            this.isLoading = false;
+            return
+        }
 
         // Get the AFTR Contract Source ID for Prod
         if (import.meta.env.VITE_ENV === "PROD") {
@@ -314,6 +311,9 @@ export default {
 
             response = await this.arweave.api.post("graphql", {
                 query: this.query,
+                variables: {
+                "cursor": this.cursor
+                }
             });
 
             if (response.status !== 200) {
@@ -325,14 +325,35 @@ export default {
             this.$log.error("VehicleList : created :: ", "ERROR while fetching from gateway: " + error);
         }
 
-        // Load each Vehicle
-        for (let edge of response.data.data.transactions.edges) {
-            await this.loadAllVehicles(edge.node.id);
+        if(response.data.data.transactions.pageInfo.hasNextPage) {
+            const [lastNumber] = response.data.data.transactions.edges.slice(-1);
+            this.cursor = lastNumber.cursor;
+        } else {
+            if(this.showResult){
+                this.showResult = false;
+                for (let edge of response.data.data.transactions.edges) {
+                    await this.loadAllVehicles(edge.node.id);
+                }
+                 this.isLoading = false;
+            }
+            
+            this.cursor = ""
+            this.noResult = true;
+            // this.message = "No result found";
+            this.isLoading = false;
+            this.isDataAvaliable = true
+            
+            return;
         }
+
+        // Load each Vehicle'
         
-        let arrayLen = JSON.parse(JSON.stringify(this.vehicles))
-        this.total = arrayLen.length
-        
+        if(!this.noResult && this.showResult){
+            for (let edge of response.data.data.transactions.edges) {
+                await this.loadAllVehicles(edge.node.id);
+            }
+        }
+        this.isDataAvaliable = true
         this.isLoading = false;
 
         // for (let index = 1; index < 12; index++) {
@@ -340,5 +361,7 @@ export default {
         //     this.vehicles.push(this.vehicles[0]);
         // }
     },
+    },
+    
 };
 </script>
