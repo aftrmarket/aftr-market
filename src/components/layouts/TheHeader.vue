@@ -16,7 +16,7 @@
                     <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
                     <a href="#" @click="goTo('overview')" :class="homeClass">Welcome</a>
 
-                    <a v-if="siteMode === 'PROD'" href="#" @click="goTo('vehicles')" :class="vehiclesClass">Vehicles</a>
+                    <a v-if="siteMode === 'PROD1'" href="#" @click="goTo('vehicles')" :class="vehiclesClass">Vehicles</a>
 
                     <!--<a href="#" class="text-gray-300 hover:bg-aftrYellow hover:text-aftrDarkGrey px-3 py-2 rounded-md text-sm font-medium">About</a>-->
                   </div>
