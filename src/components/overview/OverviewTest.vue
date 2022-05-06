@@ -322,7 +322,7 @@ export default {
                     ) {
                         this.$swal({
                             icon: "error",
-                            html: "Your Arweave Gateway Config is pointing to the wrong gateway.  Please change the gateway to localhost.",
+                            html: "Your ArConnect Gateway Config is pointing to the wrong gateway.  Please change the gateway to localhost.",
                         });
                         this.$store.dispatch("arDisconnect");
                         return false;
@@ -335,7 +335,7 @@ export default {
                     ) {
                         this.$swal({
                             icon: "error",
-                            html: "Your Arweave Gateway Config is pointing to the wrong gateway.  Please change the gateway to www.arweave.run.",
+                            html: "Your ArConnect Gateway Config is pointing to the wrong gateway.  Please change the gateway to www.arweave.run.",
                         });
                         this.$store.dispatch("arDisconnect");
                         return false;
