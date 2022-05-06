@@ -885,7 +885,7 @@ export default {
             }
 
             if (!this.tokenValid) {
-                this.$refs.tokenValue.focus();
+                //this.$refs.tokenValue.focus();
                 return false;
             }
 
@@ -1033,8 +1033,21 @@ export default {
                 } else {
                     this.vehicle["id"] = await createContractFromTx(arweave, "use_wallet", this.getAftrContractSrcId, JSON.stringify(this.vehicle), initTags);
                 }
-                this.$log.info("CreateVehicle : createVehicle :: ", "ID = " + this.vehicle["id"]);
 
+                if (import.meta.env.VITE_ENV !== "PROD") {
+                    // Add to Wallet PSTs in non-prod environments
+                    let pst = {
+                        id: this.vehicle["id"],
+                        balance: this.vehicle.balances[this.vehicle.creator],
+                        name: this.vehicle.name,
+                        ticker: this.vehicle.ticker,
+                        logo: this.communityLogoValue,
+                        fcp: true
+                    };
+                    this.$store.commit("addWalletPst", pst);
+                }
+
+                this.$log.info("CreateVehicle : createVehicle :: ", "ID = " + this.vehicle["id"]);
                 if(Boolean(this.arweaveMine)){
                     await fetch(this.mineUrl);
                 }
