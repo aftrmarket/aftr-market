@@ -26,6 +26,7 @@
     "vue-router": "^4.0.5",
     "vue-sweetalert2": "^5.0.2",
     "vue-uuid": "^2.0.2",
+    "vue3-perfect-scrollbar": "^1.6.0",
     "vuejs3-logger": "1.0.0",
     "vuex": "^4.0.2"
   },

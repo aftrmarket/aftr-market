@@ -17,7 +17,7 @@
                     </button>
                 </div>
                 <!-- List -->
-                
+                <perfect-scrollbar>
                 <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6">
                     <ul v-if="!isLoading && vehicles.length > 0" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                         <li v-for="vehicle in vehicles" :key="vehicle.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
@@ -38,7 +38,7 @@
                         <button v-if="!isLoading && hasNextPage" @click.prevent="load" type="submit" class="mt-4 px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Load More</button>
                     </div>
                 </div>
-
+                </perfect-scrollbar>
                 <!-- <div v-if="!isLoading && noResult" class="">
                     <p>
                         No more data...
@@ -360,3 +360,10 @@ export default {
     
 };
 </script>
+
+<style src="vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css"/>
+<style scoped>
+    .ps {
+        height: 750px;
+    }   
+</style>

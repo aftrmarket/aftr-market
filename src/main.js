@@ -18,6 +18,9 @@ import Chat from './components/utils/Chat.vue';
 import VueSweetalert2 from 'vue-sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
 //import { readContract } from 'smartweave';
+import PerfectScrollbar from 'vue3-perfect-scrollbar'
+import 'vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css'
+
 
 let logLevel = "";
 if (import.meta.env.VITE_ENV === 'PROD') {
@@ -64,6 +67,7 @@ app.use(store);
 app.use(router);
 app.use(VueLogger, options);
 app.use(VueSweetalert2);
+app.use(PerfectScrollbar)
 //app.use(uuid);
 
 app.mount('#app');

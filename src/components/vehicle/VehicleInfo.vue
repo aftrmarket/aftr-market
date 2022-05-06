@@ -12,89 +12,93 @@
         </div>
     </div>
     <div v-if="!uiEditMode" class="pt-2">
+        <perfect-scrollbar>
         <vehicle-info-read :vehicle="vehicle"></vehicle-info-read>
+        </perfect-scrollbar>
     </div>
     <!-- EDIT MODE -->
     <div v-else>
-        <form action="#" method="POST">
-            <h3 class="text-xl font-light leading-6">Vehicle Information</h3>
-            <div class="bg-white sm:p-6">
-                <div class="pt-2 grid grid-cols-3 gap-4">
-                    <label for="newName" class="block text-sm font-medium text-gray-700">Vehicle Name</label>
-                    <label for="newTicker" class="block text-sm font-medium text-gray-700">Ticker</label>
-                </div>
-                <div class="pt-2 grid grid-cols-3 gap-4">
-                    <input @change="formDirty" type="text" name="newName" v-model="newName" :class="inputBox(newName !== '')" />
-                    <input @change="formDirty" type="text" name="newTicker" v-model="newTicker" :class="inputBox(newTicker !== '')" />
-                    
-                </div>
-                <div class="pt-2 grid grid-cols-3 gap-4">
-                    <div class="col-span-2">
-                        <label for="newDesc" class="pt-2 block text-sm font-medium text-gray-700">Description</label>
-                        <div class="mt-1">
-                            <textarea @change="formDirty" id="newDesc" name="newDesc" v-model="newDesc" rows="3" class="shadow-sm focus:ring-aftrBlue focus:border-aftrBlue mt-1 block w-full sm:text-sm border-gray-300 rounded-md" placeholder="Describe your fund"></textarea>
+         <perfect-scrollbar>
+            <form action="#" method="POST">
+                <h3 class="text-xl font-light leading-6">Vehicle Information</h3>
+                <div class="bg-white sm:p-6">
+                    <div class="pt-2 grid grid-cols-3 gap-4">
+                        <label for="newName" class="block text-sm font-medium text-gray-700">Vehicle Name</label>
+                        <label for="newTicker" class="block text-sm font-medium text-gray-700">Ticker</label>
+                    </div>
+                    <div class="pt-2 grid grid-cols-3 gap-4">
+                        <input @change="formDirty" type="text" name="newName" v-model="newName" :class="inputBox(newName !== '')" />
+                        <input @change="formDirty" type="text" name="newTicker" v-model="newTicker" :class="inputBox(newTicker !== '')" />
+                        
+                    </div>
+                    <div class="pt-2 grid grid-cols-3 gap-4">
+                        <div class="col-span-2">
+                            <label for="newDesc" class="pt-2 block text-sm font-medium text-gray-700">Description</label>
+                            <div class="mt-1">
+                                <textarea @change="formDirty" id="newDesc" name="newDesc" v-model="newDesc" rows="3" class="shadow-sm focus:ring-aftrBlue focus:border-aftrBlue mt-1 block w-full sm:text-sm border-gray-300 rounded-md" placeholder="Describe your fund"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="newLogo" class="py-2 block text-sm font-medium text-gray-700">Logo</label>
+                        <div class="mt-2 sm:mt-0 sm:col-span-2 pl-6">
+                            <div class="flex text-sm text-gray-600">
+                                <label for="newLogo" class="relative cursor-pointer bg-white rounded-md font-medium text-aftrBlue hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                                    <span>Change the Logo</span>
+                                    <input @change="onFileChange" id="newLogo" name="newLogo" type="file" accept="image/png, image/gif, image/jpeg" class="sr-only" />
+                                </label>
+                            </div>
+                            <p class="text-xs text-gray-500">200 x 200 PNG, JPG, or GIF</p>
+                            <p class="text-xs text-aftrRed">
+                                {{ fileMessage }}
+                            </p>
                         </div>
                     </div>
                 </div>
-                <div>
-                    <label for="newLogo" class="py-2 block text-sm font-medium text-gray-700">Logo</label>
-                    <div class="mt-2 sm:mt-0 sm:col-span-2 pl-6">
-                        <div class="flex text-sm text-gray-600">
-                            <label for="newLogo" class="relative cursor-pointer bg-white rounded-md font-medium text-aftrBlue hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
-                                <span>Change the Logo</span>
-                                <input @change="onFileChange" id="newLogo" name="newLogo" type="file" accept="image/png, image/gif, image/jpeg" class="sr-only" />
-                            </label>
+                <h3 class="mt-4 border-t border-gray-200 pt-4 text-xl font-light leading-6">Settings</h3>
+                <div class="bg-white sm:p-6">
+                    <div class="pt-2 grid grid-cols-3 flex items-center gap-x-4">
+                        <label class="block text-sm font-medium text-gray-700">Status</label>
+                        <label class="block text-sm font-medium text-gray-700">Vehicle Ownership</label>
+                        <label class="block text-sm font-medium text-gray-700">Voting System</label>
+                        <div>
+                            <input @change="formDirty" type="radio" v-model="newStatus" id="started" value="started" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">Start</label>
+                            <input @change="formDirty" type="radio" v-model="newStatus" id="stopped" value="stopped" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">Stop</label>
+                            <input @change="formDirty" type="radio" v-model="newStatus" id="expired" value="expired" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">Expire</label>
                         </div>
-                        <p class="text-xs text-gray-500">200 x 200 PNG, JPG, or GIF</p>
-                        <p class="text-xs text-aftrRed">
-                            {{ fileMessage }}
-                        </p>
+                        <div>
+                            <input @change="formDirty" type="radio" v-model="newOwnership" id="single" value="single" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">Single Owner</label>
+                            <input @change="formDirty" type="radio" v-model="newOwnership" id="dao" value="dao" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">DAO Owned</label>
+                        </div>
+                        <div>
+                            <input @change="formDirty" type="radio" v-model="newVotingSystem" id="equal" value="equal" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">Distributed Evenly</label>
+                            <input @change="formDirty" type="radio" v-model="newVotingSystem" id="weighted" value="weighted" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">Weighted</label>
+                        </div>
+                        <label class="pt-4 pb-2  block text-sm font-medium text-gray-700">Quorum (between 0.01 - 0.99)</label>
+                        <label class="pt-4 pb-2  block text-sm font-medium text-gray-700">Support (between 0.01 - 0.99)</label>
+                        <label class="pt-4 pb-2  block text-sm font-medium text-gray-700">Vote Length (blocks)</label>
+                        
+                        <input @change="formDirty" v-model="newQuorum" class="w-3/4" type="number" name="newQuorum" :class="inputBox(quorumIsValid)" />
+                        <input @change="formDirty" v-model="newSupport" class="w-3/4" type="number" name="newSupport" :class="inputBox(supportIsValid)" />
+                        <input @change="formDirty" v-model="newVoteLength" class="w-3/4" type="number" name="newVoteLength" :class="inputBox(voteLengthIsValid)" />
+                        <div/>
+                        <div/>
+                        <label class="pt-4 pb-2 grid col-span-2 block text-sm font-medium text-gray-700">Creator (transferring ownership not recommended!)</label>
+                        <div/>
+                        <input @change="formDirty" v-model="newCreator" class="grid col-span-2 w-3/4" type="text" name="newCreator" :class="inputBox(creatorIsValid)" />
                     </div>
                 </div>
-            </div>
-            <h3 class="mt-4 border-t border-gray-200 pt-4 text-xl font-light leading-6">Settings</h3>
-            <div class="bg-white sm:p-6">
-                <div class="pt-2 grid grid-cols-3 flex items-center gap-x-4">
-                    <label class="block text-sm font-medium text-gray-700">Status</label>
-                    <label class="block text-sm font-medium text-gray-700">Vehicle Ownership</label>
-                    <label class="block text-sm font-medium text-gray-700">Voting System</label>
-                    <div>
-                        <input @change="formDirty" type="radio" v-model="newStatus" id="started" value="started" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">Start</label>
-                        <input @change="formDirty" type="radio" v-model="newStatus" id="stopped" value="stopped" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">Stop</label>
-                        <input @change="formDirty" type="radio" v-model="newStatus" id="expired" value="expired" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">Expire</label>
-                    </div>
-                    <div>
-                        <input @change="formDirty" type="radio" v-model="newOwnership" id="single" value="single" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">Single Owner</label>
-                        <input @change="formDirty" type="radio" v-model="newOwnership" id="dao" value="dao" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">DAO Owned</label>
-                    </div>
-                    <div>
-                        <input @change="formDirty" type="radio" v-model="newVotingSystem" id="equal" value="equal" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">Distributed Evenly</label>
-                        <input @change="formDirty" type="radio" v-model="newVotingSystem" id="weighted" value="weighted" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">Weighted</label>
-                    </div>
-                    <label class="pt-4 pb-2  block text-sm font-medium text-gray-700">Quorum (between 0.01 - 0.99)</label>
-                    <label class="pt-4 pb-2  block text-sm font-medium text-gray-700">Support (between 0.01 - 0.99)</label>
-                    <label class="pt-4 pb-2  block text-sm font-medium text-gray-700">Vote Length (blocks)</label>
-                    
-                    <input @change="formDirty" v-model="newQuorum" class="w-3/4" type="number" name="newQuorum" :class="inputBox(quorumIsValid)" />
-                    <input @change="formDirty" v-model="newSupport" class="w-3/4" type="number" name="newSupport" :class="inputBox(supportIsValid)" />
-                    <input @change="formDirty" v-model="newVoteLength" class="w-3/4" type="number" name="newVoteLength" :class="inputBox(voteLengthIsValid)" />
-                    <div/>
-                    <div/>
-                    <label class="pt-4 pb-2 grid col-span-2 block text-sm font-medium text-gray-700">Creator (transferring ownership not recommended!)</label>
-                    <div/>
-                    <input @change="formDirty" v-model="newCreator" class="grid col-span-2 w-3/4" type="text" name="newCreator" :class="inputBox(creatorIsValid)" />
+                <div class="flex justify-end">
+                    <button v-if="isFormValid" @click.prevent="updateVehicle" type="submit" class="inline-flex justify-center py-2 px-2 border border-gray shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-transparent hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
+                            <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" />
+                        </svg>
+                        <span class="pl-2">Modify Vehicle</span>
+                    </button>
                 </div>
-            </div>
-            <div class="flex justify-end">
-                <button v-if="isFormValid" @click.prevent="updateVehicle" type="submit" class="inline-flex justify-center py-2 px-2 border border-gray shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-transparent hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
-                        <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" />
-                    </svg>
-                    <span class="pl-2">Modify Vehicle</span>
-                </button>
-            </div>
-        </form>
+            </form>
+         </perfect-scrollbar>
     </div>
 </template>
 
@@ -502,7 +506,7 @@ export default {
             const filename = file.name.replace(/ /g, "") + file.lastModified;
 
             // Total size should be < ? so that it's a free transaction
-            this.totalSize += file.size;
+            this.totalSize = file.size;
             this.isFormValid = true
             this.$log.info("VehicleInfo : onFileChange :: ", "totalSize", this.totalSize, this.balance);
 
@@ -560,3 +564,10 @@ export default {
     },
 };
 </script>
+
+<style src="vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css"/>
+<style scoped>
+    .ps {
+        height: 550px;
+    }   
+</style>

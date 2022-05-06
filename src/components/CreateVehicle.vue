@@ -23,6 +23,7 @@
         <div>
             <!-- Vehicle Info -->
             <form-container>
+                <perfect-scrollbar>
                 <form action="#" method="POST">
                     <h3 class="text-xl font-light leading-6">Vehicle Information</h3>
                     <div class="bg-white sm:p-6">
@@ -357,6 +358,7 @@
                     </div>
                     <!--- End Button Row --->
                 </form>
+                </perfect-scrollbar>
             </form-container>
             <!-- End Vehicle Info -->
         </div>
@@ -613,7 +615,7 @@ export default {
             // this.balance = arweave.ar.winstonToAr(bal);
 
             // Total size should be < ? so that it's a free transaction
-            this.totalSize += file.size;
+            this.totalSize = file.size;
             this.$log.info("CreateVehicle : onFileChange :: ", "totalSize", this.totalSize, this.balance);
 
             /**** SHOULD THIS BE > 0? */
@@ -895,17 +897,6 @@ export default {
                 showConfirmButton: false,
                 allowOutsideClick: false,
             });
-
-            /***** NEED TO MAKE SURE THAT NONE OF THESE ARE NULL */
-            this.vehicle.settings = [
-                ["quorum", this.newQuorum],
-                ["support", this.newSupport],
-                ["voteLength", 2160],
-                ["communityDescription", this.vehicle.desc],
-                ["communityLogo", this.communityLogoValue],
-            ];
-            /*************** */
-
             let arweave = {};
             try {
                 arweave = await Arweave.init({
@@ -981,6 +972,16 @@ export default {
                     await fetch(this.mineUrl);
                 }
             }
+
+            /***** NEED TO MAKE SURE THAT NONE OF THESE ARE NULL */
+            this.vehicle.settings = [
+                ["quorum", this.newQuorum],
+                ["support", this.newSupport],
+                ["voteLength", 2160],
+                ["communityDescription", this.vehicle.desc],
+                ["communityLogo", this.communityLogoValue],
+            ];
+            /*************** */
 
             // Convert DAO Member array to dictionary
             this.vehicle.balances = this.daoMembers.reduce( (a, x) => ({ ...a, [x.wallet]: x.balance }), {} );
@@ -1145,3 +1146,10 @@ export default {
     },
 };
 </script>
+
+<style src="vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css"/>
+<style scoped>
+    .ps {
+        height: 750px;
+    }   
+</style>

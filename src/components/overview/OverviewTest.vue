@@ -802,13 +802,13 @@ export default {
                 swTags = [
                     { name: "Protocol", value: import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL },
                     { name: "Aftr-Playground", value: name },
-                    { name: "Contract-Src", values: [ aftrId ] }
+                    // { name: "Contract-Src", values: [ aftrId ] }
                 ];
             } else {
                 swTags = [
                     { name: "Aftr-Playground", value: name },
                     { name: "Aftr-Playground-Type", value: "PST" },
-                    { name: "Contract-Src", values: [ aftrId ] }
+                    // { name: "Contract-Src", values: [ aftrId ] }
                 ];
             }
             this.$log.info("OverviewTest : createSampleContract :: ", "initState", initState);
