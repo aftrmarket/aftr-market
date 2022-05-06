@@ -50,13 +50,13 @@ const router = createRouter({
         { name: 'ui-test', path: '/ui-test', component: UiTest },
         { name: 'read', path: '/read/:contractId', component: ContractRead, props: true },
         { name: 'overview', path: '/overview', component: Overview, props: true, alias: '/' },
-        { 
-            path: '/chat',
-            component: Chat,
-            beforeEnter(to, from, next) {
-                window.location.href = 'https://discord.gg/YEy8VpuNXR'
-            }
-        },
+        // { 
+        //     path: '/chat',
+        //     component: Chat,
+        //     beforeEnter(to, from, next) {
+        //         window.location.href = 'https://discord.gg/YEy8VpuNXR'
+        //     }
+        // },
         { path: '/:notFound(.*)', redirect: '/' }
     ],
     linkActiveClass: 'active'
