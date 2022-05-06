@@ -571,6 +571,7 @@ export default {
                             transactions(
                                 tags: [
                                     { name: "App-Name", values: ["SmartWeaveContract"] },
+                                    { name: "Contract-Src", values: ["${ aftrContractSrcId }"] } 
                                 ]
                                 first: 100
                                 after: $cursor
