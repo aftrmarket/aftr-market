@@ -521,7 +521,7 @@ export default {
                         this.$swal.showLoading()
                     },
                 });
-
+                this.$log.info("OverviewTest : init :: ", "Reading Blue Horizon contract.");
                 //const blueVeh = await readContract(arweave, blueContractId);
                 //const blueVeh = await executeContract(blueContractId, undefined, true, this.gatewayConfig);
                 const { state, validity } = await executeContract(blueContractId, undefined, true, {
@@ -538,7 +538,7 @@ export default {
                         qty: 100000,
                     };
                     // Calls mint function on Blue Horizon contract. If user already has a balance, nothing happens.
-console.log("Getting to call InteractWrite");
+                    this.$log.info("OverviewTest : init :: ", "Blue Horizon Interact Write.");
                     contractTxId = await interactWrite(arweave, use_wallet, blueContractId, input);
 
                     if (Boolean(this.arweaveMine)) {
@@ -552,6 +552,7 @@ console.log("Getting to call InteractWrite");
                     function: "plygnd-mint",
                     qty: 100000,
                 };
+                this.$log.info("OverviewTest : init :: ", "Give user's wallet PSTs.");
                 contractTxId = await interactWrite(arweave, use_wallet, vintContractId, input);
                 this.$log.info("OverviewTest : init :: ", "User Wallet VINT: " + contractTxId);
 
