@@ -35,7 +35,7 @@
                         </li>
                     </ul>
                     <div class="text-center">
-                        <button v-if="hasNextPage" @click.prevent="load" type="submit" class="mt-4 px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Load More</button>
+                        <button v-if="!isLoading && hasNextPage" @click.prevent="load" type="submit" class="mt-4 px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Load More</button>
                     </div>
                 </div>
 
