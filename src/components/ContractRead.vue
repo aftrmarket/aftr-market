@@ -50,7 +50,7 @@ export default {
                 //const { state, validity } = await executeContract(this.contractId, undefined, true, this.gatewayConfig);
                 //const { state, validity } = await executeContract("Vjt13JlvOzaOs4St_Iy2jmanxa7dc-Z3pDk3ktwEQNA", undefined, true, 
                 //this.contract3 = await executeContract("HKr5pJhPUAzlGvQqERPLwIw9hm2nAr3CY-b0iRfctN4", undefined, true, 
-                const { state, validity } = await executeContract("HKr5pJhPUAzlGvQqERPLwIw9hm2nAr3CY-b0iRfctN4", undefined, true,
+                const { state, validity } = await executeContract(this.contractId, undefined, true,
                     {
                         ARWEAVE_HOST: "www.arweave.run",
                         ARWEAVE_PORT: "443",
@@ -72,8 +72,8 @@ export default {
 
             try {
                 // Using Smartweave
-                //this.contract = await readContract(this.arweave, this.contractId, undefined, true);
-                this.contract = await readContract(this.arweave, "HKr5pJhPUAzlGvQqERPLwIw9hm2nAr3CY-b0iRfctN4", undefined, true);
+                this.contract = await readContract(this.arweave, this.contractId, undefined, true);
+                //this.contract = await readContract(this.arweave, "HKr5pJhPUAzlGvQqERPLwIw9hm2nAr3CY-b0iRfctN4", undefined, true);
             } catch (e) {
                 console.log(e);
             }
