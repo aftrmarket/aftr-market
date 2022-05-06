@@ -115,7 +115,6 @@
         <div v-else>
             <h3 class="text-xl font-light leading-6">No current tokens in vehicle</h3>
         </div>
-
         <div class="mt-6 flex flex-col inline-flex">
             <button v-if="allowAdd" @click.prevent="addPst" type="button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -675,7 +674,14 @@ export default {
 };
 </script>
 
+
+<style src="vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css"/>
+
 <style>
+.ps {
+height: 250px;
+}  
+
 .swal-height {
   height: 60vh;
 }

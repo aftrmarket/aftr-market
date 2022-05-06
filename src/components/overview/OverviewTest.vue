@@ -322,7 +322,7 @@ export default {
                     ) {
                         this.$swal({
                             icon: "error",
-                            html: "Your Arweave Config is pointing to the wrong gateway.  Please check your config in ArConnect.",
+                            html: "Your ArConnect Gateway Config is pointing to the wrong gateway.  Please change the gateway to localhost.",
                         });
                         this.$store.dispatch("arDisconnect");
                         return false;
@@ -335,7 +335,7 @@ export default {
                     ) {
                         this.$swal({
                             icon: "error",
-                            html: "Your Arweave Config is pointing to the wrong gateway.  Please check your config in ArConnect.",
+                            html: "Your ArConnect Gateway Config is pointing to the wrong gateway.  Please change the gateway to www.arweave.run.",
                         });
                         this.$store.dispatch("arDisconnect");
                         return false;
@@ -514,7 +514,7 @@ export default {
 
                 this.$swal({
                     icon: "success",
-                    html: "Ensure Blue Horizon is ready for testing.",
+                    html: "Ensuring Playground is ready for testing.",
                     showConfirmButton: false,
                     allowOutsideClick: false,
                     didOpen: () => {
@@ -561,14 +561,19 @@ export default {
                     await fetch(this.mineUrl);
                 }
 
+                /*** Look at all PSTs and save the ones where the user has a balance.
+                 * In PROD, Arconnect should have this already.
+                 * If it doesn't, then we'll need to come up with a caching solution for each user.
+                 */
                 let queryval = {
                     query: `
                         query($cursor: String) {
                             transactions(
                                 tags: [
                                     { name: "App-Name", values: ["SmartWeaveContract"] },
-                                    { name: "Aftr-Playground-Version", values: ["${import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL}"] }
+                                    { name: "Contract-Src", values: ["${ aftrContractSrcId }"] } 
                                 ]
+                                first: 100
                                 after: $cursor
                             ) {
                                 pageInfo {
@@ -690,7 +695,7 @@ export default {
                             tags: [
                                 { name: "Protocol", values: ["${import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL}"] },
                                 { name: "Aftr-Playground", values: ["${ticker}"] },
-                                { name: "Aftr-Playground-Version", values: ["${import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL}"] }                                
+                                { name: "Contract-Src", values: ["${ aftrSourceId }"] }                               
                             ]
                             after: $cursor
                         )
@@ -704,7 +709,7 @@ export default {
                             tags: [ 
                                 { name: "Aftr-Playground", values: ["${ticker}"] },
                                 { name: "Aftr-Playground-Type", values: ["PST"] },
-                                { name: "Aftr-Playground-Version", values: ["${import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL}"] }
+                                { name: "Contract-Src", values: ["${ aftrSourceId }"] }
                         ]
                             after: $cursor
                         )
@@ -797,13 +802,13 @@ export default {
                 swTags = [
                     { name: "Protocol", value: import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL },
                     { name: "Aftr-Playground", value: name },
-                    { name: "Aftr-Playground-Version", value: import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL }  
+                    // { name: "Contract-Src", values: [ aftrId ] }
                 ];
             } else {
                 swTags = [
                     { name: "Aftr-Playground", value: name },
                     { name: "Aftr-Playground-Type", value: "PST" },
-                    { name: "Aftr-Playground-Version", value: import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL }
+                    // { name: "Contract-Src", values: [ aftrId ] }
                 ];
             }
             this.$log.info("OverviewTest : createSampleContract :: ", "initState", initState);

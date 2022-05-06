@@ -23,6 +23,7 @@
         <div>
             <!-- Vehicle Info -->
             <form-container>
+                <perfect-scrollbar>
                 <form action="#" method="POST">
                     <h3 class="text-xl font-light leading-6">Vehicle Information</h3>
                     <div class="bg-white sm:p-6">
@@ -357,6 +358,7 @@
                     </div>
                     <!--- End Button Row --->
                 </form>
+                </perfect-scrollbar>
             </form-container>
             <!-- End Vehicle Info -->
         </div>
@@ -613,7 +615,7 @@ export default {
             // this.balance = arweave.ar.winstonToAr(bal);
 
             // Total size should be < ? so that it's a free transaction
-            this.totalSize += file.size;
+            this.totalSize = file.size;
             this.$log.info("CreateVehicle : onFileChange :: ", "totalSize", this.totalSize, this.balance);
 
             /**** SHOULD THIS BE > 0? */
@@ -885,7 +887,7 @@ export default {
             }
 
             if (!this.tokenValid) {
-                this.$refs.tokenValue.focus();
+                //this.$refs.tokenValue.focus();
                 return false;
             }
 
@@ -895,17 +897,6 @@ export default {
                 showConfirmButton: false,
                 allowOutsideClick: false,
             });
-
-            /***** NEED TO MAKE SURE THAT NONE OF THESE ARE NULL */
-            this.vehicle.settings = [
-                ["quorum", this.newQuorum],
-                ["support", this.newSupport],
-                ["voteLength", 2160],
-                ["communityDescription", this.vehicle.desc],
-                ["communityLogo", this.communityLogoValue],
-            ];
-            /*************** */
-
             let arweave = {};
             try {
                 arweave = await Arweave.init({
@@ -982,6 +973,16 @@ export default {
                 }
             }
 
+            /***** NEED TO MAKE SURE THAT NONE OF THESE ARE NULL */
+            this.vehicle.settings = [
+                ["quorum", this.newQuorum],
+                ["support", this.newSupport],
+                ["voteLength", 2160],
+                ["communityDescription", this.vehicle.desc],
+                ["communityLogo", this.communityLogoValue],
+            ];
+            /*************** */
+
             // Convert DAO Member array to dictionary
             this.vehicle.balances = this.daoMembers.reduce( (a, x) => ({ ...a, [x.wallet]: x.balance }), {} );
 
@@ -1033,8 +1034,21 @@ export default {
                 } else {
                     this.vehicle["id"] = await createContractFromTx(arweave, "use_wallet", this.getAftrContractSrcId, JSON.stringify(this.vehicle), initTags);
                 }
-                this.$log.info("CreateVehicle : createVehicle :: ", "ID = " + this.vehicle["id"]);
 
+                if (import.meta.env.VITE_ENV !== "PROD") {
+                    // Add to Wallet PSTs in non-prod environments
+                    let pst = {
+                        id: this.vehicle["id"],
+                        balance: this.vehicle.balances[this.vehicle.creator],
+                        name: this.vehicle.name,
+                        ticker: this.vehicle.ticker,
+                        logo: this.communityLogoValue,
+                        fcp: true
+                    };
+                    this.$store.commit("addWalletPst", pst);
+                }
+
+                this.$log.info("CreateVehicle : createVehicle :: ", "ID = " + this.vehicle["id"]);
                 if(Boolean(this.arweaveMine)){
                     await fetch(this.mineUrl);
                 }
@@ -1132,3 +1146,10 @@ export default {
     },
 };
 </script>
+
+<style src="vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css"/>
+<style scoped>
+    .ps {
+        height: 750px;
+    }   
+</style>
