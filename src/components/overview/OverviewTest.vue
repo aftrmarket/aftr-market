@@ -34,7 +34,7 @@
                         </div>
                     </div>
                     <div class="mt-3 text-base text-gray-300 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
-                        <!--<button @click.prevent="contractRead" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">SW vs 3EM</button>-->
+                        <button @click.prevent="contractRead" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">SW vs 3EM</button>
                         For more information, see below 👇
                     </div>
                 </div>
