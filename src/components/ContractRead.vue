@@ -44,20 +44,35 @@ export default {
     },
     methods: {
         async readContracts() {
+            try {
+                // Using Smartweave
+                this.contract = await readContract(this.arweave, this.contractId, undefined, true);
+                //this.contract = await readContract(this.arweave, "HKr5pJhPUAzlGvQqERPLwIw9hm2nAr3CY-b0iRfctN4", undefined, true);
+            } catch (e) {
+                console.log(e);
+            }
+
             try{
                 // Using 3EM
                 //this.contract3 = await executeContract(this.contractId, undefined, true, this.gatewayConfig);
                 //const { state, validity } = await executeContract(this.contractId, undefined, true, this.gatewayConfig);
                 //const { state, validity } = await executeContract("Vjt13JlvOzaOs4St_Iy2jmanxa7dc-Z3pDk3ktwEQNA", undefined, true, 
                 //this.contract3 = await executeContract("HKr5pJhPUAzlGvQqERPLwIw9hm2nAr3CY-b0iRfctN4", undefined, true, 
-                const { state, validity } = await executeContract(this.contractId, undefined, true,
+                //const { state, validity } = await executeContract(this.contractId, undefined, true,
+                //     {
+                //         ARWEAVE_HOST: "www.arweave.run",
+                //         ARWEAVE_PORT: "443",
+                //         ARWEAVE_PROTOCOL: "https"
+                //     }
+                // );
+                this.contract3 = await executeContract(this.contractId, undefined, true,
                     {
                         ARWEAVE_HOST: "www.arweave.run",
                         ARWEAVE_PORT: "443",
                         ARWEAVE_PROTOCOL: "https"
                     }
                 );
-                this.contract3 = state;
+                // this.contract3 = state;
                 // this.contract3 = await executeContract(this.contractId, undefined, true,
                 // {
                 //     ARWEAVE_HOST: import.meta.env.VITE_ARWEAVE_HOST,
@@ -67,14 +82,6 @@ export default {
                 //console.log(JSON.stringify(state));
                 //this.contract3 = state;
             } catch(e) {
-                console.log(e);
-            }
-
-            try {
-                // Using Smartweave
-                this.contract = await readContract(this.arweave, this.contractId, undefined, true);
-                //this.contract = await readContract(this.arweave, "HKr5pJhPUAzlGvQqERPLwIw9hm2nAr3CY-b0iRfctN4", undefined, true);
-            } catch (e) {
                 console.log(e);
             }
         }
