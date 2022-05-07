@@ -478,8 +478,6 @@ export default {
             });
 
             if (result.isConfirmed) {
-                this.$swal.fire("Transfer initiated", '', "success");
-
                 // Create inputs
                 let action = {
                     input: {}
@@ -531,13 +529,24 @@ export default {
                 this.$log.info("VehicleTokens : processWithdrawal :: ", JSON.stringify(action));
 
                 let arweave = {};
-                arweave = await Arweave.init({
-                    host: this.arweaveHost,
-                    port: this.arweavePort,
-                    protocol: this.arweaveProtocol,
-                    timeout: 20000,
-                    logging: true,
-                });
+
+                try {
+                    arweave = await Arweave.init({
+                        host: this.arweaveHost,
+                        port: this.arweavePort,
+                        protocol: this.arweaveProtocol,
+                        timeout: 20000,
+                        logging: true,
+                    });
+                } catch(e) {
+                    this.$swal({
+                        icon: "error",
+                        html: "Failed to connect to Arweave Gateway.",
+                        showConfirmButton: true,
+                        allowOutsideClick: false
+                    });
+                    return;
+                }
 
                 let wallet;
                 if (import.meta.env.VITE_ENV === "DEV") {
@@ -553,11 +562,17 @@ export default {
                     wallet = "use_wallet";
                 }
                 
-                /**** SWEETALERT INFO POPUP - Performing Vehicle Invocation... 
-                 * On screen until next popup
-                */
                 // FCP Part 1 - Invocation
                 // 1 call to the vehicle contract (will either be single or multi-interaction)
+                this.$swal({
+                    icon: "info",
+                    html: "Please wait while the withdrawal is sent to the contract...",
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        this.$swal.showLoading()
+                    },
+                });
                 let txid = await interactWrite(arweave, wallet, this.vehicle.id, action.input);
 
                 /**** SWEETALERT INFO POPUP - Reading Outbox...  */
@@ -569,12 +584,12 @@ export default {
                     this.$log.info("VehicleTokens : readContract :: ", txid);
                 }
                 
-                /*** Close SWEETALERT POPUP */
                 if(Boolean(this.arweaveMine)){
                     const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
                     const response = await fetch(mineUrl);
                 }
                 this.$log.info("VehicleTokens : sumbit :: ", "TX: " + txid);
+                this.$swal.close();
 
                 this.$router.push("/vehicles");
                 }
@@ -592,6 +607,8 @@ export default {
             this.$swal({
                 icon: 'info',
                 html: msg,
+                showConfirmButton: true,
+                allowOutsideClick: false
             });
 
             // Determine if multi-interaction is needed based on number of changes
@@ -621,14 +638,23 @@ export default {
             this.$log.info("VehicleTokens : submit :: ", JSON.stringify(action));
 
             let arweave = {};
-            arweave = await Arweave.init({
-                host: this.arweaveHost,
-                port: this.arweavePort,
-                protocol: this.arweaveProtocol,
-                timeout: 20000,
-                logging: true,
-            });
-
+            try {
+                arweave = await Arweave.init({
+                    host: this.arweaveHost,
+                    port: this.arweavePort,
+                    protocol: this.arweaveProtocol,
+                    timeout: 20000,
+                    logging: true,
+                });
+            } catch(e) {
+                this.$swal({
+                    icon: "error",
+                    html: "Failed to connect to Arweave Gateway.",
+                    showConfirmButton: true,
+                    allowOutsideClick: false
+                });
+                return;
+            }
             let wallet;
             if (import.meta.env.VITE_ENV === "DEV") {
                 if(this.keyFile.length){
@@ -642,6 +668,17 @@ export default {
             } else {
                 wallet = "use_wallet";
             }
+
+            this.$swal({
+                icon: "info",
+                html: "Please wait while the token changes are sent to the contract...",
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    this.$swal.showLoading()
+                },
+            });
+
             let txid = "";
             txid = await interactWrite(arweave, wallet, this.vehicle.id, action.input);
             this.$log.info("VehicleTokens : submit :: ", "TX: " + txid);
@@ -664,7 +701,7 @@ export default {
                 const response = await fetch(mineUrl);
             }
             this.$log.info("VehicleTokens : submit :: ", "TX: " + txid);
-
+            this.$swal.close();
             this.$router.push("/vehicles");
         },
     },
@@ -679,7 +716,7 @@ export default {
 
 <style>
 .ps {
-height: 250px;
+height: 750px;
 }  
 
 .swal-height {

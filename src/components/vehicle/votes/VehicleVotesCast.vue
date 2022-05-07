@@ -261,6 +261,8 @@ export default {
         this.$swal({
                 icon: "success",
                 html: "Thank you for casting your vote.  Your vote will be reflected in the next block.",
+                showConfirmButton: true,
+                allowOutsideClick: false
         })
         this.$log.info("VehicleVotesCast : recordVote :: ", txID);
         this.$router.push("../vehicles");
