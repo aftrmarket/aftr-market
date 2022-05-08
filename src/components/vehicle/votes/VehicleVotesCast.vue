@@ -242,13 +242,7 @@ export default {
                 wallet,
                 this.contractId,
                 input
-            );
-
-            /**** IN ORDER FOR THIS TO PROCESS, YOU NEED TO RUN http://localhost:1984/mine */
-            if(Boolean(this.arweaveMine)){
-              const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
-              const response = await fetch(mineUrl);
-            }            
+            );         
         } else {
             txID = await interactWrite(
                 arweave,
@@ -256,6 +250,11 @@ export default {
                 this.contractId,
                 input
             );
+        }
+        /**** IN ORDER FOR THIS TO PROCESS, YOU NEED TO RUN http://localhost:1984/mine */
+        if(Boolean(this.arweaveMine)){
+            const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
+            const response = await fetch(mineUrl);
         }
         // alert("Thank you for casting your vote.  Your vote will be reflected in the next block.")
         this.$swal({

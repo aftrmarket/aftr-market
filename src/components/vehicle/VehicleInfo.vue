@@ -483,12 +483,6 @@ export default {
                     if (import.meta.env.VITE_ENV === "DEV") {
                         const txid = await interactWrite(arweave, wallet, this.contractId, input);
                         this.$log.info("VehicleInfo : updateVehicle :: ", "TX: " + txid);
-
-                        /**** IN ORDER FOR THIS TO PROCESS, YOU NEED TO RUN http://localhost:1984/mine */
-                        if(Boolean(this.arweaveMine)){
-                            const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
-                            const response = await fetch(mineUrl);
-                        }
                     } else {
                         const txid = await interactWrite(arweave, "use_wallet", this.contractId, input);
                         this.$log.info("VehicleInfo : updateVehicle :: ", "TX: " + txid);
@@ -500,6 +494,12 @@ export default {
                         showConfirmButton: true,
                         allowOutsideClick: false
                     });
+                }
+
+                /**** IN ORDER FOR THIS TO PROCESS, YOU NEED TO RUN http://localhost:1984/mine */
+                if(Boolean(this.arweaveMine)){
+                    const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
+                    const response = await fetch(mineUrl);
                 }
                 this.$swal.close();
                 this.$router.push("/vehicles");
