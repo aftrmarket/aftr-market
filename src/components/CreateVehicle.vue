@@ -1153,6 +1153,6 @@ export default {
 <style src="vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css"/>
 <style scoped>
     .ps {
-        height: 750px;
+        height: 800px;
     }   
 </style>
