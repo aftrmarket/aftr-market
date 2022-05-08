@@ -451,14 +451,23 @@ export default {
             /*** CALL SMARTWEAVE */
             let arweave = {};
 
-            arweave = await Arweave.init({
-            host: this.arweaveHost,
-            port: this.arweavePort,
-            protocol: this.arweaveProtocol,
-            timeout: 20000,
-            logging: true,
-            });
-
+            try {
+                arweave = await Arweave.init({
+                    host: this.arweaveHost,
+                    port: this.arweavePort,
+                    protocol: this.arweaveProtocol,
+                    timeout: 20000,
+                    logging: true,
+                });
+            } catch(e) {
+                this.$swal({
+                    icon: "error",
+                    html: "Failed to connect to Arweave Gateway.",
+                    showConfirmButton: true,
+                    allowOutsideClick: false
+                });
+                return;
+            }
             this.$log.info("VehicleMembers : submit :: ", JSON.stringify(input));
 
             let wallet;
@@ -473,6 +482,15 @@ export default {
                     })
                 }        
             }
+            this.$swal({
+                icon: "info",
+                html: "Please wait while member changes are sent to the contract...",
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    this.$swal.showLoading()
+                },
+            });
             let txid = "";
             if (import.meta.env.VITE_ENV === "DEV") {
                 txid = await interactWrite(arweave, wallet, this.vehicle.id, input);
@@ -485,6 +503,8 @@ export default {
                 const response = await fetch(mineUrl);
             }
             this.$log.info("VehicleMembers : sumbit :: ", "TX: " + txid);
+
+            this.$swal.close();
 
             let msg = "Your membership changes have been submitted to the Permaweb.  Your changes will be reflected in the next block.";
             if (this.vehicle.ownership === "dao") {
@@ -592,6 +612,6 @@ export default {
 <style src="vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css"/>
 <style scoped>
     .ps {
-        height: 250px;
+        height: 750px;
     }   
 </style>

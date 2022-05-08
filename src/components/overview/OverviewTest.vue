@@ -294,9 +294,9 @@ export default {
         },
         contractRead() {
             if (import.meta.env.VITE_ENV === "TEST") {
-                this.$router.push({ name: "read", params: { contractId: "Vjt13JlvOzaOs4St_Iy2jmanxa7dc-Z3pDk3ktwEQNA" } });
+                this.$router.push({ name: "read", params: { contractId: "DlsykD_fJ3m7yAzCvFgRdb0W1jgGWe4LcAHJzrRx99A" } });
             } else if (import.meta.env.VITE_ENV === "DEV") {
-                this.$router.push({ name: "read", params: { contractId: "iO3STQWIOyj4V1kdojb6onaLO7QD7qoeMMyatk3mISQ" } });
+                this.$router.push({ name: "read", params: { contractId: "DlsykD_fJ3m7yAzCvFgRdb0W1jgGWe4LcAHJzrRx99A" } });
             }
         },
         async init() {
@@ -521,7 +521,7 @@ export default {
                         this.$swal.showLoading()
                     },
                 });
-
+                this.$log.info("OverviewTest : init :: ", "Reading Blue Horizon contract.");
                 //const blueVeh = await readContract(arweave, blueContractId);
                 //const blueVeh = await executeContract(blueContractId, undefined, true, this.gatewayConfig);
                 const { state, validity } = await executeContract(blueContractId, undefined, true, {
@@ -538,6 +538,7 @@ export default {
                         qty: 100000,
                     };
                     // Calls mint function on Blue Horizon contract. If user already has a balance, nothing happens.
+                    this.$log.info("OverviewTest : init :: ", "Blue Horizon Interact Write.");
                     contractTxId = await interactWrite(arweave, use_wallet, blueContractId, input);
 
                     if (Boolean(this.arweaveMine)) {
@@ -551,6 +552,7 @@ export default {
                     function: "plygnd-mint",
                     qty: 100000,
                 };
+                this.$log.info("OverviewTest : init :: ", "Give user's wallet PSTs.");
                 contractTxId = await interactWrite(arweave, use_wallet, vintContractId, input);
                 this.$log.info("OverviewTest : init :: ", "User Wallet VINT: " + contractTxId);
 
