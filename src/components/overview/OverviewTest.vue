@@ -34,7 +34,7 @@
                         </div>
                     </div>
                     <div class="mt-3 text-base text-gray-300 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
-                        <button @click.prevent="contractRead" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">SW vs 3EM</button>
+                        <!--<button @click.prevent="contractRead" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">SW vs 3EM</button>-->
                         For more information, see below 👇
                     </div>
                 </div>
@@ -294,9 +294,9 @@ export default {
         },
         contractRead() {
             if (import.meta.env.VITE_ENV === "TEST") {
-                this.$router.push({ name: "read", params: { contractId: "xZkUQuOBUslZ_W_HIaxqcZiYmP2sjDJ7WJLNcLhuyRs" } });
+                this.$router.push({ name: "read", params: { contractId: "DlsykD_fJ3m7yAzCvFgRdb0W1jgGWe4LcAHJzrRx99A" } });
             } else if (import.meta.env.VITE_ENV === "DEV") {
-                this.$router.push({ name: "read", params: { contractId: "iO3STQWIOyj4V1kdojb6onaLO7QD7qoeMMyatk3mISQ" } });
+                this.$router.push({ name: "read", params: { contractId: "DlsykD_fJ3m7yAzCvFgRdb0W1jgGWe4LcAHJzrRx99A" } });
             }
         },
         async init() {
@@ -521,7 +521,7 @@ export default {
                         this.$swal.showLoading()
                     },
                 });
-
+                this.$log.info("OverviewTest : init :: ", "Reading Blue Horizon contract.");
                 //const blueVeh = await readContract(arweave, blueContractId);
                 //const blueVeh = await executeContract(blueContractId, undefined, true, this.gatewayConfig);
                 const { state, validity } = await executeContract(blueContractId, undefined, true, {
@@ -538,6 +538,7 @@ export default {
                         qty: 100000,
                     };
                     // Calls mint function on Blue Horizon contract. If user already has a balance, nothing happens.
+                    this.$log.info("OverviewTest : init :: ", "Blue Horizon Interact Write.");
                     contractTxId = await interactWrite(arweave, use_wallet, blueContractId, input);
 
                     if (Boolean(this.arweaveMine)) {
@@ -551,6 +552,7 @@ export default {
                     function: "plygnd-mint",
                     qty: 100000,
                 };
+                this.$log.info("OverviewTest : init :: ", "Give user's wallet PSTs.");
                 contractTxId = await interactWrite(arweave, use_wallet, vintContractId, input);
                 this.$log.info("OverviewTest : init :: ", "User Wallet VINT: " + contractTxId);
 

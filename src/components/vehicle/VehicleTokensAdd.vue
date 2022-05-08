@@ -168,14 +168,32 @@ export default {
             this.msg = "Please wait for deposit into vehicle to complete..."
             let arweave = {};
 
-            arweave = await Arweave.init({
-                host: this.arweaveHost,
-                port: this.arweavePort,
-                protocol: this.arweaveProtocol,
-                timeout: 20000,
-                logging: true,
+            try {
+                arweave = await Arweave.init({
+                    host: this.arweaveHost,
+                    port: this.arweavePort,
+                    protocol: this.arweaveProtocol,
+                    timeout: 20000,
+                    logging: true,
+                });
+            } catch(e) {
+                this.$swal({
+                    icon: "error",
+                    html: "Failed connecting to Arweave Gateway.",
+                    showConfirmButton: true,
+                    allowOutsideClick: false
+                });
+                return;
+            }
+            this.$swal({
+                icon: "info",
+                html: "Please wait while the deposit transaction completes...",
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    this.$swal.showLoading()
+                },
             });
-
             const inputTransfer = {
                 function: "transfer",
                 target: this.vehicle.id,
@@ -225,15 +243,6 @@ export default {
                 updatedPst.balance = this.pstBalance - this.pstInputTokens;
                 /***  */
             }
-            this.$swal({
-                icon: 'info',
-                html: "Please wait for deposit into vehicle to complete...",
-                showConfirmButton: false,
-                allowOutsideClick: false,
-                didOpen: () => {
-                    this.$swal.showLoading()
-                },
-            });
             this.$swal.close();
             this.$router.push("../vehicles");
             this.$emit("close");

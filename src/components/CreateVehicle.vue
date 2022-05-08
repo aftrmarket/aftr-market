@@ -890,12 +890,14 @@ export default {
                 //this.$refs.tokenValue.focus();
                 return false;
             }
-
             this.$swal({
                 icon: "info",
                 html: "Please wait while your new vehicle is being created...",
                 showConfirmButton: false,
                 allowOutsideClick: false,
+                didOpen: () => {
+                    this.$swal.showLoading()
+                },
             });
             let arweave = {};
             try {
@@ -1130,6 +1132,7 @@ export default {
             //     this.$log.error("CreateVehicle : createVehicle :: ", "ERROR transferring tokens: " + error);
             //     return false;
             // }
+            this.$swal.close();
         },
         cancelCreate() {
             this.$router.push("vehicles");
@@ -1150,6 +1153,6 @@ export default {
 <style src="vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css"/>
 <style scoped>
     .ps {
-        height: 750px;
+        height: 800px;
     }   
 </style>
