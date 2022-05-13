@@ -79,7 +79,7 @@ export default {
             }
             try {
                 // Using Smartweave
-                this.contract = await readContract(this.arweave, this.contractId, undefined, true);
+                //this.contract = await readContract(this.arweave, this.contractId, undefined, true);
                 //this.contract = await readContract(this.arweave, "HKr5pJhPUAzlGvQqERPLwIw9hm2nAr3CY-b0iRfctN4", undefined, true);
             } catch (e) {
                 console.log(e);
