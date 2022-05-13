@@ -27,7 +27,7 @@
                                 Select Token
                             </option>
                             <option v-for="pst in $store.getters.getActiveWallet.psts" :key="pst.contractId" :value="pst.contractId">
-                                <span v-if="pst.id !== vehicle.id">{{ pst.name }} ({{ pst.id }})</span>
+                                <span v-if="pst.contractId !== vehicle.id">{{ pst.name }} ({{ pst.contractId }})</span>
                             </option>
                         </select>
                     </div>
