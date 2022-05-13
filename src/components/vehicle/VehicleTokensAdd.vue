@@ -26,8 +26,8 @@
                             <option value="" disabled selected>
                                 Select Token
                             </option>
-                            <option v-for="pst in $store.getters.getActiveWallet.psts" :key="pst.contractId" :value="pst.contractId">
-                                <span v-if="pst.contractId !== vehicle.id">{{ pst.name }} ({{ pst.contractId }})</span>
+                            <option v-for="pst in walletPsts" :key="pst.contractId" :value="pst.contractId">
+                                {{ pst.name }} ({{ pst.contractId }})
                             </option>
                         </select>
                     </div>
@@ -107,7 +107,8 @@ export default {
             arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
             arweaveMine: import.meta.env.VITE_MINE,
             /** */
-            msg: ""
+            msg: "",
+            walletPsts: [],
         }
     },
     computed : {
@@ -268,6 +269,8 @@ export default {
     },
     setup() {
         const open = ref(true)
+
+        this.walletPsts = this.$store.getters.getActiveWallet.psts.filter(pst => pst.contractId !== this.vehicle.id);
 
         return {
             open,
