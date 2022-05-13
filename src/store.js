@@ -135,7 +135,7 @@ const store = createStore({
                 context.commit("setTestLaunchConfigState");
             }
 
-            if (import.meta.env.VITE_ENV === "TEST") {
+            if (import.meta.env.VITE_ENV === "TEST" && !import.meta.env.VITE_BUILD_PSTS) {
 
                 const tokens = await fetchBalancesForAddress(wallet.address);
                 /*** Returns an array of objects

@@ -569,7 +569,7 @@ export default {
                  * This doesn't need to be done in PROD or TEST b/c the Verto Cache is used
                  * and the wallet.psts are built during the Arconnection.
                  */
-                if (import.meta.env.VITE_ENV === "DEV" || import.meta.env.BUILD_PSTS) {
+                if (import.meta.env.VITE_ENV === "DEV" || import.meta.env.VITE_BUILD_PSTS) {
                     await this.buildWalletPsts(arweave, aftrContractSrcId, userAddr);
                 }
 
