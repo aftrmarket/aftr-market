@@ -1,39 +1,44 @@
 <template>
     <perfect-scrollbar>
-        <div v-for="(activity, index) in activities" :key="activity.id" class="pt-4 w-full">
-            <div class="">
-                <span class="text-aftrBlue text-md font-medium uppercase tracking-wide">{{ activities.length - index }}. {{ interactionText(activity.input.function) }}</span>
-                <span class="font-mono text-xs text-gray-500">({{ activity.id }})</span>
-            </div>
-            <div class="pl-8 pb-4">
-                <span v-html="getAllInputs(activity.input)"></span>
-            </div>
-            <div class="flex flex-row">
-                <div v-if="activity.result">
-                    <div class="pb-1 border-solid border border-green-500 rounded ">
-                        <span class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium bg-white border-1 border-green text-green">
-                            <svg class="-ml-0.5 mr-1.5 h-2 w-2" fill="green" viewBox="0 0 8 8">
-                                <circle cx="4" cy="4" r="3" />
-                            </svg>
-                            <span class="font-light text-green-600">Successful</span>
-                        </span>
-                    </div>
+        <div v-if="activities.length === 0" class="pl-4 pt-4">
+            Not yet any activities to show on this vehicle.
+        </div>
+        <div v-else>
+            <div v-for="(activity, index) in activities" :key="activity.id" class="pt-4 w-full">
+                <div class="">
+                    <span class="text-aftrBlue text-md font-medium uppercase tracking-wide">{{ activities.length - index }}. {{ interactionText(activity.input.function) }}</span>
+                    <span class="font-mono text-xs text-gray-500">({{ activity.id }})</span>
                 </div>
-                <div v-else>
-                    <div class="pb-1 border-solid border border-red-500 rounded ">
-                        <span class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium bg-white border-1 border-red text-red">
-                            <svg class="-ml-0.5 mr-1.5 h-2 w-2" fill="red" viewBox="0 0 8 8">
-                                <circle cx="4" cy="4" r="3" />
-                            </svg>
-                            <span class="font-light text-red-600">Failed</span>
-                        </span>
-                    </div>
+                <div class="pl-8 pb-4">
+                    <span v-html="getAllInputs(activity.input)"></span>
                 </div>
-                <div class="pl-10 pt-2 text-xs">Block <span class="font-mono text-gray-500">{{ activity.block }}</span></div>
-                <div class="pl-10 pt-2 text-xs">
-                    Caller 
-                        <span v-if="activity.result" class="font-mono text-green-600">{{ activity.owner }}</span>
-                        <span v-else class="font-mono text-red-600">{{ activity.owner }}</span>
+                <div class="flex flex-row">
+                    <div v-if="activity.result">
+                        <div class="pb-1 border-solid border border-green-500 rounded ">
+                            <span class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium bg-white border-1 border-green text-green">
+                                <svg class="-ml-0.5 mr-1.5 h-2 w-2" fill="green" viewBox="0 0 8 8">
+                                    <circle cx="4" cy="4" r="3" />
+                                </svg>
+                                <span class="font-light text-green-600">Successful</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div v-else>
+                        <div class="pb-1 border-solid border border-red-500 rounded ">
+                            <span class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium bg-white border-1 border-red text-red">
+                                <svg class="-ml-0.5 mr-1.5 h-2 w-2" fill="red" viewBox="0 0 8 8">
+                                    <circle cx="4" cy="4" r="3" />
+                                </svg>
+                                <span class="font-light text-red-600">Failed</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="pl-10 pt-2 text-xs">Block <span class="font-mono text-gray-500">{{ activity.block }}</span></div>
+                    <div class="pl-10 pt-2 text-xs">
+                        Caller 
+                            <span v-if="activity.result" class="font-mono text-green-600">{{ activity.owner }}</span>
+                            <span v-else class="font-mono text-red-600">{{ activity.owner }}</span>
+                    </div>
                 </div>
             </div>
         </div>
