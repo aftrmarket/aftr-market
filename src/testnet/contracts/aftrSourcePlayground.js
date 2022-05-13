@@ -115,6 +115,11 @@ async function handle(state, action) {
           ThrowError("Can't remove creator from balances.");
         }
       }
+      if (voteType === "addMember") {
+        if (recipient === SmartWeave.contract.id) {
+          ThrowError("Can't add the vehicle as a member.");
+        }
+      }
       if (voteType === "mint") {
         note = "Mint " + String(qty) + " tokens for " + recipient;
       } else if (voteType === "mintLocked") {
@@ -284,8 +289,8 @@ async function handle(state, action) {
     if (!input.tokenId) {
       ThrowError("No token supplied. Tokens were not transferred to the vehicle.");
     }
-    if(input.tokenId === SmartWeave.contract.id) {
-        ThrowError("Deposit not allowed because you can't deposit an asset of itself.");
+    if (input.tokenId === SmartWeave.contract.id) {
+      ThrowError("Deposit not allowed because you can't deposit an asset of itself.");
     }
     let lockLength = 0;
     if (input.lockLength) {
@@ -327,6 +332,7 @@ async function handle(state, action) {
     }
     state = res;
   }
+
 
 /*** PLAYGROUND FUNCTIONS - NOT FOR PRODUCTION */
     /*** ADDED MINT FUNCTION FOR THE TEST GATEWAY - NOT FOR PRODUCTION */
@@ -372,6 +378,7 @@ async function handle(state, action) {
         }
     }
 /*** PLAYGROUND FUNCTIONS END */
+
 
   if (input.function === "multiInteraction") {
     if (typeof input.actions === "undefined") {
