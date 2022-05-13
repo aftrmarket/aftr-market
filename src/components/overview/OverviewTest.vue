@@ -35,7 +35,7 @@
                     </div>
                     <div class="mt-3 text-base text-gray-300 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
                         Please note that the Playground will be refreshed periodically, so you will see your vehicles disappear when this happens.
-                        <button @click.prevent="contractRead" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">SW vs 3EM</button>
+                        <!--<button @click.prevent="contractRead" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">SW vs 3EM</button>-->
                         For more information, see below 👇
                     </div>
                 </div>
@@ -297,7 +297,7 @@ export default {
             if (import.meta.env.VITE_ENV === "TEST") {
                 this.$router.push({ name: "read", params: { contractId: "Ec4RtO4woGOq5HOmu6YWbCP9bXJZ3otL1kJxTUEuZGg" } });
             } else if (import.meta.env.VITE_ENV === "DEV") {
-                this.$router.push({ name: "read", params: { contractId: "nsn8CwD2Sa7NVcmabnfVt1FTRyOB-RLoZng80WaCy-U" } });
+                this.$router.push({ name: "read", params: { contractId: "RlgLcFOzm6xVho6w76PCg_WbShb3n62jjH6HKSJw9WM" } });
             }
         },
         async init() {
