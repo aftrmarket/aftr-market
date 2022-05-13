@@ -267,10 +267,11 @@ export default {
             }
         },
     },
+    created() {
+        this.walletPsts = this.$store.getters.getActiveWallet.psts.filter(pst => pst.contractId !== this.vehicle.id);
+    },
     setup() {
         const open = ref(true)
-
-        this.walletPsts = this.$store.getters.getActiveWallet.psts.filter(pst => pst.contractId !== this.vehicle.id);
 
         return {
             open,
