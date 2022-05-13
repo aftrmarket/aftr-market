@@ -34,6 +34,7 @@
                         </div>
                     </div>
                     <div class="mt-3 text-base text-gray-300 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
+                        Please note that the Playground will be refreshed periodically, so you will see your vehicles disappear when this happens.
                         <!--<button @click.prevent="contractRead" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">SW vs 3EM</button>-->
                         For more information, see below 👇
                     </div>
@@ -294,9 +295,9 @@ export default {
         },
         contractRead() {
             if (import.meta.env.VITE_ENV === "TEST") {
-                this.$router.push({ name: "read", params: { contractId: "DlsykD_fJ3m7yAzCvFgRdb0W1jgGWe4LcAHJzrRx99A" } });
+                this.$router.push({ name: "read", params: { contractId: "nsn8CwD2Sa7NVcmabnfVt1FTRyOB-RLoZng80WaCy-U" } });
             } else if (import.meta.env.VITE_ENV === "DEV") {
-                this.$router.push({ name: "read", params: { contractId: "DlsykD_fJ3m7yAzCvFgRdb0W1jgGWe4LcAHJzrRx99A" } });
+                this.$router.push({ name: "read", params: { contractId: "nsn8CwD2Sa7NVcmabnfVt1FTRyOB-RLoZng80WaCy-U" } });
             }
         },
         async init() {
@@ -563,87 +564,15 @@ export default {
                     await fetch(this.mineUrl);
                 }
 
-                /*** Look at all PSTs and save the ones where the user has a balance.
-                 * In PROD, Arconnect should have this already.
-                 * If it doesn't, then we'll need to come up with a caching solution for each user.
+                /***
+                 * Look at all PSTs and save the ones where the user has a balance.
+                 * This doesn't need to be done in PROD or TEST b/c the Verto Cache is used
+                 * and the wallet.psts are built during the Arconnection.
                  */
-                let queryval = {
-                    query: `
-                        query($cursor: String) {
-                            transactions(
-                                tags: [
-                                    { name: "App-Name", values: ["SmartWeaveContract"] },
-                                    { name: "Contract-Src", values: ["${ aftrContractSrcId }"] } 
-                                ]
-                                first: 100
-                                after: $cursor
-                            ) {
-                                pageInfo {
-                                    hasNextPage
-                                }
-                                edges {
-                                    cursor
-                                    node { id } 
-                                }
-                            }
-                    }`,
-                };
-
-                const responseValue = await arweave.api.post("graphql", { query: queryval.query,});
-
-                let wallet = {
-                    address: "",
-                    psts: [],
-                };
-
-                wallet.address = userAddr;
-
-                for (let edge of responseValue.data.data.transactions.edges) {
-                    try {
-                        //let vehicle = await readContract(arweave, edge.node.id);
-                        //const state = await executeContract(edge.node.id, undefined, true, this.gatewayConfig);
-                        const { state, validity } = await executeContract(edge.node.id, undefined, true, {
-                            ARWEAVE_HOST: import.meta.env.VITE_ARWEAVE_HOST,
-                            ARWEAVE_PORT: import.meta.env.VITE_ARWEAVE_PORT,
-                            ARWEAVE_PROTOCOL: import.meta.env.VITE_ARWEAVE_PROTOCOL
-                        });
-                        let vehicle = state;
-
-                        if (vehicle && Object.keys(vehicle.balances).length != 0 && vehicle.name) {
-                            let data = {
-                                id: edge.node.id,
-                                balance: 0,
-                                name: vehicle.name,
-                                ticker: vehicle.ticker,
-                                logo: "",
-                                fcp: vehicle && vehicle.invocations && vehicle.foreignCalls ? true : false,
-                            };
-
-                            Object.keys(vehicle.balances).some((walletId) => {
-                                if (walletId == wallet.address) {
-                                    data.balance = vehicle.balances[wallet.address];
-                                }
-                            });
-
-                            // Logo
-                            vehicle.settings.forEach((setting) => {
-                                if (setting[0] === "communityLogo") {
-                                    data.logo = setting[1];
-                                }
-                            });
-
-                            if (data.balance > 0) {
-                                wallet.psts.push(data);
-                            }
-
-                            this.$log.info("OverviewTest : init :: ", wallet);
-                        }
-                    } catch (e) {
-                        this.$log.error("ERROR reading contract for " + edge.node.id + ": " + e);
-                    }
-                    this.$log.info("PSTS: " + JSON.stringify(wallet.psts));
-                    this.$store.commit("arConnect", wallet);
+                if (import.meta.env.VITE_ENV === "DEV" || import.meta.env.BUILD_PSTS) {
+                    await this.buildWalletPsts(arweave, aftrContractSrcId, userAddr);
                 }
+
                 this.$swal.close();
                 this.$router.push("vehicles");
             } catch (error) {
@@ -651,6 +580,85 @@ export default {
                     icon: "error",
                     html: error,
                 });
+            }
+        },
+        async buildWalletPsts(arweave, aftrId, userAddr) {
+            let queryval = {
+                query: `
+                    query($cursor: String) {
+                        transactions(
+                            tags: [
+                                { name: "App-Name", values: ["SmartWeaveContract"] },
+                                { name: "Contract-Src", values: ["${ aftrId }"] } 
+                            ]
+                            first: 100
+                            after: $cursor
+                        ) {
+                            pageInfo {
+                                hasNextPage
+                            }
+                            edges {
+                                cursor
+                                node { id } 
+                            }
+                        }
+                }`,
+            };
+
+            const responseValue = await arweave.api.post("graphql", { query: queryval.query,});
+
+            let wallet = {
+                address: "",
+                psts: [],
+            };
+
+            wallet.address = userAddr;
+
+            for (let edge of responseValue.data.data.transactions.edges) {
+                try {
+                    //let vehicle = await readContract(arweave, edge.node.id);
+                    //const state = await executeContract(edge.node.id, undefined, true, this.gatewayConfig);
+                    const { state, validity } = await executeContract(edge.node.id, undefined, true, {
+                        ARWEAVE_HOST: import.meta.env.VITE_ARWEAVE_HOST,
+                        ARWEAVE_PORT: import.meta.env.VITE_ARWEAVE_PORT,
+                        ARWEAVE_PROTOCOL: import.meta.env.VITE_ARWEAVE_PROTOCOL
+                    });
+                    let vehicle = state;
+
+                    if (vehicle && Object.keys(vehicle.balances).length != 0 && vehicle.name) {
+                        let data = {
+                            contractId: edge.node.id,
+                            balance: 0,
+                            name: vehicle.name,
+                            ticker: vehicle.ticker,
+                            //logo: "",
+                            //fcp: vehicle && vehicle.invocations && vehicle.foreignCalls ? true : false,
+                        };
+
+                        Object.keys(vehicle.balances).some((walletId) => {
+                            if (walletId == wallet.address) {
+                                data.balance = vehicle.balances[wallet.address];
+                            }
+                        });
+
+                        // Logo
+                        // vehicle.settings.forEach((setting) => {
+                        //     if (setting[0] === "communityLogo") {
+                        //         data.logo = setting[1];
+                        //     }
+                        // });
+
+                        if (data.balance > 0) {
+                            wallet.psts.push(data);
+                        }
+
+                        this.$log.info("OverviewTest : init :: ", wallet);
+                    }
+                } catch (e) {
+                    this.$log.error("ERROR reading contract for " + edge.node.id + ": " + e);
+                }
+                this.$log.info("PSTS: " + JSON.stringify(wallet.psts));
+                this.$store.commit("arConnect", wallet);
             }
         },
         async createAftrVehicle(arweave, wallet, aftrId, initState) {

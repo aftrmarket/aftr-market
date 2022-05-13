@@ -1,4 +1,4 @@
-<template> 
+<template>
     <div class="grid grid-cols-2 gap-4 p-4 border">
         <div class="col-span-2">Contract Comparison</div>
         <div class="pt-4 w-full">
@@ -44,14 +44,7 @@ export default {
     },
     methods: {
         async readContracts() {
-            try {
-                // Using Smartweave
-                this.contract = await readContract(this.arweave, this.contractId, undefined, true);
-                //this.contract = await readContract(this.arweave, "HKr5pJhPUAzlGvQqERPLwIw9hm2nAr3CY-b0iRfctN4", undefined, true);
-            } catch (e) {
-                console.log(e);
-            }
-
+            //let contractId = "du1NxgooOxqDRg7N2eXiP5ozI5bbZu0VT4QBtDEjuwE";
             try{
                 // Using 3EM
                 //this.contract3 = await executeContract(this.contractId, undefined, true, this.gatewayConfig);
@@ -82,6 +75,13 @@ export default {
                 //console.log(JSON.stringify(state));
                 //this.contract3 = state;
             } catch(e) {
+                console.log(e);
+            }
+            try {
+                // Using Smartweave
+                this.contract = await readContract(this.arweave, this.contractId, undefined, true);
+                //this.contract = await readContract(this.arweave, "HKr5pJhPUAzlGvQqERPLwIw9hm2nAr3CY-b0iRfctN4", undefined, true);
+            } catch (e) {
                 console.log(e);
             }
         }

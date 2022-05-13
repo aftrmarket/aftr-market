@@ -458,14 +458,14 @@ export default {
         },
         pstBalance() {
             const currentPst = this.$store.getters.getActiveWallet.psts.find(
-                (item) => item.id === this.selectedPstId
+                (item) => item.contractId === this.selectedPstId
             );
             this.$log.info("CreateVehicle : pstBalance :: ", "currentPst Value", currentPst.fcp, currentPst.balance);
             return this.formatNumber(currentPst.balance);
         },
         pstTicker() {
             const currentPst = this.$store.getters.getActiveWallet.psts.find(
-                (item) => item.id === this.selectedPstId
+                (item) => item.contractId === this.selectedPstId
             );
             this.$log.info("CreateVehicle : pstTicker :: ","pstTicker value", currentPst);
             return currentPst.ticker;
@@ -734,7 +734,7 @@ export default {
         },
         calcPstPrice() {
             const currentPst = this.$store.getters.getActiveWallet.psts.find(
-                (item) => item.id === this.selectedPstId
+                (item) => item.contractId === this.selectedPstId
             );
             this.pricePerToken = currentPst.price;
             this.pstValue = currentPst.price * this.pstInputTokens;
@@ -765,7 +765,7 @@ export default {
         addPst() {
             // Create temp object and add new keys
             let currentPst = this.$store.getters.getActiveWallet.psts.find(
-                (item) => item.id === this.selectedPstId
+                (item) => item.contractId === this.selectedPstId
             );
             let existingIndex = this.vehiclePsts.findIndex(
                 (item) => item.id === this.selectedPstId
@@ -784,13 +784,10 @@ export default {
             }
             // Subtract tokens from wallet pst
             existingIndex = this.$store.getters.getActiveWallet.psts.findIndex(
-                (item) => item.id === this.selectedPstId
+                (item) => item.contractId === this.selectedPstId
             );
 
-            const newBal =
-                this.$store.getters.getActiveWallet.psts[existingIndex][
-                    "balance"
-                ] - parseInt(this.pstInputTokens);
+            const newBal = this.$store.getters.getActiveWallet.psts[existingIndex]["balance"] - parseInt(this.pstInputTokens);
             this.$store.commit("updateWalletPstBalance", {
                 index: existingIndex,
                 balance: newBal,
@@ -809,11 +806,9 @@ export default {
             const idTokens = this.vehiclePsts[deleteIndex].tokens;
             const existingIndex =
                 this.$store.getters.getActiveWallet.psts.findIndex(
-                    (item) => item.id === id
+                    (item) => item.contractId === id
                 );
-            const newBal =
-                this.$store.getters.getActiveWallet.psts[existingIndex]
-                    .balance + idTokens;
+            const newBal = this.$store.getters.getActiveWallet.psts[existingIndex].balance + idTokens;
             this.$store.commit("updateWalletPstBalance", {
                 index: existingIndex,
                 balance: newBal,

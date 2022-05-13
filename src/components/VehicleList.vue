@@ -347,7 +347,7 @@ export default {
         getUserPsts() {
             // Loads all of user's PSTs to be used as a filter on the My Vehicles query
             for (const pst of this.$store.getters.getActiveWallet.psts) {
-                this.myPsts.push(pst.id);
+                this.myPsts.push(pst.contractId);
             }
         },
     },

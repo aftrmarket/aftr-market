@@ -26,8 +26,8 @@
                             <option value="" disabled selected>
                                 Select Token
                             </option>
-                            <option v-for="pst in $store.getters.getActiveWallet.psts" :key="pst.id" :value="pst.id" :disabled="!pst.fcp">
-                                {{ pst.name }} ({{ pst.id }})
+                            <option v-for="pst in $store.getters.getActiveWallet.psts" :key="pst.contractId" :value="pst.contractId">
+                                <span v-if="pst.id !== vehicle.id">{{ pst.name }} ({{ pst.id }})</span>
                             </option>
                         </select>
                     </div>
@@ -112,11 +112,11 @@ export default {
     },
     computed : {
         pstBalance() {
-            const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.id === this.selectedPstId);
+            const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.contractId === this.selectedPstId);
             return currentPst.balance;
         },
         pstTicker() {
-            const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.id === this.selectedPstId);
+            const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.contractId === this.selectedPstId);
             return currentPst.ticker;
         },
         vehicleTokenBox() {
@@ -200,7 +200,7 @@ export default {
                 qty: Number(this.pstInputTokens),
             };
             const currentPst = this.$store.getters.getActiveWallet.psts.find(
-                (item) => item.id === this.selectedPstId
+                (item) => item.contractId === this.selectedPstId
             );
 
             let wallet;
@@ -239,7 +239,7 @@ export default {
             if (import.meta.env.VITE_ENV !== "PROD") {
                 /*** This will not be needed when ArConnect is automatically updated on TESTNET */
                 // Update user's PST balance 
-                const updatedPst = this.$store.getters.getActiveWallet.psts.find((item) => item.id === this.selectedPstId);
+                const updatedPst = this.$store.getters.getActiveWallet.psts.find((item) => item.contractId === this.selectedPstId);
                 updatedPst.balance = this.pstBalance - this.pstInputTokens;
                 /***  */
             }
@@ -252,7 +252,7 @@ export default {
             this.pricePerToken = null;
         },
         calcPstPrice() {
-            const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.id === this.selectedPstId);
+            const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.contractId === this.selectedPstId);
             this.pricePerToken = currentPst.balance;
             this.pstValue = currentPst.balance * this.pstInputTokens;
             this.updatePstInputValid(currentPst.balance);
