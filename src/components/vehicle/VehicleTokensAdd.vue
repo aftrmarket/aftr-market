@@ -212,13 +212,13 @@ export default {
             }
             const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
 
-            await interactWrite(arweave, wallet, currentPst.id, inputTransfer)
+            await interactWrite(arweave, wallet, currentPst.contractId, inputTransfer)
             .then(async (id) => {
                 this.$log.info("VehicleTokensAdd : interactWrite :: ", "Transfer ID = " + JSON.stringify(id));
 
                 const inputDeposit = {
                     function: "deposit",
-                    tokenId: currentPst.id,
+                    tokenId: currentPst.contractId,
                     txID: id,
                 };
                 this.$log.info("VehicleTokensAdd : interactWrite :: ", "INPUT DEP: " + JSON.stringify(inputDeposit));
