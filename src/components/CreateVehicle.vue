@@ -23,7 +23,6 @@
         <div>
             <!-- Vehicle Info -->
             <form-container>
-                <perfect-scrollbar>
                 <form action="#" method="POST">
                     <h3 class="text-xl font-light leading-6">Vehicle Information</h3>
                     <div class="bg-white sm:p-6">
@@ -358,7 +357,6 @@
                     </div>
                     <!--- End Button Row --->
                 </form>
-                </perfect-scrollbar>
             </form-container>
             <!-- End Vehicle Info -->
         </div>
@@ -983,15 +981,16 @@ export default {
             // Convert DAO Member array to dictionary
             this.vehicle.balances = this.daoMembers.reduce( (a, x) => ({ ...a, [x.wallet]: x.balance }), {} );
 
-            const tmpPsts = this.vehiclePsts.map((item) => {
-                return {
-                    id: item.id,
-                    name: item.name,
-                    ticker: item.ticker,
-                    logo: item.logo,
-                    tokens: item.tokens,
-                };
-            });
+            /**** REMOVED ADDING TOKENS FROM CREATE VEHICLE PAGE */
+            // const tmpPsts = this.vehiclePsts.map((item) => {
+            //     return {
+            //         id: item.id,
+            //         name: item.name,
+            //         ticker: item.ticker,
+            //         logo: item.logo,
+            //         tokens: item.tokens,
+            //     };
+            // });
 
             this.vehicle.tokens = [];
             let obj = this.vehicle.balances;
@@ -1032,15 +1031,15 @@ export default {
                     this.vehicle["id"] = await createContractFromTx(arweave, "use_wallet", this.getAftrContractSrcId, JSON.stringify(this.vehicle), initTags);
                 }
 
-                if (import.meta.env.VITE_ENV !== "PROD") {
-                    // Add to Wallet PSTs in non-prod environments
+                if (import.meta.env.VITE_ENV === "DEV" || import.meta.env.VITE_BUILD_PSTS) {
+                    // Add to Wallet PSTs if the Verto Cache is not being used
                     let pst = {
-                        id: this.vehicle["id"],
+                        contractId: this.vehicle["id"],
                         balance: this.vehicle.balances[this.vehicle.creator],
                         name: this.vehicle.name,
                         ticker: this.vehicle.ticker,
-                        logo: this.communityLogoValue,
-                        fcp: true
+                        //logo: this.communityLogoValue,
+                        //fcp: true
                     };
                     this.$store.commit("addWalletPst", pst);
                 }
@@ -1144,10 +1143,3 @@ export default {
     },
 };
 </script>
-
-<style src="vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css"/>
-<style scoped>
-    .ps {
-        height: 800px;
-    }   
-</style>
