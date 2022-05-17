@@ -110,8 +110,8 @@
                                 <input type="radio" v-model="ownership" id="dao" value="dao" class="form-radio text-aftrBlue" /><label class="px-2 text-sm text-gray-700">DAO Owned</label>
                             </div>
                             <div class="">
-                                <input type="radio" v-model="votingSystem" id="equal" value="equal" class="form-radio text-aftrBlue" /><label class="px-2 text-sm text-gray-700">Distributed Evenly</label>
                                 <input type="radio" v-model="votingSystem" id="weighted" value="weighted" class="form-radio text-aftrBlue" /><label class="px-2 text-sm text-gray-700">Weighted</label>
+                                <input type="radio" v-model="votingSystem" id="equal" value="equal" class="form-radio text-aftrBlue" /><label class="px-2 text-sm text-gray-700">Distributed Evenly</label>
                             </div>
                             <div class="">
                                 <input v-model="newQuorum" name="newQuorum" type="number" :class="inputBox(quorumIsValid)" />
@@ -410,7 +410,7 @@ export default {
             minLease: 2, // Minimum seat lease length in months
             maxLease: 24, // Maximum seat lease length in months
             ownership: "single", // Type of ownership for vehicle (single or dao)
-            votingSystem: "equal", // Type of voting for vehicle (equal or weighted)
+            votingSystem: "weighted", // Type of voting for vehicle (equal or weighted)
             inputValid: false, // Boolean to show when any input field is invalid
             pstInputValid: false, // Boolean to show when amount goes over tokens held
             nameValid: false, // Boolean for valid vehicle name
