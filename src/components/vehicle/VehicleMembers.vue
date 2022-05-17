@@ -521,7 +521,7 @@ export default {
             this.addRow = !this.addRow;
         },
         addMember() {
-            if (this.newMember.length === 43 && +this.newQty > 0 && !(this.newMember in this.vehicle.balances)) {
+            if (this.newMember.length === 43 && +this.newQty > 0 && !(this.newMember in this.vehicle.balances) && (this.newMember !== this.vehicle.id)) {
                 this.memberAdds.push(
                     { recipient : this.newMember, qty: +this.newQty }
                 );

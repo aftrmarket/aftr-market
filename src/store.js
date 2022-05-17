@@ -1,4 +1,5 @@
 import {createStore } from 'vuex';
+import { fetchBalancesForAddress } from "verto-cache-interface";
 
 const store = createStore({
     state() {
@@ -134,10 +135,26 @@ const store = createStore({
                 context.commit("setTestLaunchConfigState");
             }
 
-    /*** ONLY RUNS IN PROD
-     * BUT NEEDS TO RUN HERE IN STORE.JS
-     */
-            if (import.meta.env.VITE_ENV === "PROD") {
+            if (import.meta.env.VITE_ENV === "TEST" && !import.meta.env.VITE_BUILD_PSTS) {
+
+                const tokens = await fetchBalancesForAddress(wallet.address);
+                /*** Returns an array of objects
+                 *  [
+                        {
+                            "name": "<TOKEN>",
+                            "ticker": "<TICKER>",
+                            "balance": <BALANCE>,
+                            "contractId": "<CONTRACT-ID OF TOKEN>",
+                            "userAddress": "<WALLET ADDRESS>",
+                            "type": "<TYPE OF TOKEN>"
+                        }
+                    ]
+                 */
+
+                
+                /*** DO WE HAVE THE ABILITY TO GET TOKEN PRICES IN TEST? */
+
+            } else if (import.meta.env.VITE_ENV === "PROD") {
                 // Now query Verto to get all PSTs contained in Wallet
                 const response = await fetch(
                     import.meta.env.VITE_VERTO_CACHE_URL + "balance/" + wallet.address

@@ -101,11 +101,11 @@ export default {
     },
     computed : {
         pstBalance() {
-            const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.id === this.selectedPstId);
+            const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.contractId === this.selectedPstId);
             return this.formatNumber(currentPst.balance);
         },
         pstTicker() {
-            const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.id === this.selectedPstId);
+            const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.contractId === this.selectedPstId);
             return currentPst.ticker;
         },
         vehicleTokenBox() {
@@ -162,7 +162,7 @@ export default {
             this.pricePerToken = null;
         },
         calcPstPrice() {
-            const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.id === this.selectedPstId);
+            const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.contractId === this.selectedPstId);
             this.pricePerToken = currentPst.price;
             this.pstValue = currentPst.price * this.pstInputTokens;
             this.updatePstInputValid(currentPst.balance);

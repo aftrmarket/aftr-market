@@ -1,4 +1,4 @@
-<template> 
+<template>
     <div class="grid grid-cols-2 gap-4 p-4 border">
         <div class="col-span-2">Contract Comparison</div>
         <div class="pt-4 w-full">
@@ -44,14 +44,7 @@ export default {
     },
     methods: {
         async readContracts() {
-            try {
-                // Using Smartweave
-                this.contract = await readContract(this.arweave, this.contractId, undefined, true);
-                //this.contract = await readContract(this.arweave, "HKr5pJhPUAzlGvQqERPLwIw9hm2nAr3CY-b0iRfctN4", undefined, true);
-            } catch (e) {
-                console.log(e);
-            }
-
+            //let contractId = "du1NxgooOxqDRg7N2eXiP5ozI5bbZu0VT4QBtDEjuwE";
             try{
                 // Using 3EM
                 //this.contract3 = await executeContract(this.contractId, undefined, true, this.gatewayConfig);
@@ -65,14 +58,14 @@ export default {
                 //         ARWEAVE_PROTOCOL: "https"
                 //     }
                 // );
-                this.contract3 = await executeContract(this.contractId, undefined, true,
-                    {
-                        ARWEAVE_HOST: "www.arweave.run",
-                        ARWEAVE_PORT: "443",
-                        ARWEAVE_PROTOCOL: "https"
-                    }
+                const stateInteractions = await executeContract(this.contractId, undefined, true, this.gatewayConfig
+                    // {
+                    //     ARWEAVE_HOST: "www.arweave.run",
+                    //     ARWEAVE_PORT: "443",
+                    //     ARWEAVE_PROTOCOL: "https"
+                    // }
                 );
-                // this.contract3 = state;
+                this.contract3 = stateInteractions.state;
                 // this.contract3 = await executeContract(this.contractId, undefined, true,
                 // {
                 //     ARWEAVE_HOST: import.meta.env.VITE_ARWEAVE_HOST,
@@ -84,24 +77,31 @@ export default {
             } catch(e) {
                 console.log(e);
             }
+            try {
+                // Using Smartweave
+                this.contract = await readContract(this.arweave, this.contractId, undefined, true);
+                //this.contract = await readContract(this.arweave, "HKr5pJhPUAzlGvQqERPLwIw9hm2nAr3CY-b0iRfctN4", undefined, true);
+            } catch (e) {
+                console.log(e);
+            }
         }
     },
     async created() {
         try {
-            // this.arweave = await Arweave.init({
-            //     host: this.arweaveHost,
-            //     port: this.arweavePort,
-            //     protocol: this.arweaveProtocol,
-            //     timeout: 20000,
-            //     logging: true,
-            // });
             this.arweave = await Arweave.init({
-                host: "www.arweave.run",
-                port: "443",
-                protocol: "https",
+                host: this.arweaveHost,
+                port: this.arweavePort,
+                protocol: this.arweaveProtocol,
                 timeout: 20000,
                 logging: true,
             });
+            // this.arweave = await Arweave.init({
+            //     host: "www.arweave.run",
+            //     port: "443",
+            //     protocol: "https",
+            //     timeout: 20000,
+            //     logging: true,
+            // });
         } catch (error) {
             console.log(error);
             return false;
