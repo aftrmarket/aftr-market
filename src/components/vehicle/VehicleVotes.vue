@@ -162,7 +162,7 @@ export default {
             if (!vote.type || vote.type === '') {
                 return vote.note;
             } else if (vote.type=== 'set') {
-                return "Change " + capitalize(vote.key) + " to " + capitalize(vote.value);
+                return "Change " + capitalize(vote.key) + " to " + capitalize(String(vote.value));
             } else if (vote.type === '?') {
                 return "?";
             } else if (vote.type === '???') {
