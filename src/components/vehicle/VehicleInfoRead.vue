@@ -1,5 +1,6 @@
 <template>
     <div class="pt-2">
+        <vote-simulator v-if="showVoteSimulator" @close="closeModal"></vote-simulator>
         <div class="flex items-center justify-between">
             <div class="px-4 py-6 sm:px-6 grid grid-cols-2 gap-x-4">
                 <label class="block text-lg text-gray-900">Vehicle Name:</label>
@@ -77,6 +78,11 @@
                     </div>
                 </div>
             </div>
+            <div>
+                <div class="px-4 sm:px-6 max-w-2xl text-sm text-gray-500">
+                    Use the <button style="color:#6C8CFF" @click.prevent="voteSimulatorTest" type="submit" :vehicle="vehicle"> Vote Simulator </button> to validate your vote system settings.
+                </div>
+            </div>
         </div>
         <div class="pt-4 grid grid-cols-4">    
             <div>
@@ -117,10 +123,11 @@
 
 <script>
 import numeral from "numeral";
+import VoteSimulator from "./VoteSimulator.vue";
 
 export default {
     props: ['vehicle'],
-    components: {},
+    components: {VoteSimulator},
     data() {
         return {
             currentVehicleSettings: null,
@@ -139,7 +146,8 @@ export default {
                     active: 0,
                     finalized: 0
                 },
-            }
+            },
+            showVoteSimulator: false,
         };
     },
     computed: {
@@ -168,6 +176,13 @@ export default {
         }
     },
     methods: {
+        voteSimulatorTest(){
+             console.log("vehicle", this.vehicle)
+            this.showVoteSimulator = true;
+        },
+        closeModal() {
+            this.showVoteSimulator = false;
+        },
         formatNumber(num, dec = false) {
             if (dec) {
                 return numeral(num).format("0,0.0000");

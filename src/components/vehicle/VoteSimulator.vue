@@ -63,19 +63,6 @@
           >
             <div class="bg-white px-2 pt-5 pb-8 col-lg-12">
               <div class="sm:flex sm:items-start">
-                <!-- <div
-                  class="
-                    mx-auto
-                    flex-shrink-0 flex
-                    items-center
-                    justify-center
-                    h-12
-                    w-12
-                    rounded-full
-                    bg-green-100
-                    sm:mx-0 sm:h-100 sm:w-100
-                  "
-                ></div> -->
                 <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                   <DialogTitle
                     as="h3"
@@ -93,8 +80,6 @@
                     <div class="mt-4 mb-4 grid grid-cols-3 gap-x-4">
                       <div class="text-gray-500">Voting System</div>
                     </div>
-
-                    <!-- <div  class="mt-4 mb-4 grid grid-cols-3 gap-x-4"> -->
                     <div>
                       <input
                         type="radio"
@@ -127,7 +112,6 @@
                         name="newQuorum"
                         :class="inputBox(true)"
                         v-model="selectedQuormValue"
-                        disabled
                       />
 
                       <label class="px-2 text-sm text-gray-700">Support</label>
@@ -138,14 +122,12 @@
                         name="newQuorum"
                         :class="inputBox(true)"
                         v-model="selectedSupportValue"
-                        disabled
                       />
                     </div>
-                    <!-- </div> -->
                   </div>
-
                   <div
                     class="
+                      mt-4
                       shadow
                       overflow-hidden
                       border-b border-gray-200
@@ -155,20 +137,6 @@
                     <table class="w-full text-xs divide-y divide-gray-200">
                       <thead class="bg-gray-50">
                         <tr>
-                          <!-- <th
-                            scope="col"
-                            class="
-                              px-6
-                              py-3
-                              text-left
-                              font-medium
-                              text-gray-500
-                              uppercase
-                              tracking-wider
-                            "
-                          >
-                            Member
-                          </th> -->
                           <th
                             scope="col"
                             class="
@@ -357,8 +325,7 @@
                               type="number"
                               v-model="value.token"
                               @change="tokenValue(value, index)"
-                              class="w-3/4"
-                              disabled
+                              class="w-3/4 mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md"
                             />
                           </td>
                           <td class="text-center px-1 py-6 text-gray-500">
@@ -366,7 +333,7 @@
                               type="radio"
                               v-model="value.voteCast"
                               value="yay"
-                              disabled
+                              @change="tokenValue(value, index)"
                             /><label class="px-2 text-sm text-gray-700"
                               >Yay</label
                             >
@@ -374,11 +341,11 @@
                               type="radio"
                               v-model="value.voteCast"
                               value="nay"
-                              disabled
+                              @change="tokenValue(value, index)"
                             /><label class="text-sm text-gray-700">Nay</label>
                           </td>
                           <td class="text-center px-4 py-3 text-gray-500">
-                            {{ value.votingPower }}
+                            {{ value.token }}
                           </td>
                         </tr>
                         <tr>
@@ -399,35 +366,47 @@
                     </table>
                   </div>
 
-                  <!-- <div class="mt-4 mb-4 grid grid-cols-3 gap-x-4"> -->
-                  <div class="text-gray-500">Vote Result</div>
-                  <div class="flex-parent-element">
-                    <div class="flex-child-element magenta">
-                      <label class="px-4 text-sm text-gray-700">Quarum</label>
-                      <label class="px-9 text-sm text-gray-700">Support</label>
-                      <div
-                        class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left"
-                      >
-                        <label class="px-1 text-sm text-gray-700"
-                          >{{ distrubutedQuorem }} %</label
-                        >
-                        <label class="px-10 text-sm text-gray-700">{{distrubutedSupport}} %</label>
+                  <div class="mt-4">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">
+                      Vote Result
+                    </h3>
+                    <dl class="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2">
+                      <div v-bind:class="inputClass('distrubutedQuorem')">
+                        <dt class="text-sm font-medium text-gray-500 truncate">
+                          Quorum
+                        </dt>
+                        <dd class="mt-1 text-2xl font-semibold text-gray-600">
+                          {{ distrubutedQuorem }}%
+                        </dd>
                       </div>
-                    </div>
-                    <div class="flex-child-element green">
-                      <label class="px-12 text-sm text-gray-700"
-                        >Total Support</label
+                      <div v-bind:class="inputClass('distrubutedSupport')">
+                        <dt class="text-sm font-medium text-gray-500 truncate">
+                          Support
+                        </dt>
+                        <dd class="mt-1 text-2xl font-semibold text-gray-600">
+                          {{ distrubutedSupport }}%
+                        </dd>
+                      </div>
+                      <div v-bind:class="inputClass('distrubutedSupport')">
+                        <dt class="text-sm font-medium text-gray-500 truncate">
+                          Total Support
+                        </dt>
+                        <dd class="mt-1 text-2xl font-semibold text-gray-600">
+                          {{ distrubutedTotalSupport }}%
+                        </dd>
+                      </div>
+                      <div
+                        v-bind:class="inputClass('distrubutedTotalOpposition')"
                       >
-                       <div
-                        class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left"
-                      >
-                        <label class="px-11 text-sm text-gray-700"
-                          >{{ distrubutedTotalSupport }} %</label
-                        >
-                       </div>  
-                    </div>
+                        <dt class="text-sm font-medium text-gray-500 truncate">
+                          Total Opposition
+                        </dt>
+                        <dd class="mt-1 text-2xl font-semibold text-gray-600">
+                          {{ distrubutedTotalOpposition }}%
+                        </dd>
+                      </div>
+                    </dl>
                   </div>
-                  <!-- </div> -->
                 </div>
               </div>
             </div>
@@ -466,13 +445,11 @@ export default {
           member: "test1",
           token: 1000,
           voteCast: "yay",
-          votingPower: 1000,
         },
         {
           member: "test2",
           token: 1005,
           voteCast: "nay",
-          votingPower: 1005,
         },
       ],
       tokenTotal: 0,
@@ -489,21 +466,50 @@ export default {
       distrubutedQuorem: 0,
       distrubutedSupport: 0,
       distrubutedTotalSupport: 0,
+      distrubutedTotalOpposition: 0,
       voteCastYay: [],
       voteCastNay: [],
     };
   },
 
   mounted() {
-    this.changeVoteCategory()
+    this.changeVoteCategory();
   },
 
   methods: {
+    formDirty() {
+      if (!this.selectedQuormValue || this.selectedQuormValue === "") {
+        // Quorum needs to be in the following range:  0.01 - 0.99
+        this.selectedQuormValue = this.selectedQuormValue;
+      }
+      if (!this.selectedSupportValue || this.selectedSupportValue === "") {
+        // Quorum needs to be in the following range:  0.01 - 0.99
+        this.selectedSupportValue = this.selectedSupportValue;
+      }
+    },
     inputBox(valid) {
       if (valid) {
         return "mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md";
       } else {
         return "mt-1 focus:ring-aftrRed focus:border-aftrRed shadow-sm sm:text-sm border-aftrRed rounded-md";
+      }
+    },
+
+    inputClass(key) {
+      if (
+        key == "distrubutedSupport" &&
+        this.distrubutedTotalSupport >= this.selectedSupportValue
+      ) {
+        return "px-4 py-5 bg-white shadow rounded-lg overflow-hidden sm:p-6 bg-green-100";
+      } else if (key == "distrubutedTotalOpposition") {
+        return "px-4 py-5 bg-white shadow rounded-lg overflow-hidden sm:p-6 bg-red-100";
+      } else if (
+        key == "distrubutedQuorem" &&
+        this.distrubutedQuorem >= this.selectedQuormValue
+      ) {
+        return "px-4 py-5 bg-white shadow rounded-lg overflow-hidden sm:p-6 bg-green-100";
+      } else {
+        return "px-4 py-5 bg-white shadow rounded-lg overflow-hidden sm:p-6 bg-red-100";
       }
     },
 
@@ -513,7 +519,7 @@ export default {
       }, 0);
 
       this.votingPowerTotal = this.memberData.reduce((accumulator, object) => {
-        return accumulator + object.votingPower;
+        return accumulator + object.token;
       }, 0);
 
       let result = this.memberData.filter((object) => object.voteCast == "yay");
@@ -526,23 +532,30 @@ export default {
     },
 
     tokenValue(value, index) {
-      console.log((value, index));
+      this.changeVoteCategory();
     },
 
-    async quarumCalculation() {
+    async quorumCalculation() {
       let data;
 
       if (this.selectedVoteCategory == "Distributed") {
-        data = ((this.voteCastTotal + this.voteNayCastTotal) / this.memberData.length) * 100;
+        data =
+          ((this.voteCastTotal + this.voteNayCastTotal) /
+            this.memberData.length) *
+          100;
         this.distrubutedQuorem = data.toFixed(2);
       } else {
-        let yayTotal = this.memberData.filter((object) => object.voteCast == "yay").reduce((accumulator , object) => {
-          return accumulator + object.token;
-        }, 0)
+        let yayTotal = this.memberData
+          .filter((object) => object.voteCast == "yay")
+          .reduce((accumulator, object) => {
+            return accumulator + object.token;
+          }, 0);
 
-        let nayTotal = this.memberData.filter((object) => object.voteCast == "nay").reduce((accumulator , object) => {
-          return accumulator + object.token;
-        }, 0)
+        let nayTotal = this.memberData
+          .filter((object) => object.voteCast == "nay")
+          .reduce((accumulator, object) => {
+            return accumulator + object.token;
+          }, 0);
 
         data = ((yayTotal + nayTotal) / this.tokenTotal) * 100;
         this.distrubutedQuorem = data.toFixed(2);
@@ -553,18 +566,23 @@ export default {
       let data;
 
       if (this.selectedVoteCategory == "Distributed") {
-        data = (this.voteCastTotal / (this.voteCastTotal + this.voteNayCastTotal)) * 100;
+        data =
+          (this.voteCastTotal / (this.voteCastTotal + this.voteNayCastTotal)) *
+          100;
         this.distrubutedSupport = data.toFixed(2);
       } else {
-        let yayTotal = this.memberData.filter((object) => object.voteCast == "yay").reduce((accumulator , object) => {
-          return accumulator + object.token;
-        }, 0)
+        let yayTotal = this.memberData
+          .filter((object) => object.voteCast == "yay")
+          .reduce((accumulator, object) => {
+            return accumulator + object.token;
+          }, 0);
 
-        let nayTotal = this.memberData.filter((object) => object.voteCast == "nay").reduce((accumulator , object) => {
-          return accumulator + object.token;
-        }, 0)
+        let nayTotal = this.memberData
+          .filter((object) => object.voteCast == "nay")
+          .reduce((accumulator, object) => {
+            return accumulator + object.token;
+          }, 0);
 
-        console.log("(yayTotal / (yayTotal + nayTotal)", yayTotal ,yayTotal , nayTotal)
         data = (yayTotal / (yayTotal + nayTotal)) * 100;
         this.distrubutedSupport = data.toFixed(2);
       }
@@ -577,17 +595,38 @@ export default {
         data = (this.voteCastTotal / this.memberData.length) * 100;
         this.distrubutedTotalSupport = data.toFixed(2);
       } else {
-        let yayTotal = this.memberData.filter((object) => object.voteCast == "yay").reduce((accumulator , object) => {
-          return accumulator + object.token;
-        }, 0)
+        let yayTotal = this.memberData
+          .filter((object) => object.voteCast == "yay")
+          .reduce((accumulator, object) => {
+            return accumulator + object.token;
+          }, 0);
 
-        let nayTotal = this.memberData.filter((object) => object.voteCast == "nay").reduce((accumulator , object) => {
-          return accumulator + object.token;
-        }, 0)
+        let nayTotal = this.memberData
+          .filter((object) => object.voteCast == "nay")
+          .reduce((accumulator, object) => {
+            return accumulator + object.token;
+          }, 0);
 
-        console.log("(yayTotal / (yayTotal + nayTotal)", yayTotal ,yayTotal , nayTotal)
         data = (yayTotal / (yayTotal + nayTotal)) * 100;
         this.distrubutedTotalSupport = data.toFixed(2);
+      }
+    },
+
+    async totalOppositionCalculation() {
+      let data;
+
+      if (this.selectedVoteCategory == "Distributed") {
+        data = (this.voteNayCastTotal / this.memberData.length) * 100;
+        this.distrubutedTotalOpposition = data.toFixed(2);
+      } else {
+        let nayTotal = this.memberData
+          .filter((object) => object.voteCast == "nay")
+          .reduce((accumulator, object) => {
+            return accumulator + object.token;
+          }, 0);
+
+        data = (nayTotal / this.tokenTotal) * 100;
+        this.distrubutedTotalOpposition = data.toFixed(2);
       }
     },
 
@@ -595,7 +634,6 @@ export default {
       this.addRow = !this.addRow;
     },
     addMember() {
-      console.log(this.newMember, this.newQty, this.selectedCastCategory);
       if (
         (this.newMember != "" &&
           this.newQty != "" &&
@@ -606,21 +644,21 @@ export default {
           member: this.newMember,
           token: this.newQty,
           voteCast: this.selectedCastCategory,
-          votingPower: this.newQty,
+          // votingPower: this.newQty,
         });
         this.addRow = false;
         this.newMember = "";
         this.newQty = "";
       }
-      console.log("memberData", this.memberData);
       this.changeVoteCategory();
       return;
     },
     changeVoteCategory() {
       this.total();
-      this.quarumCalculation();
+      this.quorumCalculation();
       this.supportCalculation();
       this.totalSupportCalculation();
+      this.totalOppositionCalculation();
     },
   },
   setup() {
@@ -631,22 +669,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.flex-parent-element {
-  display: flex;
-  width: 100%;
-}
-
-.flex-child-element {
-  flex: 1;
-  border: 1px solid rgb(204, 197, 197);
-  /* border: 2px solid red; */
-  border-radius: 5px;
-  /* margin: 10px; */
-}
-
-.flex-child-element:first-child {
-  margin-right: 20px;
-}
-</style>
