@@ -1,6 +1,6 @@
 <template>
     <div class="pt-2">
-        <vote-simulator v-if="showVoteSimulator" @close="closeModal"></vote-simulator>
+        <vote-simulator v-if="showVoteSimulator" :vehicle="vehicle" @close="closeModal"></vote-simulator>
         <div class="flex items-center justify-between">
             <div class="px-4 py-6 sm:px-6 grid grid-cols-2 gap-x-4">
                 <label class="block text-lg text-gray-900">Vehicle Name:</label>
@@ -177,7 +177,7 @@ export default {
     },
     methods: {
         voteSimulatorTest(){
-             console.log("vehicle", this.vehicle)
+            //  console.log("vehicle", this.vehicle)
             this.showVoteSimulator = true;
         },
         closeModal() {
