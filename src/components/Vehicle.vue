@@ -43,7 +43,7 @@
                                     <div class="hidden sm:block">
                                     <div class="border-b border-gray-200">
                                         <nav class="-mb-px flex" aria-label="Tabs">
-                                        <a v-for="tab in tabs" :key="tab.name" :href="tab.href" @click="tabClick(tab.name)" :class="[tab.current ? 'border-aftrBlue text-aftrBlue' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300', 'w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm']" :aria-current="tab.current ? 'page' : undefined">
+                                        <a v-for="tab in tabs" :key="tab.name" :href="tab.href" @click="tabClick(tab.name)" :class="tabText(tab)" :aria-current="tab.current ? 'page' : undefined">
                                             {{ tab.name }}
                                         </a>
                                         </nav>
@@ -108,6 +108,7 @@ export default {
             contractId: this.vehicleId,
             vehicle: {},
             interations: {},
+            anyWithdrawals: false,
 
             arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
             arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
@@ -132,6 +133,17 @@ export default {
         ...mapGetters(["getAftrContractSrcId"]),
     },
     methods: {
+        tabText(tab) {
+            let cssText = "w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm ";
+            if (tab.current) {
+                return cssText + "border-aftrBlue text-aftrBlue";
+            } else if (this.anyWithdrawals && tab.name == "Tokens") {
+                return cssText + "border-transparent text-aftrRed hover:text-gray-700 hover:border-gray-300";
+            } else {
+                return cssText + "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300";
+            }
+            
+        },
         viewVehicles() {
             this.$log.info("Vehicle : viewVehicles :: " ,"View Clicked");
             this.$router.push("../vehicles");
@@ -175,6 +187,11 @@ export default {
             let treasuryTotal = 0;
             if (this.vehicle.tokens) {
                 for (let token of this.vehicle.tokens) {
+                    // Are there any withdrawals waiting to be processed?
+                    if (token.withdrawals && token.withdrawals.length > 0) {
+                        this.anyWithdrawals = true;
+                    }
+
                     try {
                         const response = await fetch(import.meta.env.VITE_VERTO_CACHE_URL + "token/" + token.tokenId + "/price");
                         const responseObj = await response.json();
