@@ -292,7 +292,7 @@
                                             <tbody class="bg-white divide-y divide-gray-200">
                                                 <tr v-for="(member, index) in daoMembers" :key="index" class="hover:bg-gray-50">
                                                     <td class="text-xs px-6 py-3">
-                                                        {{ walletAddressSubstr(member.wallet) + "..." }}
+                                                        {{ walletAddressSubstr(member.wallet) }}
                                                     </td>
                                                     <td class="text-xs px-6 py-3">
                                                         {{ member.balance }}
