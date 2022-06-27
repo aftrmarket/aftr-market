@@ -59,7 +59,7 @@
                                 <vehicle-votes v-else-if="activeTab === 'Votes'" :vehicle="vehicle" :contractId="contractId"></vehicle-votes>
                                 <vehicle-state v-else-if="activeTab === 'State'" :vehicle="vehicle"></vehicle-state>
                                 <vehicle-activity v-else-if="activeTab === 'Activity'" :arweave="arweave" :interactions="interactions"></vehicle-activity>
-
+                                <vehicle-setting v-else-if="activeTab === 'Setting'" :vehicle="vehicle"></vehicle-setting>
                             </div>
                         </section>
                         <!-- Tabs End -->
@@ -84,10 +84,11 @@ import VehicleVotes from './vehicle/VehicleVotes.vue';
 import VehicleState from './vehicle/VehicleState.vue';
 import VehicleActivity from './vehicle/VehicleActivity.vue';
 import VehiclePlaceholder from './vehicle/VehiclePlaceholder.vue';
+import VehicleSetting from './vehicle/VehicleSetting.vue';
 import { mapGetters } from "vuex";
 
 export default {
-    components: { VehicleInfo, VehicleMembers, VehicleTokens, VehicleVotes, VehicleState, VehicleActivity, VehiclePlaceholder },
+    components: { VehicleInfo, VehicleMembers, VehicleTokens, VehicleVotes, VehicleState, VehicleActivity, VehiclePlaceholder,VehicleSetting },
     props: ['vehicleId'],
     data() {
         return {
@@ -101,6 +102,7 @@ export default {
                 { name: 'Votes', href: '#', current: false },
                 { name: 'State', href: '#', current: false },
                 { name: 'Activity', href: '#', current: false },
+                { name: 'Setting', href: '#', current: false },
             ],
             arweave: {},
             activeTab: "Info",
