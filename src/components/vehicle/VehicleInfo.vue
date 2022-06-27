@@ -2,7 +2,7 @@
     <div class="pt-4 flex justify-end">
         <div v-if="allowEdits" class="px-4 sm:px-6">
             <SwitchGroup as="div" class="flex items-center">
-                <Switch v-model="uiEditMode" @click="loadVehicleDefaults" :class="[uiEditMode ? 'bg-green-600' : 'bg-gray-200', 'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2']">
+                <Switch v-model="uiEditMode" :class="[uiEditMode ? 'bg-green-600' : 'bg-gray-200', 'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2']">
                     <span aria-hidden="true" :class="[uiEditMode ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200']" />
                 </Switch>
                 <SwitchLabel as="span" class="ml-3">
@@ -161,6 +161,9 @@ export default {
             } else {
                 this.allowVehicleEdits = false;
             }
+        },
+        uiEditMode() {
+            this.loadVehicleDefaults();
         }
     },
     computed: {
