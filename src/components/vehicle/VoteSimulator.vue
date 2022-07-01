@@ -241,19 +241,26 @@ export default {
         });
     } else {
       let myVehicle = JSON.parse(JSON.stringify(this.vehicle));
-
+      
       const objEntries = Object.entries(myVehicle);
       let test = Object.fromEntries(objEntries);
+      let val = Object.entries(test.settings).map((item) =>{
+        if(item[1][0] == "quorum"){
+          this.selectedQuorumValue = item[1][1] * 100
+        }
 
-      console.log(
+        if(item[1][0] == "support"){
+          this.selectedSupportValue = item[1][1] * 100
+        }
+      })
         Object.entries(test.balances).map((item) =>
           this.memberData.push({
             member: this.idSubstr(item[0]),
             token: item[1],
-            voteCast: "",
+            voteCast: "", 
           })
         )
-      );
+      
     }
 
     this.changeVoteCategory();

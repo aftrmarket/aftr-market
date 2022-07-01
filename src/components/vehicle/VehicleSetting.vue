@@ -13,14 +13,14 @@
     </div>
     <perfect-scrollbar>
     <div :class="editClass">
-        <!-- Member Table -->
+        <!-- Setting Table -->
         <div class="col-span-3 shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
                         <th scope="col" class="flex space-x-3 px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             <span class="py-2">Key ({{ Object.keys(vehicle.settings).length }})</span>
-                            <button v-if="uiEditMode" @click.prevent="addMemberRow" type="button" class="px-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none">
+                            <button v-if="uiEditMode" @click.prevent="addSettingRow" type="button" class="px-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" />
                                 </svg>
@@ -30,10 +30,10 @@
                             Value
                         </th>
                         <th v-if="uiEditMode" scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            New Key
+                            Add/Remove Key
                         </th>
-                        <!-- <th v-if="uiEditMode" scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        </th> -->
+                        <th v-if="uiEditMode" scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        </th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -45,28 +45,28 @@
                             {{ val[1] }}
                         </td>
                         <td v-if="uiEditMode" class="text-right px-4 py-2">
-                            <input type="number" v-model="memberUpdates[addr]" @blur="onDirty" class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
+                            <textarea v-model="memberUpdates[val[0]]" @blur="onDirty" class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
                         </td>
-                        <!-- <td v-if="uiEditMode" class="text-center px-4 py-2">
-                            <button @click.prevent="removeMember(addr)" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none">
+                        <td v-if="uiEditMode" class="text-center px-4 py-2">
+                            <button @click.prevent="removeSetting(val)" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
                                 </svg>
                             </button>
-                        </td> -->
+                        </td>
                     </tr>
                     <tr v-show="addRow" class="text-xs text-gray-500 hover:bg-gray-50">
                         <td class="text-left px-2 py-2">
-                            <input type="text" v-model="newMember" class="mt-1 mb-1 w-full text-xs focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md">
+                            <input type="text" v-model="newSettingKey" class="mt-1 mb-1 w-full text-xs focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md">
                         </td>
                         <td class="text-right px-4 py-2">
                             0
                         </td>
                         <td class="text-right px-4 py-2">
-                            <textarea v-model="newQty" @blur="onDirty" class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
+                            <textarea v-model="newSettingValue" @blur="onDirty" class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
                         </td>
                         <td class="text-center px-4 py-2">
-                            <button @click.prevent="addMember" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none">
+                            <button @click.prevent="addSetting" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
                                 </svg>
@@ -91,7 +91,7 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    <!-- <tr v-for="(key, index) in Object.keys(memberUpdates)" :key="key" class="text-xs text-gray-500 hover:bg-gray-50">
+                    <tr v-for="(key, index) in Object.keys(memberUpdates)" :key="key" class="text-xs text-gray-500 hover:bg-gray-50">
                         <td class="px-4 py-2">
                             {{ index + 1 }}
                         </td>
@@ -105,37 +105,37 @@
                                 </svg>
                             </button>
                         </td>
-                    </tr> -->
-                    <tr v-for="(member, index) in memberAdds" :key="member" class="text-xs text-gray-500 hover:bg-gray-50">
+                    </tr>
+                    <tr v-for="(value, index) in settingAdds" :key="value" class="text-xs text-gray-500 hover:bg-gray-50">
                         <td class="px-4 py-2">
                             {{ Object.keys(memberUpdates).length + index + 1 }}
                         </td>
                         <td class="px-4 py-2">
-                            <span v-html="proposedText(member.recipient, member.qty, 'add')"></span>
+                            <span v-html="proposedText(value, value, 'add')"></span>
                         </td>
                         <td class="px-4 py-2 text-center">
-                            <button @click.prevent="removeProposal(member.recipient, 'add')" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none">
+                            <button @click.prevent="removeProposal(value[0], 'add')" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
                                 </svg>
                             </button>
                         </td>
                     </tr>
-                    <!-- <tr v-for="(member, index) in memberRemoves" :key="member" class="text-xs text-gray-500 hover:bg-gray-50">
+                    <tr v-for="(value, index) in settingRemoves" :key="value" class="text-xs text-gray-500 hover:bg-gray-50">
                         <td class="px-4 py-2">
-                            {{ Object.keys(memberUpdates).length + memberAdds.length + index + 1 }}
+                            {{ Object.keys(memberUpdates).length + settingAdds.length + index + 1 }}
                         </td>
                         <td class="px-4 py-2">
-                            <span v-html="proposedText(member, vehicle.balances[member], 'remove')"></span>
+                            <span v-html="proposedText(value, value, 'remove')"></span>
                         </td>
                         <td class="px-4 py-2 text-center">
-                            <button @click.prevent="removeProposal(member, 'remove')" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none">
+                            <button @click.prevent="removeProposal(value[0], 'remove')" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
                                 </svg>
                             </button>
                         </td>
-                    </tr> -->
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -181,12 +181,12 @@ export default {
             arweaveMine: import.meta.env.VITE_MINE,
             /** */
 
-            memberRemoves: [],
+            settingRemoves: [],
             memberUpdates: {},
-            memberAdds: [],
+            settingAdds: [],
             uiEditMode: false,
-            newMember: '',
-            newQty: null,
+            newSettingKey: '',
+            newSettingValue: null,
             addRow: false,
             allowEdits: false,
             isDirty: false,
@@ -198,20 +198,20 @@ export default {
         },
     },
     computed: {
-        selectAll: {
-            get() {
-                return this.vehicle.balances ? this.memberRemoves.length == Object.keys(this.vehicle.balances).length : false;
-            },
-            set(value) {
-                let selected = [];
-                if(value) {
-                    for(let balance in this.vehicle.balances) {
-                        selected.push(balance);
-                    }
-                }
-                this.memberRemoves = selected;
-            }
-        },
+        // selectAll: {
+        //     get() {
+        //         return this.vehicle.balances ? this.settingRemoves.length == Object.keys(this.vehicle.balances).length : false;
+        //     },
+        //     set(value) {
+        //         let selected = [];
+        //         if(value) {
+        //             for(let balance in this.vehicle.balances) {
+        //                 selected.push(balance);
+        //             }
+        //         }
+        //         this.settingRemoves = selected;
+        //     }
+        // },
         editClass() {
             if (this.allowEdits && this.uiEditMode) {
                 return 'pt-4 w-full grid grid-cols-3 gap-4';
@@ -220,11 +220,11 @@ export default {
             }
         },
         numChanges() {
-            return this.memberRemoves.length + this.memberAdds.length + Object.keys(this.memberUpdates).length;
+            return this.settingRemoves.length + this.settingAdds.length + Object.keys(this.memberUpdates).length;
         },
-        checkboxClass() {
-            return "focus:ring-aftrBlue h-4 w-4 text-aftrBlue border-gray-300 rounded";
-        },
+        // checkboxClass() {
+        //     return "focus:ring-aftrBlue h-4 w-4 text-aftrBlue border-gray-300 rounded";
+        // },
         editModeClass() {
             if (this.uiEditMode) {
                 return "text-black text-sm";
@@ -249,49 +249,51 @@ export default {
         ...mapGetters(['arConnected', 'getActiveAddress', 'keyFile']),
     },
     methods: {
-        formatNumber(num, dec = false) {
-            if (dec) {
-                return numeral(num).format("0,0.0000");
-            } else {
-                return numeral(num).format("0,0");
+        // formatNumber(num, dec = false) {
+        //     if (dec) {
+        //         return numeral(num).format("0,0.0000");
+        //     } else {
+        //         return numeral(num).format("0,0");
+        //     }
+        // },
+        // formatAddr(addr) {
+        //     return addr.substring(0, 5) + '...' + addr.substring(addr.length - 5);
+        // },
+        proposedText(settingKey, settingValue, type) {
+            if (type === 'update') {
+                return "<span style='color:#FF6C8C'><b>Update</b></span> " + settingValue;
+            } else if (type === 'add') {
+                return "<span style='color:green'><b>Add key </b></span> <b>" + settingKey[0] + "</b> and <span style='color:green'><b>Value </b></span> <b>" + settingValue[1] +"</b>";
+            } else if (type === 'remove') {
+                return "<span style='color:#FF6C8C'><b>Remove key </b></span> <b>" + settingKey[0];
             }
         },
-        formatAddr(addr) {
-            return addr.substring(0, 5) + '...' + addr.substring(addr.length - 5);
-        },
-        proposedText(recipient, qty, type) {
-            if (type === 'update') {
-                const currentQty = this.vehicle.balances[recipient];
-                if (currentQty > +qty) {
-                    return "<span style='color:#FF6C8C'><b>Burn</b></span> " + this.formatNumber(String(currentQty - +qty)) + " tokens for <b> " + recipient + "</b>";
-                } else if (currentQty < +qty) {
-                    return "<span style='color:green'><b>Mint</b></span> " + this.formatNumber(String(+qty - currentQty)) + " tokens for <b>" + recipient + "</b>";
-                } else if (currentQty === +qty) {
-                    return "No change for " + recipient;
+        removeSetting(settingVal) {
+            if (!this.settingRemoves.includes(settingVal)) {
+                if(!(settingVal[0] == 'quorum' || settingVal[0] == 'support' || settingVal[0] == 'voteLength' || settingVal[0] == 'communityDescription' || settingVal[0] == 'communityLogo')){
+                    this.settingRemoves.push(settingVal);
+                    this.onDirty();
+                } else {
+                    this.$swal({
+                    icon: "error",
+                    html: "Can't remove the "+ `${settingVal[0]}`+ ' from setting',
+                    showConfirmButton: true,
+                    allowOutsideClick: false
+                });
                 }
-            } else if (type === 'add') {
-                return "<span style='color:green'><b>Add</b></span> <b>" + recipient + "</b>, minting " + this.formatNumber(qty) + " tokens";
-            } else if (type === 'remove') {
-                return "<span style='color:#FF6C8C'><b>Remove</b></span> <b>" + recipient + "</b>, burning " + this.formatNumber(qty) + " tokens";
+                
             }
         },
-        removeMember(member) {
-            if (!this.memberRemoves.includes(member)) {
-                this.memberRemoves.push(member);
-                this.onDirty();
-            }
-        },
-        removeProposal(member, type) {
+        removeProposal(value, type) {
             if (type === 'update') {
-                delete this.memberUpdates[member];
+                delete this.memberUpdates[value];
             } else if (type === 'add') {
-                this.memberAdds = this.memberAdds.filter((el) => el.recipient !== member);
+                this.settingAdds = this.settingAdds.filter((el) => el[0] !== value);
             } else if (type === 'remove') {
-                this.memberRemoves = this.memberRemoves.filter((el) => el !== member);
+                this.settingRemoves = this.settingRemoves.filter((el) => el[0] !== value);
             }
         },
         checkEditStatus() {
-          console.log("checkEditStatus", this.vehicle)
             // If wallet is in balances, then user can edit
             if ((this.getActiveAddress === this.vehicle.creator && this.vehicle.ownership === 'single') || (this.getActiveAddress in this.vehicle.balances && this.vehicle.ownership === 'dao')) {
                 this.allowEdits = true;
@@ -314,13 +316,13 @@ export default {
                     }
                 }
                 // Deselect any rows with checkboxes
-                if (this.memberRemoves.includes(member)) {
+                if (this.settingRemoves.includes(member)) {
                     
-                    this.memberRemoves = this.memberRemoves.filter((el) => el !== member);
+                    this.settingRemoves = this.settingRemoves.filter((el) => el !== member);
                 }
             }
 
-            if (this.memberRemoves.length + this.memberAdds.length + Object.keys(this.memberUpdates).length > 0) {
+            if (this.settingRemoves.length + this.settingAdds.length + Object.keys(this.memberUpdates).length > 0) {
                 this.isDirty = true;
             } else {
                 this.isDirty = false;
@@ -329,30 +331,24 @@ export default {
         arConnect() {
             this.$store.dispatch('arConnect');
         },
-        buildInput(recipient, qty, type = 'tokenChange') {
+        buildInput(settingKey, settingValue, type = 'tokenChange') {
             let input = {};
-            let currentQty = +this.vehicle.balances[recipient];
+            // let currentsettingValue = +this.vehicle.balances[settingKey];
             
             input.function = 'propose';
-            input.recipient = recipient;
-            if (type === 'removeMember') {
-                input.type = type;
-                input.qty = qty;
-                input.note = "Remove " + recipient + ", burning " + this.formatNumber(String(currentQty)) + " tokens";
-            } else if (type === 'addMember') {
-                input.type = type;
-                input.qty = qty;
-                input.note = "Add " + recipient + ", minting " + qty + " tokens";
-            } else if (currentQty > qty) {
-                input.qty = currentQty - qty;
-                input.type = 'burn';
-                input.note = "Burn " + this.formatNumber(String(currentQty - qty)) + " for " + recipient;
-            } else if (currentQty < qty) {
-                input.qty = qty - currentQty;
-                input.type = 'mint';
-                input.note = "Mint " + this.formatNumber(String(qty - currentQty)) + " for " + recipient;
-            }
-
+            if (type === 'removeSetting') {
+                input.type = 'set',
+                input.key = 'settings.'+settingKey,
+                input.value = "-"
+            } else if (type === 'addSetting') {
+                input.type = 'set',
+                input.key = 'settings.'+settingKey,
+                input.value = settingValue
+            } else if (type === 'update') {
+                input.type = 'set',
+                input.key = 'settings.'+settingKey,
+                input.value = settingValue
+            } 
             return input;
         },
         async submit() {
@@ -361,30 +357,25 @@ export default {
                 return;
             }
 
-            // Determine changes
-            const count = this.memberRemoves.length + this.memberAdds.length + Object.keys(this.memberUpdates).length;
-            let recipient = '';
-            let qty = 0;
-            let action = {
-                input: {}
-                //caller: this.getActiveAddress
-            };
-
+            const count = this.settingRemoves.length + this.settingAdds.length + Object.keys(this.memberUpdates).length;
+            let settingKey = '';
+            let settingValue = 0;
+            
             let input = {};
 
             if (count === 1) {
-                if (this.memberRemoves.length === 1) {
-                    recipient = this.memberRemoves[0];
-                    qty = +this.vehicle.balances[recipient];
-                    input = this.buildInput(recipient, qty, 'removeMember');
-                } else if (this.memberAdds.length === 1) {
-                    recipient = this.memberAdds[0].recipient;
-                    qty = +this.memberAdds[0].qty;
-                    input = this.buildInput(recipient, qty, 'addMember');
+                if (this.settingRemoves.length === 1) {
+                    settingKey = this.settingRemoves[0][0];
+                    settingValue = this.settingRemoves[0][1];
+                    input = this.buildInput(settingKey, settingValue, 'removeSetting');
+                } else if (this.settingAdds.length === 1) {
+                    settingKey = this.settingAdds[0][0];
+                    settingValue = this.settingAdds[0][1];
+                    input = this.buildInput(settingKey, settingValue, 'addSetting');
                 } else if (Object.keys(this.memberUpdates).length === 1) {
-                    recipient = Object.keys(this.memberUpdates)[0];
-                    qty = +Object.values(this.memberUpdates)[0];
-                    input = this.buildInput(recipient, qty);
+                    settingKey = Object.keys(this.memberUpdates)[0];
+                    settingValue = Object.keys(this.memberUpdates)[1];
+                    input = this.buildInput(memberKey, settingValue, 'update');
                 }
             } else if (count > 1) {
                 input.function = 'multiInteraction';
@@ -392,27 +383,29 @@ export default {
                 input.note = 'Multi-Interaction';
                 input.actions = [];
 
-                if (this.memberRemoves.length > 0) {
-                    for(let member in this.memberRemoves) {
+                if (this.settingRemoves.length > 0) {
+                    this.settingRemoves.forEach(setting => {
                         let multiAction = {
                             input: {}
                         };
-                        recipient = member;
-                        qty = +this.vehicle.balances[member];
+                        
+                        settingKey = setting[0];
+                        settingValue = setting[1];
                     
-                        multiAction.input = this.buildInput(recipient, qty, 'removeMember');
+                        multiAction.input = this.buildInput(settingKey, settingValue, 'removeSetting');
                         input.actions.push(multiAction);
-                    }
+                    })
                 }
-                if (this.memberAdds.length > 0) {
-                    this.memberAdds.forEach(member => {
+                if (this.settingAdds.length > 0) {
+                    this.settingAdds.forEach(setting => {
                         let multiAction = {
                             input: {}
                         };
-                        recipient = member.recipient;
-                        qty = +member.qty;
+                        
+                        settingKey = setting[0];
+                        settingValue = setting[1];
 
-                        multiAction.input = this.buildInput(recipient, qty, 'addMember');
+                        multiAction.input = this.buildInput(settingKey, settingValue, 'addSetting');
                         input.actions.push(multiAction);
                     });
                 }
@@ -421,10 +414,10 @@ export default {
                         let multiAction = {
                             input: {}
                         };
-                        recipient = member;
-                        qty = +this.memberUpdates[member];
+                        settingKey = member;
+                        settingValue = +this.memberUpdates[member];
                     
-                        multiAction.input = this.buildInput(recipient, qty);
+                        multiAction.input = this.buildInput(settingKey, settingValue);
                         input.actions.push(multiAction);
                     }
                 }
@@ -449,14 +442,13 @@ export default {
                 });
                 return;
             }
-            this.$log.info("VehicleMembers : submit :: ", JSON.stringify(input));
+            this.$log.info("VehicleSetting : submit :: ", JSON.stringify(input));
 
             let wallet;
             if (import.meta.env.VITE_ENV === "DEV") {
                 if(this.keyFile.length){
                     wallet =  JSON.parse(this.keyFile);
                 } else {
-                    // alert("Please attach your keyfile");
                     this.$swal({
                         icon: 'warning',
                         html: "Please attach your keyfile",
@@ -465,7 +457,7 @@ export default {
             }
             this.$swal({
                 icon: "info",
-                html: "Please wait while member changes are sent to the contract...",
+                html: "Please wait while setting changes are sent to the contract...",
                 showConfirmButton: false,
                 allowOutsideClick: false,
                 didOpen: () => {
@@ -483,13 +475,13 @@ export default {
                 const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
                 const response = await fetch(mineUrl);
             }
-            this.$log.info("VehicleMembers : sumbit :: ", "TX: " + txid);
+            this.$log.info("VehicleSetting : sumbit :: ", "TX: " + txid);
 
             this.$swal.close();
 
-            let msg = "Your membership changes have been submitted to the Permaweb.  Your changes will be reflected in the next block.";
+            let msg = "Your setting changes have been submitted to the Permaweb.  Your changes will be reflected in the next block.";
             if (this.vehicle.ownership === "dao") {
-                msg = "Your membership changes have been proposed.  You'll be able to see the vote in the next block.";
+                msg = "Your setting changes have been proposed.  You'll be able to see the vote in the next block.";
             }
             // alert(msg);
             this.$swal({
@@ -498,18 +490,17 @@ export default {
             })
             this.$router.push("/vehicles");
         },
-        addMemberRow() {
+        addSettingRow() {
             this.addRow = !this.addRow;
         },
-        addMember() {
-            if (this.newMember.length > 0 && +this.newQty > 0 ) {
-                this.memberAdds.push(
-                    [this.newMember , this.newQty]
+        addSetting() {
+            if (this.newSettingKey.length > 0 && this.newSettingValue) {
+                this.settingAdds.push(
+                    [this.newSettingKey , this.newSettingValue]
                 );
-                console.log("memberAdds", this.memberAdds)
                 this.addRow = false;
-                this.newMember = '';
-                this.newQty = ''
+                this.newSettingKey = '';
+                this.newSettingValue = ''
             }
         },
     },
