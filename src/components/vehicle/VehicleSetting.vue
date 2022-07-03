@@ -14,7 +14,7 @@
     <perfect-scrollbar>
     <div :class="editClass">
         <!-- Setting Table -->
-        <div class="col-span-3 shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+        <div class="col-span-3 pt-2 shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
@@ -29,8 +29,8 @@
                         <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Value
                         </th>
-                        <th v-if="uiEditMode" scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Add/Remove Key
+                        <th v-if="uiEditMode" scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Edit Value
                         </th>
                         <th v-if="uiEditMode" scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                         </th>
