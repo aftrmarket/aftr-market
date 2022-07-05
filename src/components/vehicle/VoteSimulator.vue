@@ -10,7 +10,7 @@
                         <div class="text-gray-500">Voting System</div>
                     </div>
                     <div>
-                        <input type="radio" v-model="selectedVoteCategory" value="Distributed" class="form-radio text-aftrBlue" @change="changeVoteCategory"/>
+                        <input type="radio" v-model="selectedVoteCategory" value="Equal" class="form-radio text-aftrBlue" @change="changeVoteCategory"/>
                         <label class="px-2 text-sm text-gray-700">Distributed Evenly</label>
                         <input type="radio" v-model="selectedVoteCategory" value="Weighted" class="form-radio text-aftrBlue" @change="changeVoteCategory"/>
                         <label class="px-2 text-sm text-gray-700">Weighted</label>
@@ -203,7 +203,7 @@ export default {
       totalVoteCast: 0,
       voteNayCastTotal: 0,
       votingPowerTotal: 0,
-      selectedVoteCategory: "Distributed",
+      selectedVoteCategory: "Equal",
       selectedCastCategory: "yay",
       addRow: false,
       newMember: "",
@@ -244,6 +244,11 @@ export default {
       
       const objEntries = Object.entries(myVehicle);
       let test = Object.fromEntries(objEntries);
+     
+      let voteValue = test.votingSystem
+      
+      this.selectedVoteCategory =voteValue.charAt(0).toUpperCase() + voteValue.slice(1);
+       
       let val = Object.entries(test.settings).map((item) =>{
         if(item[1][0] == "quorum"){
           this.selectedQuorumValue = item[1][1] * 100
@@ -345,7 +350,7 @@ export default {
     },
 
     determineVotingPower(tokenCount, aggregrate = false) {
-        if (this.selectedVoteCategory == "Distributed") {
+        if (this.selectedVoteCategory == "Equal") {
             if (aggregrate) {
                 return String(this.memberData.length);
             } else {
@@ -359,7 +364,7 @@ export default {
     async quorumCalculation() {
       let data;
 
-      if (this.selectedVoteCategory == "Distributed") {
+      if (this.selectedVoteCategory == "Equal") {
         data =
           ((this.voteCastTotal + this.voteNayCastTotal) /
             this.memberData.length) *
@@ -386,7 +391,7 @@ export default {
     async supportCalculation() {
       let data;
 
-      if (this.selectedVoteCategory == "Distributed") {
+      if (this.selectedVoteCategory == "Equal") {
         let result1 = this.memberData.filter(
           (object) => object.voteCast == "nay" || object.voteCast == ""
         );
@@ -414,7 +419,7 @@ export default {
     async totalSupportCalculation() {
       let data;
 
-      if (this.selectedVoteCategory == "Distributed") {
+      if (this.selectedVoteCategory == "Equal") {
         data = (this.voteCastTotal / this.memberData.length) * 100;
         this.totalSupport = data.toFixed(2);
       } else {
@@ -440,7 +445,7 @@ export default {
     async totalOppositionCalculation() {
       let data;
 
-      if (this.selectedVoteCategory == "Distributed") {
+      if (this.selectedVoteCategory == "Equal") {
         data = (this.voteNayCastTotal / this.memberData.length) * 100;
         this.totalOpposition = data.toFixed(2);
       } else {

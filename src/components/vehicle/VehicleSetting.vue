@@ -19,7 +19,7 @@
                 <thead class="bg-gray-50">
                     <tr>
                         <th scope="col" class="flex space-x-3 px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            <span class="py-2">Key ({{ Object.keys(vehicle.settings).length }})</span>
+                            <span class="py-2">Key ({{ Object.keys(settingArray).length }})</span>
                             <button v-if="uiEditMode" @click.prevent="addSettingRow" type="button" class="px-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
@@ -37,7 +37,7 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    <tr v-for="val in vehicle.settings" :key="val" class="text-xs text-gray-500 hover:bg-gray-50">
+                    <tr v-for="val in settingArray" :key="val" class="text-xs text-gray-500 hover:bg-gray-50">
                         <td class="text-left px-4 py-2 font-mono tracking-wider">
                             {{ val[0] }}
                         </td>
@@ -45,7 +45,7 @@
                             {{ val[1] }}
                         </td>
                         <td v-if="uiEditMode" class="text-right px-4 py-2">
-                            <textarea v-model="memberUpdates[val[0]]" @blur="onDirty" class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
+                            <textarea v-model="memberUpdates[val, val[0]]" @blur="onDirty" class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
                         </td>
                         <td v-if="uiEditMode" class="text-center px-4 py-2">
                             <button @click.prevent="removeSetting(val)" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none">
@@ -75,6 +75,10 @@
                     </tr>
                 </tbody>
             </table>
+        </div>
+
+         <div v-if="settingArray.length == 0 && showMessage">
+            No current custom settings.
         </div>
 
         <!--- Verify Proposal Start --->
@@ -181,6 +185,7 @@ export default {
             arweaveMine: import.meta.env.VITE_MINE,
             /** */
 
+            settingArray: [],
             settingRemoves: [],
             memberUpdates: {},
             settingAdds: [],
@@ -190,7 +195,18 @@ export default {
             addRow: false,
             allowEdits: false,
             isDirty: false,
+            updatedValue: [],
+            showMessage: true
         };
+    },
+    mounted() {
+        this.vehicle.settings.map((value,index) => {
+            if(!(value[0] == 'quorum' || value[0] == 'support' || value[0] == 'voteLength' || value[0] == 'lockMinLength' || value[0] == 'lockMaxLength' || value[0] == 'communityDescription' || value[0] == 'communityLogo')){
+                this.settingArray.push([
+                    value[0] , value[1]
+                ])
+            }
+        })
     },
     watch: {
         arConnected() {
@@ -214,8 +230,14 @@ export default {
         // },
         editClass() {
             if (this.allowEdits && this.uiEditMode) {
+                this.showMessage = false
                 return 'pt-4 w-full grid grid-cols-3 gap-4';
             } else {
+                if(this.settingArray.length == 0){
+                    this.showMessage = true
+                } else {
+                    this.showMessage = false
+                }
                 return 'pt-4 w-3/4 grid grid-cols-3 gap-4';
             }
         },
@@ -260,6 +282,7 @@ export default {
         //     return addr.substring(0, 5) + '...' + addr.substring(addr.length - 5);
         // },
         proposedText(settingKey, settingValue, type) {
+            this.showMessage = false;
             if (type === 'update') {
                 return "<span style='color:#FF6C8C'><b>Update</b></span> " + settingValue;
             } else if (type === 'add') {
@@ -307,13 +330,21 @@ export default {
                 if (this.memberUpdates[member] === '') {
                     delete this.memberUpdates[member];
                 } else {
-                    this.memberUpdates[member] = parseInt(this.memberUpdates[member]);
-                    if (+this.memberUpdates[member] < 0) {
-                        this.memberUpdates[member] = +this.memberUpdates[member] * -1;
-                    }
-                    if (isNaN(+this.memberUpdates[member])){
-                        this.memberUpdates[member] = '';
-                    }
+                    // this.memberUpdates[member] = parseInt(this.memberUpdates[member]);
+                    // if (+this.memberUpdates[member] < 0) {
+                    //     this.memberUpdates[member] = +this.memberUpdates[member] * -1;
+                    // }
+                    // if (isNaN(+this.memberUpdates[member])){
+                    //     this.memberUpdates[member] = '';
+                    // }
+                    this.updatedValue.filter((e1,index) => {
+                        if(e1[0] == member){
+                            delete this.updatedValue[index];
+                        }
+                    })
+                    this.updatedValue.push(
+                        [member ,this.memberUpdates[member]]
+                    )
                 }
                 // Deselect any rows with checkboxes
                 if (this.settingRemoves.includes(member)) {
@@ -373,9 +404,9 @@ export default {
                     settingValue = this.settingAdds[0][1];
                     input = this.buildInput(settingKey, settingValue, 'addSetting');
                 } else if (Object.keys(this.memberUpdates).length === 1) {
-                    settingKey = Object.keys(this.memberUpdates)[0];
-                    settingValue = Object.keys(this.memberUpdates)[1];
-                    input = this.buildInput(memberKey, settingValue, 'update');
+                    settingKey = this.updatedValue[0][0];
+                    settingValue = this.updatedValue[0][1];
+                    input = this.buildInput(settingKey, settingValue, 'update');
                 }
             } else if (count > 1) {
                 input.function = 'multiInteraction';

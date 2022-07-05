@@ -50,6 +50,7 @@
                                     </div>
                                 </div>
                                 <vehicle-info v-if="activeTab === 'Info'" :vehicle="vehicle" :contractId="contractId"></vehicle-info>
+                                <vehicle-setting v-else-if="activeTab === 'Settings'" :vehicle="vehicle"></vehicle-setting>
                                 <vehicle-members v-else-if="activeTab === 'Members'" :vehicle="vehicle"></vehicle-members>
                                 <vehicle-tokens v-else-if="activeTab === 'Tokens'" :vehicle="vehicle"></vehicle-tokens>
                                 <!--<vehicle-profits v-else-if="activeTab === 'Profits'"></vehicle-profits>-->
@@ -59,7 +60,6 @@
                                 <vehicle-votes v-else-if="activeTab === 'Votes'" :vehicle="vehicle" :contractId="contractId"></vehicle-votes>
                                 <vehicle-state v-else-if="activeTab === 'State'" :vehicle="vehicle"></vehicle-state>
                                 <vehicle-activity v-else-if="activeTab === 'Activity'" :arweave="arweave" :interactions="interactions"></vehicle-activity>
-                                <vehicle-setting v-else-if="activeTab === 'Setting'" :vehicle="vehicle"></vehicle-setting>
                             </div>
                         </section>
                         <!-- Tabs End -->
@@ -94,6 +94,7 @@ export default {
         return {
             tabs: [
                 { name: 'Info', href: '#', current: true },
+                { name: 'Settings', href: '#', current: false },
                 { name: 'Members', href: '#', current: false },
                 { name: 'Tokens', href: '#', current: false },
                 //{ name: 'Profits', href: '#', current: false },
@@ -101,8 +102,7 @@ export default {
                 //{ name: 'Leases', href: '#', current: false },
                 { name: 'Votes', href: '#', current: false },
                 { name: 'State', href: '#', current: false },
-                { name: 'Activity', href: '#', current: false },
-                { name: 'Setting', href: '#', current: false },
+                { name: 'Activity', href: '#', current: false },                
             ],
             arweave: {},
             activeTab: "Info",
