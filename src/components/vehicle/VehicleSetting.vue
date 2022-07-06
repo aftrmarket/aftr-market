@@ -263,9 +263,9 @@ export default {
         },
         statusMessage() {
             if (this.getActiveAddress === this.creatorAddress && this.vehicle.ownership === 'single') {
-                return "Membership changes will process immediately because you are the owner of the vehicle";
+                return "Settings changes will process immediately because you are the owner of the vehicle";
             } else {
-                return "Membership changes will be proposed as votes because this is a DAO owned vehicle";
+                return "Settings changes will be proposed as votes because this is a DAO owned vehicle";
             }
         },
         ...mapGetters(['arConnected', 'getActiveAddress', 'keyFile']),
