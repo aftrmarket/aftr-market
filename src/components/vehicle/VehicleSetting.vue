@@ -201,7 +201,7 @@ export default {
     },
     mounted() {
         this.vehicle.settings.map((value,index) => {
-            if(!(value[0] == 'quorum' || value[0] == 'support' || value[0] == 'voteLength' || value[0] == 'lockMinLength' || value[0] == 'lockMaxLength' || value[0] == 'communityDescription' || value[0] == 'communityLogo')){
+            if(!(value[0] == 'quorum' || value[0] == 'support' || value[0] == 'voteLength' || value[0] == 'communityDescription' || value[0] == 'communityLogo')){
                 this.settingArray.push([
                     value[0] , value[1]
                 ])
@@ -284,7 +284,7 @@ export default {
         proposedText(settingKey, settingValue, type) {
             this.showMessage = false;
             if (type === 'update') {
-                return "<span style='color:#FF6C8C'><b>Update</b></span> " + settingValue;
+                return "<span style='color:#FF6C8C'><b>Change  </b></span> " + settingKey+ " to " +settingValue;
             } else if (type === 'add') {
                 return "<span style='color:green'><b>Add key </b></span> <b>" + settingKey[0] + "</b> and <span style='color:green'><b>Value </b></span> <b>" + settingValue[1] +"</b>";
             } else if (type === 'remove') {
