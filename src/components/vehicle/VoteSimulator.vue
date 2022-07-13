@@ -10,10 +10,10 @@
                         <div class="text-gray-500">Voting System</div>
                     </div>
                     <div>
-                        <input type="radio" v-model="selectedVoteCategory" value="Equal" class="form-radio text-aftrBlue" @change="changeVoteCategory"/>
-                        <label class="px-2 text-sm text-gray-700">Distributed Evenly</label>
                         <input type="radio" v-model="selectedVoteCategory" value="Weighted" class="form-radio text-aftrBlue" @change="changeVoteCategory"/>
                         <label class="px-2 text-sm text-gray-700">Weighted</label>
+                        <input type="radio" v-model="selectedVoteCategory" value="Equal" class="form-radio text-aftrBlue" @change="changeVoteCategory"/>
+                        <label class="px-2 text-sm text-gray-700">Distributed Evenly</label>
                     </div>
                     <div class="mt-4 mb-4 grid grid-cols-3 gap-x-4">
                         <div class="text-gray-500">Settings</div>
@@ -203,7 +203,7 @@ export default {
       totalVoteCast: 0,
       voteNayCastTotal: 0,
       votingPowerTotal: 0,
-      selectedVoteCategory: "Equal",
+      selectedVoteCategory: "Weighted",
       selectedCastCategory: "yay",
       addRow: false,
       newMember: "",
@@ -274,9 +274,7 @@ export default {
   methods: {
     resetInput(value, index) {
       this.memberData.map((val, i) => {
-        console.log(i, index, i == index);
         if (i == index) {
-          console.log(val.voteCast);
           val.voteCast = "";
         }
       });
