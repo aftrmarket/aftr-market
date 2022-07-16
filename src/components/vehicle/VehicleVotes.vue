@@ -129,13 +129,13 @@ export default {
         }
     },
     methods: {
-    arConnect() {
-        this.$store.dispatch('getCurrentBlockValue');
-    },
-     walletAddressSubstr(addr, chars = 10) {
+        arConnect() {
+            this.$store.dispatch('getCurrentBlockValue');
+        },
+        walletAddressSubstr(addr, chars = 10) {
             if (typeof addr === 'string') {
                 let len = parseInt(chars/2);
-                return addr.substr(0, len) + '...' + addr.substr(-len);
+                return addr.substring(0, len) + '...' + addr.substring(addr.length - len);
             } else {
                 return '';
             }
