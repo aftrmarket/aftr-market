@@ -1,4 +1,7 @@
 <template>
+    <div class="pt-4 w-full">
+        <create-vehicle-simple v-if="showCreateSimple" @close="closeModal"></create-vehicle-simple>
+    </div>
     <div>
         <main class="-mt-32">
             <div class="max-w-7xl mx-auto pb-12 px-4 sm:px-6 lg:px-8">
@@ -8,13 +11,21 @@
                         <option value="all">All Vehicles</option>
                         <option value="my" selected>My Vehicles</option>
                     </select>
-                    <button type="button" @click.prevent="createVehicle()" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"></path>
-                            <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z"></path>
-                        </svg>
-                        <span class="pl-2">Create Vehicle</span>
-                    </button>
+                    <div>
+                        <button type="button" @click.prevent="createVehicle()" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"></path>
+                                <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z"></path>
+                            </svg>
+                            <span class="pl-2">Create</span>
+                        </button>
+                        <button type="button" @click.prevent="openModal" class="ml-2  inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
+                            </svg>
+                           <span class="pl-2">Quick Add</span>
+                        </button>
+                    </div>
                 </div>
                 <!-- List -->
                 <perfect-scrollbar>
@@ -56,9 +67,10 @@ import { executeContract } from "@three-em/js";
 import VehicleCard from "./vehicle/VehicleCard.vue";
 import VehicleCardPlaceholder from "./vehicle/VehicleCardPlaceholder.vue";
 import { mapGetters } from "vuex";
+import CreateVehicleSimple from "./CreateVehicleSimple.vue";
 
 export default {
-    components: { VehicleCard, VehicleCardPlaceholder, },
+    components: { VehicleCard, VehicleCardPlaceholder, CreateVehicleSimple },
     data() {
         return {
             /** Smartweave variables */
@@ -86,6 +98,7 @@ export default {
             message: "",
             showResult: true,
             hasNextPage: false,
+            showCreateSimple: false,
         };
     },
     // mounted() {
@@ -349,6 +362,13 @@ export default {
             for (const pst of this.$store.getters.getActiveWallet.psts) {
                 this.myPsts.push(pst.contractId);
             }
+        },
+        openModal() {
+            this.showCreateSimple = true;
+        },
+        closeModal() {
+            this.showCreateSimple = false;
+
         },
     },
     async created() {        
