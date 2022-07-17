@@ -14,16 +14,22 @@
               <div class="sm:flex sm:items-start">
                 <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                 </div>
                 <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                     <DialogTitle as="h3" class="text-lg leading-6 font-medium text-gray-900">
-                        Create Vehicle
+                        Create AFTR Vehicle
                     </DialogTitle>
                     <div class="pt-6">
-                        <input v-model="vehicleName" ref="inputName" type="text" placeholder="Vehicle Name" class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md" /><br/>
-                        <input v-model="vehicleTicker" ref="inputTicker" type="text" placeholder="Ticker" class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md" />
+                        <div class="flex flex-row items-center gap-2">
+                            <label class="text-gray-700 text-sm">Vehicle Name&nbsp;</label>
+                            <input v-model="vehicleName" ref="inputName" type="text" placeholder="Vehicle Name" class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md" />
+                        </div>
+                        <div class="flex flex-row items-center gap-2">
+                            <label class="text-gray-700 text-sm">Vehicle Ticker</label>
+                            <input v-model="vehicleTicker" ref="inputTicker" type="text" placeholder="Ticker" class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md" />
+                        </div>
                         <div class="pt-4 relative flex items-start">
                             <div class="flex items-center h-5">
                                 <input v-model="transferAssets" @click="transferClick" type="checkbox" class="focus:ring-aftrBlue h-4 w-4 text-aftrBlue border-gray-300 rounded" />
@@ -260,6 +266,8 @@ export default {
     },
     created() {
         //this.walletPsts = this.$store.getters.getActiveWallet.psts;
+        this.vehicleName = this.walletAddressSubstr(this.getActiveAddress);
+        this.vehicleTicker = this.walletAddressSubstr(this.getActiveAddress).substring(0, 5);
     },
 }
 </script>
