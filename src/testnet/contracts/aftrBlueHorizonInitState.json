@@ -20,7 +20,7 @@
     "settings": [
       [
         "quorum",
-        ".6"
+        0.6
       ],
       [
         "support",
