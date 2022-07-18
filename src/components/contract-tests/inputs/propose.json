@@ -1,0 +1,6 @@
+{
+    "function": "propose",
+    "type": "set",
+    "key": "settings.quorum",
+    "value": 0.5
+}

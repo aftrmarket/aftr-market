@@ -60,6 +60,8 @@
                                 <vehicle-votes v-else-if="activeTab === 'Votes'" :vehicle="vehicle" :contractId="contractId"></vehicle-votes>
                                 <vehicle-state v-else-if="activeTab === 'State'" :vehicle="vehicle"></vehicle-state>
                                 <vehicle-activity v-else-if="activeTab === 'Activity'" :arweave="arweave" :interactions="interactions"></vehicle-activity>
+
+                                <vehicle-contract-test v-else-if="activeTab === 'Test Contract' && env === 'DEV'" :vehicle="vehicle"></vehicle-contract-test>
                             </div>
                         </section>
                         <!-- Tabs End -->
@@ -82,13 +84,14 @@ import VehicleTokens from './vehicle/VehicleTokens.vue';
 //import VehicleFractions from './vehicle/VehicleFractions.vue';
 import VehicleVotes from './vehicle/VehicleVotes.vue';
 import VehicleState from './vehicle/VehicleState.vue';
+import VehicleContractTest from './contract-tests/VehicleContractTest.vue';
 import VehicleActivity from './vehicle/VehicleActivity.vue';
 import VehiclePlaceholder from './vehicle/VehiclePlaceholder.vue';
 import VehicleSetting from './vehicle/VehicleSetting.vue';
 import { mapGetters } from "vuex";
 
 export default {
-    components: { VehicleInfo, VehicleMembers, VehicleTokens, VehicleVotes, VehicleState, VehicleActivity, VehiclePlaceholder,VehicleSetting },
+    components: { VehicleInfo, VehicleMembers, VehicleTokens, VehicleVotes, VehicleState, VehicleActivity, VehiclePlaceholder,VehicleSetting, VehicleContractTest },
     props: ['vehicleId'],
     data() {
         return {
@@ -102,7 +105,8 @@ export default {
                 //{ name: 'Leases', href: '#', current: false },
                 { name: 'Votes', href: '#', current: false },
                 { name: 'State', href: '#', current: false },
-                { name: 'Activity', href: '#', current: false },                
+                { name: 'Activity', href: '#', current: false },
+                { name: 'Test Contract', href: '#', current: false },
             ],
             arweave: {},
             activeTab: "Info",
@@ -115,6 +119,7 @@ export default {
             arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
             arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
             arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
+            env: import.meta.env.VITE_ENV,
         };
     },
     computed: {
