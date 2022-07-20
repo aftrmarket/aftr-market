@@ -190,5 +190,18 @@ export default {
         reader.readAsText(this.file);
     },
   },
+  created() {
+    /*
+    window.addEventListener("arweaveWalletLoaded", async () => {
+        try {
+            const addr = await window.arweaveWallet.getActiveAddress();
+            const config = await window.arweaveWallet.getArweaveConfig();
+
+            console.log("CONNECTED");
+            // update config and addr state
+        } catch {}
+    })
+    */
+  }
 };
 </script>
