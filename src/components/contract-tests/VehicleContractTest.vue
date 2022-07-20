@@ -1,7 +1,7 @@
 <template> 
     <div class="pt-4 w-full">
         <div class="flex flex-col">
-            <select v-model="selectInput" @change="loadInput" class="w-64">
+            <select v-model="selectInput" @change="loadInput" class="w-64 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block sm:text-sm border-gray-300 rounded-md">
                 <option value="" disabled>Select Function</option>
                 <option value="balance">Balance</option>
                 <option value="propose">Propose</option>
@@ -14,20 +14,29 @@
             </select>
 
             <label class="mt-4">Input:</label>
-            <div class="border border-gray-200 mt-2 mb-2 w-3/4 pt-2 pb-2">
-                <textarea v-model="inputString" rows="4" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" />
-            </div>
-            <div>
+            <textarea v-model="input" rows="10" class=" mt-2 w-3/4 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block sm:text-sm border-gray-300 rounded-md" />
+            <div class="mt-2">
                 <button v-if="readyToTest" @click="testContract" type="button" class="rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-green-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
                     Test Contract
                 </button>
             </div>
 
-            <label class="mt-4">Output:</label>
-            <div class="border border-gray-200 mt-2 mb-2 w-3/4 pt-2 pb-2">
-                <perfect-scrollbar>
-                    <vue-json-pretty :path="'res'" :data="output" :showDoubleQuotes="keyQuotes" :deep=depth :deepCollapseChildren="false" :showLength="true" :showSelectController="true"> </vue-json-pretty>
-                </perfect-scrollbar>
+            <div v-if="readyToOutput" class="mt-4">
+                <label class="">Output:</label>
+                <div class="mt-2 text-sm flex flex-row">
+                    <label class="pl-1">Status: </label>
+                    <label class="pl-2 text-green-700 font-mono">{{ outputType }}</label>
+                </div>
+                <div class="mt-2 mb-2 text-sm flex flex-row">
+                    <label class="pl-1">Result: </label>
+                    <label class="pl-2 text-green-700 font-mono">{{ outputResult }}</label>
+                </div>
+                <label class="text-sm pl-1">State: </label>
+                <div class="border border-gray-200 mt-2 mb-2 w-full pt-2 pb-2">
+                    <perfect-scrollbar>
+                        <vue-json-pretty :path="'res'" :data="outputState" :showDoubleQuotes="keyQuotes" :deep=depth :deepCollapseChildren="false" :showLength="true" :showSelectController="true"> </vue-json-pretty>
+                    </perfect-scrollbar>
+                </div>
             </div>
         </div>
     </div>
@@ -36,12 +45,18 @@
 <script>
 import VueJsonPretty from 'vue-json-pretty';
 import 'vue-json-pretty/lib/styles.css';
-import { interactWrite } from "smartweave";
+import { interactWrite, interactWriteDryRun } from "smartweave";
 import { executeContract } from "@three-em/js";
 import { mapGetters } from 'vuex';
 
 import inputBalance from "./inputs/balance.json";
 import inputPropose from "./inputs/propose.json";
+import inputTransfer from "./inputs/transfer.json";
+import inputDeposit from "./inputs/deposit.json";
+import inputWithdrawal from "./inputs/withdrawal.json";
+import inputReadOutbox from "./inputs/readOutbox.json";
+import inputVote from "./inputs/vote.json";
+import inputMultiInteraction from "./inputs/multiInteraction.json";
 
 export default {
     props: ["vehicle"],
@@ -51,9 +66,13 @@ export default {
             keyQuotes: true,
             depth: 3,
             selectInput: "",
-            input: { message: "Please select a function." },
+            input: "Please select a function.",
             output: { message: "Waiting for input..." },
             readyToTest: false,
+            readyToOutput: false,
+            outputType: "",
+            outputResult: "",
+            outputState: "",
 
 
             arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
@@ -64,7 +83,11 @@ export default {
     },
     computed: {
         inputString() {
-            return JSON.stringify(this.input, null, 4);
+            if (JSON.stringify(this.input).includes("{")) {
+                return JSON.stringify(this.input, null, 4);
+            } else {
+                return this.input;
+            }
         },
         ...mapGetters(['keyFile']),
     },
@@ -81,13 +104,35 @@ export default {
         },
         loadInput() {
             this.readyToTest = true;
+            this.readyToOutput = false;
+            this.output = "Press the Test Contract button to to test the input.";
+            let fileInput = {};
             if (this.selectInput === "balance") {
-                this.input = inputBalance;
+                fileInput = JSON.stringify(inputBalance);
             } else if (this.selectInput === "propose") {
-                this.input = inputPropose;
+                fileInput = JSON.stringify(inputPropose);
+            } else if (this.selectInput === "transfer") {
+                fileInput = JSON.stringify(inputTransfer);
+            } else if (this.selectInput === "deposit") {
+                fileInput = JSON.stringify(inputDeposit);
+            } else if (this.selectInput === "withdrawal") {
+                fileInput = JSON.stringify(inputWithdrawal);
+            } else if (this.selectInput === "readOutbox") {
+                fileInput = JSON.stringify(inputReadOutbox);
+            } else if (this.selectInput === "vote") {
+                fileInput = JSON.stringify(inputVote);
+            } else if (this.selectInput === "multiInteraction") {
+                fileInput = JSON.stringify(inputMultiInteraction);
             } else {
                 this.readyToTest = false;
-                this.input = { message: "This function is not setup yet." } ;
+            }
+
+
+
+            if (this.readyToTest) {
+                this.input = JSON.stringify(JSON.parse(fileInput), null, 4);
+            } else {
+                this.input = "This function input has not been written yet."
             }
             
         },
@@ -136,46 +181,60 @@ export default {
                     this.$swal.showLoading()
                 },
             });
+            let response = "";
             try {
                 if (import.meta.env.VITE_ENV === "DEV") {
-                    const txid = await interactWrite(arweave, wallet, this.vehicle.id, this.input);
-                    console.log(JSON.stringify(txid));
+                    let inputObj = JSON.parse(this.input);
+                    response = await interactWriteDryRun(arweave, wallet, this.vehicle.id, inputObj);
                 }
             } catch(e) {
                 this.$swal({
                     icon: "error",
-                    html: "Failed to write to the Permaweb.  Please try again.",
+                    html: "Interact Write Dry Run Failed - " + e,
                     showConfirmButton: true,
                     allowOutsideClick: false
                 });
+                this.readyToOutput = false;
             }
+
+            // Handle the output
+            this.outputType = response.type;
+            this.outputResult = response.result;
+            this.outputState = response.state;
+            this.readyToOutput = true;
+            
+            /***
+             * type = ok or error
+             * result = "message"
+             * state = {}
+             */
 
             /**** IN ORDER FOR THIS TO PROCESS, YOU NEED TO RUN http://localhost:1984/mine */
-            if(Boolean(this.arweaveMine)){
-                const mineUrl = this.arweaveProtocol + "://" + this.arweaveHost + ":" + this.arweavePort + "/mine";
-                const response = await fetch(mineUrl);
-            }
+            // if(Boolean(this.arweaveMine)){
+            //     const mineUrl = this.arweaveProtocol + "://" + this.arweaveHost + ":" + this.arweavePort + "/mine";
+            //     const response = await fetch(mineUrl);
+            // }
 
-            this.$swal({
-                icon: "info",
-                html: "Getting new vehicle state...",
-                showConfirmButton: false,
-                allowOutsideClick: false,
-                didOpen: () => {
-                    this.$swal.showLoading()
-                },
-            });
+            // this.$swal({
+            //     icon: "info",
+            //     html: "Getting new vehicle state...",
+            //     showConfirmButton: false,
+            //     allowOutsideClick: false,
+            //     didOpen: () => {
+            //         this.$swal.showLoading()
+            //     },
+            // });
 
-            try {
-                const stateInteractions = await executeContract(this.vehicle.id, undefined, true, {
-                    ARWEAVE_HOST: import.meta.env.VITE_ARWEAVE_HOST,
-                    ARWEAVE_PORT: import.meta.env.VITE_ARWEAVE_PORT,
-                    ARWEAVE_PROTOCOL: import.meta.env.VITE_ARWEAVE_PROTOCOL
-                });
-                this.output = stateInteractions;
-            } catch(e) {
-                this.output = "Error executing contract: " + e;
-            }
+            // try {
+            //     const stateInteractions = await executeContract(this.vehicle.id, undefined, true, {
+            //         ARWEAVE_HOST: import.meta.env.VITE_ARWEAVE_HOST,
+            //         ARWEAVE_PORT: import.meta.env.VITE_ARWEAVE_PORT,
+            //         ARWEAVE_PROTOCOL: import.meta.env.VITE_ARWEAVE_PROTOCOL
+            //     });
+            //     this.output = stateInteractions;
+            // } catch(e) {
+            //     this.output = "Error executing contract: " + e;
+            // }
 
             this.$swal.close();
         },

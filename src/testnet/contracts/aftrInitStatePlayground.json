@@ -203,6 +203,7 @@
     "foreignCalls": [],
     "settings" : [
         [ "quorum", 0.5 ],
+        [ "support", 0.5],
         [ "voteLength", 2000 ],
         [ "lockMinLength", 100 ],
         [ "lockMaxLength", 10000 ],

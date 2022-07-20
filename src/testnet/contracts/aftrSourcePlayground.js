@@ -162,9 +162,14 @@ async function handle(state, action) {
       if (!key || key === "") {
         ThrowError("Invalid Key.");
       }
-      if (!value || value === "") {
+    
+    if (key === "settings.quorum" || key === "settings.support" || key === "settings.voteLength" || key === "settings.lockMinLength" || key === "settings.lockMaxLength") {
+        if (typeof value != "number") {
+            ThrowError(key + " must be a number.");
+        }
+    } else if (!value || value === '') {
         ThrowError("Invalid Value.");
-      }
+    }
       let currentValue = String(getStateValue(state, key));
       note = "Change " + getStateProperty(key) + " from " + currentValue + " to " + String(value);
     } else if (voteType === "assetDirective") {
