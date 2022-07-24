@@ -977,7 +977,7 @@ export default {
                 }
             }
 
-            /***** NEED TO MAKE SURE THAT NONE OF THESE ARE NULL */
+            /***** NEED TO MAKE SURE THAT NONE OF THESE ARE MISSING */
             this.vehicle.settings = [
                 ["quorum", this.newQuorum],
                 ["support", this.newSupport],
