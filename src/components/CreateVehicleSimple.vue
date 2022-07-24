@@ -113,22 +113,11 @@ export default {
                 "ownership" : "single",
                 "votingSystem" : "weighted",
                 "settings": [
-                    [
-                        "quorum",
-                        0.5
-                    ],
-                            [
-                        "support",
-                        0.5
-                    ],
-                    [
-                        "voteLength",
-                        2160
-                    ],
-                    [
-                        "communityLogo",
-                        ""
-                    ]
+                    [ "quorum", 0.5 ],
+                    [ "support", 0.5 ],
+                    [ "voteLength", 2160 ],
+                    [ "communityLogo", "" ],
+                    [ "evolve", null ]
                 ]
             }
         }

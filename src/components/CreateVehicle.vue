@@ -984,6 +984,7 @@ export default {
                 ["voteLength", 2160],
                 ["communityDescription", this.vehicle.desc],
                 ["communityLogo", this.communityLogoValue],
+                ["evolve", null]
             ];
             /*************** */
 
