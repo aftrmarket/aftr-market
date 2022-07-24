@@ -113,7 +113,12 @@ const store = createStore({
                 address: "",
                 psts: [],
             };
+
+            // Try to get wallet, if fails, connect so user can assign permissions
             try {
+                wallet.address = await window.arweaveWallet.getActiveAddress();
+            } catch(e) {
+                console.log(e);
                 const promiseResult = await window.arweaveWallet.connect([
                     "ACCESS_ADDRESS",
                     "ACCESS_ALL_ADDRESSES",
@@ -121,15 +126,54 @@ const store = createStore({
                     "ACCESS_ARWEAVE_CONFIG",
                 ]);
                 wallet.address = await window.arweaveWallet.getActiveAddress();
-                console.log(wallet.address);
-
-                let config = await window.arweaveWallet.getArweaveConfig();
-                context.commit("setArConnectConfig", config);
-            } catch (error) {
-                console.log("ERROR during ArConnection: " + error);
-                alert("Do you have the ArConnect wallet?.  AFTR Market integrates with ArConnect, so you'll need have the ArConnect plugin installed in your browser.  Go to ArConnect.io for more information.");
             }
-    
+            
+            // Set correct config
+            try {                
+                let config = await window.arweaveWallet.getArweaveConfig();
+                if (config.host != import.meta.env.VITE_ARWEAVE_HOST && config.port != import.meta.env.VITE_ARWEAVE_PORT && config.protocol != import.meta.env.VITE_ARWEAVE_PROTOCOL) {
+                    console.log("Current Config: " + JSON.stringify(config));
+                    config = { 
+                        host: import.meta.env.VITE_ARWEAVE_HOST, 
+                        port: import.meta.env.VITE_ARWEAVE_PORT,
+                        protocol: import.meta.env.VITE_ARWEAVE_PROTOCOL
+                    };
+                    console.log("New Config: " + JSON.stringify(config));
+                    context.commit("setArConnectConfig", config);
+                }
+                wallet.address = await window.arweaveWallet.getActiveAddress();
+                console.log(wallet.address);
+            } catch(e) {
+                alert(e);
+            }
+
+            // try {
+            //     const promiseResult = await window.arweaveWallet.connect([
+            //         "ACCESS_ADDRESS",
+            //         "ACCESS_ALL_ADDRESSES",
+            //         "SIGN_TRANSACTION",
+            //         "ACCESS_ARWEAVE_CONFIG",
+            //     ]);
+            //     wallet.address = await window.arweaveWallet.getActiveAddress();
+            //     console.log(wallet.address);
+
+            //     let config = await window.arweaveWallet.getArweaveConfig();
+            //     if (config.host != import.meta.env.VITE_ARWEAVE_HOST && config.port != import.meta.env.VITE_ARWEAVE_PORT && config.protocol != import.meta.env.VITE_ARWEAVE_PROTOCOL) {
+            //         console.log("Current Config: " + JSON.stringify(config));
+            //         config = { 
+            //             host: import.meta.env.VITE_ARWEAVE_HOST, 
+            //             port: import.meta.env.VITE_ARWEAVE_PORT,
+            //             protocol: import.meta.env.VITE_ARWEAVE_PROTOCOL
+            //         };
+            //         console.log("New Config: " + JSON.stringify(config));
+            //         context.commit("setArConnectConfig", config);
+            //     }
+                
+                
+            // } catch (error) {
+            //     console.log("ERROR during ArConnection: " + error);
+            //     alert("Do you have the ArConnect wallet?.  AFTR Market integrates with ArConnect, so you'll need have the ArConnect plugin installed in your browser.  Go to ArConnect.io for more information.");
+            // }
             if (wallet.address.length === 43) {
                 context.commit("arConnect", wallet);
                 context.commit("setTestLaunchConfigState");
@@ -195,15 +239,15 @@ const store = createStore({
     /*** END ONLY RUNS IN PROD */
             }
         },
-            async arDisconnect(context) {
-                try {
-                    const promiseResult = await window.arweaveWallet.disconnect();
-                } catch (error) {
-                    console.log("ERROR during ArDisconnection: " + error);
-                }
-                context.commit('arDisconnect');
+        async arDisconnect(context) {
+            try {
+                const promiseResult = await window.arweaveWallet.disconnect();
+            } catch (error) {
+                console.log("ERROR during ArDisconnection: " + error);
             }
+            context.commit('arDisconnect');
         }
+    }
 });
 
 export default store;

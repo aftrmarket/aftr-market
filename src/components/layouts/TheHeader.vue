@@ -1,4 +1,7 @@
 <template>
+    <div class="pt-4 w-full">
+        <ar-connect-window v-if="showArconnect" @close="closeModal"></ar-connect-window>
+    </div>
     <div class="bg-aftrDarkGrey pb-32">
       <nav class="bg-aftrDarkGrey">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -56,21 +59,21 @@
 
               <!-- ArConnect Begin -->
               <div>
-                <div v-if="!$store.getters.arConnected" class="flex items-center">
-                    <div class="text-aftrDarkGrey-light text-sm font-light">
-                        No Wallet Connected
+                    <div v-if="!$store.getters.arConnected" class="flex items-center">
+                        <div class="text-aftrDarkGrey-light text-sm font-light">
+                            No Wallet Connected
+                        </div>
+                        <button @click.prevent="arConnectClick" type="submit" class="inline-flex items-center p-1 border border-transparent shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed">
+                            <img src="../../assets/arconnect-logo.png" alt="Login to ArConnect" width="24" />
+                        </button>
                     </div>
-                    <button @click.prevent="arConnect" type="submit" class="inline-flex items-center p-1 border border-transparent shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed">
-                        <img src="../../assets/arconnect-logo.png" alt="Login to ArConnect" width="24" />
-                    </button>
-                </div>
-                <div v-else class="flex items-center">
-                    <div class="text-aftrGo text-sm font-light">
-                    <input v-if="siteMode==='DEV'" type="file" ref="doc" @change="readFile()" />
-                  {{ walletAddressSubstr }}
-                </div>
-                <div>
-                        <button @click.prevent="arDisconnect" type="submit" class="inline-flex items-center p-1 border border-transparent shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed">
+                    <div v-else class="flex items-center">
+                        <div class="text-aftrGo text-sm font-light">
+                        <input v-if="siteMode==='DEV'" type="file" ref="doc" @change="readFile()" />
+                        {{ walletAddressSubstr }}
+                    </div>
+                    <div>
+                        <button @click.prevent="arConnectClick" type="submit" class="inline-flex items-center p-1 border border-transparent shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed">
                             <img src="../../assets/arconnect-on-logo.png" alt="Login to ArConnect" width="24" />
                         </button>
                     </div>
@@ -93,16 +96,20 @@
 </template>
 <script>
 
+import ArConnectWindow from './ArConnectWindow.vue';
+
 export default {
+    components: { ArConnectWindow },
   data() {
     return {
-      arConnected: false,
-      profileDropdown: false,
-      psts: [],
-      devMode: import.meta.env.VITE_ARWEAVE_HOST === "localhost",
-      siteMode: import.meta.env.VITE_ENV,
-      file: null, 
-      content: {}
+        arConnected: false,
+        profileDropdown: false,
+        psts: [],
+        devMode: import.meta.env.VITE_ARWEAVE_HOST === "localhost",
+        siteMode: import.meta.env.VITE_ENV,
+        file: null, 
+        content: {},
+        showArconnect: false,
     };
   },
   computed: {
@@ -160,11 +167,14 @@ export default {
     toggleProfileMenu() {
       this.profileDropdown = !this.profileDropdown;
     },
+    arConnectClick() {
+        this.showArconnect = !this.showArconnect;
+    },
     arConnect() {
         this.$store.dispatch('arConnect');
     },
     arDisconnect() {
-      this.$store.dispatch("arDisconnect");
+        this.$store.dispatch("arDisconnect");
     },
     switchMode() {
         let url = "";
@@ -178,30 +188,20 @@ export default {
         window.location.href = url;
     },
     readFile() {
-      this.file = this.$refs.doc.files[0];
-      const reader = new FileReader();
+        this.file = this.$refs.doc.files[0];
+        const reader = new FileReader();
         this.content = "check the console for file output";
         reader.onload = (res) => {
-          this.$log.info("TheHeader : readFile :: ", res.target.result);
-          this.content = res.target.result
-          this.$store.commit("addKeyFile", this.content);
+            this.$log.info("TheHeader : readFile :: ", res.target.result);
+            this.content = res.target.result
+            this.$store.commit("addKeyFile", this.content);
         };
         reader.onerror = (err) => this.$log.error("TheHeader : readFile :: ", err);
         reader.readAsText(this.file);
     },
+    closeModal() {
+        this.showArconnect = false;
+    },
   },
-  created() {
-    /*
-    window.addEventListener("arweaveWalletLoaded", async () => {
-        try {
-            const addr = await window.arweaveWallet.getActiveAddress();
-            const config = await window.arweaveWallet.getArweaveConfig();
-
-            console.log("CONNECTED");
-            // update config and addr state
-        } catch {}
-    })
-    */
-  }
 };
 </script>

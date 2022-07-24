@@ -313,6 +313,8 @@ export default {
             }
         },
         async init() {
+            await this.$store.dispatch('arConnect');
+
             try {
                 this.getMyVehicle = true;
                 // Check to see if system is ready for for Test Launch
