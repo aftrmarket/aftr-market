@@ -32,18 +32,26 @@
                                 <label class="text-gray-700 text-sm">Gateway: </label>
                                 <label class="text-gray-700 text-xs font-mono">{{ arConnectConfig.host }}</label>
                             </div>
+                            <div v-if="arConnected" class="mt-3 border-t border-gray-200">
+                                <label class="text-gray-700 text-sm">Arweave Assets</label>
+                                <perfect-scrollbar>
+                                    <div v-for="pst in getActiveWallet.psts" :key="pst.contractId" class="flex flex-column items-center pl-2">
+                                        <label class="text-gray-700 text-xs font-mono">{{ pst.name }} ({{ pst.ticker }}): {{ pst.balance }}</label>
+                                    </div>
+                                </perfect-scrollbar>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row">
-                <button v-if="!arConnected" type="button" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-green-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
+                <button v-if="!arConnected" @click="buttonClick('connect')" type="button" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-green-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
                     Connect
                 </button>
                 <button v-else type="button" disabled class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-200 text-base font-medium text-gray-400 sm:ml-3 sm:w-auto sm:text-sm">
                     Connect
                 </button>
-                <button v-if="arConnected" type="button" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-aftrRed hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed sm:ml-3 sm:w-auto sm:text-sm">
+                <button v-if="arConnected" @click="buttonClick('disconnect')" type="button" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-aftrRed hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed sm:ml-3 sm:w-auto sm:text-sm">
                     Disconnect
                 </button>
                 <button v-else type="button" disabled class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-200 text-base font-medium text-gray-400 sm:ml-3 sm:w-auto sm:text-sm">
@@ -80,10 +88,16 @@ export default {
                 return "DEVNET";
             }
         },
-        ...mapGetters(["arConnected", "getActiveAddress", "arConnectConfig"]),
+        ...mapGetters(["arConnected", "getActiveAddress", "arConnectConfig", "getActiveWallet"]),
     },
     methods: {
-
+        async buttonClick(type = "connect") {
+            if (type === "connect") {
+                await this.$store.dispatch('arConnect');
+            } else {
+                await this.$store.dispatch('arDisconnect');
+            }
+        },
     },
     setup() {
         const open = ref(true)
@@ -97,3 +111,10 @@ export default {
     },
 }
 </script>
+
+<style src="vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css"/>
+<style scoped>
+    .ps {
+        height: 100px;
+    }   
+</style>
