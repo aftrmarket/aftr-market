@@ -129,13 +129,13 @@ export default {
         }
     },
     methods: {
-    arConnect() {
-        this.$store.dispatch('getCurrentBlockValue');
-    },
-     walletAddressSubstr(addr, chars = 10) {
+        arConnect() {
+            this.$store.dispatch('getCurrentBlockValue');
+        },
+        walletAddressSubstr(addr, chars = 10) {
             if (typeof addr === 'string') {
                 let len = parseInt(chars/2);
-                return addr.substr(0, len) + '...' + addr.substr(-len);
+                return addr.substring(0, len) + '...' + addr.substring(addr.length - len);
             } else {
                 return '';
             }
@@ -162,7 +162,7 @@ export default {
             if (!vote.type || vote.type === '') {
                 return vote.note;
             } else if (vote.type=== 'set') {
-                return "Change " + capitalize(vote.key) + " to " + capitalize(vote.value);
+                return "Change " + capitalize(vote.key) + " to " + capitalize(String(vote.value));
             } else if (vote.type === '?') {
                 return "?";
             } else if (vote.type === '???') {

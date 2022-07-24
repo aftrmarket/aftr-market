@@ -1,5 +1,6 @@
 <template>
     <main class="-mt-32 pb-10">
+        <vote-simulator v-if="showVoteSimulator" @close="closeModal"></vote-simulator>
         <div class="max-w-7xl mx-auto pb-2 px-4 sm:px-6 lg:px-8">
             <!--<div class="md:grid md:grid-cols-3 md:gap-6">-->
             <div class="mt-5 md:mt-0 md:col-span-2">
@@ -92,10 +93,10 @@
                             </div>
                         </div>
                     </div>
-
-                    <h3 class="mt-4 border-t border-gray-200 pt-4 text-xl font-light leading-6">
-                        Settings
-                    </h3>
+                    <div>
+                        <h3 class="mt-4 border-t border-gray-200 pt-4 text-xl font-light leading-6">Settings</h3>
+                        <span class="text-sm text-gray-500">Use the <button style="color:#6C8CFF" @click.prevent="voteSimulatorTest" type="submit" :vehicle="vehicle"> Vote Simulator </button> to understand how your vote settings can impact votes in your vehicle.</span>
+                    </div>
                     <div class="bg-white sm:p-6">
                         <div class="pt-2 grid grid-cols-4 flex items-center gap-x-4">
                             <!--<label class="block text-sm font-medium text-gray-700">Vehicle Tokens to Mint</label>-->
@@ -292,7 +293,7 @@
                                             <tbody class="bg-white divide-y divide-gray-200">
                                                 <tr v-for="(member, index) in daoMembers" :key="index" class="hover:bg-gray-50">
                                                     <td class="text-xs px-6 py-3">
-                                                        {{ walletAddressSubstr(member.wallet) + "..." }}
+                                                        {{ walletAddressSubstr(member.wallet) }}
                                                     </td>
                                                     <td class="text-xs px-6 py-3">
                                                         {{ member.balance }}
@@ -368,6 +369,7 @@ import Arweave from "arweave";
 import numeral from "numeral";
 import numberAbbreviate from "number-abbreviate";
 import { createContractFromTx, interactWrite } from "smartweave";
+import VoteSimulator from "./vehicle/VoteSimulator.vue";
 
 // @ts-expect-error
 import FormContainer from "./layouts/FormContainer.vue";
@@ -378,7 +380,7 @@ import { mapGetters } from "vuex";
 import { JWKInterface } from "arweave/web/lib/wallet";
 
 export default {
-    components: { FormContainer, ActionInput },
+    components: { FormContainer, ActionInput, VoteSimulator },
     data() {
         return {
             /** Smartweave variables */
@@ -445,6 +447,7 @@ export default {
             newQuorum: 0.5,
             newSupport: 0.5,
             fileUpload: false,
+            showVoteSimulator: false,
         };
     },
     computed: {
@@ -531,12 +534,18 @@ export default {
         },
     },
     methods: {
+        voteSimulatorTest(){
+            this.showVoteSimulator = true;
+        },
+        closeModal() {
+            this.showVoteSimulator = false;
+        },
         walletAddressSubstr(addr, chars = 10) {
-            if (typeof addr === "string") {
-                let len = parseInt(chars / 2);
-                return addr.substr(0, len) + "..." + addr.substr(-len);
+            if (typeof addr === 'string') {
+                let len = parseInt(chars/2);
+                return addr.substring(0, len) + '...' + addr.substring(addr.length - len);
             } else {
-                return "";
+                return '';
             }
         },
         formatNumber(num, dec = false) {
@@ -968,13 +977,14 @@ export default {
                 }
             }
 
-            /***** NEED TO MAKE SURE THAT NONE OF THESE ARE NULL */
+            /***** NEED TO MAKE SURE THAT NONE OF THESE ARE MISSING */
             this.vehicle.settings = [
                 ["quorum", this.newQuorum],
                 ["support", this.newSupport],
                 ["voteLength", 2160],
                 ["communityDescription", this.vehicle.desc],
                 ["communityLogo", this.communityLogoValue],
+                ["evolve", null]
             ];
             /*************** */
 

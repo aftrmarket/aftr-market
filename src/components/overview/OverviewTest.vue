@@ -1,5 +1,6 @@
 <template>
     <main class="-mt-40">
+        <vote-simulator v-if="showVoteSimulator" @close="closeModal"></vote-simulator>
         <div class="pt-10 bg-aftrDarkGrey sm:pt-16 lg:pt-8 lg:pb-14 lg:overflow-hidden">
             <div class="mx-auto max-w-7xl lg:px-8">
                 <div class="lg:grid lg:grid-cols-2 lg:gap-8">
@@ -22,6 +23,9 @@
                                         </div>
                                         <div class="mt-3 sm:mt-0 sm:ml-3">
                                             <button @click.prevent="routeUser('PROD')" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Back to MAINNET</button>
+                                        </div>
+                                         <div class="mt-3 sm:mt-0 sm:ml-3">
+                                            <button @click.prevent="voteSimulatorTest"  type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Voting Simulator</button>
                                         </div>
                                     </div>
                                 </form>
@@ -217,6 +221,7 @@ import aftrBlueHorizonInitState from "./../../testnet/contracts/aftrBlueHorizonI
 import aftrChillinInitState from "./../../testnet/contracts/aftrChillinInitState.json?raw";
 import aftrSourcePlayground from "./../../testnet/contracts/aftrSourcePlayground.js?raw";
 import aftrInitStatePlayground from "./../../testnet/contracts/aftrInitStatePlayground.json";
+import VoteSimulator from "./../vehicle/VoteSimulator.vue";
 
 import Arweave from "arweave";
 import { mapGetters } from "vuex";
@@ -258,7 +263,7 @@ const initProcess = [
 ];
 
 export default {
-    components: { PencilAltIcon, TruckIcon },
+    components: { PencilAltIcon, TruckIcon, VoteSimulator },
     data() {
         return {
             /** Smartweave variables */
@@ -282,12 +287,19 @@ export default {
             logoArhdId: "",
             getMyVehicle: false,
             isLoading: "Loading....",
+            showVoteSimulator: false
         };
     },
     computed: {
         ...mapGetters(["arConnected","keyFile","arConnectConfig","getTestLaunchFlag",]),
     },
     methods: {
+        voteSimulatorTest(){
+            this.showVoteSimulator = true;
+        },
+        closeModal() {
+            this.showVoteSimulator = false;
+        },
         routeUser(site) {
             if (site === "PROD") {
                 window.location.href = import.meta.env.VITE_AFTR_PROD;
@@ -301,6 +313,8 @@ export default {
             }
         },
         async init() {
+            await this.$store.dispatch('arConnect');
+
             try {
                 this.getMyVehicle = true;
                 // Check to see if system is ready for for Test Launch

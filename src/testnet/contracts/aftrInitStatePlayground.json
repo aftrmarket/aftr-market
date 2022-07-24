@@ -203,12 +203,14 @@
     "foreignCalls": [],
     "settings" : [
         [ "quorum", 0.5 ],
+        [ "support", 0.5],
         [ "voteLength", 2000 ],
         [ "lockMinLength", 100 ],
         [ "lockMaxLength", 10000 ],
         [ "communityAppUrl", "https://aftr.market" ],
         [ "communityDiscussionLinks", "" ],
         [ "communityDescription", "" ],
-        [ "communityLogo", "1RgJQENTmMlYxlL4I3BS9gnMasztmxpcXvRVhpsw4Oc"]
+        [ "communityLogo", "1RgJQENTmMlYxlL4I3BS9gnMasztmxpcXvRVhpsw4Oc"],
+        [ "evolve", null ]
     ]
 }

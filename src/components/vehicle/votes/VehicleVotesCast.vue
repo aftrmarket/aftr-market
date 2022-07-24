@@ -185,7 +185,7 @@ export default {
           "Change " +
           capitalize(this.vote.key) +
           " to " +
-          capitalize(this.vote.value)
+          capitalize(String(this.vote.value))
         );
       } else if (type === "?") {
         return "?";

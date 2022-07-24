@@ -43,13 +43,14 @@
                                     <div class="hidden sm:block">
                                     <div class="border-b border-gray-200">
                                         <nav class="-mb-px flex" aria-label="Tabs">
-                                        <a v-for="tab in tabs" :key="tab.name" :href="tab.href" @click="tabClick(tab.name)" :class="[tab.current ? 'border-aftrBlue text-aftrBlue' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300', 'w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm']" :aria-current="tab.current ? 'page' : undefined">
+                                        <a v-for="tab in tabs" :key="tab.name" :href="tab.href" @click="tabClick(tab.name)" :class="tabText(tab)" :aria-current="tab.current ? 'page' : undefined">
                                             {{ tab.name }}
                                         </a>
                                         </nav>
                                     </div>
                                 </div>
                                 <vehicle-info v-if="activeTab === 'Info'" :vehicle="vehicle" :contractId="contractId"></vehicle-info>
+                                <vehicle-setting v-else-if="activeTab === 'Settings'" :vehicle="vehicle"></vehicle-setting>
                                 <vehicle-members v-else-if="activeTab === 'Members'" :vehicle="vehicle"></vehicle-members>
                                 <vehicle-tokens v-else-if="activeTab === 'Tokens'" :vehicle="vehicle"></vehicle-tokens>
                                 <!--<vehicle-profits v-else-if="activeTab === 'Profits'"></vehicle-profits>-->
@@ -60,6 +61,7 @@
                                 <vehicle-state v-else-if="activeTab === 'State'" :vehicle="vehicle"></vehicle-state>
                                 <vehicle-activity v-else-if="activeTab === 'Activity'" :arweave="arweave" :interactions="interactions"></vehicle-activity>
 
+                                <vehicle-contract-test v-else-if="activeTab === 'Test Contract' && env === 'DEV'" :vehicle="vehicle"></vehicle-contract-test>
                             </div>
                         </section>
                         <!-- Tabs End -->
@@ -82,17 +84,20 @@ import VehicleTokens from './vehicle/VehicleTokens.vue';
 //import VehicleFractions from './vehicle/VehicleFractions.vue';
 import VehicleVotes from './vehicle/VehicleVotes.vue';
 import VehicleState from './vehicle/VehicleState.vue';
+import VehicleContractTest from './contract-tests/VehicleContractTest.vue';
 import VehicleActivity from './vehicle/VehicleActivity.vue';
 import VehiclePlaceholder from './vehicle/VehiclePlaceholder.vue';
+import VehicleSetting from './vehicle/VehicleSetting.vue';
 import { mapGetters } from "vuex";
 
 export default {
-    components: { VehicleInfo, VehicleMembers, VehicleTokens, VehicleVotes, VehicleState, VehicleActivity, VehiclePlaceholder },
+    components: { VehicleInfo, VehicleMembers, VehicleTokens, VehicleVotes, VehicleState, VehicleActivity, VehiclePlaceholder,VehicleSetting, VehicleContractTest },
     props: ['vehicleId'],
     data() {
         return {
             tabs: [
                 { name: 'Info', href: '#', current: true },
+                { name: 'Settings', href: '#', current: false },
                 { name: 'Members', href: '#', current: false },
                 { name: 'Tokens', href: '#', current: false },
                 //{ name: 'Profits', href: '#', current: false },
@@ -101,6 +106,7 @@ export default {
                 { name: 'Votes', href: '#', current: false },
                 { name: 'State', href: '#', current: false },
                 { name: 'Activity', href: '#', current: false },
+                { name: 'Test Contract', href: '#', current: false },
             ],
             arweave: {},
             activeTab: "Info",
@@ -108,10 +114,12 @@ export default {
             contractId: this.vehicleId,
             vehicle: {},
             interations: {},
+            anyWithdrawals: false,
 
             arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
             arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
             arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
+            env: import.meta.env.VITE_ENV,
         };
     },
     computed: {
@@ -132,6 +140,17 @@ export default {
         ...mapGetters(["getAftrContractSrcId"]),
     },
     methods: {
+        tabText(tab) {
+            let cssText = "w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm ";
+            if (tab.current) {
+                return cssText + "border-aftrBlue text-aftrBlue";
+            } else if (this.anyWithdrawals && tab.name == "Tokens") {
+                return cssText + "border-transparent text-aftrRed hover:text-gray-700 hover:border-gray-300";
+            } else {
+                return cssText + "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300";
+            }
+            
+        },
         viewVehicles() {
             this.$log.info("Vehicle : viewVehicles :: " ,"View Clicked");
             this.$router.push("../vehicles");
@@ -175,6 +194,11 @@ export default {
             let treasuryTotal = 0;
             if (this.vehicle.tokens) {
                 for (let token of this.vehicle.tokens) {
+                    // Are there any withdrawals waiting to be processed?
+                    if (token.withdrawals && token.withdrawals.length > 0) {
+                        this.anyWithdrawals = true;
+                    }
+
                     try {
                         const response = await fetch(import.meta.env.VITE_VERTO_CACHE_URL + "token/" + token.tokenId + "/price");
                         const responseObj = await response.json();
