@@ -173,6 +173,8 @@ import { Switch, SwitchGroup, SwitchLabel } from '@headlessui/vue';
 import Arweave from "arweave";
 import { interactWrite } from "smartweave";
 
+const excludeSettings = [ "quorum", "support", "voteLength", "communityDescription", "communityLogo", "evolve" ];
+
 export default {
     props: ['vehicle'],
     components: { Switch, SwitchGroup, SwitchLabel },
@@ -201,7 +203,7 @@ export default {
     },
     mounted() {
         this.vehicle.settings.map((value,index) => {
-            if(!(value[0] == 'quorum' || value[0] == 'support' || value[0] == 'voteLength' || value[0] == 'communityDescription' || value[0] == 'communityLogo')){
+            if (!excludeSettings.includes(value[0])) {
                 this.settingArray.push([
                     value[0] , value[1]
                 ])
