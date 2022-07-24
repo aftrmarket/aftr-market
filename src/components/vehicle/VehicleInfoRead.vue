@@ -78,7 +78,7 @@
                     </div>
                 </div>
             </div>
-            <div>
+            <div v-if="allowVoteSimulator">
                 <div class="px-4 sm:px-6 max-w-2xl text-sm text-gray-500">
                     Use the <button style="color:#6C8CFF" @click.prevent="voteSimulatorTest" type="submit" :vehicle="vehicle"> Vote Simulator </button> to validate your vote system settings.
                 </div>
@@ -124,6 +124,7 @@
 <script>
 import numeral from "numeral";
 import VoteSimulator from "./VoteSimulator.vue";
+import { mapGetters } from 'vuex';
 
 export default {
     props: ['vehicle'],
@@ -147,6 +148,7 @@ export default {
                     finalized: 0
                 },
             },
+            allowVoteSimulator: false,
             showVoteSimulator: false,
         };
     },
@@ -173,7 +175,8 @@ export default {
             } else {
                 return 'Weighted';
             }
-        }
+        },
+        ...mapGetters(['getActiveAddress']),
     },
     methods: {
         voteSimulatorTest(){
@@ -231,6 +234,13 @@ export default {
                 const activeVotes = this.vehicle.votes.filter(vote => vote.status === 'active');
                 this.counts.votes.active = activeVotes.length;
                 this.counts.votes.finalized = this.counts.votes.total - this.counts.votes.active;
+            }
+            
+            // Only allow Vote Simulator if user is member of Vehicle
+            if (this.getActiveAddress in this.vehicle.balances) {
+                this.allowVoteSimulator = true;
+            } else {
+                this.allowVoteSimulator = false;
             }
         }
     },
