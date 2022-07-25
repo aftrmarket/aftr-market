@@ -5,6 +5,12 @@
         },
         {
             "path": "../aftr-contracts"
+        },
+        {
+            "path": "../aftr-js"
+        },
+        {
+            "path": "../aftr-nil"
         }
     ],
     "settings": {
