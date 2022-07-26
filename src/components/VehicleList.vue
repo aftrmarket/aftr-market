@@ -105,7 +105,7 @@ export default {
         // this.created()
         // },
     computed: {
-        ...mapGetters(["getAftrContractSrcId"]),
+        ...mapGetters(["getAftrContractSrcId", "getEvolvedContractSrcId"]),
     },
     methods: {
         createVehicle() {
@@ -167,12 +167,18 @@ export default {
                     if (!vehicle.tokens) {
                         vehicle.tokens = [];
                     }
-                    // Logo and Description
+                    // Logo, Description, and evolve
                     vehicle.settings.forEach((setting) => {
                         if (setting[0] === "communityLogo") {
                             vehicle.logo = setting[1];
                         } else if (setting[0] === "communityDescription") {
                             vehicle.desc = setting[1];
+                        } else if (setting[0] === "evolve") {
+                            const evolvedValue = setting[1];
+                            if ((this.getAftrContractSrcId !== this.getEvolvedContractSrcId) && (evolvedValue !== this.getEvolvedContractSrcId)) {
+                                // Contract needs to be evolved
+                                vehicle.evolve = true;
+                            }
                         }
                     });
 
@@ -240,6 +246,7 @@ export default {
             // Get the AFTR Contract Source ID for Prod
             if (import.meta.env.VITE_ENV === "PROD") {
                 this.$store.commit("setAftrContractSrcId", import.meta.env.VITE_SMARTWEAVE_CONTRACT_SOURCE_ID);
+                this.$store.commit("setEvolvedContractSrcId", import.meta.env.VITE_EVOLVED_CONTRACT_SOURCE_ID);
             }
 
             // Use GraphQL to find all vehicle contracts, then load all vehicles

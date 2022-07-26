@@ -33,11 +33,14 @@
                <span :class="vehicleStatusAlert">{{ vehicleStatusText }}</span>
             </div>
             <div class="justify-self-center">
-                <div v-if="anyWithdrawals" class="tooltip">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="#FF6C8C">
+                <div v-if="anyWithdrawals || evolveNeeded" class="tooltip">
+                    <svg v-if="anyWithdrawals" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="#FF6C8C">
                         <path fill-rule="evenodd" d="M10 1.944A11.954 11.954 0 012.166 5C2.056 5.649 2 6.319 2 7c0 5.225 3.34 9.67 8 11.317C14.66 16.67 18 12.225 18 7c0-.682-.057-1.35-.166-2.001A11.954 11.954 0 0110 1.944zM11 14a1 1 0 11-2 0 1 1 0 012 0zm0-7a1 1 0 10-2 0v3a1 1 0 102 0V7z" clip-rule="evenodd" />
                     </svg>
-                    <span class="tooltiptext">Action Required</span>
+                    <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="#FF6C8C">
+                        <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="tooltiptext">{{ vehicleActionText }}</span>
                 </div>
             </div>
             <div class="pr-3 justify-self-end">
@@ -60,20 +63,29 @@
 
 <script>
 import numeral from "numeral";
+import { mapGetters } from "vuex";
 
 export default {
     props: ["vehicle"],
     data() {
         return {
-            anyWithdrawals: false
+            anyWithdrawals: false,
+            evolveNeeded: false,
         };
     },
     computed: {
         actionRequiredClass() {
-            if (this.anyWithdrawals) {
-                return "text-aftrRed text-2xl font-normal line-clamp-1 break-all";
+            if (this.anyWithdrawals || this.evolveNeeded) {
+                return "text-aftrRed text-xl font-normal line-clamp-1 break-all";
             } else {
-                return "text-gray-900 text-2xl font-normal line-clamp-1 break-all";
+                return "text-gray-900 text-xl font-normal line-clamp-1 break-all";
+            }
+        },
+        vehicleActionText() {
+            if (this.anyWithdrawals) {
+                return "Withdrawal Ready";
+            } else if (this.evolveNeeded) {
+                return "Contract Update Needed";
             }
         },
         vehicleStatusAlert() {
@@ -108,6 +120,7 @@ export default {
             
             return logoUrl;
         },
+        ...mapGetters(["getActiveAddress"]),
     },
     methods: {
         formatNumber(num, dec = false) {
@@ -119,6 +132,11 @@ export default {
         },
     },
     created() {
+        // Does vehicle contract need to be evolved? Only show to members of the vehicle
+        if (this.vehicle.evolve && (this.vehicle.creator === this.getActiveAddress || this.getActiveAddress in this.vehicle.balances)) {
+            this.evolveNeeded = true;
+        }
+
         // Are there any withdrawals waiting to be processed?
         for (let token of this.vehicle.tokens) {
             if (token.withdrawals && token.withdrawals.length > 0) {

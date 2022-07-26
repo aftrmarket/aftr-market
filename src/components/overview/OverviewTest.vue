@@ -401,12 +401,7 @@ export default {
                 this.$log.info("OverviewTest : init :: ", "1. Ensure wallet has some AR to make transactions");
 
                 const addr = await arweave.wallets.jwkToAddress(use_wallet);
-                const server =
-                    this.arweaveProtocol +
-                    "://" +
-                    this.arweaveHost +
-                    ":" +
-                    this.arweavePort;
+                const server = this.arweaveProtocol + "://" + this.arweaveHost + ":" + this.arweavePort;
                 const route = "/mint/" + addr + "/10000000000000"; // Amount in Winstons
 
                 this.$log.info("OverviewTest : init :: ", server, route);
@@ -473,6 +468,8 @@ export default {
                     this.$log.info("OverviewTest : init :: ", "*** FOUND CONTRACT SOURCE ID: " + aftrContractSrcId);
                 }
                 this.$store.commit("setAftrContractSrcId", aftrContractSrcId);
+                //this.$store.commit("setEvolvedContractSrcId", aftrContractSrcId);
+                this.$store.commit("setEvolvedContractSrcId", "joe");   // For testing the UI
                 this.$log.info("OverviewTest : init :: ", "AFTR Source ID: " + aftrContractSrcId);
 
                 this.$log.info("OverviewTest : init :: ", "3. Sample PSTs");

@@ -9,14 +9,9 @@ const store = createStore({
             testLaunchConfigCorrect: true,
             currentBlock: [],
             keyFile : {},
-            /** Smartweave variables */
-            smartWeaveConfig: {
-                contractSourceId: "", // Changes with every AFTR contract update
-                tagProtocol: "AFTR-Demo-a101"   // NOT USED HERE
-            },
-            /** */
             arConnectConfig: {},
-            aftrContractSrcId: ""
+            aftrContractSrcId: "",
+            evolvedContractSrcId: "",
         };
     },
     getters: {
@@ -43,6 +38,9 @@ const store = createStore({
         },
         getAftrContractSrcId(state) {
             return state.aftrContractSrcId;
+        },
+        getEvolvedContractSrcId(state) {
+            return state.evolvedContractSrcId;
         },
         getTestLaunchConfigState(state) {
             return state.testLaunchConfigCorrect;
@@ -75,10 +73,13 @@ const store = createStore({
             state.activeWallet.psts[payload.index].balance = payload.balance;
         },
         setArConnectConfig (state, arConnectConfig) {
-            state.arConnectConfig = arConnectConfig
+            state.arConnectConfig = arConnectConfig;
         },
         setAftrContractSrcId(state, item) {
-            state.aftrContractSrcId = item
+            state.aftrContractSrcId = item;
+        },
+        setEvolvedContractSrcId(state, item) {
+            state.evolvedContractSrcId = item;
         },
         setTestLaunchConfigState(state) {
             // If user tries to press the Launch button without Arconnecting, then turn flag on.

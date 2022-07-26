@@ -3,6 +3,7 @@
         <vehicle-placeholder></vehicle-placeholder>
     </div>
     <div v-else>
+        <vehicle-evolve v-if="showEvolveModal" @close="closeModal" :vehicleId="contractId"></vehicle-evolve>
         <main class="-mt-32">
             <div class="max-w-7xl mx-auto pb-12 px-4 sm:px-6 lg:px-8">
                 <!-- Page header -->
@@ -20,6 +21,14 @@
                         </div>
                     </div>
                     <div class="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3">
+                        <label v-if="vehicle.evolve && allowEdits && !evolvePressedAlready" class="py-1 pr-2 text-right text-4xl animate-pulse">👉</label>
+                        <button v-if="vehicle.evolve && allowEdits && !evolvePressedAlready" @click.prevent="evolveContract" type="submit" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+                            </svg>
+                            <span class="pl-2">Evolve Contract</span>
+                        </button>
+                        <label v-if="vehicle.evolve && allowEdits && evolvePressedAlready" class="pr-2 text-aftrRed flex items-center">Active Evolve Vote</label>
                         <button @click.prevent="viewVehicles" type="submit" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
                             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
@@ -88,10 +97,11 @@ import VehicleContractTest from './contract-tests/VehicleContractTest.vue';
 import VehicleActivity from './vehicle/VehicleActivity.vue';
 import VehiclePlaceholder from './vehicle/VehiclePlaceholder.vue';
 import VehicleSetting from './vehicle/VehicleSetting.vue';
+import VehicleEvolve from "./vehicle/VehicleEvolve.vue";
 import { mapGetters } from "vuex";
 
 export default {
-    components: { VehicleInfo, VehicleMembers, VehicleTokens, VehicleVotes, VehicleState, VehicleActivity, VehiclePlaceholder,VehicleSetting, VehicleContractTest },
+    components: { VehicleInfo, VehicleMembers, VehicleTokens, VehicleVotes, VehicleState, VehicleActivity, VehiclePlaceholder,VehicleSetting, VehicleContractTest, VehicleEvolve },
     props: ['vehicleId'],
     data() {
         return {
@@ -120,6 +130,10 @@ export default {
             arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
             arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
             env: import.meta.env.VITE_ENV,
+
+            showEvolveModal: false,
+            evolvePressedAlready: false,
+            allowEdits: false,
         };
     },
     computed: {
@@ -137,7 +151,7 @@ export default {
                 return logoUrl;
             }
         },
-        ...mapGetters(["getAftrContractSrcId"]),
+        ...mapGetters(["getActiveAddress", "getAftrContractSrcId", "getEvolvedContractSrcId"]),
     },
     methods: {
         tabText(tab) {
@@ -154,6 +168,20 @@ export default {
         viewVehicles() {
             this.$log.info("Vehicle : viewVehicles :: " ,"View Clicked");
             this.$router.push("../vehicles");
+        },
+        getEditStatus() {
+            // If wallet is in balances, user is member
+            if (this.vehicle.creator === this.getActiveAddress || this.getActiveAddress in this.vehicle.balances) {
+                this.allowEdits = true;
+            } else {
+                this.allowEdits = false;
+            }
+        },
+        evolveContract() {
+            this.showEvolveModal = true;
+        },
+        closeModal() {
+            this.showEvolveModal = false;
         },
         tabClick(name) {
             let activeTabIndex = this.tabs.findIndex(tab => tab.current == true);
@@ -181,14 +209,31 @@ export default {
             // Add contractId to vehicle object
             this.vehicle.id = this.contractId;
 
-            // Logo and Description
+            // Logo, Description, and Evolve
             this.vehicle.settings.forEach(setting => {
                 if (setting[0] === 'communityLogo') {
                     this.vehicle.logo = setting[1];
                 } else if (setting[0] === "communityDescription") {
                     this.vehicle.desc = setting[1];
+                } else if (setting[0] === "evolve") {
+                    const evolvedValue = setting[1];
+                    if ((this.getAftrContractSrcId !== this.getEvolvedContractSrcId) && (evolvedValue !== this.getEvolvedContractSrcId)) {
+                        // Contract needs to be evolved
+                        this.vehicle.evolve = true;
+
+                        // Check to see if evolve vote was already proposed
+                        const evolveVote = this.vehicle.votes.findIndex( vote => vote.status === "active" && vote.key === "settings.evolve" );
+                        if (evolveVote > -1) {
+                            this.evolvePressedAlready = true;
+                        } else {
+                            this.evolvePressedAlready = false;
+                        }
+                    }
                 }
             });
+
+            this.getEditStatus();
+
             // Tokens
             // Treasury
             let treasuryTotal = 0;
@@ -227,6 +272,7 @@ export default {
     },
     async created() {
         this.pageStatus = "in-progress";
+        this.showEvolveModal = false;
 
         //let arweave = {};
         try {

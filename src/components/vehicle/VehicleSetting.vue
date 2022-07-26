@@ -173,7 +173,7 @@ import { Switch, SwitchGroup, SwitchLabel } from '@headlessui/vue';
 import Arweave from "arweave";
 import { interactWrite } from "smartweave";
 
-const excludeSettings = [ "quorum", "support", "voteLength", "communityDescription", "communityLogo", "evolve" ];
+const excludeSettings = [ "quorum", "support", "voteLength", "communityDescription", "communityLogo" ];
 
 export default {
     props: ['vehicle'],
