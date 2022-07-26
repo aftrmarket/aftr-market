@@ -99,15 +99,12 @@
 </template>
 
 <script>
-import { ref } from 'vue';
 import { Switch, SwitchGroup, SwitchLabel } from '@headlessui/vue';
 import { mapGetters } from 'vuex';
 import numeral from "numeral";
 import VehicleInfoRead from './VehicleInfoRead.vue';
 import VehicleStatusText from './VehicleStatusText.vue';
 import { interactWrite } from "smartweave";
-//import { A } from '../../../dist/assets/vendor.62e455b6';
-
 
 export default {
     props: ['vehicle', 'contractId'],
@@ -329,12 +326,12 @@ export default {
 
         try {
             arweave = await Arweave.init({
-                    host: this.arweaveHost,
-                    port: this.arweavePort,
-                    protocol: this.arweaveProtocol,
-                    timeout: 20000,
-                    logging: true,
-                    });
+                host: this.arweaveHost,
+                port: this.arweavePort,
+                protocol: this.arweaveProtocol,
+                timeout: 20000,
+                logging: true,
+            });
         } catch(e) {
             this.$swal({
                 icon: "error",
