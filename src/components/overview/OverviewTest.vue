@@ -468,8 +468,8 @@ export default {
                     this.$log.info("OverviewTest : init :: ", "*** FOUND CONTRACT SOURCE ID: " + aftrContractSrcId);
                 }
                 this.$store.commit("setAftrContractSrcId", aftrContractSrcId);
-                //this.$store.commit("setEvolvedContractSrcId", aftrContractSrcId);
-                this.$store.commit("setEvolvedContractSrcId", "joe");   // For testing the UI
+                this.$store.commit("setEvolvedContractSrcId", aftrContractSrcId);
+                //this.$store.commit("setEvolvedContractSrcId", "joe");   // For testing the UI
                 this.$log.info("OverviewTest : init :: ", "AFTR Source ID: " + aftrContractSrcId);
 
                 this.$log.info("OverviewTest : init :: ", "3. Sample PSTs");
@@ -600,7 +600,7 @@ export default {
                         transactions(
                             tags: [
                                 { name: "App-Name", values: ["SmartWeaveContract"] },
-                                { name: "Contract-Src", values: ["${ aftrId }"] } 
+                                { name: "Contract-Src", values: ["${ aftrId }"] }
                             ]
                             first: 100
                             after: $cursor
