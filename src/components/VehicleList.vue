@@ -1,20 +1,41 @@
 <template>
+    <div class="pt-4 w-full">
+        <create-vehicle-simple v-if="showCreateSimple" @close="closeModal"></create-vehicle-simple>
+    </div>
     <div>
         <main class="-mt-32">
             <div class="max-w-7xl mx-auto pb-12 px-4 sm:px-6 lg:px-8">
                 <!-- Heading Row -->
                 <div class="pb-5 sm:flex sm:items-center sm:justify-between">
-                    <select @change="filterChange" v-model="filter" class="mt-1 block pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                        <option value="all">All Vehicles</option>
-                        <option value="my" selected>My Vehicles</option>
-                    </select>
-                    <button type="button" @click.prevent="createVehicle()" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"></path>
-                            <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z"></path>
-                        </svg>
-                        <span class="pl-2">Create Vehicle</span>
-                    </button>
+                    <div class="flex items-center gap-4">
+                        <select @change="filterChange" v-model="filter" class="mt-1 block pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                            <option value="all">All Vehicles</option>
+                            <option value="my" selected>My Vehicles</option>
+                        </select>
+                        <button type="button" @click.prevent="toggleLayout">
+                            <svg v-if="!layoutGrid" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="#FFFC79" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                            </svg>
+                            <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="#FFFC79" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div>
+                        <button type="button" @click.prevent="createVehicle()" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"></path>
+                                <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z"></path>
+                            </svg>
+                            <span class="pl-2">Create</span>
+                        </button>
+                        <button type="button" @click.prevent="openModal" class="ml-2  inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
+                            </svg>
+                           <span class="pl-2">Quick Add</span>
+                        </button>
+                    </div>
                 </div>
                 <!-- List -->
                 <perfect-scrollbar>
@@ -56,9 +77,10 @@ import { executeContract } from "@three-em/js";
 import VehicleCard from "./vehicle/VehicleCard.vue";
 import VehicleCardPlaceholder from "./vehicle/VehicleCardPlaceholder.vue";
 import { mapGetters } from "vuex";
+import CreateVehicleSimple from "./CreateVehicleSimple.vue";
 
 export default {
-    components: { VehicleCard, VehicleCardPlaceholder, },
+    components: { VehicleCard, VehicleCardPlaceholder, CreateVehicleSimple },
     data() {
         return {
             /** Smartweave variables */
@@ -86,15 +108,20 @@ export default {
             message: "",
             showResult: true,
             hasNextPage: false,
+            showCreateSimple: false,
+            layoutGrid: true,
         };
     },
     // mounted() {
         // this.created()
         // },
     computed: {
-        ...mapGetters(["getAftrContractSrcId"]),
+        ...mapGetters(["getAftrContractSrcId", "getEvolvedContractSrcId"]),
     },
     methods: {
+        toggleLayout() {
+            this.layoutGrid = !this.layoutGrid;
+        },
         createVehicle() {
             this.$router.push("create");
         },
@@ -154,12 +181,18 @@ export default {
                     if (!vehicle.tokens) {
                         vehicle.tokens = [];
                     }
-                    // Logo and Description
+                    // Logo, Description, and evolve
                     vehicle.settings.forEach((setting) => {
                         if (setting[0] === "communityLogo") {
                             vehicle.logo = setting[1];
                         } else if (setting[0] === "communityDescription") {
                             vehicle.desc = setting[1];
+                        } else if (setting[0] === "evolve") {
+                            const evolvedValue = setting[1];
+                            if ((this.getAftrContractSrcId !== this.getEvolvedContractSrcId) && (evolvedValue !== this.getEvolvedContractSrcId)) {
+                                // Contract needs to be evolved
+                                vehicle.evolve = true;
+                            }
                         }
                     });
 
@@ -227,6 +260,7 @@ export default {
             // Get the AFTR Contract Source ID for Prod
             if (import.meta.env.VITE_ENV === "PROD") {
                 this.$store.commit("setAftrContractSrcId", import.meta.env.VITE_SMARTWEAVE_CONTRACT_SOURCE_ID);
+                this.$store.commit("setEvolvedContractSrcId", import.meta.env.VITE_EVOLVED_CONTRACT_SOURCE_ID);
             }
 
             // Use GraphQL to find all vehicle contracts, then load all vehicles
@@ -347,8 +381,15 @@ export default {
         getUserPsts() {
             // Loads all of user's PSTs to be used as a filter on the My Vehicles query
             for (const pst of this.$store.getters.getActiveWallet.psts) {
-                this.myPsts.push(pst.id);
+                this.myPsts.push(pst.contractId);
             }
+        },
+        openModal() {
+            this.showCreateSimple = true;
+        },
+        closeModal() {
+            this.showCreateSimple = false;
+
         },
     },
     async created() {        

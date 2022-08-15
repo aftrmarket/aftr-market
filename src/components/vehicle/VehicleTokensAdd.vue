@@ -26,8 +26,8 @@
                             <option value="" disabled selected>
                                 Select Token
                             </option>
-                            <option v-for="pst in $store.getters.getActiveWallet.psts" :key="pst.id" :value="pst.id" :disabled="!pst.fcp">
-                                {{ pst.name }} ({{ pst.id }})
+                            <option v-for="pst in walletPsts" :key="pst.contractId" :value="pst.contractId">
+                                {{ pst.name }} ({{ pst.contractId }})
                             </option>
                         </select>
                     </div>
@@ -76,6 +76,7 @@ import { mapGetters } from 'vuex';
 import numeral from "numeral";
 //import Arweave from "arweave";
 import { interactWrite, interactWriteDryRun } from "smartweave";
+import { executeContract } from "@three-em/js";
 import VehicleAlert from './VehicleAlert.vue';
 
 export default {
@@ -107,16 +108,17 @@ export default {
             arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
             arweaveMine: import.meta.env.VITE_MINE,
             /** */
-            msg: ""
+            msg: "",
+            walletPsts: [],
         }
     },
     computed : {
         pstBalance() {
-            const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.id === this.selectedPstId);
+            const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.contractId === this.selectedPstId);
             return currentPst.balance;
         },
         pstTicker() {
-            const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.id === this.selectedPstId);
+            const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.contractId === this.selectedPstId);
             return currentPst.ticker;
         },
         vehicleTokenBox() {
@@ -164,6 +166,29 @@ export default {
                 return "mt-1 focus:ring-aftrRed focus:border-aftrRed shadow-sm sm:text-sm border-gray-300 rounded-md";
             }
         },
+        async isFcpSupported(contractId) {
+            try {
+                const stateInteractions = await executeContract(contractId, undefined, true, {
+                    ARWEAVE_HOST: arweaveHost,
+                    ARWEAVE_PORT: arweavePort,
+                    ARWEAVE_PROTOCOL: arweaveProtocol
+                });
+
+                if (!stateInteractions.state.invocations || !stateInteractions.state.foreignCalls) {
+                    return false;
+                } else {
+                    return true;
+                }
+            } catch(e) {
+                this.$swal({
+                    icon: "error",
+                    html: "An error occured while trying to validate the token being deposited.",
+                    showConfirmButton: true,
+                    allowOutsideClick: false
+                });
+                return;
+            }
+        },
         async transferTokens() {
             this.msg = "Please wait for deposit into vehicle to complete..."
             let arweave = {};
@@ -200,8 +225,20 @@ export default {
                 qty: Number(this.pstInputTokens),
             };
             const currentPst = this.$store.getters.getActiveWallet.psts.find(
-                (item) => item.id === this.selectedPstId
+                (item) => item.contractId === this.selectedPstId
             );
+
+            // Does the PST support FCP?
+            if (await !this.isFcpSupported(currentPst.contractId)) {
+                this.$swal({
+                    icon: "error",
+                    html: "This asset doesn't support cross-contract communication so it can't be deposited into an AFTR vehicle.",
+                    showConfirmButton: true,
+                    allowOutsideClick: false,
+                    didOpen: () => { this.$swal.hideLoading() }
+                });
+                return;
+            }
 
             let wallet;
             if (import.meta.env.VITE_ENV === "DEV") {
@@ -211,13 +248,13 @@ export default {
             }
             const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
 
-            await interactWrite(arweave, wallet, currentPst.id, inputTransfer)
+            await interactWrite(arweave, wallet, currentPst.contractId, inputTransfer)
             .then(async (id) => {
                 this.$log.info("VehicleTokensAdd : interactWrite :: ", "Transfer ID = " + JSON.stringify(id));
 
                 const inputDeposit = {
                     function: "deposit",
-                    tokenId: currentPst.id,
+                    tokenId: currentPst.contractId,
                     txID: id,
                 };
                 this.$log.info("VehicleTokensAdd : interactWrite :: ", "INPUT DEP: " + JSON.stringify(inputDeposit));
@@ -239,7 +276,7 @@ export default {
             if (import.meta.env.VITE_ENV !== "PROD") {
                 /*** This will not be needed when ArConnect is automatically updated on TESTNET */
                 // Update user's PST balance 
-                const updatedPst = this.$store.getters.getActiveWallet.psts.find((item) => item.id === this.selectedPstId);
+                const updatedPst = this.$store.getters.getActiveWallet.psts.find((item) => item.contractId === this.selectedPstId);
                 updatedPst.balance = this.pstBalance - this.pstInputTokens;
                 /***  */
             }
@@ -252,7 +289,7 @@ export default {
             this.pricePerToken = null;
         },
         calcPstPrice() {
-            const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.id === this.selectedPstId);
+            const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.contractId === this.selectedPstId);
             this.pricePerToken = currentPst.balance;
             this.pstValue = currentPst.balance * this.pstInputTokens;
             this.updatePstInputValid(currentPst.balance);
@@ -265,6 +302,9 @@ export default {
                 this.pstInputValid = false;
             }
         },
+    },
+    created() {
+        this.walletPsts = this.$store.getters.getActiveWallet.psts.filter(pst => pst.contractId !== this.vehicle.id);
     },
     setup() {
         const open = ref(true)

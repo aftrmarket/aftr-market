@@ -1,5 +1,6 @@
 <template>
     <div class="pt-2">
+        <vote-simulator v-if="showVoteSimulator" :vehicle="vehicle" @close="closeModal"></vote-simulator>
         <div class="flex items-center justify-between">
             <div class="px-4 py-6 sm:px-6 grid grid-cols-2 gap-x-4">
                 <label class="block text-lg text-gray-900">Vehicle Name:</label>
@@ -77,6 +78,11 @@
                     </div>
                 </div>
             </div>
+            <div v-if="allowVoteSimulator">
+                <div class="px-4 sm:px-6 max-w-2xl text-sm text-gray-500">
+                    Use the <button style="color:#6C8CFF" @click.prevent="voteSimulatorTest" type="submit" :vehicle="vehicle"> Vote Simulator </button> to validate your vote system settings.
+                </div>
+            </div>
         </div>
         <div class="pt-4 grid grid-cols-4">    
             <div>
@@ -117,10 +123,12 @@
 
 <script>
 import numeral from "numeral";
+import VoteSimulator from "./VoteSimulator.vue";
+import { mapGetters } from 'vuex';
 
 export default {
     props: ['vehicle'],
-    components: {},
+    components: {VoteSimulator},
     data() {
         return {
             currentVehicleSettings: null,
@@ -139,7 +147,9 @@ export default {
                     active: 0,
                     finalized: 0
                 },
-            }
+            },
+            allowVoteSimulator: false,
+            showVoteSimulator: false,
         };
     },
     computed: {
@@ -165,9 +175,17 @@ export default {
             } else {
                 return 'Weighted';
             }
-        }
+        },
+        ...mapGetters(['getActiveAddress']),
     },
     methods: {
+        voteSimulatorTest(){
+            //  console.log("vehicle", this.vehicle)
+            this.showVoteSimulator = true;
+        },
+        closeModal() {
+            this.showVoteSimulator = false;
+        },
         formatNumber(num, dec = false) {
             if (dec) {
                 return numeral(num).format("0,0.0000");
@@ -178,7 +196,7 @@ export default {
         walletAddressSubstr(addr, chars = 10) {
             if (typeof addr === 'string') {
                 let len = parseInt(chars/2);
-                return addr.substr(0, len) + '...' + addr.substr(-len);
+                return addr.substring(0, len) + '...' + addr.substring(addr.length - len);
             } else {
                 return '';
             }
@@ -216,6 +234,13 @@ export default {
                 const activeVotes = this.vehicle.votes.filter(vote => vote.status === 'active');
                 this.counts.votes.active = activeVotes.length;
                 this.counts.votes.finalized = this.counts.votes.total - this.counts.votes.active;
+            }
+            
+            // Only allow Vote Simulator if user is member of Vehicle
+            if (this.getActiveAddress in this.vehicle.balances) {
+                this.allowVoteSimulator = true;
+            } else {
+                this.allowVoteSimulator = false;
             }
         }
     },

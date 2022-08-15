@@ -192,7 +192,7 @@ const tmFeatures = [
         id: 2,
         name: "Multi-signature",
         description:
-            "Create DAO or signally owned vehicles to manage your Arweave assets.",
+            "Create DAO or individually owned vehicles to manage your Arweave assets.",
         icon: UserGroupIcon,
     },
     {

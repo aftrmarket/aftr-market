@@ -2,7 +2,7 @@
     <div class="pt-4 flex justify-end">
         <div v-if="allowEdits" class="px-4 sm:px-6">
             <SwitchGroup as="div" class="flex items-center">
-                <Switch v-model="uiEditMode" @click="loadVehicleDefaults" :class="[uiEditMode ? 'bg-green-600' : 'bg-gray-200', 'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2']">
+                <Switch v-model="uiEditMode" :class="[uiEditMode ? 'bg-green-600' : 'bg-gray-200', 'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2']">
                     <span aria-hidden="true" :class="[uiEditMode ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200']" />
                 </Switch>
                 <SwitchLabel as="span" class="ml-3">
@@ -99,15 +99,12 @@
 </template>
 
 <script>
-import { ref } from 'vue';
 import { Switch, SwitchGroup, SwitchLabel } from '@headlessui/vue';
 import { mapGetters } from 'vuex';
 import numeral from "numeral";
 import VehicleInfoRead from './VehicleInfoRead.vue';
 import VehicleStatusText from './VehicleStatusText.vue';
 import { interactWrite } from "smartweave";
-//import { A } from '../../../dist/assets/vendor.62e455b6';
-
 
 export default {
     props: ['vehicle', 'contractId'],
@@ -161,6 +158,9 @@ export default {
             } else {
                 this.allowVehicleEdits = false;
             }
+        },
+        uiEditMode() {
+            this.loadVehicleDefaults();
         }
     },
     computed: {
@@ -326,12 +326,12 @@ export default {
 
         try {
             arweave = await Arweave.init({
-                    host: this.arweaveHost,
-                    port: this.arweavePort,
-                    protocol: this.arweaveProtocol,
-                    timeout: 20000,
-                    logging: true,
-                    });
+                host: this.arweaveHost,
+                port: this.arweavePort,
+                protocol: this.arweaveProtocol,
+                timeout: 20000,
+                logging: true,
+            });
         } catch(e) {
             this.$swal({
                 icon: "error",

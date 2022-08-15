@@ -1,5 +1,6 @@
 <template>
     <main class="-mt-40">
+        <vote-simulator v-if="showVoteSimulator" @close="closeModal"></vote-simulator>
         <div class="pt-10 bg-aftrDarkGrey sm:pt-16 lg:pt-8 lg:pb-14 lg:overflow-hidden">
             <div class="mx-auto max-w-7xl lg:px-8">
                 <div class="lg:grid lg:grid-cols-2 lg:gap-8">
@@ -23,6 +24,9 @@
                                         <div class="mt-3 sm:mt-0 sm:ml-3">
                                             <button @click.prevent="routeUser('PROD')" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Back to MAINNET</button>
                                         </div>
+                                         <div class="mt-3 sm:mt-0 sm:ml-3">
+                                            <button @click.prevent="voteSimulatorTest"  type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Voting Simulator</button>
+                                        </div>
                                     </div>
                                 </form>
                             </div>
@@ -34,6 +38,7 @@
                         </div>
                     </div>
                     <div class="mt-3 text-base text-gray-300 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
+                        Please note that the Playground will be refreshed periodically, so you will see your vehicles disappear when this happens.
                         <!--<button @click.prevent="contractRead" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">SW vs 3EM</button>-->
                         For more information, see below 👇
                     </div>
@@ -216,6 +221,7 @@ import aftrBlueHorizonInitState from "./../../testnet/contracts/aftrBlueHorizonI
 import aftrChillinInitState from "./../../testnet/contracts/aftrChillinInitState.json?raw";
 import aftrSourcePlayground from "./../../testnet/contracts/aftrSourcePlayground.js?raw";
 import aftrInitStatePlayground from "./../../testnet/contracts/aftrInitStatePlayground.json";
+import VoteSimulator from "./../vehicle/VoteSimulator.vue";
 
 import Arweave from "arweave";
 import { mapGetters } from "vuex";
@@ -257,7 +263,7 @@ const initProcess = [
 ];
 
 export default {
-    components: { PencilAltIcon, TruckIcon },
+    components: { PencilAltIcon, TruckIcon, VoteSimulator },
     data() {
         return {
             /** Smartweave variables */
@@ -281,12 +287,19 @@ export default {
             logoArhdId: "",
             getMyVehicle: false,
             isLoading: "Loading....",
+            showVoteSimulator: false
         };
     },
     computed: {
         ...mapGetters(["arConnected","keyFile","arConnectConfig","getTestLaunchFlag",]),
     },
     methods: {
+        voteSimulatorTest(){
+            this.showVoteSimulator = true;
+        },
+        closeModal() {
+            this.showVoteSimulator = false;
+        },
         routeUser(site) {
             if (site === "PROD") {
                 window.location.href = import.meta.env.VITE_AFTR_PROD;
@@ -294,12 +307,14 @@ export default {
         },
         contractRead() {
             if (import.meta.env.VITE_ENV === "TEST") {
-                this.$router.push({ name: "read", params: { contractId: "DlsykD_fJ3m7yAzCvFgRdb0W1jgGWe4LcAHJzrRx99A" } });
+                this.$router.push({ name: "read", params: { contractId: "Ec4RtO4woGOq5HOmu6YWbCP9bXJZ3otL1kJxTUEuZGg" } });
             } else if (import.meta.env.VITE_ENV === "DEV") {
-                this.$router.push({ name: "read", params: { contractId: "DlsykD_fJ3m7yAzCvFgRdb0W1jgGWe4LcAHJzrRx99A" } });
+                this.$router.push({ name: "read", params: { contractId: "RlgLcFOzm6xVho6w76PCg_WbShb3n62jjH6HKSJw9WM" } });
             }
         },
         async init() {
+            await this.$store.dispatch('arConnect');
+
             try {
                 this.getMyVehicle = true;
                 // Check to see if system is ready for for Test Launch
@@ -386,12 +401,7 @@ export default {
                 this.$log.info("OverviewTest : init :: ", "1. Ensure wallet has some AR to make transactions");
 
                 const addr = await arweave.wallets.jwkToAddress(use_wallet);
-                const server =
-                    this.arweaveProtocol +
-                    "://" +
-                    this.arweaveHost +
-                    ":" +
-                    this.arweavePort;
+                const server = this.arweaveProtocol + "://" + this.arweaveHost + ":" + this.arweavePort;
                 const route = "/mint/" + addr + "/10000000000000"; // Amount in Winstons
 
                 this.$log.info("OverviewTest : init :: ", server, route);
@@ -458,6 +468,8 @@ export default {
                     this.$log.info("OverviewTest : init :: ", "*** FOUND CONTRACT SOURCE ID: " + aftrContractSrcId);
                 }
                 this.$store.commit("setAftrContractSrcId", aftrContractSrcId);
+                this.$store.commit("setEvolvedContractSrcId", aftrContractSrcId);
+                //this.$store.commit("setEvolvedContractSrcId", "joe");   // For testing the UI
                 this.$log.info("OverviewTest : init :: ", "AFTR Source ID: " + aftrContractSrcId);
 
                 this.$log.info("OverviewTest : init :: ", "3. Sample PSTs");
@@ -563,87 +575,15 @@ export default {
                     await fetch(this.mineUrl);
                 }
 
-                /*** Look at all PSTs and save the ones where the user has a balance.
-                 * In PROD, Arconnect should have this already.
-                 * If it doesn't, then we'll need to come up with a caching solution for each user.
+                /***
+                 * Look at all PSTs and save the ones where the user has a balance.
+                 * This doesn't need to be done in PROD or TEST b/c the Verto Cache is used
+                 * and the wallet.psts are built during the Arconnection.
                  */
-                let queryval = {
-                    query: `
-                        query($cursor: String) {
-                            transactions(
-                                tags: [
-                                    { name: "App-Name", values: ["SmartWeaveContract"] },
-                                    { name: "Contract-Src", values: ["${ aftrContractSrcId }"] } 
-                                ]
-                                first: 100
-                                after: $cursor
-                            ) {
-                                pageInfo {
-                                    hasNextPage
-                                }
-                                edges {
-                                    cursor
-                                    node { id } 
-                                }
-                            }
-                    }`,
-                };
-
-                const responseValue = await arweave.api.post("graphql", { query: queryval.query,});
-
-                let wallet = {
-                    address: "",
-                    psts: [],
-                };
-
-                wallet.address = userAddr;
-
-                for (let edge of responseValue.data.data.transactions.edges) {
-                    try {
-                        //let vehicle = await readContract(arweave, edge.node.id);
-                        //const state = await executeContract(edge.node.id, undefined, true, this.gatewayConfig);
-                        const { state, validity } = await executeContract(edge.node.id, undefined, true, {
-                            ARWEAVE_HOST: import.meta.env.VITE_ARWEAVE_HOST,
-                            ARWEAVE_PORT: import.meta.env.VITE_ARWEAVE_PORT,
-                            ARWEAVE_PROTOCOL: import.meta.env.VITE_ARWEAVE_PROTOCOL
-                        });
-                        let vehicle = state;
-
-                        if (vehicle && Object.keys(vehicle.balances).length != 0 && vehicle.name) {
-                            let data = {
-                                id: edge.node.id,
-                                balance: 0,
-                                name: vehicle.name,
-                                ticker: vehicle.ticker,
-                                logo: "",
-                                fcp: vehicle && vehicle.invocations && vehicle.foreignCalls ? true : false,
-                            };
-
-                            Object.keys(vehicle.balances).some((walletId) => {
-                                if (walletId == wallet.address) {
-                                    data.balance = vehicle.balances[wallet.address];
-                                }
-                            });
-
-                            // Logo
-                            vehicle.settings.forEach((setting) => {
-                                if (setting[0] === "communityLogo") {
-                                    data.logo = setting[1];
-                                }
-                            });
-
-                            if (data.balance > 0) {
-                                wallet.psts.push(data);
-                            }
-
-                            this.$log.info("OverviewTest : init :: ", wallet);
-                        }
-                    } catch (e) {
-                        this.$log.error("ERROR reading contract for " + edge.node.id + ": " + e);
-                    }
-                    this.$log.info("PSTS: " + JSON.stringify(wallet.psts));
-                    this.$store.commit("arConnect", wallet);
+                if (import.meta.env.VITE_ENV === "DEV" || import.meta.env.VITE_BUILD_PSTS) {
+                    await this.buildWalletPsts(arweave, aftrContractSrcId, userAddr);
                 }
+
                 this.$swal.close();
                 this.$router.push("vehicles");
             } catch (error) {
@@ -651,6 +591,85 @@ export default {
                     icon: "error",
                     html: error,
                 });
+            }
+        },
+        async buildWalletPsts(arweave, aftrId, userAddr) {
+            let queryval = {
+                query: `
+                    query($cursor: String) {
+                        transactions(
+                            tags: [
+                                { name: "App-Name", values: ["SmartWeaveContract"] },
+                                { name: "Contract-Src", values: ["${ aftrId }"] }
+                            ]
+                            first: 100
+                            after: $cursor
+                        ) {
+                            pageInfo {
+                                hasNextPage
+                            }
+                            edges {
+                                cursor
+                                node { id } 
+                            }
+                        }
+                }`,
+            };
+
+            const responseValue = await arweave.api.post("graphql", { query: queryval.query,});
+
+            let wallet = {
+                address: "",
+                psts: [],
+            };
+
+            wallet.address = userAddr;
+
+            for (let edge of responseValue.data.data.transactions.edges) {
+                try {
+                    //let vehicle = await readContract(arweave, edge.node.id);
+                    //const state = await executeContract(edge.node.id, undefined, true, this.gatewayConfig);
+                    const { state, validity } = await executeContract(edge.node.id, undefined, true, {
+                        ARWEAVE_HOST: import.meta.env.VITE_ARWEAVE_HOST,
+                        ARWEAVE_PORT: import.meta.env.VITE_ARWEAVE_PORT,
+                        ARWEAVE_PROTOCOL: import.meta.env.VITE_ARWEAVE_PROTOCOL
+                    });
+                    let vehicle = state;
+
+                    if (vehicle && Object.keys(vehicle.balances).length != 0 && vehicle.name) {
+                        let data = {
+                            contractId: edge.node.id,
+                            balance: 0,
+                            name: vehicle.name,
+                            ticker: vehicle.ticker,
+                            //logo: "",
+                            //fcp: vehicle && vehicle.invocations && vehicle.foreignCalls ? true : false,
+                        };
+
+                        Object.keys(vehicle.balances).some((walletId) => {
+                            if (walletId == wallet.address) {
+                                data.balance = vehicle.balances[wallet.address];
+                            }
+                        });
+
+                        // Logo
+                        // vehicle.settings.forEach((setting) => {
+                        //     if (setting[0] === "communityLogo") {
+                        //         data.logo = setting[1];
+                        //     }
+                        // });
+
+                        if (data.balance > 0) {
+                            wallet.psts.push(data);
+                        }
+
+                        this.$log.info("OverviewTest : init :: ", wallet);
+                    }
+                } catch (e) {
+                    this.$log.error("ERROR reading contract for " + edge.node.id + ": " + e);
+                }
+                this.$log.info("PSTS: " + JSON.stringify(wallet.psts));
+                this.$store.commit("arConnect", wallet);
             }
         },
         async createAftrVehicle(arweave, wallet, aftrId, initState) {

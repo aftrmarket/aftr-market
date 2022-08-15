@@ -1,0 +1,46 @@
+{
+    "function": "multiInteraction",
+    "type": "set",
+    "actions": [
+        {
+            "input": {
+                "function": "propose",
+                "type": "set",
+                "key": "name",
+                "value": "Alquip"
+            }
+        },
+        {
+            "input": {
+                "function": "propose",
+                "type": "set",
+                "key": "ticker",
+                "value": "AFTR-ALQP"
+            }
+        },
+        {
+            "input": {
+                "function": "propose",
+                "type": "set",
+                "key": "status",
+                "value": "started"
+            }
+        },
+        {
+            "input": {
+                "function": "propose",
+                "type": "set",
+                "key": "votingSystem",
+                "value": "equal"
+            }
+        },
+        {
+            "input": {
+                "function": "propose",
+                "type": "set",
+                "key": "settings.voteLength",
+                "value": 200
+            }
+        }
+    ]
+}

@@ -1,0 +1,8 @@
+{
+    "function": "propose",
+    "type": "withdrawal",
+    "txID": "<TX IN TOKEN OBJECT>",
+    "target": "<ADDR OF WALLET BEING TRANSFERRED TO>",
+    "qty": 10,
+    "note": "<DESCRIPTION OF WITHDRAWAL>"
+}

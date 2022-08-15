@@ -1,5 +1,6 @@
 <template>
     <main class="-mt-32 pb-10">
+        <vote-simulator v-if="showVoteSimulator" @close="closeModal"></vote-simulator>
         <div class="max-w-7xl mx-auto pb-2 px-4 sm:px-6 lg:px-8">
             <!--<div class="md:grid md:grid-cols-3 md:gap-6">-->
             <div class="mt-5 md:mt-0 md:col-span-2">
@@ -23,7 +24,6 @@
         <div>
             <!-- Vehicle Info -->
             <form-container>
-                <perfect-scrollbar>
                 <form action="#" method="POST">
                     <h3 class="text-xl font-light leading-6">Vehicle Information</h3>
                     <div class="bg-white sm:p-6">
@@ -93,10 +93,10 @@
                             </div>
                         </div>
                     </div>
-
-                    <h3 class="mt-4 border-t border-gray-200 pt-4 text-xl font-light leading-6">
-                        Settings
-                    </h3>
+                    <div>
+                        <h3 class="mt-4 border-t border-gray-200 pt-4 text-xl font-light leading-6">Settings</h3>
+                        <span class="text-sm text-gray-500">Use the <button style="color:#6C8CFF" @click.prevent="voteSimulatorTest" type="submit" :vehicle="vehicle"> Vote Simulator </button> to understand how your vote settings can impact votes in your vehicle.</span>
+                    </div>
                     <div class="bg-white sm:p-6">
                         <div class="pt-2 grid grid-cols-4 flex items-center gap-x-4">
                             <!--<label class="block text-sm font-medium text-gray-700">Vehicle Tokens to Mint</label>-->
@@ -111,8 +111,8 @@
                                 <input type="radio" v-model="ownership" id="dao" value="dao" class="form-radio text-aftrBlue" /><label class="px-2 text-sm text-gray-700">DAO Owned</label>
                             </div>
                             <div class="">
-                                <input type="radio" v-model="votingSystem" id="equal" value="equal" class="form-radio text-aftrBlue" /><label class="px-2 text-sm text-gray-700">Distributed Evenly</label>
                                 <input type="radio" v-model="votingSystem" id="weighted" value="weighted" class="form-radio text-aftrBlue" /><label class="px-2 text-sm text-gray-700">Weighted</label>
+                                <input type="radio" v-model="votingSystem" id="equal" value="equal" class="form-radio text-aftrBlue" /><label class="px-2 text-sm text-gray-700">Distributed Evenly</label>
                             </div>
                             <div class="">
                                 <input v-model="newQuorum" name="newQuorum" type="number" :class="inputBox(quorumIsValid)" />
@@ -293,7 +293,7 @@
                                             <tbody class="bg-white divide-y divide-gray-200">
                                                 <tr v-for="(member, index) in daoMembers" :key="index" class="hover:bg-gray-50">
                                                     <td class="text-xs px-6 py-3">
-                                                        {{ walletAddressSubstr(member.wallet) + "..." }}
+                                                        {{ walletAddressSubstr(member.wallet) }}
                                                     </td>
                                                     <td class="text-xs px-6 py-3">
                                                         {{ member.balance }}
@@ -358,7 +358,6 @@
                     </div>
                     <!--- End Button Row --->
                 </form>
-                </perfect-scrollbar>
             </form-container>
             <!-- End Vehicle Info -->
         </div>
@@ -370,6 +369,7 @@ import Arweave from "arweave";
 import numeral from "numeral";
 import numberAbbreviate from "number-abbreviate";
 import { createContractFromTx, interactWrite } from "smartweave";
+import VoteSimulator from "./vehicle/VoteSimulator.vue";
 
 // @ts-expect-error
 import FormContainer from "./layouts/FormContainer.vue";
@@ -380,7 +380,7 @@ import { mapGetters } from "vuex";
 import { JWKInterface } from "arweave/web/lib/wallet";
 
 export default {
-    components: { FormContainer, ActionInput },
+    components: { FormContainer, ActionInput, VoteSimulator },
     data() {
         return {
             /** Smartweave variables */
@@ -412,7 +412,7 @@ export default {
             minLease: 2, // Minimum seat lease length in months
             maxLease: 24, // Maximum seat lease length in months
             ownership: "single", // Type of ownership for vehicle (single or dao)
-            votingSystem: "equal", // Type of voting for vehicle (equal or weighted)
+            votingSystem: "weighted", // Type of voting for vehicle (equal or weighted)
             inputValid: false, // Boolean to show when any input field is invalid
             pstInputValid: false, // Boolean to show when amount goes over tokens held
             nameValid: false, // Boolean for valid vehicle name
@@ -447,6 +447,7 @@ export default {
             newQuorum: 0.5,
             newSupport: 0.5,
             fileUpload: false,
+            showVoteSimulator: false,
         };
     },
     computed: {
@@ -458,14 +459,14 @@ export default {
         },
         pstBalance() {
             const currentPst = this.$store.getters.getActiveWallet.psts.find(
-                (item) => item.id === this.selectedPstId
+                (item) => item.contractId === this.selectedPstId
             );
             this.$log.info("CreateVehicle : pstBalance :: ", "currentPst Value", currentPst.fcp, currentPst.balance);
             return this.formatNumber(currentPst.balance);
         },
         pstTicker() {
             const currentPst = this.$store.getters.getActiveWallet.psts.find(
-                (item) => item.id === this.selectedPstId
+                (item) => item.contractId === this.selectedPstId
             );
             this.$log.info("CreateVehicle : pstTicker :: ","pstTicker value", currentPst);
             return currentPst.ticker;
@@ -533,12 +534,18 @@ export default {
         },
     },
     methods: {
+        voteSimulatorTest(){
+            this.showVoteSimulator = true;
+        },
+        closeModal() {
+            this.showVoteSimulator = false;
+        },
         walletAddressSubstr(addr, chars = 10) {
-            if (typeof addr === "string") {
-                let len = parseInt(chars / 2);
-                return addr.substr(0, len) + "..." + addr.substr(-len);
+            if (typeof addr === 'string') {
+                let len = parseInt(chars/2);
+                return addr.substring(0, len) + '...' + addr.substring(addr.length - len);
             } else {
-                return "";
+                return '';
             }
         },
         formatNumber(num, dec = false) {
@@ -734,7 +741,7 @@ export default {
         },
         calcPstPrice() {
             const currentPst = this.$store.getters.getActiveWallet.psts.find(
-                (item) => item.id === this.selectedPstId
+                (item) => item.contractId === this.selectedPstId
             );
             this.pricePerToken = currentPst.price;
             this.pstValue = currentPst.price * this.pstInputTokens;
@@ -765,7 +772,7 @@ export default {
         addPst() {
             // Create temp object and add new keys
             let currentPst = this.$store.getters.getActiveWallet.psts.find(
-                (item) => item.id === this.selectedPstId
+                (item) => item.contractId === this.selectedPstId
             );
             let existingIndex = this.vehiclePsts.findIndex(
                 (item) => item.id === this.selectedPstId
@@ -784,13 +791,10 @@ export default {
             }
             // Subtract tokens from wallet pst
             existingIndex = this.$store.getters.getActiveWallet.psts.findIndex(
-                (item) => item.id === this.selectedPstId
+                (item) => item.contractId === this.selectedPstId
             );
 
-            const newBal =
-                this.$store.getters.getActiveWallet.psts[existingIndex][
-                    "balance"
-                ] - parseInt(this.pstInputTokens);
+            const newBal = this.$store.getters.getActiveWallet.psts[existingIndex]["balance"] - parseInt(this.pstInputTokens);
             this.$store.commit("updateWalletPstBalance", {
                 index: existingIndex,
                 balance: newBal,
@@ -809,11 +813,9 @@ export default {
             const idTokens = this.vehiclePsts[deleteIndex].tokens;
             const existingIndex =
                 this.$store.getters.getActiveWallet.psts.findIndex(
-                    (item) => item.id === id
+                    (item) => item.contractId === id
                 );
-            const newBal =
-                this.$store.getters.getActiveWallet.psts[existingIndex]
-                    .balance + idTokens;
+            const newBal = this.$store.getters.getActiveWallet.psts[existingIndex].balance + idTokens;
             this.$store.commit("updateWalletPstBalance", {
                 index: existingIndex,
                 balance: newBal,
@@ -975,28 +977,30 @@ export default {
                 }
             }
 
-            /***** NEED TO MAKE SURE THAT NONE OF THESE ARE NULL */
+            /***** NEED TO MAKE SURE THAT NONE OF THESE ARE MISSING */
             this.vehicle.settings = [
                 ["quorum", this.newQuorum],
                 ["support", this.newSupport],
                 ["voteLength", 2160],
                 ["communityDescription", this.vehicle.desc],
                 ["communityLogo", this.communityLogoValue],
+                ["evolve", null]
             ];
             /*************** */
 
             // Convert DAO Member array to dictionary
             this.vehicle.balances = this.daoMembers.reduce( (a, x) => ({ ...a, [x.wallet]: x.balance }), {} );
 
-            const tmpPsts = this.vehiclePsts.map((item) => {
-                return {
-                    id: item.id,
-                    name: item.name,
-                    ticker: item.ticker,
-                    logo: item.logo,
-                    tokens: item.tokens,
-                };
-            });
+            /**** REMOVED ADDING TOKENS FROM CREATE VEHICLE PAGE */
+            // const tmpPsts = this.vehiclePsts.map((item) => {
+            //     return {
+            //         id: item.id,
+            //         name: item.name,
+            //         ticker: item.ticker,
+            //         logo: item.logo,
+            //         tokens: item.tokens,
+            //     };
+            // });
 
             this.vehicle.tokens = [];
             let obj = this.vehicle.balances;
@@ -1037,15 +1041,15 @@ export default {
                     this.vehicle["id"] = await createContractFromTx(arweave, "use_wallet", this.getAftrContractSrcId, JSON.stringify(this.vehicle), initTags);
                 }
 
-                if (import.meta.env.VITE_ENV !== "PROD") {
-                    // Add to Wallet PSTs in non-prod environments
+                if (import.meta.env.VITE_ENV === "DEV" || import.meta.env.VITE_BUILD_PSTS) {
+                    // Add to Wallet PSTs if the Verto Cache is not being used
                     let pst = {
-                        id: this.vehicle["id"],
+                        contractId: this.vehicle["id"],
                         balance: this.vehicle.balances[this.vehicle.creator],
                         name: this.vehicle.name,
                         ticker: this.vehicle.ticker,
-                        logo: this.communityLogoValue,
-                        fcp: true
+                        //logo: this.communityLogoValue,
+                        //fcp: true
                     };
                     this.$store.commit("addWalletPst", pst);
                 }
@@ -1149,10 +1153,3 @@ export default {
     },
 };
 </script>
-
-<style src="vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css"/>
-<style scoped>
-    .ps {
-        height: 800px;
-    }   
-</style>
