@@ -76,6 +76,7 @@ import { mapGetters } from 'vuex';
 import numeral from "numeral";
 //import Arweave from "arweave";
 import { interactWrite, interactWriteDryRun } from "smartweave";
+import { executeContract } from "@three-em/js";
 import VehicleAlert from './VehicleAlert.vue';
 
 export default {
@@ -165,6 +166,29 @@ export default {
                 return "mt-1 focus:ring-aftrRed focus:border-aftrRed shadow-sm sm:text-sm border-gray-300 rounded-md";
             }
         },
+        async isFcpSupported(contractId) {
+            try {
+                const stateInteractions = await executeContract(contractId, undefined, true, {
+                    ARWEAVE_HOST: arweaveHost,
+                    ARWEAVE_PORT: arweavePort,
+                    ARWEAVE_PROTOCOL: arweaveProtocol
+                });
+
+                if (!stateInteractions.state.invocations || !stateInteractions.state.foreignCalls) {
+                    return false;
+                } else {
+                    return true;
+                }
+            } catch(e) {
+                this.$swal({
+                    icon: "error",
+                    html: "An error occured while trying to validate the token being deposited.",
+                    showConfirmButton: true,
+                    allowOutsideClick: false
+                });
+                return;
+            }
+        },
         async transferTokens() {
             this.msg = "Please wait for deposit into vehicle to complete..."
             let arweave = {};
@@ -203,6 +227,18 @@ export default {
             const currentPst = this.$store.getters.getActiveWallet.psts.find(
                 (item) => item.contractId === this.selectedPstId
             );
+
+            // Does the PST support FCP?
+            if (await !this.isFcpSupported(currentPst.contractId)) {
+                this.$swal({
+                    icon: "error",
+                    html: "This asset doesn't support cross-contract communication so it can't be deposited into an AFTR vehicle.",
+                    showConfirmButton: true,
+                    allowOutsideClick: false,
+                    didOpen: () => { this.$swal.hideLoading() }
+                });
+                return;
+            }
 
             let wallet;
             if (import.meta.env.VITE_ENV === "DEV") {
