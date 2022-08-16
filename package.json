@@ -14,6 +14,7 @@
     "@tailwindcss/line-clamp": "^0.3.1",
     "@three-em/js": "^0.2.13",
     "@verto/js": "^1.0.0-beta-22",
+    "aftr-market": "^1.1.45",
     "ar-gql": "^0.0.6",
     "arweave": "^1.10.18",
     "dotenv": "^16.0.0",

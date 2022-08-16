@@ -378,6 +378,9 @@ import ActionInput from "./layouts/ActionInput.vue";
 
 import { mapGetters } from "vuex";
 import { JWKInterface } from "arweave/web/lib/wallet";
+import Aftr from "aftr-market";
+
+const client = new Aftr();
 
 export default {
     components: { FormContainer, ActionInput, VoteSimulator },
@@ -1035,10 +1038,19 @@ export default {
                 this.$log.info("CreateVehicle : createVehicle :: ", "vehicle: " + JSON.stringify(this.vehicle));
                 this.$log.info("CreateVehicle : createVehicle :: ", "tags: " + JSON.stringify(initTags));
 
+                let option = {
+                    aftrSourceContractId: this.getAftrContractSrcId,  // Allows user to add a contract Id for test purposes. If no value is supplied, then the hardcoded value is used.
+                    aftrProtocolTag: initTags,    // Allows user to customize Protocol tag. If no value provided, "AFTR" is hardcoded.
+                    // customTags ?: []
+                }
+
+                console.log("option", option)
                 if (import.meta.env.VITE_ENV === "DEV") {
-                    this.vehicle["id"] = await createContractFromTx(arweave, use_wallet, this.getAftrContractSrcId, JSON.stringify(this.vehicle), initTags);  
+                    this.vehicle["id"] = await client.vehicle.createVehicle(this.vehicle, use_wallet, option)
+                    // this.vehicle["id"] = await createContractFromTx(arweave, use_wallet, this.getAftrContractSrcId, JSON.stringify(this.vehicle), initTags);  
                 } else {
-                    this.vehicle["id"] = await createContractFromTx(arweave, "use_wallet", this.getAftrContractSrcId, JSON.stringify(this.vehicle), initTags);
+                    this.vehicle["id"] = await client.vehicle.createVehicle(this.vehicle, "use_wallet", option)
+                    // this.vehicle["id"] = await createContractFromTx(arweave, "use_wallet", this.getAftrContractSrcId, JSON.stringify(this.vehicle), initTags);
                 }
 
                 if (import.meta.env.VITE_ENV === "DEV" || import.meta.env.VITE_BUILD_PSTS) {

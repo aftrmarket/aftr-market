@@ -168,6 +168,9 @@ import { mapGetters } from 'vuex';
 import { Switch, SwitchGroup, SwitchLabel } from '@headlessui/vue';
 import Arweave from "arweave";
 import { interactWrite } from "smartweave";
+import Aftr from "aftr-market";
+
+const client = new Aftr();
 
 export default {
     props: ['vehicle'],
@@ -380,75 +383,6 @@ export default {
                 return;
             }
 
-            // Determine changes
-            const count = this.memberRemoves.length + this.memberAdds.length + Object.keys(this.memberUpdates).length;
-            let recipient = '';
-            let qty = 0;
-            let action = {
-                input: {}
-                //caller: this.getActiveAddress
-            };
-
-            let input = {};
-
-            if (count === 1) {
-                if (this.memberRemoves.length === 1) {
-                    recipient = this.memberRemoves[0];
-                    qty = +this.vehicle.balances[recipient];
-                    input = this.buildInput(recipient, qty, 'removeMember');
-                } else if (this.memberAdds.length === 1) {
-                    recipient = this.memberAdds[0].recipient;
-                    qty = +this.memberAdds[0].qty;
-                    input = this.buildInput(recipient, qty, 'addMember');
-                } else if (Object.keys(this.memberUpdates).length === 1) {
-                    recipient = Object.keys(this.memberUpdates)[0];
-                    qty = +Object.values(this.memberUpdates)[0];
-                    input = this.buildInput(recipient, qty);
-                }
-            } else if (count > 1) {
-                input.function = 'multiInteraction';
-                input.key = 'multi';
-                input.note = 'Multi-Interaction';
-                input.actions = [];
-
-                if (this.memberRemoves.length > 0) {
-                    for(let member in this.memberRemoves) {
-                        let multiAction = {
-                            input: {}
-                        };
-                        recipient = member;
-                        qty = +this.vehicle.balances[member];
-                    
-                        multiAction.input = this.buildInput(recipient, qty, 'removeMember');
-                        input.actions.push(multiAction);
-                    }
-                }
-                if (this.memberAdds.length > 0) {
-                    this.memberAdds.forEach(member => {
-                        let multiAction = {
-                            input: {}
-                        };
-                        recipient = member.recipient;
-                        qty = +member.qty;
-
-                        multiAction.input = this.buildInput(recipient, qty, 'addMember');
-                        input.actions.push(multiAction);
-                    });
-                }
-                if (Object.keys(this.memberUpdates).length > 0) {
-                    for(let member in this.memberUpdates) {
-                        let multiAction = {
-                            input: {}
-                        };
-                        recipient = member;
-                        qty = +this.memberUpdates[member];
-                    
-                        multiAction.input = this.buildInput(recipient, qty);
-                        input.actions.push(multiAction);
-                    }
-                }
-            }
-            /*** CALL SMARTWEAVE */
             let arweave = {};
 
             try {
@@ -468,7 +402,7 @@ export default {
                 });
                 return;
             }
-            this.$log.info("VehicleMembers : submit :: ", JSON.stringify(input));
+            // this.$log.info("VehicleMembers : submit :: ", JSON.stringify(input));
 
             let wallet;
             if (import.meta.env.VITE_ENV === "DEV") {
@@ -482,6 +416,47 @@ export default {
                     })
                 }        
             }
+
+            // Determine changes
+            const count = this.memberRemoves.length + this.memberAdds.length + Object.keys(this.memberUpdates).length;
+            let recipient = '';
+            let qty = 0;
+            let action = {
+                input: {}
+                //caller: this.getActiveAddress
+            };
+
+            let input = {};
+            let txid = "";
+            if (count === 1) {
+                if (this.memberRemoves.length === 1) {
+                    txid = await client.vehicle.removeMember(this.memberRemoves, wallet, this.vehicle.id, this.vehicle)
+
+                } else if (this.memberAdds.length === 1) {
+                     txid = await client.vehicle.addMember(this.memberAdds, wallet, this.vehicle.id)
+                     
+                } else if (Object.keys(this.memberUpdates).length === 1) {
+                    txid = await client.vehicle.updateMember(this.memberUpdates, wallet, this.vehicle.id,this.vehicle)
+                
+                }
+            } else if (count > 1) {
+                input.function = 'multiInteraction';
+                input.key = 'multi';
+                input.note = 'Multi-Interaction';
+                input.actions = [];
+
+                if (this.memberRemoves.length > 0) {
+                    txid = await client.vehicle.removeMember(this.memberRemoves, wallet, this.vehicle.id, this.vehicle)
+                    
+                }
+                if (this.memberAdds.length > 0) {
+                    txid = await client.vehicle.addMember(this.memberAdds, wallet, this.vehicle.id)
+                }
+                if (Object.keys(this.memberUpdates).length > 0) {
+                    txid = await client.vehicle.updateMember(this.memberUpdates, wallet, this.vehicle.id,this.vehicle)
+                }
+            }
+           
             this.$swal({
                 icon: "info",
                 html: "Please wait while member changes are sent to the contract...",
@@ -491,12 +466,6 @@ export default {
                     this.$swal.showLoading()
                 },
             });
-            let txid = "";
-            if (import.meta.env.VITE_ENV === "DEV") {
-                txid = await interactWrite(arweave, wallet, this.vehicle.id, input);
-            } else {
-                txid = await interactWrite(arweave, "use_wallet", this.vehicle.id, input);
-            }
 
             if(Boolean(this.arweaveMine)){
                 const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";

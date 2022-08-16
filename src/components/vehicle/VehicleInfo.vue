@@ -105,6 +105,9 @@ import numeral from "numeral";
 import VehicleInfoRead from './VehicleInfoRead.vue';
 import VehicleStatusText from './VehicleStatusText.vue';
 import { interactWrite } from "smartweave";
+import Aftr from "aftr-market";
+
+const client = new Aftr();
 
 export default {
     props: ['vehicle', 'contractId'],
@@ -410,50 +413,50 @@ export default {
                 /**** */
 
                 
-                let input = {
-                    function: '',
-                    type: 'set',
-                    recipient: '',
-                    target: '',
-                    qty: 0,
-                    key: '',
-                    value: '',
-                    note: ''
-                };
+                // let input = {
+                //     function: '',
+                //     type: 'set',
+                //     recipient: '',
+                //     target: '',
+                //     qty: 0,
+                //     key: '',
+                //     value: '',
+                //     note: ''
+                // };
                 
-                // If more than one change, build multi-interaction input
-                if (changeMap.size > 1) {
-                    input.function = 'multiInteraction';
-                    input.key = 'multi';
-                    input.note = 'Multi-Interaction';
+                // // If more than one change, build multi-interaction input
+                // if (changeMap.size > 1) {
+                //     input.function = 'multiInteraction';
+                //     input.key = 'multi';
+                //     input.note = 'Multi-Interaction';
                     
-                    let actions = [];
-                    for (let [key, value] of changeMap) {
-                        let multiAction = {
-                            input : {
-                                function: 'propose',
-                                type: 'set',
-                                key: key,
-                                value: value
-                            }
-                        }
-                        actions.push(multiAction);
-                    }
-                    input.actions = actions;
-                } else if (changeMap.size === 1) {
-                    input.function = 'propose';
-                    for (let [key, value] of changeMap) {
-                        input.key = key;
-                        input.value = value;
-                    }
-                } else {
-                    // Invalid
-                    return;
-                }
+                //     let actions = [];
+                //     for (let [key, value] of changeMap) {
+                //         let multiAction = {
+                //             input : {
+                //                 function: 'propose',
+                //                 type: 'set',
+                //                 key: key,
+                //                 value: value
+                //             }
+                //         }
+                //         actions.push(multiAction);
+                //     }
+                //     input.actions = actions;
+                // } else if (changeMap.size === 1) {
+                //     input.function = 'propose';
+                //     for (let [key, value] of changeMap) {
+                //         input.key = key;
+                //         input.value = value;
+                //     }
+                // } else {
+                //     // Invalid
+                //     return;
+                // }
 
                 // Call Smartweave
                 this.$log.info("VehicleInfo : updateVehicle :: ", "CALL TO SMARTWEAVE");
-                this.$log.info("VehicleInfo : updateVehicle :: ", JSON.stringify(input));
+                // this.$log.info("VehicleInfo : updateVehicle :: ", JSON.stringify(input));
                 this.$log.info("VehicleInfo : updateVehicle :: ", "Contract ID: " + this.contractId);
                 
                 //const txid = await interactWrite(arweave, "use_wallet", this.contractId, JSON.stringify(action));
@@ -481,10 +484,12 @@ export default {
                 });
                 try {
                     if (import.meta.env.VITE_ENV === "DEV") {
-                        const txid = await interactWrite(arweave, wallet, this.contractId, input);
+                        // const txid = await interactWrite(arweave, wallet, this.contractId, input);
+                        const txid = await client.vehicle.editVehicle(wallet, this.contractId, [...changeMap.entries()])
                         this.$log.info("VehicleInfo : updateVehicle :: ", "TX: " + txid);
                     } else {
-                        const txid = await interactWrite(arweave, "use_wallet", this.contractId, input);
+                        // const txid = await interactWrite(arweave, "use_wallet", this.contractId, input);
+                        const txid = await client.vehicle.editVehicle("use_wallet", this.contractId, [...changeMap.entries()])
                         this.$log.info("VehicleInfo : updateVehicle :: ", "TX: " + txid);
                     }
                 } catch(e) {

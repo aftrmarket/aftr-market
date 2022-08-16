@@ -77,6 +77,9 @@ import numeral from "numeral";
 //import Arweave from "arweave";
 import { interactWrite, interactWriteDryRun } from "smartweave";
 import VehicleAlert from './VehicleAlert.vue';
+import Aftr from "aftr-market";
+
+const client = new Aftr();
 
 export default {
     props : ['vehicle'],
@@ -216,22 +219,32 @@ export default {
             .then(async (id) => {
                 this.$log.info("VehicleTokensAdd : interactWrite :: ", "Transfer ID = " + JSON.stringify(id));
 
-                const inputDeposit = {
-                    function: "deposit",
-                    tokenId: currentPst.contractId,
-                    txID: id,
-                };
-                this.$log.info("VehicleTokensAdd : interactWrite :: ", "INPUT DEP: " + JSON.stringify(inputDeposit));
-                await interactWrite(arweave, wallet, this.vehicle.id, inputDeposit)
-                .then(async (txID) => {
-                    this.msg = "Deposit Successful : " + txID
-                    if(Boolean(this.arweaveMine)){
+                // const inputDeposit = {
+                //     function: "deposit",
+                //     tokenId: currentPst.contractId,
+                //     txID: id,
+                // };
+                // this.$log.info("VehicleTokensAdd : interactWrite :: ", "INPUT DEP: " + JSON.stringify(inputDeposit));
+                // await interactWrite(arweave, wallet, this.vehicle.id, inputDeposit)
+                // .then(async (txID) => {
+                //     this.msg = "Deposit Successful : " + txID
+                //     if(Boolean(this.arweaveMine)){
+                //         await fetch(mineUrl);
+                //     }
+                // })
+                // .catch((error) => {
+                //     this.msg = error;
+                // });
+                 await client.vehicle.deposit(this.vehicle.id, wallet, id, currentPst.contractId).then(async (txid) =>{
+                     this.msg = txid
+                     if(Boolean(this.arweaveMine)){
                         await fetch(mineUrl);
                     }
-                })
-                .catch((error) => {
-                    this.msg = error;
-                });
+                     return txid
+                 }).catch((error) => {
+                     this.msg = error;
+                 })
+                //  return
             })
             .catch((error) => {
                 this.msg = error;
