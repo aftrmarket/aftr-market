@@ -25,7 +25,7 @@
                 </tr>
               </thead>
              <tbody class="divide-y divide-gray-200 bg-white">
-                <tr v-for="vehicle in vehicles" :key="vehicle.name">
+                <tr v-for="vehicle in vehicles" :key="vehicle.id">
                    <router-link :to="{ name: 'vehicle', params: { vehicleId: vehicle.id } }">
                   <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
                     <div class="flex items-center">
