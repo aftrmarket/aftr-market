@@ -40,13 +40,14 @@
                 <!-- List -->
                 <perfect-scrollbar>
                 <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6">
-                    <ul v-if="!isLoading && vehicles.length > 0" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    <ul v-if="layoutGrid && !isLoading && vehicles.length > 0" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                         <li v-for="vehicle in vehicles" :key="vehicle.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
                             <router-link :to="{ name: 'vehicle', params: { vehicleId: vehicle.id } }">
                                 <vehicle-card :vehicle="vehicle"></vehicle-card>
                             </router-link>
                         </li>
                     </ul>
+                    <vehicle-table v-else-if ="!layoutGrid && !isLoading && vehicles.length > 0"  :vehicles = "vehicles" ></vehicle-table>
                     <ul v-else-if="!isLoading && vehicles.length == 0" class="">
                         No vehicles found...
                     </ul>
@@ -78,9 +79,10 @@ import VehicleCard from "./vehicle/VehicleCard.vue";
 import VehicleCardPlaceholder from "./vehicle/VehicleCardPlaceholder.vue";
 import { mapGetters } from "vuex";
 import CreateVehicleSimple from "./CreateVehicleSimple.vue";
+import VehicleTable from './VehicleTable.vue';
 
 export default {
-    components: { VehicleCard, VehicleCardPlaceholder, CreateVehicleSimple },
+    components: { VehicleCard, VehicleCardPlaceholder, CreateVehicleSimple, VehicleTable },
     data() {
         return {
             /** Smartweave variables */
