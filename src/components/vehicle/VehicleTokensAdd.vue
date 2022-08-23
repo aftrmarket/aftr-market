@@ -253,33 +253,35 @@ export default {
 
             await interactWrite(arweave, wallet, currentPst.contractId, inputTransfer)
             .then(async (id) => {
+                /**** THIS CODE WORKS */
                 this.$log.info("VehicleTokensAdd : interactWrite :: ", "Transfer ID = " + JSON.stringify(id));
 
-                // const inputDeposit = {
-                //     function: "deposit",
-                //     tokenId: currentPst.contractId,
-                //     txID: id,
-                // };
-                // this.$log.info("VehicleTokensAdd : interactWrite :: ", "INPUT DEP: " + JSON.stringify(inputDeposit));
-                // await interactWrite(arweave, wallet, this.vehicle.id, inputDeposit)
-                // .then(async (txID) => {
-                //     this.msg = "Deposit Successful : " + txID
-                //     if(Boolean(this.arweaveMine)){
-                //         await fetch(mineUrl);
-                //     }
-                // })
-                // .catch((error) => {
-                //     this.msg = error;
-                // });
-                 await client.vehicle.deposit(this.vehicle.id, wallet, id, currentPst.contractId).then(async (txid) =>{
-                     this.msg = txid
-                     if(Boolean(this.arweaveMine)){
+                const inputDeposit = {
+                    function: "deposit",
+                    tokenId: currentPst.contractId,
+                    txID: id,
+                };
+                this.$log.info("VehicleTokensAdd : interactWrite :: ", "INPUT DEP: " + JSON.stringify(inputDeposit));
+                await interactWrite(arweave, wallet, this.vehicle.id, inputDeposit)
+                .then(async (txID) => {
+                    this.msg = "Deposit Successful : " + txID
+                    if(Boolean(this.arweaveMine)){
                         await fetch(mineUrl);
                     }
-                     return txid
-                 }).catch((error) => {
-                     this.msg = error;
-                 })
+                })
+                .catch((error) => {
+                    this.msg = error;
+                });
+                /**** THIS CODE DOESN'T WORK */
+                //  await client.vehicle.deposit(this.vehicle.id, wallet, id, currentPst.contractId).then(async (txid) =>{
+                //      this.msg = txid
+                //      if(Boolean(this.arweaveMine)){
+                //         await fetch(mineUrl);
+                //     }
+                //      return txid
+                //  }).catch((error) => {
+                //      this.msg = error;
+                //  })
                 //  return
             })
             .catch((error) => {
