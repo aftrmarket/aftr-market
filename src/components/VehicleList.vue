@@ -20,6 +20,26 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                             </svg>
                         </button>
+                        <button type="button" @click.prevent="toggleFilter">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#FFFC79" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
+                            </svg>
+                        </button>
+                        <div v-if="filtersOn">
+                            <select v-model="searchType">
+                                <option value="Name or Ticker Symbol">Name or Ticker</option>
+                                <option value="Wallet Address">Wallet Address</option>
+                                <option value="Setting Key">Setting Key</option>
+                                <option value="Setting Value">Setting Value</option>
+                                <option value="Asset ID">Assets</option>
+                            </select>
+                            <input type="text" class="" :placeholder="searchTypeText"/>
+                            <button>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#FFFC79" class="w-6 h-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                     <div>
                         <button type="button" @click.prevent="createVehicle()" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
@@ -38,8 +58,18 @@
                     </div>
                 </div>
                 <!-- List -->
-                <perfect-scrollbar>
-                <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6">
+                
+                <div class="bg-white rounded-lg shadow px-5 py-6">
+                    <div class="grid grid-cols-3">
+                        <div>
+                            <span v-show="filterText">SHOW FILTERS HERE</span>
+                        </div>
+                        <div></div>
+                        <div class="text-right text-sm">
+                            {{ vehicles.length }} Vehicles Shown
+                        </div>
+                    </div>
+                    <perfect-scrollbar>
                     <ul v-if="layoutGrid && !isLoading && vehicles.length > 0" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                         <li v-for="vehicle in vehicles" :key="vehicle.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
                             <router-link :to="{ name: 'vehicle', params: { vehicleId: vehicle.id } }">
@@ -59,8 +89,9 @@
                     <div class="text-center">
                         <button v-if="!isLoading && hasNextPage" @click.prevent="load" type="submit" class="mt-4 px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Load More</button>
                     </div>
+                    </perfect-scrollbar>
                 </div>
-                </perfect-scrollbar>
+                
                 <!-- <div v-if="!isLoading && noResult" class="">
                     <p>
                         No more data...
@@ -112,12 +143,18 @@ export default {
             hasNextPage: false,
             showCreateSimple: false,
             layoutGrid: true,
+            filtersOn: false,
+            filterText: false,
+            searchType: "Name or Ticker Symbol",
         };
     },
     // mounted() {
         // this.created()
         // },
     computed: {
+        searchTypeText() {
+            return "Enter " + this.searchType;
+        },  
         ...mapGetters(["getAftrContractSrcId", "getEvolvedContractSrcId"]),
     },
     methods: {
@@ -151,6 +188,9 @@ export default {
             this.vehicles = [];
             await this.load();
             this.isLoading = false;
+        },
+        toggleFilter() {
+            this.filtersOn = !this.filtersOn;
         },
         async loadAllVehicles(contractId) {
             try {
