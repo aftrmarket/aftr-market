@@ -132,7 +132,7 @@ const store = createStore({
             // Set correct config
             try {                
                 let config = await window.arweaveWallet.getArweaveConfig();
-                console.log(import.meta.env.VITE_ARWEAVE_HOST);
+                console.log("config info: " + config.host);
                 if (config.host != import.meta.env.VITE_ARWEAVE_HOST && config.port != import.meta.env.VITE_ARWEAVE_PORT && config.protocol != import.meta.env.VITE_ARWEAVE_PROTOCOL) {
                     console.log("Current Config: " + JSON.stringify(config));
                     config = { 
