@@ -232,6 +232,7 @@ import {
     interactWrite,
     readContract,
 } from "smartweave";
+import { ConnectableObservable } from "rxjs";
 
 const initProcess = [
     {
@@ -329,6 +330,11 @@ export default {
                 }
 
                 // Check for correct ArConnect settings
+                console.log("Checking config:");
+                console.log(this.arConnectConfig.host);
+                console.log(this.arConnectConfig.protocol);
+                console.log(this.arConnectConfig.port);
+                
                 if (import.meta.env.VITE_ENV === "DEV") {
                     if (
                         this.arConnectConfig.host != this.arweaveHost ||
