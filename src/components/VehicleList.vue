@@ -26,19 +26,19 @@
                             </svg>
                         </button>
                         <div v-if="filtersOn">
-                            <select v-model="searchType">
-                                <option value="Name or Ticker Symbol">Name or Ticker</option>
+                            <select  @change="onChange($event)" v-model="searchType">
+                                <option value="Name or Ticker Symbol" selected>Name or Ticker</option>
                                 <option value="Wallet Address">Wallet Address</option>
                                 <option value="Setting Key">Setting Key</option>
                                 <option value="Setting Value">Setting Value</option>
                                 <option value="Asset ID">Assets</option>
                             </select>
-                            <input type="text" class="" :placeholder="searchTypeText"/>
-                            <button>
+                            <input type="text" class="" :placeholder="searchTypeText" v-model="searchInput"/>
+                            <!-- <button>
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#FFFC79" class="w-6 h-6">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                                 </svg>
-                            </button>
+                            </button> -->
                         </div>
                     </div>
                     <div>
@@ -71,7 +71,8 @@
                     </div>
                     <perfect-scrollbar>
                     <ul v-if="layoutGrid && !isLoading && vehicles.length > 0" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        <li v-for="vehicle in vehicles" :key="vehicle.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
+                        <!-- <li v-for="vehicle in vehicles" :key="vehicle.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200"> -->
+                        <li v-for="vehicle in filteredList()" :key="vehicle.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
                             <router-link :to="{ name: 'vehicle', params: { vehicleId: vehicle.id } }">
                                 <vehicle-card :vehicle="vehicle"></vehicle-card>
                             </router-link>
@@ -146,6 +147,7 @@ export default {
             filtersOn: false,
             filterText: false,
             searchType: "Name or Ticker Symbol",
+            searchInput: ""
         };
     },
     // mounted() {
@@ -158,6 +160,45 @@ export default {
         ...mapGetters(["getAftrContractSrcId", "getEvolvedContractSrcId"]),
     },
     methods: {
+        onChange(event) {
+            console.log(event.target.value, this.searchType);
+        },
+        filteredList() {
+            console.log(this.searchType)
+            if(this.searchType == "Name or Ticker Symbol"){
+                return this.vehicles.filter((vehicle) =>
+                    vehicle.name.toLowerCase().includes(this.searchInput.toLowerCase()) || vehicle.ticker.toLowerCase().includes(this.searchInput.toLowerCase())
+                );
+            }
+            if(this.searchType == "Wallet Address"){
+                return this.vehicles.map((vehicle) =>{
+                   Object.keys(vehicle.balances).filter(x => {
+                       x.toLowerCase().includes(this.searchInput.toLowerCase())
+                       return vehicle;
+                    })
+                });
+            }
+
+            // if(this.searchType == "Setting Key"){
+            //     return this.vehicles.filter((vehicle) =>
+            //         vehicle.name.toLowerCase().includes(this.searchInput.toLowerCase()) || vehicle.ticker.toLowerCase().includes(this.searchInput.toLowerCase())
+            //     );
+            // }
+
+            // if(this.searchType == "Setting Value"){
+            //     return this.vehicles.filter((vehicle) =>
+            //         vehicle.name.toLowerCase().includes(this.searchInput.toLowerCase()) || vehicle.ticker.toLowerCase().includes(this.searchInput.toLowerCase())
+            //     );
+            // }
+
+            // if(this.searchType == "Asset ID"){
+            //     return this.vehicles.filter((vehicle) =>{
+            //         console.log("vehicle.tokens", vehicle.tokens)
+            //         vehicle.tokens.toLowerCase().includes(this.searchInput.toLowerCase())
+            //     }
+            //     );
+            // }
+        },
         toggleLayout() {
             this.layoutGrid = !this.layoutGrid;
         },
