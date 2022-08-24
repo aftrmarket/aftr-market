@@ -26,14 +26,14 @@
                             </svg>
                         </button>
                         <div v-if="filtersOn">
-                            <select  @change="onChange($event)" v-model="searchType">
+                            <select  @change="onChange($event)" v-model="searchType" class="ml-2 mt-1 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                                 <option value="Name or Ticker Symbol" selected>Name or Ticker</option>
                                 <option value="Wallet Address">Wallet Address</option>
                                 <option value="Setting Key">Setting Key</option>
                                 <option value="Setting Value">Setting Value</option>
                                 <option value="Asset ID">Assets</option>
                             </select>
-                            <input type="text" class="" :placeholder="searchTypeText" v-model="searchInput"/>
+                            <input type="text" :placeholder="searchTypeText" v-model="searchInput" class="ml-2 mt-1 pl-2 py-2 w-96 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"/>
                             <!-- <button>
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#FFFC79" class="w-6 h-6">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
