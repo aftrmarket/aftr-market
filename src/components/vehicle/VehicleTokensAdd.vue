@@ -169,18 +169,24 @@ export default {
                 return "mt-1 focus:ring-aftrRed focus:border-aftrRed shadow-sm sm:text-sm border-gray-300 rounded-md";
             }
         },
-        async isFcpSupported(contractId) {
+        async isDepositAllowed(contractId) {
+            let stateInteractions = {};
+            // Is FCP Supported
             try {
-                const stateInteractions = await executeContract(contractId, undefined, true, {
-                    ARWEAVE_HOST: arweaveHost,
-                    ARWEAVE_PORT: arweavePort,
-                    ARWEAVE_PROTOCOL: arweaveProtocol
+                stateInteractions = await executeContract(contractId, undefined, true, {
+                    ARWEAVE_HOST: this.arweaveHost,
+                    ARWEAVE_PORT: this.arweavePort,
+                    ARWEAVE_PROTOCOL: this.arweaveProtocol
                 });
 
                 if (!stateInteractions.state.invocations || !stateInteractions.state.foreignCalls) {
+                    this.$swal({
+                        icon: "error",
+                        html: "This asset doesn't support cross-contract communication so it can't be deposited into an AFTR vehicle.",
+                        showConfirmButton: true,
+                        allowOutsideClick: false
+                    });
                     return false;
-                } else {
-                    return true;
                 }
             } catch(e) {
                 this.$swal({
@@ -189,8 +195,21 @@ export default {
                     showConfirmButton: true,
                     allowOutsideClick: false
                 });
-                return;
+                return false;
             }
+
+            // Test to see if creator's balance would be 0
+            if ((stateInteractions.state.ownership === "single") && (this.getActiveAddress === stateInteractions.state.creator) && (stateInteractions.state.balances[this.getActiveAddress] - Number(this.pstInputTokens) <= 0)) {
+                this.$swal({
+                    icon: "error",
+                    html: "Can't deposit this asset because the owner's balance of a single-owner vehicle would become 0.",
+                    showConfirmButton: true,
+                    allowOutsideClick: false
+                });
+                return false;
+            }
+
+            return true;
         },
         async transferTokens() {
             this.msg = "Please wait for deposit into vehicle to complete..."
@@ -232,14 +251,8 @@ export default {
             );
 
             // Does the PST support FCP?
-            if (await !this.isFcpSupported(currentPst.contractId)) {
-                this.$swal({
-                    icon: "error",
-                    html: "This asset doesn't support cross-contract communication so it can't be deposited into an AFTR vehicle.",
-                    showConfirmButton: true,
-                    allowOutsideClick: false,
-                    didOpen: () => { this.$swal.hideLoading() }
-                });
+            const ok = await this.isDepositAllowed(currentPst.contractId);
+            if (!ok) {
                 return;
             }
 
@@ -253,36 +266,35 @@ export default {
 
             await interactWrite(arweave, wallet, currentPst.contractId, inputTransfer)
             .then(async (id) => {
-                /**** THIS CODE WORKS */
                 this.$log.info("VehicleTokensAdd : interactWrite :: ", "Transfer ID = " + JSON.stringify(id));
 
-                const inputDeposit = {
-                    function: "deposit",
-                    tokenId: currentPst.contractId,
-                    txID: id,
-                };
-                this.$log.info("VehicleTokensAdd : interactWrite :: ", "INPUT DEP: " + JSON.stringify(inputDeposit));
-                await interactWrite(arweave, wallet, this.vehicle.id, inputDeposit)
-                .then(async (txID) => {
-                    this.msg = "Deposit Successful : " + txID
-                    if(Boolean(this.arweaveMine)){
-                        await fetch(mineUrl);
-                    }
-                })
-                .catch((error) => {
-                    this.msg = error;
-                });
-                /**** THIS CODE DOESN'T WORK */
-                //  await client.vehicle.deposit(this.vehicle.id, wallet, id, currentPst.contractId).then(async (txid) =>{
-                //      this.msg = txid
-                //      if(Boolean(this.arweaveMine)){
+                /*** Original code before JS library */
+                // const inputDeposit = {
+                //     function: "deposit",
+                //     tokenId: currentPst.contractId,
+                //     txID: id,
+                // };
+                // this.$log.info("VehicleTokensAdd : interactWrite :: ", "INPUT DEP: " + JSON.stringify(inputDeposit));
+                // await interactWrite(arweave, wallet, this.vehicle.id, inputDeposit)
+                // .then(async (txID) => {
+                //     this.msg = "Deposit Successful : " + txID
+                //     if(Boolean(this.arweaveMine)){
                 //         await fetch(mineUrl);
                 //     }
-                //      return txid
-                //  }).catch((error) => {
-                //      this.msg = error;
-                //  })
-                //  return
+                // })
+                // .catch((error) => {
+                //     this.msg = error;
+                // });
+                 await client.vehicle.deposit(this.vehicle.id, wallet, id, currentPst.contractId).then(async (txid) =>{
+                     this.msg = txid
+                     if(Boolean(this.arweaveMine)){
+                        await fetch(mineUrl);
+                    }
+                     return txid
+                 }).catch((error) => {
+                     this.msg = error;
+                 })
+                 return;
             })
             .catch((error) => {
                 this.msg = error;
