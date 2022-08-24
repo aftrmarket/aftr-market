@@ -329,12 +329,7 @@ export default {
                     return false;
                 }
 
-                // Check for correct ArConnect settings
-                console.log("Checking config:");
-                console.log(this.arConnectConfig.host);
-                console.log(this.arConnectConfig.protocol);
-                console.log(this.arConnectConfig.port);
-                
+                // Check for correct ArConnect settings                
                 if (import.meta.env.VITE_ENV === "DEV") {
                     if (
                         this.arConnectConfig.host != this.arweaveHost ||

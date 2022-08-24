@@ -132,8 +132,7 @@ const store = createStore({
             // Set correct config
             try {                
                 let config = await window.arweaveWallet.getArweaveConfig();
-                console.log("config info: " + config.host);
-                if (config.host != import.meta.env.VITE_ARWEAVE_HOST && config.port != import.meta.env.VITE_ARWEAVE_PORT && config.protocol != import.meta.env.VITE_ARWEAVE_PROTOCOL) {
+                if (config.host != import.meta.env.VITE_ARWEAVE_HOST || config.port != import.meta.env.VITE_ARWEAVE_PORT || config.protocol != import.meta.env.VITE_ARWEAVE_PROTOCOL) {
                     console.log("Current Config: " + JSON.stringify(config));
                     config = { 
                         host: import.meta.env.VITE_ARWEAVE_HOST, 
@@ -144,7 +143,6 @@ const store = createStore({
                     context.commit("setArConnectConfig", config);
                 }
                 wallet.address = await window.arweaveWallet.getActiveAddress();
-                console.log(wallet.address);
             } catch(e) {
                 alert(e);
             }
