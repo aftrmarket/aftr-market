@@ -28,7 +28,7 @@
                 </tr>
               </thead>
              <tbody class="divide-y divide-gray-200 bg-white">
-                <tr v-for="vehicle in vehicles" :key="vehicle.id">
+                <tr v-for="vehicle in filteredList()" :key="vehicle.id">
                    <router-link :to="{ name: 'vehicle', params: { vehicleId: vehicle.id } }">
                   <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
                     <div class="flex items-center">
@@ -81,7 +81,7 @@
 import { mapGetters } from "vuex";
 
 export default {
-  props: ['vehicles'],
+  props: ['vehicles', 'searchType', 'searchInput'],
   data() {
      return {
         logoUrl: "",
@@ -94,6 +94,42 @@ export default {
         ...mapGetters(["getActiveAddress"]),
   },
   methods: {
+    filteredList() {
+            console.log(this.searchType, this.searchInput.toLowerCase())
+            if(this.searchType == "Name or Ticker Symbol"){
+                return this.vehicles.filter((vehicle) =>
+                    vehicle.name.toLowerCase().includes(this.searchInput.toLowerCase()) || vehicle.ticker.toLowerCase().includes(this.searchInput.toLowerCase())
+                );
+            }
+            if(this.searchType == "Wallet Address"){
+                return this.vehicles.filter(element => {
+                    return Object.keys(element.balances).some(key => key.toLowerCase().includes(this.searchInput.toLowerCase())); 
+                });
+            }
+
+            if(this.searchType == "Setting Key"){
+                return this.vehicles.filter((vehicle) =>{
+                    return vehicle.settings.some((setting) => {
+                        return setting[0].toLowerCase().includes(this.searchInput.toLowerCase())  
+                    });
+                });
+            }
+
+            // if(this.searchType == "Setting Value"){
+            //     return this.vehicles.filter((vehicle) =>
+            //         vehicle.name.toLowerCase().includes(this.searchInput.toLowerCase()) || vehicle.ticker.toLowerCase().includes(this.searchInput.toLowerCase())
+            //     );
+            // }
+
+             if(this.searchType == "Asset ID"){
+                console.log(this.vehicles)
+                return this.vehicles.filter(element => {
+                    return element.tokens.some((el) => {
+                        return el.tokenId.includes(this.searchInput)
+                    }); 
+                })
+            }
+        },
     vehicleLogo(vehicle) {
           console.log("vehicleLogo", vehicle.id)
             let logoUrl = "";

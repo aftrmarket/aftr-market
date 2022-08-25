@@ -78,7 +78,7 @@
                             </router-link>
                         </li>
                     </ul>
-                    <vehicle-table v-else-if ="!layoutGrid && !isLoading && vehicles.length > 0"  :vehicles = "vehicles" ></vehicle-table>
+                    <vehicle-table v-else-if ="!layoutGrid && !isLoading && vehicles.length > 0"  :vehicles = "vehicles" :searchType = "searchType" :searchInput = "searchInput"></vehicle-table>
                     <ul v-else-if="!isLoading && vehicles.length == 0" class="">
                         No vehicles found...
                     </ul>
@@ -172,29 +172,34 @@ export default {
             }
             if(this.searchType == "Wallet Address"){
                 return this.vehicles.filter(element => {
-                    return Object.keys(element.balances).some(key => key.includes(this.searchInput)); 
+                    return Object.keys(element.balances).some(key => key.toLowerCase().includes(this.searchInput.toLowerCase())); 
                 });
             }
 
-            // if(this.searchType == "Setting Key"){
-            //     return this.vehicles.filter((vehicle) =>
-            //         vehicle.name.toLowerCase().includes(this.searchInput.toLowerCase()) || vehicle.ticker.toLowerCase().includes(this.searchInput.toLowerCase())
-            //     );
-            // }
+            if(this.searchType == "Setting Key"){
+                return this.vehicles.filter((vehicle) =>{
+                    return vehicle.settings.some((setting) => {
+                        return setting[0].toLowerCase().includes(this.searchInput.toLowerCase())  
+                    });
+                });
+            }
 
             // if(this.searchType == "Setting Value"){
-            //     return this.vehicles.filter((vehicle) =>
-            //         vehicle.name.toLowerCase().includes(this.searchInput.toLowerCase()) || vehicle.ticker.toLowerCase().includes(this.searchInput.toLowerCase())
-            //     );
+            //      return this.vehicles.filter((vehicle) =>{
+            //         return vehicle.settings.some((setting) => {
+            //             return setting[1].toLowerCase().includes(this.searchInput.toLowerCase())  
+            //         });
+            //     });
             // }
 
-            // if(this.searchType == "Asset ID"){
-            //     return this.vehicles.filter((vehicle) =>{
-            //         console.log("vehicle.tokens", vehicle.tokens)
-            //         vehicle.tokens.toLowerCase().includes(this.searchInput.toLowerCase())
-            //     }
-            //     );
-            // }
+            if(this.searchType == "Asset ID"){
+                console.log(this.vehicles)
+                return this.vehicles.filter(element => {
+                    return element.tokens.some((el) => {
+                        return el.tokenId.toLowerCase().includes(this.searchInput.toLowerCase())
+                    }); 
+                })
+            }
         },
         toggleLayout() {
             this.layoutGrid = !this.layoutGrid;
