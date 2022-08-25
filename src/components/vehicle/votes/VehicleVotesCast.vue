@@ -68,7 +68,7 @@
                       <div class="text-gray-500">Current Block</div>
                       <div class="text-gray-700">{{ vote.start }}</div>
                       <div class="text-gray-700">
-                        {{ vote.start + vote.lockLength }}
+                        {{ vote.start + vote.voteLength }}
                       </div>
                       <div class="text-gray-700">{{ currentBlock }}</div>
                     </div>
