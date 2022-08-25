@@ -11,8 +11,11 @@
                   <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
                     Name 
                     <button type="button" @click.prevent="sortVehicle" >
-                      <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <svg v-if="sortDirection == 'DESC'" xmlns="http://www.w3.org/2000/svg" class="ml-2 h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                      </svg>
+                      <svg v-if="sortDirection == 'ASC'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="ml-2 h-3 w-3" >
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
                       </svg>
                     </button>
                   </th>

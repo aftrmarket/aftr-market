@@ -171,11 +171,8 @@ export default {
                 );
             }
             if(this.searchType == "Wallet Address"){
-                return this.vehicles.map((vehicle) =>{
-                   Object.keys(vehicle.balances).filter(x => {
-                       x.toLowerCase().includes(this.searchInput.toLowerCase())
-                       return vehicle;
-                    })
+                return this.vehicles.filter(element => {
+                    return Object.keys(element.balances).some(key => key.includes(this.searchInput)); 
                 });
             }
 
