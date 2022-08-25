@@ -66,13 +66,14 @@
                   {{ vote.yays }} - {{ vote.nays }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-500">
-                    <button v-if="canVote(vote) && vote.status === 'active'" @click.prevent="openModal('cast', vote.id, vote)" type="button" class="text-aftrBlue hover:text-indigo-900">
+                    <button v-if="vote.start + vote.voteLength < currentBlock.height">Complete</button>
+                    <button v-else-if="canVote(vote) && vote.status === 'active'" @click.prevent="openModal('cast', vote.id, vote)" type="button" class="text-aftrBlue hover:text-indigo-900">
                         Vote
                     </button>
                     <div v-else-if="votedText(vote) === 'voted'" class="flex content-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="green">
-                                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                            </svg> Voted
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="green">
+                            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg> Voted
                     </div>
                 </td>
               </tr>
@@ -106,8 +107,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters(['arConnected', 'getActiveAddress', 'getCurrentBlockValue']),
-        ...mapState(['currentBlock']),
+        ...mapGetters(['arConnected', 'getActiveAddress', 'currentBlock']),
         filteredVotes() {
 			let status = this.selectedVoteCategory;
             let vote = this.votes
@@ -121,7 +121,7 @@ export default {
         },
     },
     mounted () {
-        this.$store.dispatch('loadCurrentBlock')
+        this.$store.dispatch('loadCurrentBlock');
     },
     watch: {
         arConnected(value) {
@@ -130,7 +130,7 @@ export default {
     },
     methods: {
         arConnect() {
-            this.$store.dispatch('getCurrentBlockValue');
+            //this.$store.dispatch('getCurrentBlockValue');
         },
         walletAddressSubstr(addr, chars = 10) {
             if (typeof addr === 'string') {

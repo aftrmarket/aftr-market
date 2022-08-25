@@ -125,6 +125,7 @@ export default {
             vehicle: {},
             interations: {},
             anyWithdrawals: false,
+            concludedVoteNeeded: false,
 
             arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
             arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
@@ -151,7 +152,7 @@ export default {
                 return logoUrl;
             }
         },
-        ...mapGetters(["getActiveAddress", "getAftrContractSrcId", "getEvolvedContractSrcId"]),
+        ...mapGetters(["getActiveAddress", "getAftrContractSrcId", "getEvolvedContractSrcId", "currentBlock"]),
     },
     methods: {
         tabText(tab) {
@@ -159,6 +160,8 @@ export default {
             if (tab.current) {
                 return cssText + "border-aftrBlue text-aftrBlue";
             } else if (this.anyWithdrawals && tab.name == "Tokens") {
+                return cssText + "border-transparent text-aftrRed hover:text-gray-700 hover:border-gray-300";
+            } else if (this.concludeVoteNeeded && tab.name == "Votes") {
                 return cssText + "border-transparent text-aftrRed hover:text-gray-700 hover:border-gray-300";
             } else {
                 return cssText + "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300";
@@ -259,6 +262,20 @@ export default {
                 this.vehicle.tokens = [];
             }
             this.vehicle.treasury = treasuryTotal;
+
+            // Votes
+            if (this.vehicle.votes) {
+                this.$store.dispatch('loadCurrentBlock');
+                let currentBlock = +this.currentBlock.height;
+                let activeVotes = this.vehicle.votes.filter( (vote) => vote.status === "active" );
+                activeVotes.forEach((vote) => {
+                    let start = +vote.start;
+                    let voteLength = +vote.voteLength;
+                    if (start + voteLength <= currentBlock) {
+                        this.concludeVoteNeeded = true;
+                    }
+                });
+            }
         },
     },
     beforeRouteEnter(to, from, next) {

@@ -157,7 +157,7 @@ export default {
         searchTypeText() {
             return "Enter " + this.searchType;
         },  
-        ...mapGetters(["getAftrContractSrcId", "getEvolvedContractSrcId"]),
+        ...mapGetters(["getAftrContractSrcId", "getEvolvedContractSrcId", "currentBlock"]),
     },
     methods: {
         onChange(event) {
@@ -307,8 +307,19 @@ export default {
 
                     // Votes Opened
                     if (typeof vehicle.votes !== "undefined" && vehicle.votes.length !== 0) {
+                        this.$store.dispatch('loadCurrentBlock');
+                        let currentBlock = +this.currentBlock.height;
                         const activeVotes = vehicle.votes.filter((vote) => vote.status === "active");
                         vehicle.totalActiveVotes = activeVotes.length;
+
+                        // Check to see if any votes need to be concluded
+                        activeVotes.forEach( (vote) => {
+                            let start = +vote.start;
+                            let voteLength = +vote.voteLength;
+                            if (start + voteLength <= currentBlock) {
+                                vehicle.concludeVoteNeeded = true;
+                            }
+                        });
                     } else {
                         vehicle.totalActiveVotes = 0;
                     }
