@@ -15,8 +15,11 @@
 
             <label class="mt-4">Input:</label>
             <textarea v-model="input" rows="10" class=" mt-2 w-3/4 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block sm:text-sm border-gray-300 rounded-md" />
-            <div class="mt-2">
-                <button v-if="readyToTest" @click="testContract" type="button" class="rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-green-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
+            <div class="mt-2" v-if="readyToTest">
+                <button @click="testContract" type="button" class="rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-green-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
+                    Test Contract (Dry Run)
+                </button>
+                <button @click="testContract('real')" type="button" class="rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-green-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
                     Test Contract
                 </button>
             </div>
@@ -136,7 +139,7 @@ export default {
             }
             
         },
-        async testContract() {
+        async testContract(type = "dry") {
             let arweave = {};
 
             try {
@@ -185,7 +188,11 @@ export default {
             try {
                 if (import.meta.env.VITE_ENV === "DEV") {
                     let inputObj = JSON.parse(this.input);
-                    response = await interactWriteDryRun(arweave, wallet, this.vehicle.id, inputObj);
+                    if (type === "dry") {
+                        response = await interactWriteDryRun(arweave, wallet, this.vehicle.id, inputObj);
+                    } else {
+                        response = await interactWrite(arweave, wallet, this.vehicle.id, inputObj);
+                    }
                 }
             } catch(e) {
                 this.$swal({
