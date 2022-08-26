@@ -173,7 +173,7 @@ import Aftr from "aftr-market";
 const client = new Aftr();
 
 export default {
-    props: ['vehicle'],
+    props: ['vehicle', 'isMember'],
     components: { Switch, SwitchGroup, SwitchLabel },
     data() {
         return {
@@ -308,8 +308,7 @@ export default {
         //     }
         // },
         checkEditStatus() {
-            // If wallet is in balances, then user can edit
-            if ((this.getActiveAddress === this.vehicle.creator && this.vehicle.ownership === 'single') || (this.getActiveAddress in this.vehicle.balances && this.vehicle.ownership === 'dao')) {
+            if (this.isMember) {
                 this.allowEdits = true;
             } else {
                 this.allowEdits = false;

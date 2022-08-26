@@ -58,15 +58,15 @@
                                         </nav>
                                     </div>
                                 </div>
-                                <vehicle-info v-if="activeTab === 'Info'" :vehicle="vehicle" :contractId="contractId"></vehicle-info>
-                                <vehicle-setting v-else-if="activeTab === 'Settings'" :vehicle="vehicle"></vehicle-setting>
-                                <vehicle-members v-else-if="activeTab === 'Members'" :vehicle="vehicle"></vehicle-members>
-                                <vehicle-tokens v-else-if="activeTab === 'Tokens'" :vehicle="vehicle"></vehicle-tokens>
+                                <vehicle-info v-if="activeTab === 'Info'" :vehicle="vehicle" :contractId="contractId" :isMember="allowEdits"></vehicle-info>
+                                <vehicle-setting v-else-if="activeTab === 'Settings'" :vehicle="vehicle" :isMember="allowEdits"></vehicle-setting>
+                                <vehicle-members v-else-if="activeTab === 'Members'" :vehicle="vehicle" :isMember="allowEdits"></vehicle-members>
+                                <vehicle-tokens v-else-if="activeTab === 'Tokens'" :vehicle="vehicle" :isMember="allowEdits"></vehicle-tokens>
                                 <!--<vehicle-profits v-else-if="activeTab === 'Profits'"></vehicle-profits>-->
                                 <!--<vehicle-leases v-else-if="activeTab === 'Leases'" :leases="vehicles.leases"></vehicle-leases>-->
                                 <!--<vehicle-leases v-else-if="activeTab === 'Leases'"></vehicle-leases>-->
                                 <!--<vehicle-fractions v-else-if="activeTab === 'Fractions'"></vehicle-fractions>-->
-                                <vehicle-votes v-else-if="activeTab === 'Votes'" :vehicle="vehicle" :contractId="contractId"></vehicle-votes>
+                                <vehicle-votes v-else-if="activeTab === 'Votes'" :vehicle="vehicle" :contractId="contractId" :isMember="allowEdits"></vehicle-votes>
                                 <vehicle-state v-else-if="activeTab === 'State'" :vehicle="vehicle"></vehicle-state>
                                 <vehicle-activity v-else-if="activeTab === 'Activity'" :arweave="arweave" :interactions="interactions"></vehicle-activity>
 
@@ -99,6 +99,7 @@ import VehiclePlaceholder from './vehicle/VehiclePlaceholder.vue';
 import VehicleSetting from './vehicle/VehicleSetting.vue';
 import VehicleEvolve from "./vehicle/VehicleEvolve.vue";
 import { mapGetters } from "vuex";
+import { isVehicleMember } from './utils/shared.js';
 
 export default {
     components: { VehicleInfo, VehicleMembers, VehicleTokens, VehicleVotes, VehicleState, VehicleActivity, VehiclePlaceholder,VehicleSetting, VehicleContractTest, VehicleEvolve },
@@ -125,7 +126,7 @@ export default {
             vehicle: {},
             interations: {},
             anyWithdrawals: false,
-            concludedVoteNeeded: false,
+            concludeVoteNeeded: false,
 
             arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
             arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
@@ -172,9 +173,38 @@ export default {
             this.$log.info("Vehicle : viewVehicles :: " ,"View Clicked");
             this.$router.push("../vehicles");
         },
+        isVehicleMember(vehicle) {
+            const addr = this.getActiveAddress
+            let found = false;
+            
+            // Check balances
+            if (vehicle.balances) {
+                if (addr in vehicle.balances && vehicle.balances[addr] > 0) {
+                    return true;
+                }
+            }
+
+            // Check vault
+            if (vehicle.vault) {
+                for (let vaultAddr in vehicle.vault) {
+                	if (vaultAddr === addr) {
+                        for (let bal of vehicle.vault[vaultAddr]) {
+                            if (bal.balance > 0) {
+                                found = true; 
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return found;
+        },
         getEditStatus() {
-            // If wallet is in balances, user is member
-            if (this.vehicle.creator === this.getActiveAddress || this.getActiveAddress in this.vehicle.balances) {
+            // Is user member of this vehicle?
+            const isMember = isVehicleMember(this.vehicle, this.getActiveAddress);
+
+            if (isMember) {
                 this.allowEdits = true;
             } else {
                 this.allowEdits = false;

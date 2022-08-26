@@ -198,7 +198,7 @@ import { executeContract } from "@three-em/js";
 
 
 export default {
-    props: ['vehicle'],
+    props: ['vehicle', 'isMember'],
     components: { VehicleTokensAdd },
     data() {
         return {
@@ -329,8 +329,8 @@ export default {
             } else {
                 this.allowAdd = false;
             }
-            // For transfers, you must be the creator and the vehicle must have single owenership
-            if ((this.getActiveAddress === this.creatorAddress && this.vehicle.ownership === 'single') || (this.getActiveAddress in this.vehicle.balances && this.vehicle.ownership === 'dao')) {
+            // For transfers, you must be a member
+            if (this.isMember) {
                 this.allowTransfer = true;
             } else {
                 this.allowTransfer = false;

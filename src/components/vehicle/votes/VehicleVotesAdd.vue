@@ -158,7 +158,7 @@ import { Dialog, DialogOverlay, DialogTitle, TransitionChild, TransitionRoot } f
 import { ExclamationIcon } from '@heroicons/vue/outline'
 import { mapGetters } from 'vuex';
 import numeral from "numeral";
-import capitalize from '../../utils/shared.js';
+import { capitalize } from '../../utils/shared.js';
 
 export default {
     props : ['vehicle'],

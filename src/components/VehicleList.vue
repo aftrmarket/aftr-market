@@ -116,6 +116,7 @@ import VehicleCardPlaceholder from "./vehicle/VehicleCardPlaceholder.vue";
 import { mapGetters } from "vuex";
 import CreateVehicleSimple from "./CreateVehicleSimple.vue";
 import VehicleTable from './VehicleTable.vue';
+import { isVehicleMember } from './utils/shared.js';
 
 export default {
     components: { VehicleCard, VehicleCardPlaceholder, CreateVehicleSimple, VehicleTable },
@@ -162,7 +163,7 @@ export default {
         searchTypeText() {
             return "Enter " + this.searchType;
         },  
-        ...mapGetters(["getAftrContractSrcId", "getEvolvedContractSrcId"]),
+        ...mapGetters(["getAftrContractSrcId", "getEvolvedContractSrcId", "currentBlock", "getActiveAddress"]),
     },
     methods: {
         clearData(){
@@ -276,6 +277,7 @@ export default {
         toggleFilter() {
             this.filtersOn = !this.filtersOn;
         },
+
         async loadAllVehicles(contractId) {
             try {
                 // Added this b/c of the mount call to loadAllVehicles.  Not sure why that was added.
@@ -302,6 +304,9 @@ export default {
                     return;
                 }
                 
+                // Is user member of this vehicle?
+                const isMember = isVehicleMember(vehicle, this.getActiveAddress);
+
                 if (isAftrVehicle) {
                     vehicle.id = contractId;
                     if (!vehicle.tokens) {
@@ -313,7 +318,7 @@ export default {
                             vehicle.logo = setting[1];
                         } else if (setting[0] === "communityDescription") {
                             vehicle.desc = setting[1];
-                        } else if (setting[0] === "evolve") {
+                        } else if (setting[0] === "evolve" && isMember) {
                             const evolvedValue = setting[1];
                             if ((this.getAftrContractSrcId !== this.getEvolvedContractSrcId) && (evolvedValue !== this.getEvolvedContractSrcId)) {
                                 // Contract needs to be evolved
@@ -350,6 +355,20 @@ export default {
                     if (typeof vehicle.votes !== "undefined" && vehicle.votes.length !== 0) {
                         const activeVotes = vehicle.votes.filter((vote) => vote.status === "active");
                         vehicle.totalActiveVotes = activeVotes.length;
+                        
+                        // Show vehicle notices to members
+                        if (isMember) {
+                            // Look for votes that need to be concluded
+                            this.$store.dispatch('loadCurrentBlock');
+                            let currentBlock = +this.currentBlock.height;
+                            activeVotes.forEach((vote) => {
+                                let start = +vote.start;
+                                let voteLength = +vote.voteLength;
+                                if (start + voteLength <= currentBlock) {
+                                    vehicle.concludeVoteNeeded = true;
+                                }
+                            });
+                        }
                     } else {
                         vehicle.totalActiveVotes = 0;
                     }

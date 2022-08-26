@@ -120,7 +120,7 @@ import {
 import { ExclamationIcon } from "@heroicons/vue/outline";
 import { mapGetters } from "vuex";
 import numeral from "numeral";
-import capitalize from "../../utils/shared.js";
+import { capitalize } from "../../utils/shared.js";
 import { interactWrite } from "smartweave";
 import Arweave from "arweave";
 
