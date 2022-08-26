@@ -27,6 +27,7 @@
                   <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Member?</th>
                 </tr>
               </thead>
+              <div v-if="showMessage">No vehicles found...</div>
              <tbody class="divide-y divide-gray-200 bg-white">
                 <tr v-for="vehicle in filteredList()" :key="vehicle.id">
                    <router-link :to="{ name: 'vehicle', params: { vehicleId: vehicle.id } }">
@@ -87,6 +88,7 @@ export default {
         logoUrl: "",
         allowEdits: false,
         sortDirection:"ASC",
+        showMessage: false
      }
   },
  computed: {
@@ -95,45 +97,76 @@ export default {
   },
   methods: {
     filteredList() {
-            console.log(this.searchType, this.searchInput.toLowerCase())
             if(this.searchType == "Name or Ticker Symbol"){
-                return this.vehicles.filter((vehicle) =>
+                const vehicle = this.vehicles.filter((vehicle) =>
                     vehicle.name.toLowerCase().includes(this.searchInput.toLowerCase()) || vehicle.ticker.toLowerCase().includes(this.searchInput.toLowerCase())
                 );
+                if (vehicle.length == 0){
+                    this.showMessage = true
+                    return vehicle
+                }
+                this.showMessage = false
+                return vehicle
             }
             if(this.searchType == "Wallet Address"){
-                return this.vehicles.filter(element => {
+                const vehicle = this.vehicles.filter(element => {
                     return Object.keys(element.balances).some(key => key.toLowerCase().includes(this.searchInput.toLowerCase())); 
                 });
+
+                if (vehicle.length == 0){
+                    this.showMessage = true
+                    return vehicle
+                }
+                this.showMessage = false
+                return vehicle
             }
 
             if(this.searchType == "Setting Key"){
-                return this.vehicles.filter((vehicle) =>{
+                const vehicle =  this.vehicles.filter((vehicle) =>{
                     return vehicle.settings.some((setting) => {
                         return setting[0].toLowerCase().includes(this.searchInput.toLowerCase())  
                     });
                 });
+
+                if (vehicle.length == 0){
+                    this.showMessage = true
+                    return vehicle
+                }
+                this.showMessage = false
+                return vehicle
             }
 
             if(this.searchType == "Setting Value"){
-                 return this.vehicles.filter((vehicle) =>{
+                 const vehicle = this.vehicles.filter((vehicle) =>{
                     return vehicle.settings.some((setting) => {
                         return String(setting[1]).toLowerCase().includes(this.searchInput.toLowerCase())  
                     });
                 });
+
+                if (vehicle.length == 0){
+                    this.showMessage = true
+                    return vehicle
+                }
+                this.showMessage = false
+                return vehicle
             }
-            
-             if(this.searchType == "Asset ID"){
-                console.log(this.vehicles)
-                return this.vehicles.filter(element => {
+
+            if(this.searchType == "Asset ID"){
+                const vehicle = this.vehicles.filter(element => {
                     return element.tokens.some((el) => {
-                        return el.tokenId.includes(this.searchInput)
+                        return el.tokenId.toLowerCase().includes(this.searchInput.toLowerCase())
                     }); 
                 })
+
+                if (vehicle.length == 0){
+                    this.showMessage = true
+                    return vehicle
+                }
+                this.showMessage = false
+                return vehicle
             }
         },
     vehicleLogo(vehicle) {
-          console.log("vehicleLogo", vehicle.id)
             let logoUrl = "";
             if (!vehicle.logo || vehicle.logo === '') {
                 logoUrl = "https://avatars.dicebear.com/api/pixel-art-neutral/:" + vehicle.id + ".svg";

@@ -80,6 +80,7 @@
                                 <vehicle-card :vehicle="vehicle"></vehicle-card>
                             </router-link>
                         </li>
+                        <div v-if="showMessage">No vehicles found...</div>
                     </ul>
                     <vehicle-table v-else-if ="!layoutGrid && !isLoading && vehicles.length > 0"  :vehicles = "vehicles" :searchType = "searchType" :searchInput = "searchInput"></vehicle-table>
                     <ul v-else-if="!isLoading && vehicles.length == 0" class="">
@@ -150,7 +151,8 @@ export default {
             filtersOn: false,
             filterText: false,
             searchType: "Name or Ticker Symbol",
-            searchInput: ""
+            searchInput: "",
+            showMessage: false
         };
     },
     // mounted() {
@@ -160,7 +162,7 @@ export default {
         searchTypeText() {
             return "Enter " + this.searchType;
         },  
-        ...mapGetters(["getAftrContractSrcId", "getEvolvedContractSrcId", "currentBlock"]),
+        ...mapGetters(["getAftrContractSrcId", "getEvolvedContractSrcId"]),
     },
     methods: {
         clearData(){
@@ -171,41 +173,73 @@ export default {
             this.searchInput = ""
         },
         filteredList() {
-            console.log(this.searchType)
             if(this.searchType == "Name or Ticker Symbol"){
-                return this.vehicles.filter((vehicle) =>
+                const vehicle = this.vehicles.filter((vehicle) =>
                     vehicle.name.toLowerCase().includes(this.searchInput.toLowerCase()) || vehicle.ticker.toLowerCase().includes(this.searchInput.toLowerCase())
                 );
+                if (vehicle.length == 0){
+                    this.showMessage = true
+                    return vehicle
+                }
+                this.showMessage = false
+                return vehicle
             }
             if(this.searchType == "Wallet Address"){
-                return this.vehicles.filter(element => {
+                const vehicle = this.vehicles.filter(element => {
                     return Object.keys(element.balances).some(key => key.toLowerCase().includes(this.searchInput.toLowerCase())); 
                 });
+
+                if (vehicle.length == 0){
+                    this.showMessage = true
+                    return vehicle
+                }
+                this.showMessage = false
+                return vehicle
             }
 
             if(this.searchType == "Setting Key"){
-                return this.vehicles.filter((vehicle) =>{
+                const vehicle =  this.vehicles.filter((vehicle) =>{
                     return vehicle.settings.some((setting) => {
                         return setting[0].toLowerCase().includes(this.searchInput.toLowerCase())  
                     });
                 });
+
+                if (vehicle.length == 0){
+                    this.showMessage = true
+                    return vehicle
+                }
+                this.showMessage = false
+                return vehicle
             }
 
             if(this.searchType == "Setting Value"){
-                 return this.vehicles.filter((vehicle) =>{
+                 const vehicle = this.vehicles.filter((vehicle) =>{
                     return vehicle.settings.some((setting) => {
                         return String(setting[1]).toLowerCase().includes(this.searchInput.toLowerCase())  
                     });
                 });
+
+                if (vehicle.length == 0){
+                    this.showMessage = true
+                    return vehicle
+                }
+                this.showMessage = false
+                return vehicle
             }
 
             if(this.searchType == "Asset ID"){
-                console.log(this.vehicles)
-                return this.vehicles.filter(element => {
+                const vehicle = this.vehicles.filter(element => {
                     return element.tokens.some((el) => {
                         return el.tokenId.toLowerCase().includes(this.searchInput.toLowerCase())
                     }); 
                 })
+
+                if (vehicle.length == 0){
+                    this.showMessage = true
+                    return vehicle
+                }
+                this.showMessage = false
+                return vehicle
             }
         },
         toggleLayout() {
@@ -314,19 +348,8 @@ export default {
 
                     // Votes Opened
                     if (typeof vehicle.votes !== "undefined" && vehicle.votes.length !== 0) {
-                        this.$store.dispatch('loadCurrentBlock');
-                        let currentBlock = +this.currentBlock.height;
                         const activeVotes = vehicle.votes.filter((vote) => vote.status === "active");
                         vehicle.totalActiveVotes = activeVotes.length;
-
-                        // Check to see if any votes need to be concluded
-                        activeVotes.forEach( (vote) => {
-                            let start = +vote.start;
-                            let voteLength = +vote.voteLength;
-                            if (start + voteLength <= currentBlock) {
-                                vehicle.concludeVoteNeeded = true;
-                            }
-                        });
                     } else {
                         vehicle.totalActiveVotes = 0;
                     }
