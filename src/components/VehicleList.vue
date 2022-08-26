@@ -34,11 +34,14 @@
                                 <option value="Asset ID">Assets</option>
                             </select>
                             <input type="text" :placeholder="searchTypeText" v-model="searchInput" class="ml-2 mt-1 pl-2 py-2 w-96 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"/>
-                            <!-- <button>
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#FFFC79" class="w-6 h-6">
+                            <button  title="Clear search box." class="visible" @click="clearData" type="button">
+                                <!-- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#FFFC79" class="w-6 h-6">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                                </svg> -->
+                               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="ml-2 w-5 h-45">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12c0-1.232.046-2.453.138-3.662a4.006 4.006 0 013.7-3.7 48.678 48.678 0 017.324 0 4.006 4.006 0 013.7 3.7c.017.22.032.441.046.662M4.5 12l-3-3m3 3l3-3m12 3c0 1.232-.046 2.453-.138 3.662a4.006 4.006 0 01-3.7 3.7 48.657 48.657 0 01-7.324 0 4.006 4.006 0 01-3.7-3.7c-.017-.22-.032-.441-.046-.662M19.5 12l-3 3m3-3l3 3" />
                                 </svg>
-                            </button> -->
+                            </button>
                         </div>
                     </div>
                     <div>
@@ -160,8 +163,12 @@ export default {
         ...mapGetters(["getAftrContractSrcId", "getEvolvedContractSrcId", "currentBlock"]),
     },
     methods: {
+        clearData(){
+            this.searchInput = ""
+        },
         onChange(event) {
             console.log(event.target.value, this.searchType);
+            this.searchInput = ""
         },
         filteredList() {
             console.log(this.searchType)
@@ -184,13 +191,13 @@ export default {
                 });
             }
 
-            // if(this.searchType == "Setting Value"){
-            //      return this.vehicles.filter((vehicle) =>{
-            //         return vehicle.settings.some((setting) => {
-            //             return setting[1].toLowerCase().includes(this.searchInput.toLowerCase())  
-            //         });
-            //     });
-            // }
+            if(this.searchType == "Setting Value"){
+                 return this.vehicles.filter((vehicle) =>{
+                    return vehicle.settings.some((setting) => {
+                        return String(setting[1]).toLowerCase().includes(this.searchInput.toLowerCase())  
+                    });
+                });
+            }
 
             if(this.searchType == "Asset ID"){
                 console.log(this.vehicles)
@@ -502,5 +509,10 @@ export default {
 <style scoped>
     .ps {
         height: 750px;
-    }   
+    } 
+    
+    .visible {
+        height: 3em;
+        width: 10em
+    }
 </style>

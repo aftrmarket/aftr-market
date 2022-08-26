@@ -115,12 +115,14 @@ export default {
                 });
             }
 
-            // if(this.searchType == "Setting Value"){
-            //     return this.vehicles.filter((vehicle) =>
-            //         vehicle.name.toLowerCase().includes(this.searchInput.toLowerCase()) || vehicle.ticker.toLowerCase().includes(this.searchInput.toLowerCase())
-            //     );
-            // }
-
+            if(this.searchType == "Setting Value"){
+                 return this.vehicles.filter((vehicle) =>{
+                    return vehicle.settings.some((setting) => {
+                        return String(setting[1]).toLowerCase().includes(this.searchInput.toLowerCase())  
+                    });
+                });
+            }
+            
              if(this.searchType == "Asset ID"){
                 console.log(this.vehicles)
                 return this.vehicles.filter(element => {
