@@ -1,4 +1,5 @@
 <template>
+    <vote-simulator v-if="showVoteSimulator" :vehicle="vehicle" @close="closeModal"></vote-simulator>
     <div class="pt-4 w-full">
         <vehicle-votes-add v-if="showAddVotes" :vehicle="vehicle" @close="closeModal('add')"></vehicle-votes-add>
         <vehicle-votes-cast v-if="showCastVotes" :vehicle="vehicle" :voteId="voteId" :voteData="voteData" :contractId="contractId" :currentBlock="currentBlock.height"  @close="closeModal('cast')"></vehicle-votes-cast>
@@ -67,9 +68,12 @@
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-500">
                     <button v-if="vote.start + vote.voteLength < currentBlock.height">Complete</button>
-                    <button v-else-if="canVote(vote) && vote.status === 'active'" @click.prevent="openModal('cast', vote.id, vote)" type="button" class="text-aftrBlue hover:text-indigo-900">
-                        Vote
+                    <div v-else-if="canVote(vote) && vote.status === 'active'">
+                    <button @click.prevent="openModal('cast', vote.id, vote)" type="button" class="text-aftrBlue hover:text-indigo-900">
+                        Cast
                     </button>
+                     <button class="ml-2" style="color:red"  @click.prevent="voteSimulatorTest" type="submit" :vehicle="vehicle"> Vote Simulator </button> 
+                    </div>
                     <div v-else-if="votedText(vote) === 'voted'" class="flex content-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="green">
                             <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
@@ -91,10 +95,11 @@ import VehicleVotesAdd from './votes/VehicleVotesAdd.vue';
 import VehicleVotesCast from './votes/VehicleVotesCast.vue';
 import { mapGetters,mapState } from 'vuex';
 import { capitalize } from '../utils/shared.js';
+import VoteSimulator from "./VoteSimulator.vue";
 
 export default {
     props: ['vehicle', 'contractId', 'isMember'],
-    components: { VehicleVotesAdd, VehicleVotesCast },
+    components: { VehicleVotesAdd, VehicleVotesCast, VoteSimulator },
     data() {
         return {
             showAddVotes: false,
@@ -103,7 +108,8 @@ export default {
             voteId: 0,
             voteData : {},
             votes: this.vehicle.votes,
-            selectedVoteCategory: "Active"
+            selectedVoteCategory: "Active",
+            showVoteSimulator: false,
         };
     },
     computed: {
@@ -129,6 +135,13 @@ export default {
         }
     },
     methods: {
+        voteSimulatorTest(){
+            //  console.log("vehicle", this.vehicle)
+            this.showVoteSimulator = true;
+        },
+        closeModal() {
+            this.showVoteSimulator = false;
+        },
         arConnect() {
             //this.$store.dispatch('getCurrentBlockValue');
         },

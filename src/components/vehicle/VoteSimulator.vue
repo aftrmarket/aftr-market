@@ -384,6 +384,7 @@ export default {
         data = ((yayTotal + nayTotal) / this.tokenTotal) * 100;
         this.quorum = data.toFixed(2);
       }
+      this.determineMessage()
     },
 
     async supportCalculation() {
@@ -412,6 +413,7 @@ export default {
         data = (yayTotal / (yayTotal + nayTotal)) * 100;
         this.support = data ? data.toFixed(2) : Number(0).toFixed(2);
       }
+      this.determineMessage()
     },
 
     async totalSupportCalculation() {
@@ -438,6 +440,7 @@ export default {
           ? data.toFixed(2)
           : Number(0).toFixed(2);
       }
+      this.determineMessage()
     },
 
     async totalOppositionCalculation() {
@@ -456,6 +459,7 @@ export default {
         data = (nayTotal / this.tokenTotal) * 100;
         this.totalOpposition = data.toFixed(2);
       }
+      this.determineMessage()
     },
 
     addMemberRow() {
