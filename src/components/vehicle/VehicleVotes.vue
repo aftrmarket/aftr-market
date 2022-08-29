@@ -90,10 +90,10 @@
 import VehicleVotesAdd from './votes/VehicleVotesAdd.vue';
 import VehicleVotesCast from './votes/VehicleVotesCast.vue';
 import { mapGetters,mapState } from 'vuex';
-import capitalize from '../utils/shared.js';
+import { capitalize } from '../utils/shared.js';
 
 export default {
-    props: ['vehicle', 'contractId'],
+    props: ['vehicle', 'contractId', 'isMember'],
     components: { VehicleVotesAdd, VehicleVotesCast },
     data() {
         return {
@@ -186,11 +186,15 @@ export default {
         },
         canVote(vote) {
             // In order to vote, user must be a member of the vehicle AND must not have already voted
-            if (this.arConnected && this.getActiveAddress in this.vehicle.balances && !vote.voted.includes(this.getActiveAddress)) {
+            /*** ALSO NEED TO CHECK VAULT */
+            if (this.isMember(this.vehicle) && !vote.voted.includes(this.getActiveAddress)) {
                 return true;
             } else {
                 return false;
             }
+        },
+        hasVoteCompleted(vote) {
+            /*** Still working on */
         },
         votedText(vote) {
             if (!this.arConnected) {
