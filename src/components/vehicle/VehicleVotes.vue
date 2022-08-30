@@ -1,6 +1,7 @@
 <template>
-    <vote-simulator v-if="showVoteSimulator" :vehicle="vehicle" @close="closeModal"></vote-simulator>
+    <vote-simulator v-if="showVoteSimulator" :vehicle="vehicle" @close="closeSimulatorModal"></vote-simulator>
     <div class="pt-4 w-full">
+        <vehicle-vote-history v-if="showVoteHistory" :vehicle="vehicle" @close="closeVoteHostory"></vehicle-vote-history>
         <vehicle-votes-add v-if="showAddVotes" :vehicle="vehicle" @close="closeModal('add')"></vehicle-votes-add>
         <vehicle-votes-cast v-if="showCastVotes" :vehicle="vehicle" :voteId="voteId" :voteData="voteData" :contractId="contractId" :currentBlock="currentBlock.height"  @close="closeModal('cast')"></vehicle-votes-cast>
     </div>
@@ -54,7 +55,7 @@
             </thead>
             <tbody class="bg-white divide-y divide-gray-200" v-for="vote in filteredVotes" :key="vote.id">
               <tr>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" @click.prevent="voteHistoryModel()">
                   {{ walletAddressSubstr(vote.id) }}
                 </td>
                 <td class="px-6 py-4 whitespace-normal text-sm text-gray-500 break-all">
@@ -97,6 +98,7 @@
 
 import VehicleVotesAdd from './votes/VehicleVotesAdd.vue';
 import VehicleVotesCast from './votes/VehicleVotesCast.vue';
+import VehicleVoteHistory from './votes/VehicleVoteHistory.vue';
 import { mapGetters,mapState } from 'vuex';
 import { capitalize } from '../utils/shared.js';
 import VoteSimulator from "./VoteSimulator.vue";
@@ -105,11 +107,12 @@ import Arweave from "arweave";
 
 export default {
     props: ['vehicle', 'contractId', 'isMember'],
-    components: { VehicleVotesAdd, VehicleVotesCast, VoteSimulator },
+    components: { VehicleVotesAdd, VehicleVotesCast, VoteSimulator, VehicleVoteHistory },
     data() {
         return {
             showAddVotes: false,
             showCastVotes: false,
+            showVoteHistory: false,
             allowAdd: false,
             voteId: 0,
             voteData : {},
@@ -152,8 +155,15 @@ export default {
             //  console.log("vehicle", this.vehicle)
             this.showVoteSimulator = true;
         },
-        closeModal() {
+        closeSimulatorModal() {
             this.showVoteSimulator = false;
+        },
+        voteHistoryModel(){
+            //  console.log("vehicle", this.vehicle)
+            this.showVoteHistory = true;
+        },
+        closeVoteHostory() {
+            this.showVoteHistory = false;
         },
         arConnect() {
             //this.$store.dispatch('getCurrentBlockValue');
