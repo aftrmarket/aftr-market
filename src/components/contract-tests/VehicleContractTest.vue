@@ -205,6 +205,7 @@ export default {
             }
 
             // Handle the output
+            console.log(JSON.stringify(response));
             this.outputType = response.type;
             this.outputResult = response.result;
             this.outputState = response.state;
@@ -217,10 +218,12 @@ export default {
              */
 
             /**** IN ORDER FOR THIS TO PROCESS, YOU NEED TO RUN http://localhost:1984/mine */
-            // if(Boolean(this.arweaveMine)){
-            //     const mineUrl = this.arweaveProtocol + "://" + this.arweaveHost + ":" + this.arweavePort + "/mine";
-            //     const response = await fetch(mineUrl);
-            // }
+            if (type !== "dry") {
+                if(Boolean(this.arweaveMine)){
+                    const mineUrl = this.arweaveProtocol + "://" + this.arweaveHost + ":" + this.arweavePort + "/mine";
+                    const response = await fetch(mineUrl);
+                }
+            }
 
             // this.$swal({
             //     icon: "info",
@@ -247,7 +250,7 @@ export default {
         },
     },
     async created() {
-        this.cleanupState();
+        //this.cleanupState();
     }
 }
 </script>
