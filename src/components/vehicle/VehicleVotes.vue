@@ -47,13 +47,13 @@
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Result <br/> (Y - N)
                 </th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th v-if="allowAdd && selectedVoteCategory === 'Active'" scope="col" class="py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Action
                 </th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200" v-for="vote in filteredVotes" :key="vote.id">
-              <tr >
+              <tr>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {{ walletAddressSubstr(vote.id) }}
                 </td>
@@ -66,18 +66,22 @@
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {{ vote.yays }} - {{ vote.nays }}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-500">
-                    <button v-if="vote.start + vote.voteLength < currentBlock.height">Complete</button>
+                <td v-if="allowAdd && selectedVoteCategory === 'Active'" class="py-4 whitespace-nowrap text-sm font-medium flex flex-row">
+                    <div v-if="vote.status === 'active' && (vote.start + vote.voteLength < currentBlock.height)">
+                        <button @click.prevent="completeVote" type="button" class="text-aftrRed hover:text-indigo-900">Complete</button>
+                    </div>
                     <div v-else-if="canVote(vote) && vote.status === 'active'">
-                    <button @click.prevent="openModal('cast', vote.id, vote)" type="button" class="text-aftrBlue hover:text-indigo-900">
-                        Cast
-                    </button>
-                     <button class="ml-2" style="color:red"  @click.prevent="voteSimulatorTest" type="submit" :vehicle="vehicle"> Vote Simulator </button> 
+                        <button @click.prevent="openModal('cast', vote.id, vote)" type="button" class="text-aftrBlue hover:text-indigo-900">
+                            Cast
+                        </button>
                     </div>
                     <div v-else-if="votedText(vote) === 'voted'" class="flex content-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="green">
                             <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                         </svg> Voted
+                    </div>
+                    <div v-if="vote.status === 'active'" class="pl-2">
+                        <button @click.prevent="voteSimulatorTest" :vehicle="vehicle" type="submit" class="text-aftrBlue hover:text-indigo-900">Simulate</button>
                     </div>
                 </td>
               </tr>
@@ -96,6 +100,8 @@ import VehicleVotesCast from './votes/VehicleVotesCast.vue';
 import { mapGetters,mapState } from 'vuex';
 import { capitalize } from '../utils/shared.js';
 import VoteSimulator from "./VoteSimulator.vue";
+import { interactWrite } from "smartweave";
+import Arweave from "arweave";
 
 export default {
     props: ['vehicle', 'contractId', 'isMember'],
@@ -110,10 +116,17 @@ export default {
             votes: this.vehicle.votes,
             selectedVoteCategory: "Active",
             showVoteSimulator: false,
+
+            /** Smartweave variables */
+            arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
+            arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
+            arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
+            arweaveMine: import.meta.env.VITE_MINE,
+            /** */
         };
     },
     computed: {
-        ...mapGetters(['arConnected', 'getActiveAddress', 'currentBlock']),
+        ...mapGetters(['arConnected', 'getActiveAddress', 'currentBlock', 'keyFile']),
         filteredVotes() {
 			let status = this.selectedVoteCategory;
             let vote = this.votes
@@ -159,11 +172,11 @@ export default {
                     1. Be arConnected.
                     2. Be a member of the vehicle.
             ***/
-            if (this.arConnected && this.getActiveAddress in this.vehicle.balances) {
+           if (this.isMember) {
                 this.allowAdd = true;
-            } else {
+           } else {
                 this.allowAdd = false;
-            }
+           }
         },
         arConnect() {
             this.$store.dispatch('arConnect');
@@ -199,15 +212,71 @@ export default {
         },
         canVote(vote) {
             // In order to vote, user must be a member of the vehicle AND must not have already voted
-            /*** ALSO NEED TO CHECK VAULT */
-            if (this.isMember(this.vehicle) && !vote.voted.includes(this.getActiveAddress)) {
+            if (this.allowAdd && !vote.voted.includes(this.getActiveAddress)) {
                 return true;
             } else {
                 return false;
             }
         },
-        hasVoteCompleted(vote) {
-            /*** Still working on */
+        async completeVote() {
+            let arweave = {};
+
+            arweave = await Arweave.init({
+                host: this.arweaveHost,
+                port: this.arweavePort,
+                protocol: this.arweaveProtocol,
+                timeout: 20000,
+                logging: true,
+            });
+
+            let wallet;
+            if (import.meta.env.VITE_ENV === "DEV") {
+                if (this.keyFile.length) {
+                    wallet = JSON.parse(this.keyFile);
+                } else {
+                    this.$swal({
+                        icon: 'warning',
+                        html: "Please attach your keyfile",
+                    })
+                }
+            } else {
+                wallet = "use_wallet";
+            }
+
+            // Call SmartWeave
+            try {
+                const input = {
+                    function: "balance",
+                    target: this.getActiveAddress
+                };
+            
+                const tx = await interactWrite(
+                    arweave,
+                    wallet,
+                    this.vehicle.id,
+                    input
+                );         
+                /**** IN ORDER FOR THIS TO PROCESS, YOU NEED TO RUN http://localhost:1984/mine */
+                if(Boolean(this.arweaveMine)){
+                    const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
+                    const response = await fetch(mineUrl);
+                }
+            } catch(e) {
+                this.$swal({
+                    icon: "error",
+                    html: "The Complete Vote action failed.",
+                    showConfirmButton: true,
+                    allowOutsideClick: false,
+                });
+            }
+            this.$swal({
+                icon: "success",
+                html: "The complete vote action has been submitted.  Once the contract processes the vote, the vehicle will be updated.",
+                showConfirmButton: true,
+                allowOutsideClick: false
+            });
+
+            this.$router.push({ name: "vehicle", params: { vehicleId: this.vehicle.id } });
         },
         votedText(vote) {
             if (!this.arConnected) {
