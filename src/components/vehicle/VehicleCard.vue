@@ -150,11 +150,8 @@ export default {
         }
 
         // Are there any withdrawals waiting to be processed?
-        for (let token of this.vehicle.tokens) {
-            if (token.withdrawals && token.withdrawals.length > 0) {
-                this.anyWithdrawals = true;
-                break;
-            }
+        if (this.vehicle.anyWithdrawals) {
+            this.anyWithdrawals = true;
         }
 
         if (this.vehicle.concludeVoteNeeded) {
