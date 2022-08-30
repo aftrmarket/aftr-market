@@ -173,33 +173,6 @@ export default {
             this.$log.info("Vehicle : viewVehicles :: " ,"View Clicked");
             this.$router.push("../vehicles");
         },
-        isVehicleMember(vehicle) {
-            const addr = this.getActiveAddress
-            let found = false;
-            
-            // Check balances
-            if (vehicle.balances) {
-                if (addr in vehicle.balances && vehicle.balances[addr] > 0) {
-                    return true;
-                }
-            }
-
-            // Check vault
-            if (vehicle.vault) {
-                for (let vaultAddr in vehicle.vault) {
-                	if (vaultAddr === addr) {
-                        for (let bal of vehicle.vault[vaultAddr]) {
-                            if (bal.balance > 0) {
-                                found = true; 
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            return found;
-        },
         getEditStatus() {
             // Is user member of this vehicle?
             const isMember = isVehicleMember(this.vehicle, this.getActiveAddress);
@@ -301,7 +274,7 @@ export default {
                 activeVotes.forEach((vote) => {
                     let start = +vote.start;
                     let voteLength = +vote.voteLength;
-                    if (start + voteLength <= currentBlock) {
+                    if (start + voteLength < currentBlock) {
                         this.concludeVoteNeeded = true;
                     }
                 });
