@@ -30,9 +30,10 @@
                             <option value="Wallet Address">Wallet Address</option>
                             <option value="Setting Key">Setting Key</option>
                             <option value="Setting Value">Setting Value</option>
-                            <option value="Asset ID">Assets</option>
+                            <option value="Asset ID">Asset ID</option>
+                            <option value="Needs Attention">Needs Attention</option>
                         </select>
-                        <input v-if="filtersOn" type="text" :placeholder="searchTypeText" v-model="searchInput" class="ml-2 mt-1 pl-2 py-2 w-96 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"/>
+                        <input v-if="filtersOn && searchType !== 'Needs Attention'" type="text" :placeholder="searchTypeText" v-model="searchInput" class="ml-2 mt-1 pl-2 py-2 w-96 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"/>
                         <button v-if="filtersOn" title="Clear search box" class="visible pl-1" @click="clearData" type="button">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#FFFC79" class="w-6 h-6">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -64,7 +65,7 @@
                         </div>
                         <div></div>
                         <div class="text-right text-sm">
-                            {{ vehicles.length }} Vehicles Shown
+                            {{ numVehicles }} Vehicles Shown
                         </div>
                     </div>
                     <perfect-scrollbar>
@@ -148,7 +149,8 @@ export default {
             filterText: false,
             searchType: "Name or Ticker Symbol",
             searchInput: "",
-            showMessage: false
+            showMessage: false,
+            numVehicles: 0,
         };
     },
     // mounted() {
@@ -162,7 +164,9 @@ export default {
     },
     methods: {
         clearData(){
-            this.searchInput = ""
+            this.searchType = "Name or Ticker Symbol";
+            this.searchInput = "";
+            this.numVehicles = this.vehicles.length;
         },
         onChange(event) {
             console.log(event.target.value, this.searchType);
@@ -174,11 +178,12 @@ export default {
                     vehicle.name.toLowerCase().includes(this.searchInput.toLowerCase()) || vehicle.ticker.toLowerCase().includes(this.searchInput.toLowerCase())
                 );
                 if (vehicle.length == 0){
-                    this.showMessage = true
-                    return vehicle
+                    this.showMessage = true;
+                    return vehicle;
                 }
-                this.showMessage = false
-                return vehicle
+                this.showMessage = false;
+                this.numVehicles = vehicle.length;
+                return vehicle;
             }
             if(this.searchType == "Wallet Address"){
                 const vehicle = this.vehicles.filter(element => {
@@ -186,26 +191,30 @@ export default {
                 });
 
                 if (vehicle.length == 0){
-                    this.showMessage = true
-                    return vehicle
+                    this.showMessage = true;
+                    this.numVehicles = vehicle.length;
+                    return vehicle;
                 }
-                this.showMessage = false
+                this.showMessage = false;
+                this.numVehicles = vehicle.length;
                 return vehicle
             }
 
             if(this.searchType == "Setting Key"){
                 const vehicle =  this.vehicles.filter((vehicle) =>{
                     return vehicle.settings.some((setting) => {
-                        return setting[0].toLowerCase().includes(this.searchInput.toLowerCase())  
+                        return setting[0].toLowerCase().includes(this.searchInput.toLowerCase());
                     });
                 });
 
                 if (vehicle.length == 0){
-                    this.showMessage = true
-                    return vehicle
+                    this.showMessage = true;
+                    this.numVehicles = vehicle.length;
+                    return vehicle;
                 }
-                this.showMessage = false
-                return vehicle
+                this.showMessage = false;
+                this.numVehicles = vehicle.length;
+                return vehicle;
             }
 
             if(this.searchType == "Setting Value"){
@@ -216,11 +225,13 @@ export default {
                 });
 
                 if (vehicle.length == 0){
-                    this.showMessage = true
-                    return vehicle
+                    this.showMessage = true;
+                    this.numVehicles = vehicle.length;
+                    return vehicle;
                 }
-                this.showMessage = false
-                return vehicle
+                this.showMessage = false;
+                this.numVehicles = vehicle.length;
+                return vehicle;
             }
 
             if(this.searchType == "Asset ID"){
@@ -231,11 +242,21 @@ export default {
                 })
 
                 if (vehicle.length == 0){
-                    this.showMessage = true
-                    return vehicle
+                    this.showMessage = true;
+                    this.numVehicles = vehicle.length;
+                    return vehicle;
                 }
-                this.showMessage = false
-                return vehicle
+                this.showMessage = false;
+                this.numVehicles = vehicle.length;
+                return vehicle;
+            }
+
+            if (this.searchType == "Needs Attention") {
+                const vehicle = this.vehicles.filter( (vehicle) => {
+                    vehicle.evolve == true || vehicle.concludeVoteNeeded == true || vehicle.anyWithdrawals == true
+                });
+                this.numVehicles = vehicle.length;
+                return vehicle;
             }
         },
         toggleLayout() {
@@ -375,6 +396,17 @@ export default {
                     } else {
                         vehicle.totalActiveVotes = 0;
                     }
+
+                    // Are there any withdrawals waiting to be processed?
+                    if (typeof vehicle.tokens !== "undefined") {
+                        for (let token of vehicle.tokens) {
+                            if (token.withdrawals && token.withdrawals.length > 0) {
+                                vehicle.anyWithdrawals = true;
+                                break;
+                            }
+                        }
+                    }
+
                     // if (!this.getMyVehicle) {
                     //     await Object.keys(vehicle.balances).some((walletId) => {
                     //         if (walletId == this.$store.getters.getActiveAddress) {
@@ -525,6 +557,8 @@ export default {
             //     /*** FOR NOW JUST LOAD A FAKE SCREEN OF VEHICLES */
             //     this.vehicles.push(this.vehicles[0]);
             // }
+
+            this.numVehicles = this.vehicles.length;
         },
         getUserPsts() {
             // Loads all of user's PSTs to be used as a filter on the My Vehicles query
