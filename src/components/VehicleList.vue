@@ -7,12 +7,12 @@
             <div class="max-w-7xl mx-auto pb-12 px-4 sm:px-6 lg:px-8">
                 <!-- Heading Row -->
                 <div class="pb-5 sm:flex sm:items-center sm:justify-between">
-                    <div class="flex items-center gap-4">
-                        <select @change="filterChange" v-model="filter" class="mt-1 block pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                    <div class="flex items-center">
+                        <select @change="filterChange" v-model="filter" class="mt-1 mr-2 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                             <option value="all">All Vehicles</option>
                             <option value="my" selected>My Vehicles</option>
                         </select>
-                        <button type="button" @click.prevent="toggleLayout">
+                        <button type="button" @click.prevent="toggleLayout" class="mr-2">
                             <svg v-if="!layoutGrid" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="#FFFC79" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                             </svg>
@@ -25,24 +25,19 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
                             </svg>
                         </button>
-                        <div v-if="filtersOn">
-                            <select  @change="onChange($event)" v-model="searchType" class="ml-2 mt-1 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                                <option value="Name or Ticker Symbol" selected>Name or Ticker</option>
-                                <option value="Wallet Address">Wallet Address</option>
-                                <option value="Setting Key">Setting Key</option>
-                                <option value="Setting Value">Setting Value</option>
-                                <option value="Asset ID">Assets</option>
-                            </select>
-                            <input type="text" :placeholder="searchTypeText" v-model="searchInput" class="ml-2 mt-1 pl-2 py-2 w-96 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"/>
-                            <button  title="Clear search box." class="visible" @click="clearData" type="button">
-                                <!-- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#FFFC79" class="w-6 h-6">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                                </svg> -->
-                               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="ml-2 w-5 h-45">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12c0-1.232.046-2.453.138-3.662a4.006 4.006 0 013.7-3.7 48.678 48.678 0 017.324 0 4.006 4.006 0 013.7 3.7c.017.22.032.441.046.662M4.5 12l-3-3m3 3l3-3m12 3c0 1.232-.046 2.453-.138 3.662a4.006 4.006 0 01-3.7 3.7 48.657 48.657 0 01-7.324 0 4.006 4.006 0 01-3.7-3.7c-.017-.22-.032-.441-.046-.662M19.5 12l-3 3m3-3l3 3" />
-                                </svg>
-                            </button>
-                        </div>
+                        <select v-if="filtersOn" @change="onChange($event)" v-model="searchType" class="ml-2 mt-1 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                            <option value="Name or Ticker Symbol" selected>Name or Ticker</option>
+                            <option value="Wallet Address">Wallet Address</option>
+                            <option value="Setting Key">Setting Key</option>
+                            <option value="Setting Value">Setting Value</option>
+                            <option value="Asset ID">Assets</option>
+                        </select>
+                        <input v-if="filtersOn" type="text" :placeholder="searchTypeText" v-model="searchInput" class="ml-2 mt-1 pl-2 py-2 w-96 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"/>
+                        <button v-if="filtersOn" title="Clear search box" class="visible pl-1" @click="clearData" type="button">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#FFFC79" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </button>
                     </div>
                     <div>
                         <button type="button" @click.prevent="createVehicle()" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
@@ -275,7 +270,12 @@ export default {
             this.isLoading = false;
         },
         toggleFilter() {
-            this.filtersOn = !this.filtersOn;
+            if (this.filtersOn) {
+                this.filtersOn = false;
+                this.clearData();
+            } else {
+                this.filtersOn = true;
+            }
         },
 
         async loadAllVehicles(contractId) {
@@ -290,6 +290,9 @@ export default {
                     ARWEAVE_PORT: import.meta.env.VITE_ARWEAVE_PORT,
                     ARWEAVE_PROTOCOL: import.meta.env.VITE_ARWEAVE_PROTOCOL
                 });
+                //let state = await readContract(this.arweave, contractId, undefined, true);
+                //let vehicle = state.state;
+                //console.log(JSON.stringify(state));
                 let vehicle = state;
 
                 // Check to make sure contract source matches AFTR Contract Source
@@ -364,7 +367,7 @@ export default {
                             activeVotes.forEach((vote) => {
                                 let start = +vote.start;
                                 let voteLength = +vote.voteLength;
-                                if (start + voteLength <= currentBlock) {
+                                if (start + voteLength < currentBlock) {
                                     vehicle.concludeVoteNeeded = true;
                                 }
                             });
