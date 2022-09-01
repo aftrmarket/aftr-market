@@ -1,7 +1,7 @@
 <template>
     <vote-simulator v-if="showVoteSimulator" :vehicle="vehicle" @close="closeSimulatorModal"></vote-simulator>
     <div class="pt-4 w-full">
-        <vehicle-vote-history v-if="showVoteHistory" :vehicle="vehicle" @close="closeVoteHostory"></vehicle-vote-history>
+        <vehicle-vote-history v-if="showVoteHistory" :vehicle="vehicle" :voteData="voteData" @close="closeVoteHostory"></vehicle-vote-history>
         <vehicle-votes-add v-if="showAddVotes" :vehicle="vehicle" @close="closeModal('add')"></vehicle-votes-add>
         <vehicle-votes-cast v-if="showCastVotes" :vehicle="vehicle" :voteId="voteId" :voteData="voteData" :contractId="contractId" :currentBlock="currentBlock.height"  @close="closeModal('cast')"></vehicle-votes-cast>
     </div>
@@ -54,8 +54,8 @@
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200" v-for="vote in filteredVotes" :key="vote.id">
-              <tr>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" @click.prevent="voteHistoryModel()">
+              <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 cursor-pointer" @click.prevent="voteHistoryModel(vote)">
                   {{ walletAddressSubstr(vote.id) }}
                 </td>
                 <td class="px-6 py-4 whitespace-normal text-sm text-gray-500 break-all">
@@ -158,9 +158,9 @@ export default {
         closeSimulatorModal() {
             this.showVoteSimulator = false;
         },
-        voteHistoryModel(){
-            //  console.log("vehicle", this.vehicle)
+        voteHistoryModel(vote){
             this.showVoteHistory = true;
+            this.voteData = vote;
         },
         closeVoteHostory() {
             this.showVoteHistory = false;

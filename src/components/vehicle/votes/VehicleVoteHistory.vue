@@ -1,124 +1,77 @@
 <template>
   <TransitionRoot as="template" :show="open">
-    <Dialog
-      as="div"
-      auto-reopen="true"
-      class="fixed z-10 inset-0 overflow-y-auto"
-      @close="open = false"
-    >
-      <div
-        class="
-          flex
-          items-end
-          justify-center
-          min-h-screen
-          pt-4
-          px-4
-          pb-20
-          text-center
-          sm:block sm:p-0
-        "
-      >
-        <TransitionChild
-          as="template"
-          enter="ease-out duration-300"
-          enter-from="opacity-0"
-          enter-to="opacity-100"
-          leave="ease-in duration-200"
-          leave-from="opacity-100"
-          leave-to="opacity-0"
-        >
-          <DialogOverlay
-            class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-          />
-        </TransitionChild>
-
-        <!-- This element is to trick the browser into centering the modal contents. -->
-        <span
-          class="hidden sm:inline-block sm:align-middle sm:h-screen"
-          aria-hidden="true"
-          >&#8203;</span
-        >
-        <TransitionChild
-          as="template"
-          enter="ease-out duration-300"
-          enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-          enter-to="opacity-100 translate-y-0 sm:scale-100"
-          leave="ease-in duration-200"
-          leave-from="opacity-100 translate-y-0 sm:scale-100"
-          leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-        >
-          <div
-            class="
-              inline-block
-              align-bottom
-              bg-white
-              rounded-lg
-              text-left
-              overflow-hidden
-              shadow-xl
-              transform
-              transition-all
-              sm:my-8 sm:align-middle sm:max-w-lg sm:w-full
-            "
-          >
-            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+    <Dialog as="div" auto-reopen="true" class="relative z-50" @close="open = false"> 
+      <div class="fixed inset-0 overflow-y-auto flex items-center justify-center p-4 rounded-md shadow border-b border-gray-200">
+      <DialogPanel class="w-full max-w-4xl shadow border-b border-gray-200">
+        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
               <div class="sm:flex sm:items-start">
-                <div
-                  class="
-                    mx-auto
-                    flex-shrink-0 flex
-                    items-center
-                    justify-center
-                    h-12
-                    w-12
-                    rounded-full
-                    bg-green-100
-                    sm:mx-0 sm:h-10 sm:w-10
-                  "
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="w-6 h-6"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
-                    />
-                  </svg>
+                <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z" />
+                    </svg>
                 </div>
                 <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                   <DialogTitle
                     as="h3"
-                    class="text-lg leading-6 font-medium text-gray-900"
+                    class="text-lg leading-6 font-medium text-gray-900 break-all"
                   >
-                    Vote History
+                    Voting History - {{ testdata.id }}
                   </DialogTitle>
-                  <div >
-                    <!-- <perfect-scrollbar> -->
-                      <vue-json-pretty
-                        :path="'res'"
-                        :data="vehicle.votes"
-                        :showDoubleQuotes="keyQuotes"
-                        :deep="depth"
-                        :deepCollapseChildren="false"
-                        :showLength="true"
-                        :showSelectController="true"
-                      >
-                      </vue-json-pretty>
-                    <!-- </perfect-scrollbar> -->
+
+                  <div class="pt-6 text-sm font-medium">
+                    <div class="mt-4 mb-4 grid grid-cols-3 gap-x-4">
+                      <div class="text-gray-500">VOTE</div>
+                      <div class="text-gray-500">{{ walletAddressSubstr(testdata.id) }}</div>
+                    </div>
+
+                    <div class="mt-4 mb-4 grid grid-cols-3 gap-x-4">
+                      <div class="text-gray-500">STATUS</div>
+                      <div class="text-gray-500">{{ testdata.status }}</div>
+                    </div>
+
+                     <div class="mt-4 mb-4 grid grid-cols-3 gap-x-4">
+                      <div class="text-gray-500">PROPOSAL</div>
+                      <div class="text-gray-500">{{ testdata.note }}</div>
+                    </div>
+                    
+                    <dl>
+                      <dt class="text-gray-500">VOTING POWER</dt>
+                      <div class="mt-4 mb-4 grid grid-cols-3 gap-x-4" v-for="(tokens, addr) in vehicle.balances" :key="addr">
+                        <div class="ml-6 text-gray-500">{{ walletAddressSubstr(addr) }}</div>
+                        <div class="text-gray-500">{{ formatNumber(tokens) }}</div>
+                      </div>
+                      <div class="mt-4 mb-4 grid grid-cols-3 gap-x-4 border-t border-gray-300">
+                        <div class="ml-6 text-gray-500">TOTAL :</div>
+                        <div class="text-gray-500">{{ total }}</div>
+                      </div> 
+                    </dl>
+
+                    <div v-if="vehicle.ownership == 'dao'">
+                      <div class="mt-4 mb-4 grid grid-cols-2 gap-x-4">
+                        <div class="text-gray-500">STARTING BLOCK</div>
+                        <div class="text-gray-500">ENDING BLOCK</div>
+                        <div class="text-gray-700">{{ testdata.start }}</div>
+                        <div class="text-gray-700">{{ testdata.start + testdata.voteLength}}</div>
+                      </div>
+
+                      <dl>
+                        <dt class="text-gray-500">RESULT</dt>
+                        <div class="mt-4 mb-2 grid grid-cols-3 gap-x-4">
+                          <div class="ml-6 text-gray-500">(Y - N) :</div>
+                          <div class="text-gray-500">{{ testdata.yays }} - {{ testdata.nays }}</div>
+                        </div>
+                      </dl>
+
+                      <dl>
+                        <dt class="text-gray-500">{{ testdata.statusNote }}</dt>
+                      </dl> 
+                    </div> 
                   </div>
-                  <div></div>
+
                 </div>
               </div>
             </div>
-          </div>
-        </TransitionChild>
+      </DialogPanel>
       </div>
     </Dialog>
   </TransitionRoot>
@@ -128,69 +81,59 @@
 import { ref } from "vue";
 import {
   Dialog,
+  DialogPanel,
   DialogOverlay,
   DialogTitle,
   TransitionChild,
   TransitionRoot,
 } from "@headlessui/vue";
 import { ExclamationIcon } from "@heroicons/vue/outline";
-import VueJsonPretty from "vue-json-pretty";
-import "vue-json-pretty/lib/styles.css";
+import numeral from "numeral";
 
 export default {
-  props: ["vehicle"],
+  props: ["vehicle", "voteData"],
   components: {
     Dialog,
+    DialogPanel,
     DialogOverlay,
     DialogTitle,
     TransitionChild,
     TransitionRoot,
     ExclamationIcon,
-    VueJsonPretty,
   },
   data() {
     return {
-      arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
-      arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
-      arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
-
-      voteType: "",
-      stateKey: "",
-      stateValue: "",
-      currentValue: "",
-      memberVoteType: "add",
-      memberWallet: "",
-      memberQty: "",
-      tokenAction: "mint",
-      proposedMemberBalance: 0,
-      dataValid: false,
-      stateKeys: [
-        {
-          id: "status",
-          desc: "Status",
-          valid: ["stopped", "started", "expired"],
-        },
-        { id: "name", desc: "Name" },
-        { id: "ticker", desc: "Ticker" },
-        { id: "creator", desc: "Creator" },
-        { id: "ownership", desc: "Ownership", valid: ["single", "dao"] },
-        { id: "settings.quorum", desc: "Quorum", type: "number" },
-        { id: "settings.voteLength", desc: "Vote Length", type: "number" },
-        {
-          id: "settings.lockMinLength",
-          desc: "Minimum Lock Length",
-          type: "number",
-        },
-        {
-          id: "settings.lockMaxLength",
-          desc: "Maximum Lock Length",
-          type: "number",
-        },
-        { id: "settings.communityLogo", desc: "Community Logo" },
-      ],
+      // testdata : this.vehicle.votes[0],
+      testdata : this.voteData,
+      total: 0
     };
   },
-
+  mounted() {
+   this.totalBalance()
+  },
+  methods: {
+    walletAddressSubstr(addr, chars = 10) {
+            if (typeof addr === 'string') {
+                let len = parseInt(chars/2);
+                return addr.substring(0, len) + '...' + addr.substring(addr.length - len);
+            } else {
+                return '';
+            }
+    },
+    formatNumber(num, dec = false) {
+            if (dec) {
+                return numeral(num).format("0,0.0000");
+            } else {
+                return numeral(num).format("0,0");
+            }
+    },
+     totalBalance(){
+       console.log("testdata", this.vehicle, this.voteData)
+      this.total = Object.values(this.vehicle.balances).reduce((accumulator, object) => {
+            return accumulator + object;
+          }, 0)
+    }
+  },
   setup() {
     const open = ref(true);
 
