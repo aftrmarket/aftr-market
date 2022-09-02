@@ -67,7 +67,7 @@
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {{ vote.yays }} - {{ vote.nays }}
                 </td>
-                <td v-if="allowAdd && selectedVoteCategory === 'Active'" class="py-4 whitespace-nowrap text-sm font-medium flex flex-row">
+                <td v-if="allowAdd && selectedVoteCategory === 'Active'" class="py-4 whitespace-nowrap text-sm font-medium grid grid-cols-2">
                     <div v-if="vote.status === 'active' && (vote.start + vote.voteLength < currentBlock.height)">
                         <button @click.prevent="completeVote" type="button" class="text-aftrRed hover:text-indigo-900">Complete</button>
                     </div>
