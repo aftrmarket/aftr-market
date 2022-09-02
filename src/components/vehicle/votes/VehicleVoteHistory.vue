@@ -15,31 +15,33 @@
                     as="h3"
                     class="text-lg leading-6 font-medium text-gray-900 break-all"
                   >
-                    Voting History - {{ testdata.id }}
+                    Voting History - {{ voteData.id }}
                   </DialogTitle>
 
                   <div class="pt-6 text-sm font-medium">
                     <div class="mt-4 mb-4 grid grid-cols-3 gap-x-4">
                       <div class="text-gray-500">VOTE</div>
-                      <div class="text-gray-500">{{ walletAddressSubstr(testdata.id) }}</div>
+                      <div class="text-gray-500">{{ walletAddressSubstr(voteData.id) }}</div>
                     </div>
 
                     <div class="mt-4 mb-4 grid grid-cols-3 gap-x-4">
                       <div class="text-gray-500">STATUS</div>
-                      <div class="text-gray-500">{{ testdata.status }}</div>
+                      <div class="text-gray-500">{{ voteData.status }}</div>
                     </div>
 
                      <div class="mt-4 mb-4 grid grid-cols-3 gap-x-4">
                       <div class="text-gray-500">PROPOSAL</div>
-                      <div class="text-gray-500">{{ testdata.note }}</div>
+                      <div class="text-gray-500">{{ voteData.note }}</div>
                     </div>
                     
                     <dl>
                       <dt class="text-gray-500">VOTING POWER</dt>
+                      <perfect-scrollbar>
                       <div class="mt-4 mb-4 grid grid-cols-3 gap-x-4" v-for="(tokens, addr) in vehicle.balances" :key="addr">
                         <div class="ml-6 text-gray-500">{{ walletAddressSubstr(addr) }}</div>
                         <div class="text-gray-500">{{ formatNumber(tokens) }}</div>
                       </div>
+                      </perfect-scrollbar>
                       <div class="mt-4 mb-4 grid grid-cols-3 gap-x-4 border-t border-gray-300">
                         <div class="ml-6 text-gray-500">TOTAL :</div>
                         <div class="text-gray-500">{{ total }}</div>
@@ -50,22 +52,23 @@
                       <div class="mt-4 mb-4 grid grid-cols-2 gap-x-4">
                         <div class="text-gray-500">STARTING BLOCK</div>
                         <div class="text-gray-500">ENDING BLOCK</div>
-                        <div class="text-gray-700">{{ testdata.start }}</div>
-                        <div class="text-gray-700">{{ testdata.start + testdata.voteLength}}</div>
+                        <div class="text-gray-700">{{ voteData.start }}</div>
+                        <div class="text-gray-700">{{ voteData.start + voteData.voteLength}}</div>
                       </div>
 
                       <dl>
                         <dt class="text-gray-500">RESULT</dt>
                         <div class="mt-4 mb-2 grid grid-cols-3 gap-x-4">
                           <div class="ml-6 text-gray-500">(Y - N) :</div>
-                          <div class="text-gray-500">{{ testdata.yays }} - {{ testdata.nays }}</div>
+                          <div class="text-gray-500">{{ voteData.yays }} - {{ voteData.nays }}</div>
                         </div>
                       </dl>
-
-                      <dl>
-                        <dt class="text-gray-500">{{ testdata.statusNote }}</dt>
-                      </dl> 
                     </div> 
+
+                     <dl>
+                      <dt class="text-gray-500">{{ voteData.statusNote }}</dt>
+                    </dl> 
+                    
                   </div>
 
                 </div>
@@ -103,8 +106,8 @@ export default {
   },
   data() {
     return {
-      // testdata : this.vehicle.votes[0],
-      testdata : this.voteData,
+      // voteData : this.vehicle.votes[0],
+      voteData : this.voteData,
       total: 0
     };
   },
@@ -128,7 +131,7 @@ export default {
             }
     },
      totalBalance(){
-       console.log("testdata", this.vehicle, this.voteData)
+       console.log("voteData", this.vehicle, this.voteData)
       this.total = Object.values(this.vehicle.balances).reduce((accumulator, object) => {
             return accumulator + object;
           }, 0)
@@ -143,3 +146,14 @@ export default {
   },
 };
 </script>
+<style src="vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css"/>
+<style scoped>
+    .ps {
+        height: 100px;
+    } 
+/*     
+    .visible {
+        height: 3em;
+        width: 10em
+    } */
+</style>
