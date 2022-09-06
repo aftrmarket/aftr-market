@@ -69,6 +69,10 @@
                       <dt class="text-gray-500">{{ voteData.statusNote }}</dt>
                     </dl> 
                     
+                     <dl v-if="voteData.status == 'quorumFailed'">
+                      <dt class="text-gray-500">The proposal failed due to the Quorum not being met. The proposal's quorum was {{vehicle.settings[0][1]}}</dt>
+                    </dl> 
+                    
                   </div>
 
                 </div>
@@ -131,7 +135,7 @@ export default {
             }
     },
      totalBalance(){
-       console.log("voteData", this.vehicle, this.voteData)
+       console.log("voteData", this.vehicle, this.voteData , this.vehicle.settings[0][1])
       this.total = Object.values(this.vehicle.balances).reduce((accumulator, object) => {
             return accumulator + object;
           }, 0)
@@ -149,7 +153,7 @@ export default {
 <style src="vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css"/>
 <style scoped>
     .ps {
-        height: 100px;
+        height: 110px;
     } 
 /*     
     .visible {
