@@ -2,11 +2,11 @@
     <div class="grid grid-cols-2 gap-4 p-4 border">
         <div class="col-span-2">Contract Comparison</div>
         <div class="pt-4 w-full">
-            <p class="font-sans font-lg text-aftrBlue">SmartWeave</p><br/>
+            <p class="font-sans font-lg text-aftrBlue">3EM</p><br/>
             <vue-json-pretty :path="'res'" :data="contract" :showDoubleQuotes="keyQuotes" :deep=depth :deepCollapseChildren="false" :showLength="true" :showSelectController="true"> </vue-json-pretty>
         </div>
         <div class="pt-4 w-full">
-            <p class="font-sans font-lg text-aftrBlue">3EM</p><br/>
+            <p class="font-sans font-lg text-aftrBlue">Warp</p><br/>
             <vue-json-pretty :path="'res'" :data="contract3" :showDoubleQuotes="keyQuotes" :deep=depth :deepCollapseChildren="false" :showLength="true" :showSelectController="true"> </vue-json-pretty>
         </div>
     </div>
@@ -17,6 +17,7 @@ import VueJsonPretty from 'vue-json-pretty';
 import 'vue-json-pretty/lib/styles.css';
 import { readContract } from 'smartweave';
 import { executeContract } from "@three-em/js";
+import { WarpFactory, defaultCacheOptions } from 'warp-contracts/web';
 
 export default {
     props: ["contractId"],
@@ -44,46 +45,57 @@ export default {
     },
     methods: {
         async readContracts() {
-            //let contractId = "du1NxgooOxqDRg7N2eXiP5ozI5bbZu0VT4QBtDEjuwE";
-            try{
-                // Using 3EM
-                //this.contract3 = await executeContract(this.contractId, undefined, true, this.gatewayConfig);
-                //const { state, validity } = await executeContract(this.contractId, undefined, true, this.gatewayConfig);
-                //const { state, validity } = await executeContract("Vjt13JlvOzaOs4St_Iy2jmanxa7dc-Z3pDk3ktwEQNA", undefined, true, 
-                //this.contract3 = await executeContract("HKr5pJhPUAzlGvQqERPLwIw9hm2nAr3CY-b0iRfctN4", undefined, true, 
-                //const { state, validity } = await executeContract(this.contractId, undefined, true,
-                //     {
-                //         ARWEAVE_HOST: "www.arweave.run",
-                //         ARWEAVE_PORT: "443",
-                //         ARWEAVE_PROTOCOL: "https"
-                //     }
-                // );
-                const stateInteractions = await executeContract(this.contractId, undefined, true, this.gatewayConfig
-                    // {
-                    //     ARWEAVE_HOST: "www.arweave.run",
-                    //     ARWEAVE_PORT: "443",
-                    //     ARWEAVE_PROTOCOL: "https"
-                    // }
-                );
-                this.contract3 = stateInteractions.state;
-                // this.contract3 = await executeContract(this.contractId, undefined, true,
-                // {
-                //     ARWEAVE_HOST: import.meta.env.VITE_ARWEAVE_HOST,
-                //     ARWEAVE_PORT: import.meta.env.VITE_ARWEAVE_PORT,
-                //     ARWEAVE_PROTOCOL: import.meta.env.VITE_ARWEAVE_PROTOCOL
-                // });
-                //console.log(JSON.stringify(state));
-                //this.contract3 = state;
-            } catch(e) {
-                console.log(e);
-            }
+            let contractId = "dwkfht8aSlH9J39g6xaPF_R9hM1pDNWAAtTiw9Ncc28";
+            // try{
+            //     // Using 3EM
+            //     const { state, validity } = await executeContract(contractId, undefined, true, {
+            //         ARWEAVE_HOST: import.meta.env.VITE_ARWEAVE_HOST,
+            //         ARWEAVE_PORT: import.meta.env.VITE_ARWEAVE_PORT,
+            //         ARWEAVE_PROTOCOL: import.meta.env.VITE_ARWEAVE_PROTOCOL
+            //     });
+            //     this.contract = { state, validity };
+            // } catch(e) {
+            //     console.log(e);
+            // }
             try {
                 // Using Smartweave
-                this.contract = await readContract(this.arweave, this.contractId, undefined, true);
+                this.contract = await readContract(this.arweave, contractId, undefined, true);
                 //this.contract = await readContract(this.arweave, "HKr5pJhPUAzlGvQqERPLwIw9hm2nAr3CY-b0iRfctN4", undefined, true);
             } catch (e) {
                 console.log(e);
             }
+
+            // Try to get wallet, if fails, connect so user can assign permissions
+            //let wallet = "";
+            // try {
+            //     wallet = await window.arweaveWallet.getActiveAddress();
+            // } catch(e) {
+            //     console.log(e);
+            //     const promiseResult = await window.arweaveWallet.connect([
+            //         "ACCESS_ADDRESS",
+            //         "ACCESS_ALL_ADDRESSES",
+            //         "SIGN_TRANSACTION",
+            //         "ACCESS_ARWEAVE_CONFIG"
+            //     ]);
+            //     wallet = await window.arweaveWallet.getActiveAddress();
+            // }
+
+            try {
+                // Using Warp
+                let warp = {};
+
+                warp = WarpFactory.forLocal();
+                
+                const contract = warp.contract(contractId)
+                    .setEvaluationOptions( { allowUnsafeClient: true, internalWrites: true } )
+                    .connect("use_wallet");
+                const { cachedValue } = await contract.readState();
+                let state = cachedValue;
+                this.contract3 = state;
+            } catch(e) {
+                console.log(e);
+            }
+
         }
     },
     async created() {

@@ -107,6 +107,7 @@
 <script>
 //import { readContract } from "smartweave";
 import { executeContract } from "@three-em/js";
+import { WarpFactory } from "warp-contracts/web";
 import VehicleCard from "./vehicle/VehicleCard.vue";
 import VehicleCardPlaceholder from "./vehicle/VehicleCardPlaceholder.vue";
 import { mapGetters } from "vuex";
@@ -129,6 +130,7 @@ export default {
                     value: import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL,
                 },
             ],
+            warp: {},
             /** */
             myPsts: [],
             isLoading: true,
@@ -305,12 +307,20 @@ export default {
                 if (!contractId) {
                     return;
                 }
+                /*** Using 3em */
+                // const { state, validity } = await executeContract(contractId, undefined, true, {
+                //     ARWEAVE_HOST: import.meta.env.VITE_ARWEAVE_HOST,
+                //     ARWEAVE_PORT: import.meta.env.VITE_ARWEAVE_PORT,
+                //     ARWEAVE_PROTOCOL: import.meta.env.VITE_ARWEAVE_PROTOCOL
+                // });
 
-                const { state, validity } = await executeContract(contractId, undefined, true, {
-                    ARWEAVE_HOST: import.meta.env.VITE_ARWEAVE_HOST,
-                    ARWEAVE_PORT: import.meta.env.VITE_ARWEAVE_PORT,
-                    ARWEAVE_PROTOCOL: import.meta.env.VITE_ARWEAVE_PROTOCOL
-                });
+                /*** Using Warp */
+                const contract = this.warp.contract(contractId)
+                    .setEvaluationOptions( { allowUnsafeClient: true, internalWrites: true } );
+                const { cachedValue } = await contract.readState();
+                let state = cachedValue.state;
+
+
                 //let state = await readContract(this.arweave, contractId, undefined, true);
                 //let vehicle = state.state;
                 //console.log(JSON.stringify(state));
@@ -521,9 +531,19 @@ export default {
                 this.hasNextPage = false;
             }
 
+            /*** Connect to warp */
+            if (import.meta.env.VITE_ENV === "PROD") {
+                this.warp = WarpFactory.forMainnet();
+            } else if (import.meta.env.VITE_ENV === "TEST") {
+                this.warp = WarpFactory.forTestnet();
+            } else if (import.meta.env.VITE_ENV === "DEV") {
+                this.warp = WarpFactory.forLocal();
+            }
+
             for (let edge of response.data.data.transactions.edges) {
                 await this.loadAllVehicles(edge.node.id);
             }
+            
             // else {
             //     this.hasNextPage = false;
             //     if(this.showResult){

@@ -39,7 +39,7 @@
                     </div>
                     <div class="mt-3 text-base text-gray-300 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
                         Please note that the Playground will be refreshed periodically, so you will see your vehicles disappear when this happens.
-                        <!--<button @click.prevent="contractRead" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">SW vs 3EM</button>-->
+                        <button @click.prevent="contractRead" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">SW vs 3EM</button>
                         For more information, see below 👇
                     </div>
                 </div>
@@ -225,14 +225,15 @@ import VoteSimulator from "./../vehicle/VoteSimulator.vue";
 
 import Arweave from "arweave";
 import { mapGetters } from "vuex";
-import { executeContract } from "@three-em/js";
+// import { executeContract } from "@three-em/js";
 import {
     createContractFromTx,
     createContract,
     interactWrite,
     readContract,
 } from "smartweave";
-import { ConnectableObservable } from "rxjs";
+import { WarpFactory } from "warp-contracts/web";
+//import { ConnectableObservable } from "rxjs";
 
 const initProcess = [
     {
@@ -274,7 +275,10 @@ export default {
             arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
             arweaveMine: import.meta.env.VITE_MINE,
             mineUrl: import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine",
+            env: import.meta.env.VITE_ENV,
             /** */
+
+            warp: {},
 
             // Saved logos on Arweave
             logoVint: "https://arweave.net/CpuwI6XuBk2bFMYT7q5N8XuiSKzkOEWJP2n1CPDmNX4",
@@ -295,6 +299,38 @@ export default {
         ...mapGetters(["arConnected","keyFile","arConnectConfig","getTestLaunchFlag",]),
     },
     methods: {
+        warpInit() {
+            console.log("***** WARP INIT ***** ");
+            try {
+                // Using Warp
+                if (this.env === "PROD") {
+                    this.warp = WarpFactory.forMainnet();
+                } else if (this.env === "TEST") {
+                    this.warp = WarpFactory.forTestnet();
+                } else if (this.env === "DEV") {
+                    this.warp = WarpFactory.forLocal();
+                }
+                return true;
+            } catch(e) {
+                console.log(e);
+                return false;
+            }
+        },
+        async warpRead(contractId) {
+            console.log("**** WARP READ **** ");
+            try {
+                const contract = this.warp.contract(contractId)
+                    .setEvaluationOptions({ 
+                        allowUnsafeClient: true,
+                        internalWrites: true,
+                     });
+                const { cachedValue } = await contract.readState();
+                return cachedValue.state;
+            } catch (e) {
+                console.log(e);
+                return {};
+            }
+        },
         voteSimulatorTest(){
             this.showVoteSimulator = true;
         },
@@ -307,9 +343,9 @@ export default {
             }
         },
         contractRead() {
-            if (import.meta.env.VITE_ENV === "TEST") {
+            if (this.env === "TEST") {
                 this.$router.push({ name: "read", params: { contractId: "Ec4RtO4woGOq5HOmu6YWbCP9bXJZ3otL1kJxTUEuZGg" } });
-            } else if (import.meta.env.VITE_ENV === "DEV") {
+            } else if (this.env === "DEV") {
                 this.$router.push({ name: "read", params: { contractId: "RlgLcFOzm6xVho6w76PCg_WbShb3n62jjH6HKSJw9WM" } });
             }
         },
@@ -330,7 +366,7 @@ export default {
                 }
 
                 // Check for correct ArConnect settings                
-                if (import.meta.env.VITE_ENV === "DEV") {
+                if (this.env === "DEV") {
                     if (
                         this.arConnectConfig.host != this.arweaveHost ||
                         this.arConnectConfig.protocol != this.arweaveProtocol ||
@@ -343,7 +379,7 @@ export default {
                         this.$store.dispatch("arDisconnect");
                         return false;
                     }
-                } else if (import.meta.env.VITE_ENV === "TEST") {
+                } else if (this.env === "TEST") {
                     if (
                         this.arConnectConfig.host != this.arweaveHost ||
                         this.arConnectConfig.protocol != this.arweaveProtocol ||
@@ -362,6 +398,7 @@ export default {
                     return false;
                 }
 
+                // Initializing Arweave
                 let arweave = {};
                 try {
                     arweave = await Arweave.init({
@@ -376,7 +413,7 @@ export default {
                 }
 
                 let use_wallet;
-                if (import.meta.env.VITE_ENV === "DEV") {
+                if (this.env === "DEV") {
                     if (this.keyFile.length) {
                         use_wallet = JSON.parse(this.keyFile);
                     } else {
@@ -398,6 +435,14 @@ export default {
                         this.$swal.showLoading()
                     },
                 });
+                
+                // Initialize Warp
+                if (!this.warpInit()) {
+                    console.log("Warp Init Failed.");
+                    return;
+                } else {
+                    console.log("Warp Init Successful");
+                }
 
                 this.$log.info("OverviewTest : init :: ", "1. Ensure wallet has some AR to make transactions");
 
@@ -537,12 +582,28 @@ export default {
                 this.$log.info("OverviewTest : init :: ", "Reading Blue Horizon contract.");
                 //const blueVeh = await readContract(arweave, blueContractId);
                 //const blueVeh = await executeContract(blueContractId, undefined, true, this.gatewayConfig);
-                const { state, validity } = await executeContract(blueContractId, undefined, true, {
-                    ARWEAVE_HOST: import.meta.env.VITE_ARWEAVE_HOST,
-                    ARWEAVE_PORT: import.meta.env.VITE_ARWEAVE_PORT,
-                    ARWEAVE_PROTOCOL: import.meta.env.VITE_ARWEAVE_PROTOCOL
-                });
-                const blueVeh = state;
+                // const { state, validity } = await executeContract(blueContractId, undefined, true, {
+                //     ARWEAVE_HOST: import.meta.env.VITE_ARWEAVE_HOST,
+                //     ARWEAVE_PORT: import.meta.env.VITE_ARWEAVE_PORT,
+                //     ARWEAVE_PROTOCOL: import.meta.env.VITE_ARWEAVE_PROTOCOL
+                // });
+                //const blueVeh = state;
+
+            //     const blueVeh = this.warpRead(blueContractId);
+
+                // Use Warp to read the contract
+                let blueVeh = {};
+                try {
+                const contract = this.warp.contract(blueContractId)
+                    .setEvaluationOptions({ 
+                        allowUnsafeClient: true,
+                        internalWrites: true,
+                     });
+                const { cachedValue } = await contract.readState();
+                blueVeh = cachedValue.state;
+                } catch (e) {
+                    console.log(e);
+                }
 
                 //if (!(addr in blueVeh.state.balances)) {
                 if (!(addr in blueVeh.balances)) {
@@ -581,7 +642,7 @@ export default {
                  * This doesn't need to be done in PROD or TEST b/c the Verto Cache is used
                  * and the wallet.psts are built during the Arconnection.
                  */
-                if (import.meta.env.VITE_ENV === "DEV" || import.meta.env.VITE_BUILD_PSTS) {
+                if (this.env === "DEV" || import.meta.env.VITE_BUILD_PSTS) {
                     await this.buildWalletPsts(arweave, aftrContractSrcId, userAddr);
                 }
 
@@ -630,12 +691,24 @@ export default {
                 try {
                     //let vehicle = await readContract(arweave, edge.node.id);
                     //const state = await executeContract(edge.node.id, undefined, true, this.gatewayConfig);
-                    const { state, validity } = await executeContract(edge.node.id, undefined, true, {
-                        ARWEAVE_HOST: import.meta.env.VITE_ARWEAVE_HOST,
-                        ARWEAVE_PORT: import.meta.env.VITE_ARWEAVE_PORT,
-                        ARWEAVE_PROTOCOL: import.meta.env.VITE_ARWEAVE_PROTOCOL
-                    });
-                    let vehicle = state;
+                    // const { state, validity } = await executeContract(edge.node.id, undefined, true, {
+                    //     ARWEAVE_HOST: import.meta.env.VITE_ARWEAVE_HOST,
+                    //     ARWEAVE_PORT: import.meta.env.VITE_ARWEAVE_PORT,
+                    //     ARWEAVE_PROTOCOL: import.meta.env.VITE_ARWEAVE_PROTOCOL
+                    // });
+                    // let vehicle = state;
+
+                    //let vehicle = this.warpRead(edge.node.id);
+
+            
+                    const contract = this.warp.contract(edge.node.id)
+                        .setEvaluationOptions({ 
+                            allowUnsafeClient: true,
+                            internalWrites: true,
+                        });
+                    const { cachedValue } = await contract.readState();
+                    let vehicle = cachedValue.state;
+            
 
                     if (vehicle && Object.keys(vehicle.balances).length != 0 && vehicle.name) {
                         let data = {
@@ -916,37 +989,60 @@ export default {
             });
         },
         async transferTokens(arweave, wallet, vehContractId, pstContractId, qty) {
-            const inputTransfer = {
-                function: "transfer",
-                target: vehContractId,
-                qty: qty,
-            };
+            // const inputTransfer = {
+            //     function: "transfer",
+            //     target: vehContractId,
+            //     qty: qty,
+            // };
 
-            await interactWrite(arweave, wallet, pstContractId, inputTransfer)
-                .then(async (id) => { 
-                    this.$log.info("OverviewTestTransferTokens : interactWrite :: ", "Transfer Vint = " + JSON.stringify(id));
+            let allowTxId = "";
+            // const warp = WarpFactory.forLocal();
+            // const vehContract = warp.contract(vehContractId)
+            //     .setEvaluationOptions({ 
+            //         allowUnsafeClient: true,
+            //         internalWrites: true,
+            //     })
+            //     .connect("use_wallet");
+            try {
+                const inputAllow = {
+                    function: "allow",
+                    target: vehContractId,
+                    qty: qty,
+                };
+                allowTxId = await interactWrite(arweave, wallet, pstContractId, inputAllow);
 
-                    const inputDeposit = {
-                        function: "deposit",
-                        tokenId: pstContractId,
-                        txID: id,
-                    };
-                    this.$log.info("OverviewTestTransferTokens : interactWrite :: ", "INPUT DEP: " + JSON.stringify(inputDeposit));
+                //const { originalTxId, allowTxId } = await contract.writeInteraction(inputAllow);
 
-                    await interactWrite(arweave, wallet, vehContractId, inputDeposit)
-                        .then(async (txID) => {
-                            if (Boolean(this.arweaveMine)) {
-                                await fetch(this.mineUrl);
-                            }
-                        })
-                        .catch((error) => {
-                            this.$log.info("OverviewTestTransferTokens : interactWriteDeposit :: Error: " + error);
-                        });
-                })
-                .catch((error) => {
-                    this.$log.info("OverviewTestTransferTokens : interactWriteTransfer :: Error: " + error);
-                }
-            );
+                this.$log.info("OverviewTestTransferTokens : interactWrite :: ", "Allow Function Tx = " + allowTxId);
+            } catch(e) {
+                console.log("ERROR allowing transfer of " + pstContractId + " tokens to AFTR Vehicle " + vehContractId + ".  " + e);
+            }
+
+            try {
+                const inputDeposit = {
+                    function: "deposit",
+                    tokenId: pstContractId,
+                    qty: qty,
+                    txID: allowTxId,
+                };
+
+                // const pstContract = warp.contract(pstContractId)
+                // .setEvaluationOptions({ 
+                //     allowUnsafeClient: true,
+                //     internalWrites: true,
+                // })
+                // .connect("use_wallet");
+                // const { originalTxId, depTxId } = await contract.writeInteraction(inputDeposit);
+
+                const depTxId = await interactWrite(arweave, wallet, vehContractId, inputDeposit);
+                this.$log.info("OverviewTestDepositTokens : interactWrite :: ", "Deposit Function Tx = " + depTxId);
+            } catch(e) {
+                console.log("ERROR depositing " + pstContractId + " tokens into AFTR Vehicle " + vehContractId + "." + e);
+            }
+
+            if (Boolean(this.arweaveMine)) {
+                await fetch(this.mineUrl);
+            }
         },
     },
     setup() {

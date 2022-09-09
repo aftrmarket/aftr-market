@@ -12,6 +12,8 @@
     },
     "invocations": [],
     "foreignCalls": [],
+    "claimable": [],
+    "claims": [],
     "tokens": [],
     "vault": {},
     "votes": [],

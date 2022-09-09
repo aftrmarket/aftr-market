@@ -84,7 +84,8 @@
 
 <script>
 //import { readContract } from 'smartweave';
-import { executeContract } from "@three-em/js";
+//import { executeContract } from "@three-em/js";
+import { WarpFactory } from "warp-contracts/web";
 import VehicleInfo from './vehicle/VehicleInfo.vue';
 import VehicleMembers from './vehicle/VehicleMembers.vue';
 import VehicleTokens from './vehicle/VehicleTokens.vue';
@@ -124,7 +125,8 @@ export default {
             pageStatus: "",
             contractId: this.vehicleId,
             vehicle: {},
-            interations: {},
+            interactions: {},
+            interactionErrorMsgs: {},
             anyWithdrawals: false,
             concludeVoteNeeded: false,
 
@@ -319,17 +321,28 @@ export default {
             //const stateInteractions = await readContract(this.arweave, this.contractId, undefined, true);
 
             //const { state, validity } = await executeContract(this.contractId, undefined, true, this.gatewayConfig);
-            const stateInteractions = await executeContract(this.contractId, undefined, true, {
-                ARWEAVE_HOST: import.meta.env.VITE_ARWEAVE_HOST,
-                ARWEAVE_PORT: import.meta.env.VITE_ARWEAVE_PORT,
-                ARWEAVE_PROTOCOL: import.meta.env.VITE_ARWEAVE_PROTOCOL
-            });
-            //console.log(JSON.stringify(state));
-            // console.log(JSON.stringify(state));
-            // console.log(JSON.stringify(validity));
+            // const stateInteractions = await executeContract(this.contractId, undefined, true, {
+            //     ARWEAVE_HOST: import.meta.env.VITE_ARWEAVE_HOST,
+            //     ARWEAVE_PORT: import.meta.env.VITE_ARWEAVE_PORT,
+            //     ARWEAVE_PROTOCOL: import.meta.env.VITE_ARWEAVE_PROTOCOL
+            // });
+            // this.vehicle = stateInteractions.state;
+            // this.interactions = stateInteractions.validity;
 
-            this.vehicle = stateInteractions.state;
-            this.interactions = stateInteractions.validity;
+            /*** Connect to warp */
+            if (import.meta.env.VITE_ENV === "PROD") {
+                this.warp = WarpFactory.forMainnet();
+            } else if (import.meta.env.VITE_ENV === "TEST") {
+                this.warp = WarpFactory.forTestnet();
+            } else if (import.meta.env.VITE_ENV === "DEV") {
+                this.warp = WarpFactory.forLocal();
+            }
+            /*** Using Warp */
+            const contract = this.warp.contract(this.contractId)
+                .setEvaluationOptions( { allowUnsafeClient: true, internalWrites: true } );
+            const { cachedValue } = await contract.readState();
+            this.vehicle = cachedValue.state;
+            this.interactions = cachedValue.validity;
             
 
             //this.vehicle = stateInteractions.state;
