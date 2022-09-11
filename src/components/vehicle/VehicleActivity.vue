@@ -47,7 +47,7 @@
 
 <script>
 export default {
-    props: ["arweave", "interactions"],
+    props: ["arweave", "interactions", "errorMessages"],
     data() {
         return {
             isLoading: true,

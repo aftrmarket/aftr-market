@@ -68,7 +68,7 @@
                                 <!--<vehicle-fractions v-else-if="activeTab === 'Fractions'"></vehicle-fractions>-->
                                 <vehicle-votes v-else-if="activeTab === 'Votes'" :vehicle="vehicle" :contractId="contractId" :isMember="allowEdits"></vehicle-votes>
                                 <vehicle-state v-else-if="activeTab === 'State'" :vehicle="vehicle"></vehicle-state>
-                                <vehicle-activity v-else-if="activeTab === 'Activity'" :arweave="arweave" :interactions="interactions"></vehicle-activity>
+                                <vehicle-activity v-else-if="activeTab === 'Activity'" :arweave="arweave" :interactions="interactions" :errorMessages="interactionErrorMsgs"></vehicle-activity>
 
                                 <vehicle-contract-test v-else-if="activeTab === 'Test Contract' && env === 'DEV'" :vehicle="vehicle"></vehicle-contract-test>
                             </div>
@@ -343,8 +343,8 @@ export default {
             const { cachedValue } = await contract.readState();
             this.vehicle = cachedValue.state;
             this.interactions = cachedValue.validity;
+            this.interactionErrorMsgs = cachedValue.errorMessages;
             
-
             //this.vehicle = stateInteractions.state;
             //this.interactions = stateInteractions.validity;
             //console.log(JSON.stringify(this.interactions));
