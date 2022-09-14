@@ -375,6 +375,7 @@ async function handle(state, action) {
       ticker: tokenInfo.ticker,
       logo: tokenInfo.logo,
       lockLength
+      //transferResult
     };
     if (!state.tokens) {
       state["tokens"] = [];
@@ -433,6 +434,9 @@ async function handle(state, action) {
       if (state.claims[i] === txID) {
         ThrowError("This claim has already been made.");
       }
+    }
+    if (!balances[caller]) {
+        balances[caller] = 0;
     }
     balances[caller] += obj.qty;
     state.claimable.splice(index, 1);
