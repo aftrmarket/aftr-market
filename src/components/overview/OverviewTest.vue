@@ -222,18 +222,18 @@ import aftrChillinInitState from "./../../testnet/contracts/aftrChillinInitState
 import aftrSourcePlayground from "./../../testnet/contracts/aftrSourcePlayground.js?raw";
 import aftrInitStatePlayground from "./../../testnet/contracts/aftrInitStatePlayground.json";
 import VoteSimulator from "./../vehicle/VoteSimulator.vue";
+import { warpInit, warpRead, warpWrite } from './../utils/warpUtils.js';
 
 import Arweave from "arweave";
 import { mapGetters } from "vuex";
-// import { executeContract } from "@three-em/js";
+
 import {
     createContractFromTx,
     createContract,
     interactWrite,
     readContract,
 } from "smartweave";
-import { WarpFactory } from "warp-contracts/web";
-//import { ConnectableObservable } from "rxjs";
+
 
 const initProcess = [
     {
@@ -299,38 +299,38 @@ export default {
         ...mapGetters(["arConnected","keyFile","arConnectConfig","getTestLaunchFlag",]),
     },
     methods: {
-        warpInit() {
-            console.log("***** WARP INIT ***** ");
-            try {
-                // Using Warp
-                if (this.env === "PROD") {
-                    this.warp = WarpFactory.forMainnet();
-                } else if (this.env === "TEST") {
-                    this.warp = WarpFactory.forTestnet();
-                } else if (this.env === "DEV") {
-                    this.warp = WarpFactory.forLocal();
-                }
-                return true;
-            } catch(e) {
-                console.log(e);
-                return false;
-            }
-        },
-        async warpRead(contractId) {
-            console.log("**** WARP READ **** ");
-            try {
-                const contract = this.warp.contract(contractId)
-                    .setEvaluationOptions({ 
-                        allowUnsafeClient: true,
-                        internalWrites: true,
-                     });
-                const { cachedValue } = await contract.readState();
-                return cachedValue.state;
-            } catch (e) {
-                console.log(e);
-                return {};
-            }
-        },
+        // warpInit() {
+        //     console.log("***** WARP INIT ***** ");
+        //     try {
+        //         // Using Warp
+        //         if (this.env === "PROD") {
+        //             this.warp = WarpFactory.forMainnet();
+        //         } else if (this.env === "TEST") {
+        //             this.warp = WarpFactory.forTestnet();
+        //         } else if (this.env === "DEV") {
+        //             this.warp = WarpFactory.forLocal();
+        //         }
+        //         return true;
+        //     } catch(e) {
+        //         console.log(e);
+        //         return false;
+        //     }
+        // },
+        // async warpRead(contractId) {
+        //     console.log("**** WARP READ **** ");
+        //     try {
+        //         const contract = this.warp.contract(contractId)
+        //             .setEvaluationOptions({ 
+        //                 allowUnsafeClient: true,
+        //                 internalWrites: true,
+        //              });
+        //         const { cachedValue } = await contract.readState();
+        //         return cachedValue;
+        //     } catch (e) {
+        //         console.log(e);
+        //         return {};
+        //     }
+        // },
         voteSimulatorTest(){
             this.showVoteSimulator = true;
         },
@@ -437,11 +437,13 @@ export default {
                 });
                 
                 // Initialize Warp
-                if (!this.warpInit()) {
-                    console.log("Warp Init Failed.");
-                    return;
-                } else {
-                    console.log("Warp Init Successful");
+                this.warp = warpInit();
+
+                if (this.warp == {}) {
+                    this.$swal({
+                        icon: "error",
+                        html: "Warp Initialization Failed."
+                    });
                 }
 
                 this.$log.info("OverviewTest : init :: ", "1. Ensure wallet has some AR to make transactions");
@@ -580,44 +582,24 @@ export default {
                     },
                 });
                 this.$log.info("OverviewTest : init :: ", "Reading Blue Horizon contract.");
-                //const blueVeh = await readContract(arweave, blueContractId);
-                //const blueVeh = await executeContract(blueContractId, undefined, true, this.gatewayConfig);
-                // const { state, validity } = await executeContract(blueContractId, undefined, true, {
-                //     ARWEAVE_HOST: import.meta.env.VITE_ARWEAVE_HOST,
-                //     ARWEAVE_PORT: import.meta.env.VITE_ARWEAVE_PORT,
-                //     ARWEAVE_PROTOCOL: import.meta.env.VITE_ARWEAVE_PROTOCOL
-                // });
-                //const blueVeh = state;
-
-            //     const blueVeh = this.warpRead(blueContractId);
 
                 // Use Warp to read the contract
-                let blueVeh = {};
-                try {
-                const contract = this.warp.contract(blueContractId)
-                    .setEvaluationOptions({ 
-                        allowUnsafeClient: true,
-                        internalWrites: true,
-                     });
-                const { cachedValue } = await contract.readState();
-                blueVeh = cachedValue.state;
-                } catch (e) {
-                    console.log(e);
-                }
+                const cachedValue = await warpRead(this.warp, blueContractId);
+                let blueVeh = cachedValue.state;
 
-                //if (!(addr in blueVeh.state.balances)) {
-                if (!(addr in blueVeh.balances)) {
+                if (blueVeh == undefined || !(addr in blueVeh.balances)) {
                     input = {
                         function: "plygnd-mint",
                         qty: 100000,
                     };
                     // Calls mint function on Blue Horizon contract. If user already has a balance, nothing happens.
                     this.$log.info("OverviewTest : init :: ", "Blue Horizon Interact Write.");
-                    contractTxId = await interactWrite(arweave, use_wallet, blueContractId, input);
+                    //contractTxId = await interactWrite(arweave, use_wallet, blueContractId, input);
+                    contractTxId = await warpWrite(this.warp, blueContractId, input);
 
-                    if (Boolean(this.arweaveMine)) {
-                        await fetch(this.mineUrl);
-                    }
+                    // if (Boolean(this.arweaveMine)) {
+                    //     await fetch(this.mineUrl);
+                    // }
                     this.$log.info("OverviewTest : init :: ", "Blue Horizon Contract Write: " + contractTxId);
                 }
 
@@ -628,9 +610,11 @@ export default {
                 };
                 this.$log.info("OverviewTest : init :: ", "Give user's wallet PSTs.");
                 contractTxId = await interactWrite(arweave, use_wallet, vintContractId, input);
+                //contractTxId = await warpWrite(this.warp, vintContractId, input);
                 this.$log.info("OverviewTest : init :: ", "User Wallet VINT: " + contractTxId);
 
-                contractTxId = await interactWrite(arweave, use_wallet, arhdContractId, input);
+                contractTxId = await warpWrite(this.warp, arhdContractId, input);
+                //contractTxId = await interactWrite(arweave, use_wallet, arhdContractId, input);
                 this.$log.info("OverviewTest : init :: ", "User Wallet ARHD: " + contractTxId);
 
                 if (Boolean(this.arweaveMine)) {
@@ -689,24 +673,7 @@ export default {
 
             for (let edge of responseValue.data.data.transactions.edges) {
                 try {
-                    //let vehicle = await readContract(arweave, edge.node.id);
-                    //const state = await executeContract(edge.node.id, undefined, true, this.gatewayConfig);
-                    // const { state, validity } = await executeContract(edge.node.id, undefined, true, {
-                    //     ARWEAVE_HOST: import.meta.env.VITE_ARWEAVE_HOST,
-                    //     ARWEAVE_PORT: import.meta.env.VITE_ARWEAVE_PORT,
-                    //     ARWEAVE_PROTOCOL: import.meta.env.VITE_ARWEAVE_PROTOCOL
-                    // });
-                    // let vehicle = state;
-
-                    //let vehicle = this.warpRead(edge.node.id);
-
-            
-                    const contract = this.warp.contract(edge.node.id)
-                        .setEvaluationOptions({ 
-                            allowUnsafeClient: true,
-                            internalWrites: true,
-                        });
-                    const { cachedValue } = await contract.readState();
+                    const cachedValue = await warpRead(this.warp, edge.node.id);
                     let vehicle = cachedValue.state;
             
 
@@ -1010,6 +977,9 @@ export default {
                     qty: qty,
                 };
                 allowTxId = await interactWrite(arweave, wallet, pstContractId, inputAllow);
+                if (Boolean(this.arweaveMine)) {
+                    await fetch(this.mineUrl);
+                }
 
                 //const { originalTxId, allowTxId } = await contract.writeInteraction(inputAllow);
 

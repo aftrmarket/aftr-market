@@ -35,4 +35,6 @@ function isVehicleMember(vehicle, userAddr) {
     return found;
 };
 
+
+
 export { capitalize, isVehicleMember };
