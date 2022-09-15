@@ -364,6 +364,11 @@ async function handle(state, action) {
     if (transferResult.type !== "ok") {
       ThrowError("Unable to deposit token " + input.tokenId);
     }
+
+    /*** For troubleshooting */
+    //state.transferResult = transferResult;
+    /*** For troubleshooting */
+
     const tokenInfo = await getTokenInfo(input.tokenId);
     const txObj = {
       txID: input.txID,

@@ -23,7 +23,7 @@ async function warpRead(warp, contractId) {
             .setEvaluationOptions({ 
                 allowUnsafeClient: true,
                 internalWrites: true,
-             });
+        });
         const { cachedValue } = await contract.readState();
         return cachedValue;
     } catch (e) {

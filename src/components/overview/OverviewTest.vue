@@ -804,10 +804,11 @@ export default {
                         function: "plygnd-addLogo",
                         logo: logoId,
                     };
-                    let res = await interactWrite(arweave, wallet, contractTxId, input);
-                    if (Boolean(this.arweaveMine)) {
-                        await fetch(this.mineUrl);
-                    }
+                    // let res = await interactWrite(arweave, wallet, contractTxId, input);
+                    // if (Boolean(this.arweaveMine)) {
+                    //     await fetch(this.mineUrl);
+                    // }
+                    let res = await warpWrite(this.warp, contractTxId, input);
 
                     this.$log.info("OverviewTest : createSampleAftrVehicle :: ", "LOGO ADD for " + name + ": " + res);
 
@@ -853,10 +854,11 @@ export default {
                 logoVint: logoVint,
                 logoArhd: logoArhd,
             };
-            let res = await interactWrite(arweave, wallet, contractId, input);
-            if (Boolean(this.arweaveMine)) {
-                await fetch(this.mineUrl);
-            }
+            // let res = await interactWrite(arweave, wallet, contractId, input);
+            // if (Boolean(this.arweaveMine)) {
+            //     await fetch(this.mineUrl);
+            // }
+            let res = await warpWrite(this.warp, contractId, input);
         },
         async createSampleContract(arweave, wallet, aftrId, initState, type = "aftr", name) {
             let swTags = [];
@@ -956,63 +958,24 @@ export default {
             });
         },
         async transferTokens(arweave, wallet, vehContractId, pstContractId, qty) {
-            // const inputTransfer = {
-            //     function: "transfer",
-            //     target: vehContractId,
-            //     qty: qty,
-            // };
+            const inputAllow = {
+                function: "allow",
+                target: vehContractId,
+                qty: qty,
+            };
+            const allowTxId = await warpWrite(this.warp, pstContractId, inputAllow);
+            this.$log.info("OverviewTestDepositTokens : warpWrite :: ", "Allow Function Tx = " + allowTxId);
 
-            let allowTxId = "";
-            // const warp = WarpFactory.forLocal();
-            // const vehContract = warp.contract(vehContractId)
-            //     .setEvaluationOptions({ 
-            //         allowUnsafeClient: true,
-            //         internalWrites: true,
-            //     })
-            //     .connect("use_wallet");
-            try {
-                const inputAllow = {
-                    function: "allow",
-                    target: vehContractId,
-                    qty: qty,
-                };
-                allowTxId = await interactWrite(arweave, wallet, pstContractId, inputAllow);
-                if (Boolean(this.arweaveMine)) {
-                    await fetch(this.mineUrl);
-                }
 
-                //const { originalTxId, allowTxId } = await contract.writeInteraction(inputAllow);
+            const inputDeposit = {
+                function: "deposit",
+                tokenId: pstContractId,
+                qty: qty,
+                txID: allowTxId,
+            };
 
-                this.$log.info("OverviewTestTransferTokens : interactWrite :: ", "Allow Function Tx = " + allowTxId);
-            } catch(e) {
-                console.log("ERROR allowing transfer of " + pstContractId + " tokens to AFTR Vehicle " + vehContractId + ".  " + e);
-            }
-
-            try {
-                const inputDeposit = {
-                    function: "deposit",
-                    tokenId: pstContractId,
-                    qty: qty,
-                    txID: allowTxId,
-                };
-
-                // const pstContract = warp.contract(pstContractId)
-                // .setEvaluationOptions({ 
-                //     allowUnsafeClient: true,
-                //     internalWrites: true,
-                // })
-                // .connect("use_wallet");
-                // const { originalTxId, depTxId } = await contract.writeInteraction(inputDeposit);
-
-                const depTxId = await interactWrite(arweave, wallet, vehContractId, inputDeposit);
-                this.$log.info("OverviewTestDepositTokens : interactWrite :: ", "Deposit Function Tx = " + depTxId);
-            } catch(e) {
-                console.log("ERROR depositing " + pstContractId + " tokens into AFTR Vehicle " + vehContractId + "." + e);
-            }
-
-            if (Boolean(this.arweaveMine)) {
-                await fetch(this.mineUrl);
-            }
+            const depTxId = await warpWrite(this.warp, vehContractId, inputDeposit);
+            this.$log.info("OverviewTestDepositTokens : warpWrite :: ", "Deposit Function Tx = " + depTxId);
         },
     },
     setup() {
