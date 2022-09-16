@@ -114,6 +114,7 @@ import { mapGetters } from "vuex";
 import CreateVehicleSimple from "./CreateVehicleSimple.vue";
 import VehicleTable from './VehicleTable.vue';
 import { isVehicleMember } from './utils/shared.js';
+import axios from 'axios'
 
 export default {
     components: { VehicleCard, VehicleCardPlaceholder, CreateVehicleSimple, VehicleTable },
@@ -454,10 +455,9 @@ export default {
             }
 
             // Use GraphQL to find all vehicle contracts, then load all vehicles
-
             let response = {};
             let totalVehicles = 0;
-            try {
+            /** try {
                 this.arweave = await Arweave.init({
                     host: this.arweaveHost,
                     port: this.arweavePort,
@@ -529,8 +529,12 @@ export default {
                 this.cursor = lastNumber.cursor;
             } else {
                 this.hasNextPage = false;
-            }
+            } */
 
+            response = await axios.get('http://localhost:3001/vehicles/read')
+            console.log("response",response)
+            totalVehicles = response.data.state.vehicles.length;
+            console.log("totalVehicles", totalVehicles)
             /*** Connect to warp */
             if (import.meta.env.VITE_ENV === "PROD") {
                 this.warp = WarpFactory.forMainnet();
@@ -540,43 +544,15 @@ export default {
                 this.warp = WarpFactory.forLocal();
             }
 
-            for (let edge of response.data.data.transactions.edges) {
-                await this.loadAllVehicles(edge.node.id);
+            // for (let edge of response.data.data.transactions.edges) {
+            //     console.log("edge.node.id ",edge.node.id)
+            //     await this.loadAllVehicles(edge.node.id);
+            // }
+
+            for (let edge of response.data.state.vehicles) {
+                console.log("edge.node.id ",edge)
+                await this.loadAllVehicles(edge);
             }
-            
-            // else {
-            //     this.hasNextPage = false;
-            //     if(this.showResult){
-            //         this.showResult = false;
-            //         //this.vehicles = [];
-            //         for (let edge of response.data.data.transactions.edges) {
-            //             await this.loadAllVehicles(edge.node.id);
-            //         }
-            //         //this.isLoading = false;
-            //     }
-                
-            //     this.cursor = ""
-            //     this.noResult = true;
-            //     // this.message = "No result found";
-            //     this.isLoading = false;
-                
-            //     return;
-            // }
-
-            // Load each Vehicle
-            
-            // if(!this.noResult && this.showResult){
-            //     //this.vehicles = [];
-            //     for (let edge of response.data.data.transactions.edges) {
-            //         await this.loadAllVehicles(edge.node.id);
-            //     }
-            // }
-    
-
-            // for (let index = 1; index < 12; index++) {
-            //     /*** FOR NOW JUST LOAD A FAKE SCREEN OF VEHICLES */
-            //     this.vehicles.push(this.vehicles[0]);
-            // }
 
             this.numVehicles = this.vehicles.length;
         },
