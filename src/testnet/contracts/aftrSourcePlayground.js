@@ -351,7 +351,6 @@ async function handle(state, action) {
     if (!input.qty || typeof +input.qty !== "number" || +input.qty <= 0) {
       ThrowError("Qty is invalid.");
     }
-
     let lockLength = 0;
     if (input.lockLength) {
       lockLength = input.lockLength;
@@ -364,12 +363,7 @@ async function handle(state, action) {
     if (transferResult.type !== "ok") {
       ThrowError("Unable to deposit token " + input.tokenId);
     }
-
-    /*** For troubleshooting */
-    //state.transferResult = transferResult;
-    /*** For troubleshooting */
-
-    const tokenInfo = await getTokenInfo(input.tokenId);
+    const tokenInfo = await getTokenInfo(transferResult.state);
     const txObj = {
       txID: input.txID,
       tokenId: input.tokenId,
@@ -380,7 +374,6 @@ async function handle(state, action) {
       ticker: tokenInfo.ticker,
       logo: tokenInfo.logo,
       lockLength
-      //transferResult
     };
     if (!state.tokens) {
       state["tokens"] = [];
@@ -441,13 +434,12 @@ async function handle(state, action) {
       }
     }
     if (!balances[caller]) {
-        balances[caller] = 0;
+      balances[caller] = 0;
     }
     balances[caller] += obj.qty;
     state.claimable.splice(index, 1);
     state.claims.push(txID);
   }
-
 
 /*** PLAYGROUND FUNCTIONS - NOT FOR PRODUCTION */
     /*** ADDED MINT FUNCTION FOR THE TEST GATEWAY - NOT FOR PRODUCTION */
@@ -493,7 +485,6 @@ async function handle(state, action) {
         }
     }
 /*** PLAYGROUND FUNCTIONS END */
-
 
 
   if (input.function === "multiInteraction") {
@@ -624,34 +615,35 @@ function invoke(state, input) {
   });
 }
 async function finalizeVotes(vehicle, concludedVotes, quorum, support, block) {
-    for (let vote of concludedVotes) {
-        let finalQuorum = 0;
-        let finalSupport = 0;
-        if (vehicle.ownership === "single" || vote.yays / vote.totalWeight > support) {
-        vote.statusNote = vehicle.ownership === "single" ? "Single owner, no vote required." : "Total Support achieved before vote length timeline.";
-        vote.status = "passed";
-        await modifyVehicle(vehicle, vote);
-        } else if (vote.nays / vote.totalWeight > support) {
-        vote.statusNote = "No number of yays can exceed the total number of nays. The proposal fails before the vote length timeline.";
-        vote.status = "failed";
-        } else if (block > vote.start + vote.voteLength) {
-        finalQuorum = (vote.yays + vote.nays) / vote.totalWeight;
-        if (vote.totalWeight * quorum > vote.yays + vote.nays) {
-            vote.status = "quorumFailed";
-            vote.statusNote = "The proposal failed due to the Quorum not being met. The proposal's quorum was " + String(finalQuorum);
-        } else if (vote.yays / (vote.yays + vote.nays) > support) {
-            finalSupport = vote.yays / (vote.yays + vote.nays);
-            vote.status = "passed";
-            vote.statusNote = "The proposal passed with " + String(finalSupport) + " support of a " + String(finalQuorum) + " quorum.";
-            await modifyVehicle(vehicle, vote);
-        }
-        } else {
-        vote.status = "failed";
-        finalQuorum = (vote.yays + vote.nays) / vote.totalWeight;
+  for (let vote of concludedVotes) {
+    let finalQuorum = 0;
+    let finalSupport = 0;
+    if (vehicle.ownership === "single" || vote.yays / vote.totalWeight > support) {
+      vote.statusNote = vehicle.ownership === "single" ? "Single owner, no vote required." : "Total Support achieved before vote length timeline.";
+      vote.status = "passed";
+      await modifyVehicle(vehicle, vote);
+    } else if (vote.nays / vote.totalWeight > support) {
+      vote.statusNote = "No number of yays can exceed the total number of nays. The proposal fails before the vote length timeline.";
+      vote.status = "failed";
+    } else if (block > vote.start + vote.voteLength) {
+      finalQuorum = (vote.yays + vote.nays) / vote.totalWeight;
+      if (vote.totalWeight * quorum > vote.yays + vote.nays) {
+        vote.status = "quorumFailed";
+        vote.statusNote = "The proposal failed due to the Quorum not being met. The proposal's quorum was " + String(finalQuorum);
+      } else if (vote.yays / (vote.yays + vote.nays) > support) {
         finalSupport = vote.yays / (vote.yays + vote.nays);
-        vote.statusNote = "The proposal achieved " + String(finalSupport) + " support of a " + String(finalQuorum) + " quorum which was not enough to pass the proposal.";
-        }
-  };
+        vote.status = "passed";
+        vote.statusNote = "The proposal passed with " + String(finalSupport) + " support of a " + String(finalQuorum) + " quorum.";
+        await modifyVehicle(vehicle, vote);
+      }
+    } else {
+      vote.status = "failed";
+      finalQuorum = (vote.yays + vote.nays) / vote.totalWeight;
+      finalSupport = vote.yays / (vote.yays + vote.nays);
+      vote.statusNote = "The proposal achieved " + String(finalSupport) + " support of a " + String(finalQuorum) + " quorum which was not enough to pass the proposal.";
+    }
+  }
+  ;
 }
 async function modifyVehicle(vehicle, vote) {
   if (vote.type === "mint" || vote.type === "addMember") {
@@ -709,12 +701,11 @@ function updateSetting(vehicle, key, value) {
     vehicle.settings.push([key, value]);
   }
 }
-async function getTokenInfo(contractId) {
-    const assetState = await SmartWeave.contracts.readContractState(contractId);
-    const settings = new Map(assetState.settings);
-    return {
-        name: assetState.name,
-        ticker: assetState.ticker,
-        logo: settings.get("communityLogo")
+async function getTokenInfo(assetState) {
+  const settings = new Map(assetState.settings);
+  return {
+    name: assetState.name,
+    ticker: assetState.ticker,
+    logo: settings.get("communityLogo")
   };
 }
