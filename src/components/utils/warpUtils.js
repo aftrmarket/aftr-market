@@ -21,7 +21,7 @@ async function warpRead(warp, contractId) {
     try {
         const contract = warp.contract(contractId)
             .setEvaluationOptions({ 
-                allowUnsafeClient: true,
+                //allowUnsafeClient: true,
                 internalWrites: true,
         });
         const { cachedValue } = await contract.readState();
@@ -36,7 +36,7 @@ async function warpWrite(warp, contractId ,input) {
     try {
         const contract = warp.contract(contractId)
         .setEvaluationOptions({ 
-            allowUnsafeClient: true,
+            //allowUnsafeClient: true,
             internalWrites: true,
          })
         .connect("use_wallet");
