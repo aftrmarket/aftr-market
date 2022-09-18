@@ -106,8 +106,8 @@
 
 <script>
 //import { readContract } from "smartweave";
-import { executeContract } from "@three-em/js";
-import { WarpFactory } from "warp-contracts/web";
+//import { executeContract } from "@three-em/js";
+import { warpInit, warpRead } from './utils/warpUtils.js';
 import VehicleCard from "./vehicle/VehicleCard.vue";
 import VehicleCardPlaceholder from "./vehicle/VehicleCardPlaceholder.vue";
 import { mapGetters } from "vuex";
@@ -316,29 +316,32 @@ export default {
                 // });
 
                 /*** Using Warp */
-                const contract = this.warp.contract(contractId)
-                    .setEvaluationOptions( { allowUnsafeClient: true, internalWrites: true } );
-                const { cachedValue } = await contract.readState();
-                let state = cachedValue.state;
-
+                const cachedValue = await warpRead(this.warp, contractId);
+                let vehicle = cachedValue.state;
 
                 //let state = await readContract(this.arweave, contractId, undefined, true);
                 //let vehicle = state.state;
                 //console.log(JSON.stringify(state));
-                let vehicle = state;
+                // let vehicle = state;
 
+/*** COMMENTING OUT CHECKING FOR CONTRACT SOURCE.
+ * WITH THE ADDITION OF EXECUTION MACHINE FUNCTIONS, WE MAY NOT NEED TO CHECK THE CONTRACT SOURCE.
+ * RE-EVALUATE THIS LATER.
+ */
                 // Check to make sure contract source matches AFTR Contract Source
                 let isAftrVehicle = true;
-                const contractSrc = await this.returnContractSrc(contractId);
-                if (contractSrc !== this.getAftrContractSrcId) {
-                    console.log("FAILED CONTRACT SRC: " + contractSrc);
+                // const contractSrc = await this.returnContractSrc(contractId);
+                // if (contractSrc !== this.getAftrContractSrcId) {
+                //     console.log("FAILED CONTRACT SRC: " + contractSrc);
                     
-                    //throw "Not valid AFTR Vehicle";
-                    this.$log.error("VehicleList : loadAllVehicles :: ", "Invalid AFTR Vehicle found - Contract ID: " + contractId);
-                    //isAftrVehicle = false;
-                    return;
-                }
+                //     //throw "Not valid AFTR Vehicle";
+                //     this.$log.error("VehicleList : loadAllVehicles :: ", "Invalid AFTR Vehicle found - Contract ID: " + contractId);
+                //     //isAftrVehicle = false;
+                //     return;
+                // }
                 
+/*** END OF COMMENTING OUT */           
+     
                 // Is user member of this vehicle?
                 const isMember = isVehicleMember(vehicle, this.getActiveAddress);
 
@@ -531,18 +534,21 @@ export default {
                 this.hasNextPage = false;
             } */
 
-            response = await axios.get('http://localhost:3001/vehicles/read')
-            console.log("response",response)
+            //response = await axios.get('http://localhost:3001/vehicles/read');
+            //console.log("response",response);
+
+response = {
+    data: {
+        state: {
+            vehicles: ["ZwuRHscSYKCjtZ66QHi4ObpuOQgSG2G7KIy50Nxjgk0", "rCeWSwF_sig1xdPQVSow8qyypPQCIbDr47YZ2PSjvqs", "3LIi55LsAlTt-y-jP9hBE5WEATRR2IHoRQk0nFZcF6Y"]
+        }
+    }
+}
             totalVehicles = response.data.state.vehicles.length;
             console.log("totalVehicles", totalVehicles)
+            
             /*** Connect to warp */
-            if (import.meta.env.VITE_ENV === "PROD") {
-                this.warp = WarpFactory.forMainnet();
-            } else if (import.meta.env.VITE_ENV === "TEST") {
-                this.warp = WarpFactory.forTestnet();
-            } else if (import.meta.env.VITE_ENV === "DEV") {
-                this.warp = WarpFactory.forLocal();
-            }
+            this.warp = warpInit();
 
             // for (let edge of response.data.data.transactions.edges) {
             //     console.log("edge.node.id ",edge.node.id)
