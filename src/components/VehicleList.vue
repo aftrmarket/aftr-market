@@ -534,16 +534,9 @@ export default {
                 this.hasNextPage = false;
             } */
 
-            //response = await axios.get('http://localhost:3001/vehicles/read');
-            //console.log("response",response);
+            response = await axios.get('http://localhost:3001/vehicles/read');
+            console.log("response",response);
 
-response = {
-    data: {
-        state: {
-            vehicles: ["ZwuRHscSYKCjtZ66QHi4ObpuOQgSG2G7KIy50Nxjgk0", "rCeWSwF_sig1xdPQVSow8qyypPQCIbDr47YZ2PSjvqs", "3LIi55LsAlTt-y-jP9hBE5WEATRR2IHoRQk0nFZcF6Y"]
-        }
-    }
-}
             totalVehicles = response.data.state.vehicles.length;
             console.log("totalVehicles", totalVehicles)
             
