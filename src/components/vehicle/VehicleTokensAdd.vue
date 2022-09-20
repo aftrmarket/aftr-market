@@ -179,7 +179,9 @@ export default {
                     ARWEAVE_PROTOCOL: this.arweaveProtocol
                 });
 
-                if (!stateInteractions.state.invocations || !stateInteractions.state.foreignCalls) {
+                /*** Changing to look for Warp's version of FCP which will require claims and claimable arrays. */
+                //if (!stateInteractions.state.invocations || !stateInteractions.state.foreignCalls) {
+                if (!stateInteractions.state.claims || !stateInteractions.state.claimable) {
                     this.$swal({
                         icon: "error",
                         html: "This asset doesn't support cross-contract communication so it can't be deposited into an AFTR vehicle.",

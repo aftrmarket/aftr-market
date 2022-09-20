@@ -32,7 +32,7 @@
     "vue3-perfect-scrollbar": "^1.6.0",
     "vuejs3-logger": "1.0.0",
     "vuex": "^4.0.2",
-    "warp-contracts": "^1.2.5"
+    "warp-contracts": "^1.2.10"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^2.3.1",
