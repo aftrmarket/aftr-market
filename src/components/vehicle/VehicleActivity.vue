@@ -29,7 +29,7 @@
                                 <svg class="-ml-0.5 mr-1.5 h-2 w-2" fill="red" viewBox="0 0 8 8">
                                     <circle cx="4" cy="4" r="3" />
                                 </svg>
-                                <span class="font-light text-red-600">Failed</span>
+                                <span class="font-light text-red-600"><button @click="test">Failed</button></span>
                             </span>
                         </div>
                     </div>
@@ -65,6 +65,13 @@ export default {
         },
     },
     methods: {
+        test(){
+            this.$swal({
+                html: JSON.stringify(this.errorMessages),
+                width: 800,
+                showConfirmButton: false,
+            }) 
+        },
         parseActivity(edge) {
             // Parses the query response and returns an object with the needed variables
             let activity = {};
@@ -74,6 +81,7 @@ export default {
             activity.block = edge.node.block.height;
             activity.result = this.interactions[activity.id];
 
+            console.log("activity.result ", activity.result )
             // Parse Input tag to get the interaction specifics
             for (let tag of edge.node.tags) {
                 if (tag.name === "Input") {
