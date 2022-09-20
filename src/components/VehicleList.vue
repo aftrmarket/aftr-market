@@ -105,8 +105,6 @@
 </template>
 
 <script>
-//import { readContract } from "smartweave";
-//import { executeContract } from "@three-em/js";
 import { warpInit, warpRead } from './utils/warpUtils.js';
 import VehicleCard from "./vehicle/VehicleCard.vue";
 import VehicleCardPlaceholder from "./vehicle/VehicleCardPlaceholder.vue";
@@ -447,7 +445,7 @@ export default {
                     this.vehicles.push(vehicle);
                 }
             } catch (error) {
-                this.$log.error("VehicleList : loadAllVehicles :: ", "ERROR calling SmartWeave: " + error);
+                this.$log.error("VehicleList : loadAllVehicles :: ", "ERROR reading contract: " + error);
             }
         },
         async load() {
@@ -457,10 +455,29 @@ export default {
                 this.$store.commit("setEvolvedContractSrcId", import.meta.env.VITE_EVOLVED_CONTRACT_SOURCE_ID);
             }
 
-            // Use GraphQL to find all vehicle contracts, then load all vehicles
+            // Get all aftr vehicle contracts, then load all vehicles
+            let txs = await this.getAftrVehicles();
+            
+            /*** Connect to warp */
+            this.warp = warpInit();
+
+            for (let edge of txs.edges) {
+                await this.loadAllVehicles(edge.node.id);
+            }
+
+            this.numVehicles = this.vehicles.length;
+        },
+        async getAftrVehicles() {
             let response = {};
-            let totalVehicles = 0;
-            /** try {
+            // try {
+            //     response = await axios.get('http://localhost:3001/vehicles/read');
+            //     return response.data.state;
+            // } catch(e) {
+            //     return {};
+            // }
+
+            /*** TEMPORARILY QUERY ARWEAVE TO GET VEHICLES UNTIL EXECUTION MACHINE FUNCTIONS ARE WORKING PROPERLY */
+            try {
                 this.arweave = await Arweave.init({
                     host: this.arweaveHost,
                     port: this.arweavePort,
@@ -520,10 +537,9 @@ export default {
                 if (response.status !== 200) {
                     throw response.status + " - " + response.statusText;
                 }
-
-                totalVehicles = response.data.data.transactions.edges.length;
             } catch (error) {
-                this.$log.error("VehicleList : created :: ", "ERROR while fetching from gateway: " + error);
+                this.$log.error("VehicleList : getAftrVehicles :: ", "ERROR while fetching from gateway: " + error);
+                return {};
             }
             //this.isLoading = false;
             if(response.data.data.transactions.pageInfo.hasNextPage) {
@@ -532,28 +548,10 @@ export default {
                 this.cursor = lastNumber.cursor;
             } else {
                 this.hasNextPage = false;
-            } */
-
-            response = await axios.get('http://localhost:3001/vehicles/read');
-            console.log("response",response);
-
-            totalVehicles = response.data.state.vehicles.length;
-            console.log("totalVehicles", totalVehicles)
-            
-            /*** Connect to warp */
-            this.warp = warpInit();
-
-            // for (let edge of response.data.data.transactions.edges) {
-            //     console.log("edge.node.id ",edge.node.id)
-            //     await this.loadAllVehicles(edge.node.id);
-            // }
-
-            for (let edge of response.data.state.vehicles) {
-                console.log("edge.node.id ",edge)
-                await this.loadAllVehicles(edge);
             }
 
-            this.numVehicles = this.vehicles.length;
+            return response.data.data.transactions;
+            /*** */
         },
         getUserPsts() {
             // Loads all of user's PSTs to be used as a filter on the My Vehicles query

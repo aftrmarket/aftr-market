@@ -45,7 +45,7 @@ export default {
     },
     methods: {
         async readContracts() {
-            let contractId = "nBDS8-v75W-NTbIfOACLuAHa8048dhxffeN5BOu9aKY";
+            let contractId = "3BAmM5_b6S_3Mkb_93CuSnH6FPlWUxCIF3JrFtq-Mac";
             // try{
             //     // Using 3EM
             //     const { state, validity } = await executeContract(contractId, undefined, true, {

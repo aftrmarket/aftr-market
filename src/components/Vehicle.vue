@@ -83,9 +83,7 @@
 </template>
 
 <script>
-//import { readContract } from 'smartweave';
-//import { executeContract } from "@three-em/js";
-import { WarpFactory } from "warp-contracts/web";
+import { warpInit, warpRead } from './utils/warpUtils.js';
 import VehicleInfo from './vehicle/VehicleInfo.vue';
 import VehicleMembers from './vehicle/VehicleMembers.vue';
 import VehicleTokens from './vehicle/VehicleTokens.vue';
@@ -296,7 +294,6 @@ export default {
         this.pageStatus = "in-progress";
         this.showEvolveModal = false;
 
-        //let arweave = {};
         try {
             this.arweave = await Arweave.init({
                 host: this.arweaveHost,
@@ -317,39 +314,13 @@ export default {
         }
 
         try {
-            //this.vehicle = await readContract(arweave, this.contractId);
-            //const stateInteractions = await readContract(this.arweave, this.contractId, undefined, true);
-
-            //const { state, validity } = await executeContract(this.contractId, undefined, true, this.gatewayConfig);
-            // const stateInteractions = await executeContract(this.contractId, undefined, true, {
-            //     ARWEAVE_HOST: import.meta.env.VITE_ARWEAVE_HOST,
-            //     ARWEAVE_PORT: import.meta.env.VITE_ARWEAVE_PORT,
-            //     ARWEAVE_PROTOCOL: import.meta.env.VITE_ARWEAVE_PROTOCOL
-            // });
-            // this.vehicle = stateInteractions.state;
-            // this.interactions = stateInteractions.validity;
-
-            /*** Connect to warp */
-            if (import.meta.env.VITE_ENV === "PROD") {
-                this.warp = WarpFactory.forMainnet();
-            } else if (import.meta.env.VITE_ENV === "TEST") {
-                this.warp = WarpFactory.forTestnet();
-            } else if (import.meta.env.VITE_ENV === "DEV") {
-                this.warp = WarpFactory.forLocal();
-            }
-            /*** Using Warp */
-            const contract = this.warp.contract(this.contractId)
-                .setEvaluationOptions( { allowUnsafeClient: true, internalWrites: true } );
-            const { cachedValue } = await contract.readState();
+            // Using Warp
+            this.warp = warpInit();
+            const cachedValue = await warpRead(this.warp, this.contractId);
             this.vehicle = cachedValue.state;
             this.interactions = cachedValue.validity;
             this.interactionErrorMsgs = cachedValue.errorMessages;
-            
-            //this.vehicle = stateInteractions.state;
-            //this.interactions = stateInteractions.validity;
-            //console.log(JSON.stringify(this.interactions));
-
-            
+                        
             // Ensure AFTR Vehicle
             const contractSrc = await this.returnContractSrc(this.arweave, this.contractId);
             if (contractSrc !== this.getAftrContractSrcId) {
