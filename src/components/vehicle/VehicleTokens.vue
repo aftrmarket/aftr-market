@@ -561,21 +561,25 @@ export default {
                         this.$swal.showLoading()
                     },
                 });
-                let txid = await interactWrite(arweave, wallet, this.vehicle.id, action.input);
+                this.warp = warpInit();
 
-                /**** SWEETALERT INFO POPUP - Reading Outbox...  */
-                // FCP Part 2 - Read Outbox
-                // Will need a call for every token that is being transferred.
-                for (let roAction of action2) {
-                    this.$log.info("VehicleTokens : readContract :: ", JSON.stringify(roAction));
-                    txid = await interactWrite(arweave, wallet, roAction.foreignContract, roAction.input);
-                    this.$log.info("VehicleTokens : readContract :: ", txid);
-                }
+                let txid = await warpWrite(this.warp, this.vehicle.id, action.input);
+                this.$log.info("VehicleTokens : submit :: ", "TX: " + txid);
+                // let txid = await interactWrite(arweave, wallet, this.vehicle.id, action.input);
+
+                // /**** SWEETALERT INFO POPUP - Reading Outbox...  */
+                // // FCP Part 2 - Read Outbox
+                // // Will need a call for every token that is being transferred.
+                // for (let roAction of action2) {
+                //     this.$log.info("VehicleTokens : readContract :: ", JSON.stringify(roAction));
+                //     txid = await interactWrite(arweave, wallet, roAction.foreignContract, roAction.input);
+                //     this.$log.info("VehicleTokens : readContract :: ", txid);
+                // }
                 
-                if(Boolean(this.arweaveMine)){
-                    const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
-                    const response = await fetch(mineUrl);
-                }
+                // if(Boolean(this.arweaveMine)){
+                //     const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
+                //     const response = await fetch(mineUrl);
+                // }
                 this.$log.info("VehicleTokens : sumbit :: ", "TX: " + txid);
                 this.$swal.close();
 

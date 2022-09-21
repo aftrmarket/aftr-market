@@ -60,6 +60,7 @@ import inputWithdrawal from "./inputs/withdrawal.json";
 import inputReadOutbox from "./inputs/readOutbox.json";
 import inputVote from "./inputs/vote.json";
 import inputMultiInteraction from "./inputs/multiInteraction.json";
+import { warpInit, warpRead, warpWrite } from './../utils/warpUtils.js';
 
 export default {
     props: ["vehicle"],
@@ -186,14 +187,17 @@ export default {
             });
             let response = "";
             try {
-                if (import.meta.env.VITE_ENV === "DEV") {
-                    let inputObj = JSON.parse(this.input);
-                    if (type === "dry") {
-                        response = await interactWriteDryRun(arweave, wallet, this.vehicle.id, inputObj);
-                    } else {
-                        response = await interactWrite(arweave, wallet, this.vehicle.id, inputObj);
-                    }
-                }
+                // if (import.meta.env.VITE_ENV === "DEV") {
+                //     let inputObj = JSON.parse(this.input);
+                //     if (type === "dry") {
+                //         response = await interactWriteDryRun(arweave, wallet, this.vehicle.id, inputObj);
+                //     } else {
+                //         response = await interactWrite(arweave, wallet, this.vehicle.id, inputObj);
+                //     }
+                // }
+                this.warp = warpInit();
+
+                response = await warpWrite(this.warp, this.vehicle.id, inputObj);
             } catch(e) {
                 this.$swal({
                     icon: "error",

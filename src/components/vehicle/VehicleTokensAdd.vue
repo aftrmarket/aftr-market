@@ -79,6 +79,7 @@ import { interactWrite, interactWriteDryRun } from "smartweave";
 import { executeContract } from "@three-em/js";
 import VehicleAlert from './VehicleAlert.vue';
 import Aftr from "aftr-market";
+import { warpInit, warpRead, warpWrite } from './../utils/warpUtils.js';
 
 const client = new Aftr();
 
@@ -265,8 +266,9 @@ export default {
                 wallet = "use_wallet";
             }
             const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
-
-            await interactWrite(arweave, wallet, currentPst.contractId, inputTransfer)
+            this.warp = warpInit();
+            //await interactWrite(arweave, wallet, currentPst.contractId, inputTransfer)
+            await warpWrite(this.warp, currentPst.contractId, inputTransfer)
             .then(async (id) => {
                 this.$log.info("VehicleTokensAdd : interactWrite :: ", "Transfer ID = " + JSON.stringify(id));
 
@@ -289,9 +291,9 @@ export default {
                 // });
                  await client.vehicle.deposit(this.vehicle.id, wallet, id, currentPst.contractId).then(async (txid) =>{
                      this.msg = txid
-                     if(Boolean(this.arweaveMine)){
-                        await fetch(mineUrl);
-                    }
+                    //  if(Boolean(this.arweaveMine)){
+                    //     await fetch(mineUrl);
+                    // }
                      return txid
                  }).catch((error) => {
                      this.msg = error;

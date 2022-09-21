@@ -172,6 +172,7 @@ import { mapGetters } from 'vuex';
 import { Switch, SwitchGroup, SwitchLabel } from '@headlessui/vue';
 import Arweave from "arweave";
 import { interactWrite } from "smartweave";
+import { warpInit, warpRead, warpWrite } from './../utils/warpUtils.js';
 
 const excludeSettings = [ "quorum", "support", "voteLength", "communityDescription", "communityLogo" ];
 
@@ -496,17 +497,20 @@ export default {
                     this.$swal.showLoading()
                 },
             });
-            let txid = "";
-            if (import.meta.env.VITE_ENV === "DEV") {
-                txid = await interactWrite(arweave, wallet, this.vehicle.id, input);
-            } else {
-                txid = await interactWrite(arweave, "use_wallet", this.vehicle.id, input);
-            }
+            this.warp = warpInit();
 
-            if(Boolean(this.arweaveMine)){
-                const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
-                const response = await fetch(mineUrl);
-            }
+            let txid = await warpWrite(this.warp, this.vehicle.id, input);
+            // let txid = "";
+            // if (import.meta.env.VITE_ENV === "DEV") {
+            //     txid = await interactWrite(arweave, wallet, this.vehicle.id, input);
+            // } else {
+            //     txid = await interactWrite(arweave, "use_wallet", this.vehicle.id, input);
+            // }
+
+            // if(Boolean(this.arweaveMine)){
+            //     const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
+            //     const response = await fetch(mineUrl);
+            // }
             this.$log.info("VehicleSetting : sumbit :: ", "TX: " + txid);
 
             this.$swal.close();

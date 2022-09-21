@@ -123,6 +123,7 @@ import numeral from "numeral";
 import { capitalize } from "../../utils/shared.js";
 import { interactWrite } from "smartweave";
 import Arweave from "arweave";
+import { warpInit, warpRead, warpWrite } from '../../utils/warpUtils.js';
 
 export default {
   props: ["vehicle", "voteId", "voteData", "contractId", "currentBlock"],
@@ -223,26 +224,29 @@ export default {
             };
         }
         // Call SmartWeave
-        if (import.meta.env.VITE_ENV === "DEV") {
-            txID = await interactWrite(
-                arweave,
-                wallet,
-                this.contractId,
-                input
-            );         
-        } else {
-            txID = await interactWrite(
-                arweave,
-                "use_wallet",
-                this.contractId,
-                input
-            );
-        }
+        // if (import.meta.env.VITE_ENV === "DEV") {
+        //     txID = await interactWrite(
+        //         arweave,
+        //         wallet,
+        //         this.contractId,
+        //         input
+        //     );         
+        // } else {
+        //     txID = await interactWrite(
+        //         arweave,
+        //         "use_wallet",
+        //         this.contractId,
+        //         input
+        //     );
+        // }
+        this.warp = warpInit();
+
+        txID = await warpWrite(this.warp, this.contractId, input);
         /**** IN ORDER FOR THIS TO PROCESS, YOU NEED TO RUN http://localhost:1984/mine */
-        if(Boolean(this.arweaveMine)){
-            const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
-            const response = await fetch(mineUrl);
-        }
+        // if(Boolean(this.arweaveMine)){
+        //     const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
+        //     const response = await fetch(mineUrl);
+        // }
         // alert("Thank you for casting your vote.  Your vote will be reflected in the next block.")
         this.$swal({
                 icon: "success",

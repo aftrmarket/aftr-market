@@ -48,6 +48,7 @@ import { ref } from 'vue';
 import { Dialog, DialogOverlay, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
 import { mapGetters } from "vuex";
 import { interactWrite } from "smartweave";
+import { warpInit, warpRead, warpWrite } from './../utils/warpUtils.js';
 
 
 export default {
@@ -118,14 +119,18 @@ export default {
             };
 
             try {
-                if (import.meta.env.VITE_ENV === "DEV") {
-                    console.log("hello");
-                    const txid = await interactWrite(arweave, wallet, this.contractId, input);
-                    this.$log.info("VehicleEvolve : proposeVote :: ", "TX: " + txid);
-                } else {
-                    const txid = await interactWrite(arweave, "use_wallet", this.contractId, input);
-                    this.$log.info("VehicleEvolve : proposeVote :: ", "TX: " + txid);
-                }
+                // if (import.meta.env.VITE_ENV === "DEV") {
+                //     console.log("hello");
+                //     const txid = await interactWrite(arweave, wallet, this.contractId, input);
+                //     this.$log.info("VehicleEvolve : proposeVote :: ", "TX: " + txid);
+                // } else {
+                //     const txid = await interactWrite(arweave, "use_wallet", this.contractId, input);
+                //     this.$log.info("VehicleEvolve : proposeVote :: ", "TX: " + txid);
+                // }
+                this.warp = warpInit();
+
+                let txid = await warpWrite(this.warp, this.vehicle.id, input);
+                this.$log.info("VehicleEvolve : proposeVote :: ", "TX: " + txid);
             } catch(e) {
                 this.$swal({
                     icon: "error",
@@ -135,10 +140,10 @@ export default {
                 });
             }
 
-            if(Boolean(import.meta.env.VITE_MINE)){
-                const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
-                const response = await fetch(mineUrl);
-            }
+            // if(Boolean(import.meta.env.VITE_MINE)){
+            //     const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
+            //     const response = await fetch(mineUrl);
+            // }
             this.$swal.close();
             this.$router.push("/vehicles");
         },

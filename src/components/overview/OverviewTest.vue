@@ -609,17 +609,17 @@ export default {
                     qty: 100000,
                 };
                 this.$log.info("OverviewTest : init :: ", "Give user's wallet PSTs.");
-                contractTxId = await interactWrite(arweave, use_wallet, vintContractId, input);
-                //contractTxId = await warpWrite(this.warp, vintContractId, input);
+                // contractTxId = await interactWrite(arweave, use_wallet, vintContractId, input);
+                contractTxId = await warpWrite(this.warp, vintContractId, input);
                 this.$log.info("OverviewTest : init :: ", "User Wallet VINT: " + contractTxId);
 
                 contractTxId = await warpWrite(this.warp, arhdContractId, input);
                 //contractTxId = await interactWrite(arweave, use_wallet, arhdContractId, input);
                 this.$log.info("OverviewTest : init :: ", "User Wallet ARHD: " + contractTxId);
 
-                if (Boolean(this.arweaveMine)) {
-                    await fetch(this.mineUrl);
-                }
+                // if (Boolean(this.arweaveMine)) {
+                //     await fetch(this.mineUrl);
+                // }
 
                 /***
                  * Look at all PSTs and save the ones where the user has a balance.
