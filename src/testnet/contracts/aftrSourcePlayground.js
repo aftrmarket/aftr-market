@@ -682,6 +682,9 @@ async function modifyVehicle(vehicle, vote) {
       target: vote.target,
       qty: vote.qty
     });
+
+    tokenObj.tokenState = wdResult.state.balances;
+
     if (wdResult.type !== "ok") {
       ThrowError("Unable to withdrawal " + contractId + " for " + vote.target + ".");
     }

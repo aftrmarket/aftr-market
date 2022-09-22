@@ -221,7 +221,6 @@ export default {
             proposedChanges: [],
             transferAmtValid: true,
             transferAddrValid: true,
-            state: {}
 
 /*** TODO: HANDLE TOKENS THAT ARE LOCKED! */
 /**************************************** */
@@ -301,15 +300,15 @@ export default {
             this.warp = warpInit();
             const cachedValue = await warpRead(this.warp, id);
 
-            this.state = cachedValue.state;
-            let title = JSON.stringify(this.state.name)
+            const state = cachedValue.state;
+            let title = JSON.stringify(state.name)
             
             this.$swal({
                 title: '<span style="vertical-align:middle" >' + title.replace(/^"(.*)"$/, '$1') + '</span><hr size="8">',
-                html: "<pre style= 'text-align:left'> <code>" + "<p style='color:green'> Balances : </p>" + JSON.stringify(this.state.balances,null, 3) + "</code> </pre>",
+                html: "<pre style= 'text-align:left'> <code>" + "<p style='color:green'> Balances : </p>" + JSON.stringify(state.balances,null, 3) + "</code> </pre>",
                 width: 800,
                 customClass: 'swal-height'
-            })            
+            });
         },
         setFlags() {
             if (this.arConnected) {
