@@ -10,6 +10,8 @@ function warpInit() {
             warp = WarpFactory.forTestnet();
         } else if (import.meta.env.VITE_ENV === "DEV") {
             warp = WarpFactory.forLocal();
+        } else {
+            warp = WarpFactory.forTestnet();
         }
     } catch(e) {
         console.log(e);

@@ -103,8 +103,6 @@ export default {
                 "name": "",
                 "ticker": "",
                 "balances": {},
-                "invocations": [],
-                "foreignCalls": [],
                 "tokens": [],
                 "vault": {},
                 "votes": [],
@@ -112,6 +110,8 @@ export default {
                 "creator" : "",
                 "ownership" : "single",
                 "votingSystem" : "weighted",
+                "claims": [],
+                "claimable": [],
                 "settings": [
                     [ "quorum", 0.5 ],
                     [ "support", 0.5 ],

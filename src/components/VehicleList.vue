@@ -316,7 +316,6 @@ export default {
                 /*** Using Warp */
                 const cachedValue = await warpRead(this.warp, contractId);
                 let vehicle = cachedValue.state;
-
                 //let state = await readContract(this.arweave, contractId, undefined, true);
                 //let vehicle = state.state;
                 //console.log(JSON.stringify(state));

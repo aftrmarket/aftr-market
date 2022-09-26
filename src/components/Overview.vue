@@ -5,6 +5,9 @@
     <div v-else-if="overviewRoute === 'TEST'">
         <overview-test></overview-test>
     </div>
+    <div v-else-if="overviewRoute === 'DEV1'">
+        <overview-test></overview-test>
+    </div>
     <div v-else>
         <overview-prod></overview-prod>
     </div>

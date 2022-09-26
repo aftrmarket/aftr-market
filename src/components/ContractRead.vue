@@ -45,7 +45,7 @@ export default {
     },
     methods: {
         async readContracts() {
-            let contractId = "3BAmM5_b6S_3Mkb_93CuSnH6FPlWUxCIF3JrFtq-Mac";
+            let contractId = "9UN_SQ3RZkA0etf8mlZUN2qbcigOLZKARFM7MMbLTZ0";
             // try{
             //     // Using 3EM
             //     const { state, validity } = await executeContract(contractId, undefined, true, {
@@ -57,13 +57,7 @@ export default {
             // } catch(e) {
             //     console.log(e);
             // }
-            try {
-                // Using Smartweave
-                this.contract = await readContract(this.arweave, contractId, undefined, true);
-                //this.contract = await readContract(this.arweave, "HKr5pJhPUAzlGvQqERPLwIw9hm2nAr3CY-b0iRfctN4", undefined, true);
-            } catch (e) {
-                console.log(e);
-            }
+
 
             // Try to get wallet, if fails, connect so user can assign permissions
             //let wallet = "";
@@ -79,6 +73,8 @@ export default {
             //     ]);
             //     wallet = await window.arweaveWallet.getActiveAddress();
             // }
+            let state1 = {};
+            let state2 = {};
 
             try {
                 // Using Warp
@@ -87,14 +83,27 @@ export default {
                 warp = WarpFactory.forLocal();
                 
                 const contract = warp.contract(contractId)
-                    .setEvaluationOptions( { allowUnsafeClient: true, internalWrites: true } )
-                    .connect("use_wallet");
-                const { cachedValue } = await contract.readState();
-                let state = cachedValue;
-                this.contract3 = state;
+                    .setEvaluationOptions( { internalWrites: true } )
+                    //.connect("use_wallet");
+                let result  = await contract.readState();
+                state2 = result.cachedValue;
+                this.contract = state2;
+                
             } catch(e) {
                 console.log(e);
             }
+
+            // try {
+            //     // Using Smartweave
+            //     this.contract = await readContract(this.arweave, contractId, undefined, true);
+            //     //this.contract = await readContract(this.arweave, "HKr5pJhPUAzlGvQqERPLwIw9hm2nAr3CY-b0iRfctN4", undefined, true);
+            // } catch (e) {
+            //     console.log(e);
+            // }
+
+            await new Promise(resolve => setTimeout(resolve, 5000));
+
+            this.contract3 = state2;
 
         }
     },

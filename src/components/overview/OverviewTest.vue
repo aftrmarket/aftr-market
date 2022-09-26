@@ -392,6 +392,8 @@ export default {
                         this.$store.dispatch("arDisconnect");
                         return false;
                     }
+                } else if (this.env === "DEV1") {
+                    // Do nothing
                 } else {
                     // Situation should never occur :)
                     this.$log.info("OverviewTest : init :: ", "Situation should never occur");
