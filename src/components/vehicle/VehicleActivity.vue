@@ -11,6 +11,7 @@
                 </div>
                 <div class="pl-8 pb-4">
                     <span v-html="getAllInputs(activity.input)"></span>
+                     <span v-if="isError" v-html="getErrorInputs(activity)"></span>
                 </div>
                 <div class="flex flex-row">
                     <div v-if="activity.result">
@@ -53,6 +54,7 @@ export default {
             isLoading: true,
             edges: [],
             activities: [],
+            isError: true
         };
     },
     computed: {
@@ -131,6 +133,16 @@ export default {
                     }
                 }
             }
+            return htmlText;
+        },
+        getErrorInputs(obj) {
+            let htmlText = "";
+            Object.fromEntries( Object.entries(this.errorMessages).filter(([key, value]) => {
+                if( key == obj.id){
+                    htmlText += "Error:<br/>"
+                    htmlText += "<p class='text-sm text-red-600'>- " + value + "</p>" ;
+                }
+            }))
             return htmlText;
         },
         async runQuery(query, errorMsg) {
