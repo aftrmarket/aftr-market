@@ -37,7 +37,7 @@
                     <dl>
                       <dt class="text-gray-500">VOTING POWER</dt>
                       <perfect-scrollbar>
-                      <div class="mt-4 mb-4 grid grid-cols-3 gap-x-4" v-for="(tokens, addr) in vehicle.balances" :key="addr">
+                      <div class="mt-4 mb-4 grid grid-cols-3 gap-x-4" v-for="(tokens, addr) in voteData.votingPower" :key="addr">
                         <div class="ml-6 text-gray-500">{{ walletAddressSubstr(addr) }}</div>
                         <div class="text-gray-500">{{ formatNumber(tokens) }}</div>
                       </div>
@@ -65,16 +65,24 @@
                       </dl>
                     </div> 
 
-                     <dl>
-                      <dt class="text-gray-500">{{ voteData.statusNote }}</dt>
+                     <dl v-if="voteData.status == 'active'">
+                      <dt class="pt-1.5 text-gray-500 font-bold text-xl">VOTING IN PROGRESS.</dt>
                     </dl> 
                     
                      <dl v-if="voteData.status == 'quorumFailed'">
                       <dt class="text-gray-500">The proposal failed due to the Quorum not being met. The proposal's quorum was {{vehicle.settings[0][1]}}</dt>
                     </dl> 
-                    
-                  </div>
 
+                     <div class="flex flex-row justify-center mt-5">
+                        <svg  v-if="voteData.statusNote && voteData.status == 'passed'" xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" viewBox="0 0 20 20" fill="green">
+                          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                        <svg v-if="voteData.statusNote && voteData.status != 'passed'" xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" viewBox="0 0 20 20" fill="red">
+                          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                        <span class="pt-1.5 text-green-700 font-bold text-xl">{{ voteData.statusNote }}</span>
+                     </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -153,7 +161,7 @@ export default {
 <style src="vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css"/>
 <style scoped>
     .ps {
-        height: 110px;
+        height: 70px;
     } 
 /*     
     .visible {
