@@ -167,12 +167,9 @@
 </template>
 
 <script>
-import numeral from "numeral";
 import { mapGetters } from 'vuex';
 import { Switch, SwitchGroup, SwitchLabel } from '@headlessui/vue';
-import Arweave from "arweave";
-import { interactWrite } from "smartweave";
-import { warpInit, warpRead, warpWrite } from './../utils/warpUtils.js';
+import { warpWrite } from './../utils/warpUtils.js';
 
 const excludeSettings = [ "quorum", "support", "voteLength", "communityDescription", "communityLogo" ];
 
@@ -181,13 +178,6 @@ export default {
     components: { Switch, SwitchGroup, SwitchLabel },
     data() {
         return {
-            /** Smartweave variables */
-            arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
-            arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
-            arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
-            arweaveMine: import.meta.env.VITE_MINE,
-            /** */
-
             settingArray: [],
             settingRemoves: [],
             memberUpdates: {},
@@ -217,20 +207,6 @@ export default {
         },
     },
     computed: {
-        // selectAll: {
-        //     get() {
-        //         return this.vehicle.balances ? this.settingRemoves.length == Object.keys(this.vehicle.balances).length : false;
-        //     },
-        //     set(value) {
-        //         let selected = [];
-        //         if(value) {
-        //             for(let balance in this.vehicle.balances) {
-        //                 selected.push(balance);
-        //             }
-        //         }
-        //         this.settingRemoves = selected;
-        //     }
-        // },
         editClass() {
             if (this.allowEdits && this.uiEditMode) {
                 this.showMessage = false
@@ -247,9 +223,6 @@ export default {
         numChanges() {
             return this.settingRemoves.length + this.settingAdds.length + Object.keys(this.memberUpdates).length;
         },
-        // checkboxClass() {
-        //     return "focus:ring-aftrBlue h-4 w-4 text-aftrBlue border-gray-300 rounded";
-        // },
         editModeClass() {
             if (this.uiEditMode) {
                 return "text-black text-sm";
@@ -274,16 +247,6 @@ export default {
         ...mapGetters(['arConnected', 'getActiveAddress', 'keyFile']),
     },
     methods: {
-        // formatNumber(num, dec = false) {
-        //     if (dec) {
-        //         return numeral(num).format("0,0.0000");
-        //     } else {
-        //         return numeral(num).format("0,0");
-        //     }
-        // },
-        // formatAddr(addr) {
-        //     return addr.substring(0, 5) + '...' + addr.substring(addr.length - 5);
-        // },
         proposedText(settingKey, settingValue, type) {
             this.showMessage = false;
             if (type === 'update') {
@@ -307,7 +270,6 @@ export default {
                     allowOutsideClick: false
                 });
                 }
-                
             }
         },
         removeProposal(value, type) {
@@ -332,25 +294,17 @@ export default {
                 if (this.memberUpdates[member] === '') {
                     delete this.memberUpdates[member];
                 } else {
-                    // this.memberUpdates[member] = parseInt(this.memberUpdates[member]);
-                    // if (+this.memberUpdates[member] < 0) {
-                    //     this.memberUpdates[member] = +this.memberUpdates[member] * -1;
-                    // }
-                    // if (isNaN(+this.memberUpdates[member])){
-                    //     this.memberUpdates[member] = '';
-                    // }
                     this.updatedValue.filter((e1,index) => {
                         if(e1[0] == member){
                             delete this.updatedValue[index];
                         }
-                    })
+                    });
                     this.updatedValue.push(
                         [member ,this.memberUpdates[member]]
-                    )
+                    );
                 }
                 // Deselect any rows with checkboxes
                 if (this.settingRemoves.includes(member)) {
-                    
                     this.settingRemoves = this.settingRemoves.filter((el) => el !== member);
                 }
             }
@@ -455,39 +409,8 @@ export default {
                     }
                 }
             }
-            /*** CALL SMARTWEAVE */
-            let arweave = {};
 
-            try {
-                arweave = await Arweave.init({
-                    host: this.arweaveHost,
-                    port: this.arweavePort,
-                    protocol: this.arweaveProtocol,
-                    timeout: 20000,
-                    logging: true,
-                });
-            } catch(e) {
-                this.$swal({
-                    icon: "error",
-                    html: "Failed to connect to Arweave Gateway.",
-                    showConfirmButton: true,
-                    allowOutsideClick: false
-                });
-                return;
-            }
             this.$log.info("VehicleSetting : submit :: ", JSON.stringify(input));
-
-            let wallet;
-            if (import.meta.env.VITE_ENV === "DEV") {
-                if(this.keyFile.length){
-                    wallet =  JSON.parse(this.keyFile);
-                } else {
-                    this.$swal({
-                        icon: 'warning',
-                        html: "Please attach your keyfile",
-                    })
-                }        
-            }
             this.$swal({
                 icon: "info",
                 html: "Please wait while setting changes are sent to the contract...",
@@ -497,22 +420,9 @@ export default {
                     this.$swal.showLoading()
                 },
             });
-            this.warp = warpInit();
 
-            let txid = await warpWrite(this.warp, this.vehicle.id, input);
-            // let txid = "";
-            // if (import.meta.env.VITE_ENV === "DEV") {
-            //     txid = await interactWrite(arweave, wallet, this.vehicle.id, input);
-            // } else {
-            //     txid = await interactWrite(arweave, "use_wallet", this.vehicle.id, input);
-            // }
-
-            // if(Boolean(this.arweaveMine)){
-            //     const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
-            //     const response = await fetch(mineUrl);
-            // }
+            let txid = await warpWrite(this.vehicle.id, input);
             this.$log.info("VehicleSetting : sumbit :: ", "TX: " + txid);
-
             this.$swal.close();
 
             let msg = "Your setting changes have been submitted to the Permaweb.  Your changes will be reflected in the next block.";

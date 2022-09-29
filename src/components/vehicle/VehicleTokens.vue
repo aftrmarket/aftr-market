@@ -192,9 +192,7 @@
 import numeral from "numeral";
 import { mapGetters } from 'vuex';
 import VehicleTokensAdd from './VehicleTokensAdd.vue';
-import Arweave from "arweave";
-import { interactWrite } from "smartweave";
-import { warpInit, warpRead, warpWrite } from './../utils/warpUtils.js';
+import { warpRead, warpWrite } from './../utils/warpUtils.js';
 
 
 
@@ -203,14 +201,6 @@ export default {
     components: { VehicleTokensAdd },
     data() {
         return {
-            warp: {},
-            /** Smartweave variables */
-            arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
-            arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
-            arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
-            arweaveMine: import.meta.env.VITE_MINE,
-            /** */
-
             allowAdd: false,
             allowTransfer: false,
             showAddTokens: false,
@@ -227,20 +217,6 @@ export default {
         };
     },
     computed: {
-        // selectAll: {
-        //     get() {
-        //         return this.vehicle.tokens ? this.tokenSelected.length == Object.keys(this.vehicle.tokens).length : false;
-        //     },
-        //     set(value) {
-        //         let selected = [];
-        //         if(value) {
-        //             for(let token of this.vehicle.tokens) {
-        //                 selected.push(token.txID);
-        //             }
-        //         }
-        //         this.tokenSelected = selected;
-        //     }
-        // },
         checkboxClass() {
             return "focus:ring-aftrBlue h-4 w-4 text-aftrBlue border-gray-300 rounded";
         },
@@ -297,8 +273,7 @@ export default {
             })  
         },
         async showTokenState(id, logo){
-            this.warp = warpInit();
-            const cachedValue = await warpRead(this.warp, id);
+            const cachedValue = await warpRead(id);
 
             const state = cachedValue.state;
             let title = JSON.stringify(state.name)
@@ -402,12 +377,6 @@ export default {
                             qty: this.transferAmounts[index]
                         }
                     );
-                    // if (this.tokenSelected.includes(txID)) {
-                    //     this.tokenSelected = this.tokenSelected.filter( (id) => id !== txID);
-                    // } else {
-                    //     this.tokenSelected.push(txID);
-                    // }
-
                 } else {
                     this.proposedChanges[foundIndex].qty = this.transferAmounts[index];
                     this.proposedChanges[foundIndex].target = this.transferAddrs[index];
@@ -453,6 +422,7 @@ export default {
             return input;
         },
         async processWithdrawalClick() {
+            /*** DON'T THINK WE NEED THIS ANYMORE */
             const htmlText = "The following withdrawal has been approved.  Press Ok to complete the transfer.";
             const result = await this.$swal.fire({
                 title: "Process Withdrawal",
@@ -514,40 +484,6 @@ export default {
 
                 /*** CALL SMARTWEAVE */
                 this.$log.info("VehicleTokens : processWithdrawal :: ", JSON.stringify(action));
-
-                let arweave = {};
-
-                try {
-                    arweave = await Arweave.init({
-                        host: this.arweaveHost,
-                        port: this.arweavePort,
-                        protocol: this.arweaveProtocol,
-                        timeout: 20000,
-                        logging: true,
-                    });
-                } catch(e) {
-                    this.$swal({
-                        icon: "error",
-                        html: "Failed to connect to Arweave Gateway.",
-                        showConfirmButton: true,
-                        allowOutsideClick: false
-                    });
-                    return;
-                }
-
-                let wallet;
-                if (import.meta.env.VITE_ENV === "DEV") {
-                    if(this.keyFile.length){
-                        wallet =  JSON.parse(this.keyFile);
-                    } else {
-                        this.$swal({
-                            icon: 'warning',
-                            html: "Please attach your keyfile",
-                        })
-                    }        
-                } else {
-                    wallet = "use_wallet";
-                }
                 
                 // FCP Part 1 - Invocation
                 // 1 call to the vehicle contract (will either be single or multi-interaction)
@@ -560,28 +496,10 @@ export default {
                         this.$swal.showLoading()
                     },
                 });
-                this.warp = warpInit();
 
-                let txid = await warpWrite(this.warp, this.vehicle.id, action.input);
+                let txid = await warpWrite(this.vehicle.id, action.input);
                 this.$log.info("VehicleTokens : submit :: ", "TX: " + txid);
-                // let txid = await interactWrite(arweave, wallet, this.vehicle.id, action.input);
-
-                // /**** SWEETALERT INFO POPUP - Reading Outbox...  */
-                // // FCP Part 2 - Read Outbox
-                // // Will need a call for every token that is being transferred.
-                // for (let roAction of action2) {
-                //     this.$log.info("VehicleTokens : readContract :: ", JSON.stringify(roAction));
-                //     txid = await interactWrite(arweave, wallet, roAction.foreignContract, roAction.input);
-                //     this.$log.info("VehicleTokens : readContract :: ", txid);
-                // }
-                
-                // if(Boolean(this.arweaveMine)){
-                //     const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
-                //     const response = await fetch(mineUrl);
-                // }
-                this.$log.info("VehicleTokens : sumbit :: ", "TX: " + txid);
                 this.$swal.close();
-
                 this.$router.push("/vehicles");
                 }
 
@@ -637,29 +555,9 @@ export default {
                 },
             });
 
-            this.warp = warpInit();
 
-            let txid = await warpWrite(this.warp, this.vehicle.id, action.input);
+            let txid = await warpWrite(this.vehicle.id, action.input);
             this.$log.info("VehicleTokens : submit :: ", "TX: " + txid);
-
-            // if (this.vehicle.ownership === "single") {
-            //     // If the vehicle is a single owned vehicle, the Part 2 of the FCP (i.e. readOutbox) needs to be called right away.
-            //     let input = {
-            //         function: "readOutbox",
-            //         contract: this.vehicle.id
-            //     };
-
-            //     for (let proposedChange of this.proposedChanges) {                
-            //         txid = await interactWrite(arweave, wallet, proposedChange.tokenId, input);
-            //         this.$log.info("VehicleTokens : readOutbox :: ", "TX: " + txid + " for contract: " + proposedChange.tokenId);
-            //     }
-            // }
-
-            // if(Boolean(this.arweaveMine)){
-            //     const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
-            //     const response = await fetch(mineUrl);
-            // }
-            //this.$log.info("VehicleTokens : submit :: ", "TX: " + txid);
             this.$swal.close();
             this.$router.push("/vehicles");
         },

@@ -121,9 +121,8 @@ import { ExclamationIcon } from "@heroicons/vue/outline";
 import { mapGetters } from "vuex";
 import numeral from "numeral";
 import { capitalize } from "../../utils/shared.js";
-import { interactWrite } from "smartweave";
 import Arweave from "arweave";
-import { warpInit, warpRead, warpWrite } from '../../utils/warpUtils.js';
+import { warpWrite } from '../../utils/warpUtils.js';
 
 export default {
   props: ["vehicle", "voteId", "voteData", "contractId", "currentBlock"],
@@ -138,12 +137,6 @@ export default {
   data() {
     return {
       vote: this.voteData,
-      /** Smartweave variables */
-      arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
-      arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
-      arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
-      arweaveMine: import.meta.env.VITE_MINE,
-      /** */
     };
   },
   computed: {
@@ -184,28 +177,6 @@ export default {
       }
     },
     async recordVote(vote) {
-        let arweave = {};
-
-        arweave = await Arweave.init({
-        host: this.arweaveHost,
-        port: this.arweavePort,
-        protocol: this.arweaveProtocol,
-        timeout: 20000,
-        logging: true,
-        });
-
-        let wallet;
-        if (import.meta.env.VITE_ENV === "DEV") {
-            if (this.keyFile.length) {
-                wallet = JSON.parse(this.keyFile);
-            } else {
-                // alert("Please attach your keyfile");
-                this.$swal({
-                    icon: 'warning',
-                    html: "Please attach your keyfile",
-                })
-            }
-        }
         // Create input
         let input = {};
         let txID = "";
@@ -223,31 +194,8 @@ export default {
                 cast: "nay",
             };
         }
-        // Call SmartWeave
-        // if (import.meta.env.VITE_ENV === "DEV") {
-        //     txID = await interactWrite(
-        //         arweave,
-        //         wallet,
-        //         this.contractId,
-        //         input
-        //     );         
-        // } else {
-        //     txID = await interactWrite(
-        //         arweave,
-        //         "use_wallet",
-        //         this.contractId,
-        //         input
-        //     );
-        // }
-        this.warp = warpInit();
 
-        txID = await warpWrite(this.warp, this.contractId, input);
-        /**** IN ORDER FOR THIS TO PROCESS, YOU NEED TO RUN http://localhost:1984/mine */
-        // if(Boolean(this.arweaveMine)){
-        //     const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
-        //     const response = await fetch(mineUrl);
-        // }
-        // alert("Thank you for casting your vote.  Your vote will be reflected in the next block.")
+        txID = await warpWrite(this.contractId, input);
         this.$swal({
                 icon: "success",
                 html: "Thank you for casting your vote.  Your vote will be reflected in the next block.",

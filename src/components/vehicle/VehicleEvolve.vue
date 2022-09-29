@@ -48,7 +48,7 @@ import { ref } from 'vue';
 import { Dialog, DialogOverlay, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
 import { mapGetters } from "vuex";
 import { interactWrite } from "smartweave";
-import { warpInit, warpRead, warpWrite } from './../utils/warpUtils.js';
+import { warpWrite } from './../utils/warpUtils.js';
 
 
 export default {
@@ -118,32 +118,9 @@ export default {
                 note: ""
             };
 
-            try {
-                // if (import.meta.env.VITE_ENV === "DEV") {
-                //     console.log("hello");
-                //     const txid = await interactWrite(arweave, wallet, this.contractId, input);
-                //     this.$log.info("VehicleEvolve : proposeVote :: ", "TX: " + txid);
-                // } else {
-                //     const txid = await interactWrite(arweave, "use_wallet", this.contractId, input);
-                //     this.$log.info("VehicleEvolve : proposeVote :: ", "TX: " + txid);
-                // }
-                this.warp = warpInit();
-
-                let txid = await warpWrite(this.warp, this.vehicle.id, input);
-                this.$log.info("VehicleEvolve : proposeVote :: ", "TX: " + txid);
-            } catch(e) {
-                this.$swal({
-                    icon: "error",
-                    html: "Failed to write to the Permaweb.  Please try again.",
-                    showConfirmButton: true,
-                    allowOutsideClick: false
-                });
-            }
-
-            // if(Boolean(import.meta.env.VITE_MINE)){
-            //     const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
-            //     const response = await fetch(mineUrl);
-            // }
+            let txid = await warpWrite(this.vehicle.id, input);
+            this.$log.info("VehicleEvolve : proposeVote :: ", "TX: " + txid);
+            
             this.$swal.close();
             this.$router.push("/vehicles");
         },
