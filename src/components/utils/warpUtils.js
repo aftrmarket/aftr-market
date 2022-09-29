@@ -19,12 +19,13 @@ function warpInit() {
     return warp;
 };
 
-async function warpRead(warp, contractId) {
+async function warpRead(contractId, internalWrites = true) {
+    const warp = warpInit();
+
     try {
         const contract = warp.contract(contractId)
             .setEvaluationOptions({ 
-                //allowUnsafeClient: true,
-                internalWrites: true,
+                internalWrites: internalWrites,
             });
         const result = await contract.readState();
         return result.cachedValue;
@@ -34,12 +35,13 @@ async function warpRead(warp, contractId) {
     }
 };
 
-async function warpWrite(warp, contractId ,input) {
+async function warpWrite(contractId, input, internalWrites = true, bundling = true) {
+    const warp = warpInit();
     try {
         const contract = warp.contract(contractId)
         .setEvaluationOptions({ 
-            //allowUnsafeClient: true,
-            internalWrites: true,
+            internalWrites: internalWrites,
+            disableBundling: !bundling
          })
         .connect("use_wallet");
         const { originalTxId } = await contract.writeInteraction(input);

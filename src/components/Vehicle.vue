@@ -83,7 +83,7 @@
 </template>
 
 <script>
-import { warpInit, warpRead } from './utils/warpUtils.js';
+import { warpRead } from './utils/warpUtils.js';
 import VehicleInfo from './vehicle/VehicleInfo.vue';
 import VehicleMembers from './vehicle/VehicleMembers.vue';
 import VehicleTokens from './vehicle/VehicleTokens.vue';
@@ -315,8 +315,7 @@ export default {
 
         try {
             // Using Warp
-            this.warp = warpInit();
-            const cachedValue = await warpRead(this.warp, this.contractId);
+            const cachedValue = await warpRead(this.contractId);
             this.vehicle = cachedValue.state;
             this.interactions = cachedValue.validity;
             this.interactionErrorMsgs = cachedValue.errorMessages;

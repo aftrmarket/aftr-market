@@ -222,17 +222,12 @@ import aftrChillinInitState from "./../../testnet/contracts/aftrChillinInitState
 import aftrSourcePlayground from "./../../testnet/contracts/aftrSourcePlayground.js?raw";
 import aftrInitStatePlayground from "./../../testnet/contracts/aftrInitStatePlayground.json";
 import VoteSimulator from "./../vehicle/VoteSimulator.vue";
-import { warpInit, warpRead, warpWrite } from './../utils/warpUtils.js';
+import { warpRead, warpWrite } from './../utils/warpUtils.js';
 
 import Arweave from "arweave";
 import { mapGetters } from "vuex";
 
-import {
-    createContractFromTx,
-    createContract,
-    interactWrite,
-    readContract,
-} from "smartweave";
+import { createContractFromTx, createContract } from "smartweave";
 
 
 const initProcess = [
@@ -278,8 +273,6 @@ export default {
             env: import.meta.env.VITE_ENV,
             /** */
 
-            warp: {},
-
             // Saved logos on Arweave
             logoVint: "https://arweave.net/CpuwI6XuBk2bFMYT7q5N8XuiSKzkOEWJP2n1CPDmNX4",
             logoArhd: "https://arweave.net/hxVzJL2uq41ncSt8PgR-5UDNR8tmLqO9JSisgNq7j10",
@@ -299,38 +292,6 @@ export default {
         ...mapGetters(["arConnected","keyFile","arConnectConfig","getTestLaunchFlag",]),
     },
     methods: {
-        // warpInit() {
-        //     console.log("***** WARP INIT ***** ");
-        //     try {
-        //         // Using Warp
-        //         if (this.env === "PROD") {
-        //             this.warp = WarpFactory.forMainnet();
-        //         } else if (this.env === "TEST") {
-        //             this.warp = WarpFactory.forTestnet();
-        //         } else if (this.env === "DEV") {
-        //             this.warp = WarpFactory.forLocal();
-        //         }
-        //         return true;
-        //     } catch(e) {
-        //         console.log(e);
-        //         return false;
-        //     }
-        // },
-        // async warpRead(contractId) {
-        //     console.log("**** WARP READ **** ");
-        //     try {
-        //         const contract = this.warp.contract(contractId)
-        //             .setEvaluationOptions({ 
-        //                 allowUnsafeClient: true,
-        //                 internalWrites: true,
-        //              });
-        //         const { cachedValue } = await contract.readState();
-        //         return cachedValue;
-        //     } catch (e) {
-        //         console.log(e);
-        //         return {};
-        //     }
-        // },
         voteSimulatorTest(){
             this.showVoteSimulator = true;
         },
@@ -438,16 +399,6 @@ export default {
                     },
                 });
                 
-                // Initialize Warp
-                this.warp = warpInit();
-
-                if (this.warp == {}) {
-                    this.$swal({
-                        icon: "error",
-                        html: "Warp Initialization Failed."
-                    });
-                }
-
                 this.$log.info("OverviewTest : init :: ", "1. Ensure wallet has some AR to make transactions");
 
                 const addr = await arweave.wallets.jwkToAddress(use_wallet);
@@ -519,7 +470,7 @@ export default {
                 }
                 this.$store.commit("setAftrContractSrcId", aftrContractSrcId);
                 this.$store.commit("setEvolvedContractSrcId", aftrContractSrcId);
-                //this.$store.commit("setEvolvedContractSrcId", "joe");   // For testing the UI
+
                 this.$log.info("OverviewTest : init :: ", "AFTR Source ID: " + aftrContractSrcId);
 
                 this.$log.info("OverviewTest : init :: ", "3. Sample PSTs");
@@ -586,7 +537,7 @@ export default {
                 this.$log.info("OverviewTest : init :: ", "Reading Blue Horizon contract.");
 
                 // Use Warp to read the contract
-                const cachedValue = await warpRead(this.warp, blueContractId);
+                const cachedValue = await warpRead(blueContractId);
                 let blueVeh = cachedValue.state;
 
                 if (blueVeh == undefined || !(addr in blueVeh.balances)) {
@@ -596,12 +547,7 @@ export default {
                     };
                     // Calls mint function on Blue Horizon contract. If user already has a balance, nothing happens.
                     this.$log.info("OverviewTest : init :: ", "Blue Horizon Interact Write.");
-                    //contractTxId = await interactWrite(arweave, use_wallet, blueContractId, input);
-                    contractTxId = await warpWrite(this.warp, blueContractId, input);
-
-                    // if (Boolean(this.arweaveMine)) {
-                    //     await fetch(this.mineUrl);
-                    // }
+                    contractTxId = await warpWrite(blueContractId, input);
                     this.$log.info("OverviewTest : init :: ", "Blue Horizon Contract Write: " + contractTxId);
                 }
 
@@ -611,17 +557,11 @@ export default {
                     qty: 100000,
                 };
                 this.$log.info("OverviewTest : init :: ", "Give user's wallet PSTs.");
-                // contractTxId = await interactWrite(arweave, use_wallet, vintContractId, input);
-                contractTxId = await warpWrite(this.warp, vintContractId, input);
+                contractTxId = await warpWrite(vintContractId, input);
                 this.$log.info("OverviewTest : init :: ", "User Wallet VINT: " + contractTxId);
 
-                contractTxId = await warpWrite(this.warp, arhdContractId, input);
-                //contractTxId = await interactWrite(arweave, use_wallet, arhdContractId, input);
+                contractTxId = await warpWrite(arhdContractId, input);
                 this.$log.info("OverviewTest : init :: ", "User Wallet ARHD: " + contractTxId);
-
-                // if (Boolean(this.arweaveMine)) {
-                //     await fetch(this.mineUrl);
-                // }
 
                 /***
                  * Look at all PSTs and save the ones where the user has a balance.
@@ -675,7 +615,7 @@ export default {
 
             for (let edge of responseValue.data.data.transactions.edges) {
                 try {
-                    const cachedValue = await warpRead(this.warp, edge.node.id);
+                    const cachedValue = await warpRead(edge.node.id);
                     let vehicle = cachedValue.state;
             
 
@@ -684,9 +624,7 @@ export default {
                             contractId: edge.node.id,
                             balance: 0,
                             name: vehicle.name,
-                            ticker: vehicle.ticker,
-                            //logo: "",
-                            //fcp: vehicle && vehicle.invocations && vehicle.foreignCalls ? true : false,
+                            ticker: vehicle.ticker
                         };
 
                         Object.keys(vehicle.balances).some((walletId) => {
@@ -694,13 +632,6 @@ export default {
                                 data.balance = vehicle.balances[wallet.address];
                             }
                         });
-
-                        // Logo
-                        // vehicle.settings.forEach((setting) => {
-                        //     if (setting[0] === "communityLogo") {
-                        //         data.logo = setting[1];
-                        //     }
-                        // });
 
                         if (data.balance > 0) {
                             wallet.psts.push(data);
@@ -806,18 +737,10 @@ export default {
                         function: "plygnd-addLogo",
                         logo: logoId,
                     };
-                    // let res = await interactWrite(arweave, wallet, contractTxId, input);
-                    // if (Boolean(this.arweaveMine)) {
-                    //     await fetch(this.mineUrl);
-                    // }
-                    let res = await warpWrite(this.warp, contractTxId, input);
-
+                    let res = await warpWrite(contractTxId, input);
                     this.$log.info("OverviewTest : createSampleAftrVehicle :: ", "LOGO ADD for " + name + ": " + res);
 
-                    await this.updateTokensLogos(arweave, wallet, contractTxId, this.logoVintId, this.logoArhdId);
-                    if (Boolean(this.arweaveMine)) {
-                        await fetch(this.mineUrl);
-                    }
+                    await this.updateTokensLogos(contractTxId, this.logoVintId, this.logoArhdId);
 
                     // Transfer tokens to AFTR vehicles
                     if (type === "aftr") {
@@ -835,8 +758,8 @@ export default {
                             qtyVint = 10000;
                             qtyArhd = 25000;
                         }
-                        let transRes = await this.transferTokens(arweave, wallet, contractTxId, vintContractId, qtyVint);
-                        transRes = await this.transferTokens(arweave, wallet, contractTxId, arhdContractId, qtyArhd);
+                        let transRes = await this.transferTokens(contractTxId, vintContractId, qtyVint);
+                        transRes = await this.transferTokens(contractTxId, arhdContractId, qtyArhd);
                     }
 
                     return contractTxId;
@@ -850,17 +773,13 @@ export default {
                 });
             }
         },
-        async updateTokensLogos(arweave, wallet, contractId, logoVint, logoArhd) {
+        async updateTokensLogos(contractId, logoVint, logoArhd) {
             let input = {
                 function: "plygnd-updateTokens",
                 logoVint: logoVint,
                 logoArhd: logoArhd,
             };
-            // let res = await interactWrite(arweave, wallet, contractId, input);
-            // if (Boolean(this.arweaveMine)) {
-            //     await fetch(this.mineUrl);
-            // }
-            let res = await warpWrite(this.warp, contractId, input);
+            let res = await warpWrite(contractId, input);
         },
         async createSampleContract(arweave, wallet, aftrId, initState, type = "aftr", name) {
             let swTags = [];
@@ -959,13 +878,13 @@ export default {
                 reader.readAsArrayBuffer(file);
             });
         },
-        async transferTokens(arweave, wallet, vehContractId, pstContractId, qty) {
+        async transferTokens(vehContractId, pstContractId, qty) {
             const inputAllow = {
                 function: "allow",
                 target: vehContractId,
                 qty: qty,
             };
-            const allowTxId = await warpWrite(this.warp, pstContractId, inputAllow);
+            const allowTxId = await warpWrite(pstContractId, inputAllow);
             this.$log.info("OverviewTestDepositTokens : warpWrite :: ", "Allow Function Tx = " + allowTxId);
 
 
@@ -976,7 +895,7 @@ export default {
                 txID: allowTxId,
             };
 
-            const depTxId = await warpWrite(this.warp, vehContractId, inputDeposit);
+            const depTxId = await warpWrite(vehContractId, inputDeposit);
             this.$log.info("OverviewTestDepositTokens : warpWrite :: ", "Deposit Function Tx = " + depTxId);
         },
     },

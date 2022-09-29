@@ -105,7 +105,7 @@
 </template>
 
 <script>
-import { warpInit, warpRead } from './utils/warpUtils.js';
+import { warpRead } from './utils/warpUtils.js';
 import VehicleCard from "./vehicle/VehicleCard.vue";
 import VehicleCardPlaceholder from "./vehicle/VehicleCardPlaceholder.vue";
 import { mapGetters } from "vuex";
@@ -129,7 +129,6 @@ export default {
                     value: import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL,
                 },
             ],
-            warp: {},
             /** */
             myPsts: [],
             isLoading: true,
@@ -306,20 +305,10 @@ export default {
                 if (!contractId) {
                     return;
                 }
-                /*** Using 3em */
-                // const { state, validity } = await executeContract(contractId, undefined, true, {
-                //     ARWEAVE_HOST: import.meta.env.VITE_ARWEAVE_HOST,
-                //     ARWEAVE_PORT: import.meta.env.VITE_ARWEAVE_PORT,
-                //     ARWEAVE_PROTOCOL: import.meta.env.VITE_ARWEAVE_PROTOCOL
-                // });
 
                 /*** Using Warp */
-                const cachedValue = await warpRead(this.warp, contractId);
+                const cachedValue = await warpRead(contractId);
                 let vehicle = cachedValue.state;
-                //let state = await readContract(this.arweave, contractId, undefined, true);
-                //let vehicle = state.state;
-                //console.log(JSON.stringify(state));
-                // let vehicle = state;
 
 /*** COMMENTING OUT CHECKING FOR CONTRACT SOURCE.
  * WITH THE ADDITION OF EXECUTION MACHINE FUNCTIONS, WE MAY NOT NEED TO CHECK THE CONTRACT SOURCE.
@@ -417,30 +406,7 @@ export default {
                             }
                         }
                     }
-
-                    // if (!this.getMyVehicle) {
-                    //     await Object.keys(vehicle.balances).some((walletId) => {
-                    //         if (walletId == this.$store.getters.getActiveAddress) {
-                    //             if (vehicle.balances[walletId] > 0) {
-                    //                 this.selectedMyVehicle.push(vehicle);
-                    //             }
-                    //         } else {
-                    //             Object.keys(vehicle.vault).some((walletId) => {
-                    //                 if (walletId == this.$store.getters.getActiveAddress) {
-                    //                     if (vehicle.vault[walletId] > 0) {
-                    //                         this.selectedMyVehicle.push(vehicle);
-                    //                     }
-                    //                 }
-                    //             });
-                    //         }
-                    //     });
-                    // }
                     
-                    // if (this.getMyVehicle) {
-                    //     this.selectedVehicle.push(vehicle);
-                    // } else {
-                    //     this.vehicles.push(vehicle); 
-                    // }
                     this.vehicles.push(vehicle);
                 }
             } catch (error) {
@@ -456,9 +422,6 @@ export default {
 
             // Get all aftr vehicle contracts, then load all vehicles
             let txs = await this.getAftrVehicles();
-            
-            /*** Connect to warp */
-            this.warp = warpInit();
 
             for (let edge of txs.edges) {
                 await this.loadAllVehicles(edge.node.id);
