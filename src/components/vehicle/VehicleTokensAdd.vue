@@ -54,7 +54,7 @@
             <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
               <button type="button" v-if="pstInputValid && pstInputTokens" 
               class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm" @click="transferTokens">
-                Transfer
+                Deposit
               </button>
               <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-aftrRed hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" @click="$emit('close')" ref="cancelButtonRef">
                 Cancel
@@ -74,12 +74,9 @@ import { Dialog, DialogOverlay, DialogTitle, TransitionChild, TransitionRoot } f
 import { ExclamationIcon } from '@heroicons/vue/outline'
 import { mapGetters } from 'vuex';
 import numeral from "numeral";
-//import Arweave from "arweave";
-import { interactWrite, interactWriteDryRun } from "smartweave";
-import { executeContract } from "@three-em/js";
 import VehicleAlert from './VehicleAlert.vue';
 import Aftr from "aftr-market";
-import { warpInit, warpRead, warpWrite } from './../utils/warpUtils.js';
+import { warpRead, warpWrite } from './../utils/warpUtils.js';
 
 const client = new Aftr();
 
@@ -106,12 +103,6 @@ export default {
             pricePerToken: null,                            // Selected PST's price
             pstValue: null,                                 // pricePerShare * inputShares
             totalValue: null,
-            /** Smartweave variables */
-            arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
-            arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
-            arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
-            arweaveMine: import.meta.env.VITE_MINE,
-            /** */
             msg: "",
             walletPsts: [],
         }
@@ -171,30 +162,15 @@ export default {
             }
         },
         async isDepositAllowed(contractId) {
-            let stateInteractions = {};
-            // Is FCP Supported
-            try {
-                stateInteractions = await executeContract(contractId, undefined, true, {
-                    ARWEAVE_HOST: this.arweaveHost,
-                    ARWEAVE_PORT: this.arweavePort,
-                    ARWEAVE_PROTOCOL: this.arweaveProtocol
-                });
-
-                /*** Changing to look for Warp's version of FCP which will require claims and claimable arrays. */
-                //if (!stateInteractions.state.invocations || !stateInteractions.state.foreignCalls) {
+            // Is internalWrite Supported?
+            const stateInteractions = await warpRead(contractId);
+            
+            /*** Changing to look for Warp's version of FCP which will require claims and claimable arrays. */
+            //if (!stateInteractions.state.invocations || !stateInteractions.state.foreignCalls) {
                 if (!stateInteractions.state.claims || !stateInteractions.state.claimable) {
-                    this.$swal({
-                        icon: "error",
-                        html: "This asset doesn't support cross-contract communication so it can't be deposited into an AFTR vehicle.",
-                        showConfirmButton: true,
-                        allowOutsideClick: false
-                    });
-                    return false;
-                }
-            } catch(e) {
                 this.$swal({
                     icon: "error",
-                    html: "An error occured while trying to validate the token being deposited.",
+                    html: "This asset doesn't support cross-contract communication so it can't be deposited into an AFTR vehicle.",
                     showConfirmButton: true,
                     allowOutsideClick: false
                 });
@@ -216,25 +192,47 @@ export default {
         },
         async transferTokens() {
             this.msg = "Please wait for deposit into vehicle to complete..."
-            let arweave = {};
 
-            try {
-                arweave = await Arweave.init({
-                    host: this.arweaveHost,
-                    port: this.arweavePort,
-                    protocol: this.arweaveProtocol,
-                    timeout: 20000,
-                    logging: true,
-                });
-            } catch(e) {
+            /*** Depositing tokens process
+             * 1. Setup Claim on token being deposited.
+             * 2. Call AFTR contract to claim tokens and update the AFTR vehicle tokens object.
+             */
+
+             const quantity = Number(this.pstInputTokens);
+             const currentPst = this.$store.getters.getActiveWallet.psts.find(
+                (item) => item.contractId === this.selectedPstId
+            );
+            const pstId = currentPst.contractId;
+
+            // Does PST support internalWrites?
+            const ok = await this.isDepositAllowed(currentPst.contractId);
+            if (!ok) {
                 this.$swal({
                     icon: "error",
-                    html: "Failed connecting to Arweave Gateway.",
+                    html: "The selected token does not support cross-contract communication, therefore you can't deposit this token.",
                     showConfirmButton: true,
-                    allowOutsideClick: false
+                    allowOutsideClick: false,
                 });
                 return;
             }
+
+             // 1. Setup Claim
+            const inputAllow = {
+                function: "allow",
+                target: this.vehicle.id,
+                qty: quantity
+            };
+            const allowTxId = await warpWrite(pstId, inputAllow);
+
+            // 2. Claim tokens
+            const inputDep = {
+                function: "deposit",
+                tokenId: pstId,
+                qty: quantity,
+                txID: allowTxId
+            };
+            const allowDepId = await warpWrite(this.vehicle.id, inputDep);
+
             this.$swal({
                 icon: "info",
                 html: "Please wait while the deposit transaction completes...",
@@ -243,65 +241,6 @@ export default {
                 didOpen: () => {
                     this.$swal.showLoading()
                 },
-            });
-            const inputTransfer = {
-                function: "transfer",
-                target: this.vehicle.id,
-                qty: Number(this.pstInputTokens),
-            };
-            const currentPst = this.$store.getters.getActiveWallet.psts.find(
-                (item) => item.contractId === this.selectedPstId
-            );
-
-            // Does the PST support FCP?
-            const ok = await this.isDepositAllowed(currentPst.contractId);
-            if (!ok) {
-                return;
-            }
-
-            let wallet;
-            if (import.meta.env.VITE_ENV === "DEV") {
-                wallet = JSON.parse(this.keyFile);
-            } else {
-                wallet = "use_wallet";
-            }
-            const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
-            this.warp = warpInit();
-            //await interactWrite(arweave, wallet, currentPst.contractId, inputTransfer)
-            await warpWrite(this.warp, currentPst.contractId, inputTransfer)
-            .then(async (id) => {
-                this.$log.info("VehicleTokensAdd : interactWrite :: ", "Transfer ID = " + JSON.stringify(id));
-
-                /*** Original code before JS library */
-                // const inputDeposit = {
-                //     function: "deposit",
-                //     tokenId: currentPst.contractId,
-                //     txID: id,
-                // };
-                // this.$log.info("VehicleTokensAdd : interactWrite :: ", "INPUT DEP: " + JSON.stringify(inputDeposit));
-                // await interactWrite(arweave, wallet, this.vehicle.id, inputDeposit)
-                // .then(async (txID) => {
-                //     this.msg = "Deposit Successful : " + txID
-                //     if(Boolean(this.arweaveMine)){
-                //         await fetch(mineUrl);
-                //     }
-                // })
-                // .catch((error) => {
-                //     this.msg = error;
-                // });
-                 await client.vehicle.deposit(this.vehicle.id, wallet, id, currentPst.contractId).then(async (txid) =>{
-                     this.msg = txid
-                    //  if(Boolean(this.arweaveMine)){
-                    //     await fetch(mineUrl);
-                    // }
-                     return txid
-                 }).catch((error) => {
-                     this.msg = error;
-                 })
-                 return;
-            })
-            .catch((error) => {
-                this.msg = error;
             });
 
             if (import.meta.env.VITE_ENV !== "PROD") {
