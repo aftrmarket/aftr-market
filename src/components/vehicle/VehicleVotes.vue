@@ -68,10 +68,7 @@
                   {{ vote.yays }} - {{ vote.nays }}
                 </td>
                 <td v-if="allowAdd && selectedVoteCategory === 'Active'" class="py-4 whitespace-nowrap text-sm font-medium grid grid-cols-2">
-                    <div v-if="vote.status === 'active' && (vote.start + vote.voteLength < currentBlock.height)" class="text-right">
-                        <button @click.prevent="completeVote" type="button" class="text-aftrRed hover:text-indigo-900">Complete</button>
-                    </div>
-                    <div v-else-if="canVote(vote) && vote.status === 'active'" class="text-right">
+                    <div v-if="canVote(vote) && vote.status === 'active'" class="text-right">
                         <button @click.prevent="openModal('cast', vote.id, vote)" type="button" class="text-aftrBlue hover:text-indigo-900">
                             Cast
                         </button>
@@ -99,7 +96,7 @@
 import VehicleVotesAdd from './votes/VehicleVotesAdd.vue';
 import VehicleVotesCast from './votes/VehicleVotesCast.vue';
 import VehicleVoteHistory from './votes/VehicleVoteHistory.vue';
-import { mapGetters,mapState } from 'vuex';
+import { mapGetters } from 'vuex';
 import { capitalize } from '../utils/shared.js';
 import VoteSimulator from "./VoteSimulator.vue";
 import { interactWriteDryRun } from "smartweave";
@@ -228,64 +225,68 @@ export default {
                 return false;
             }
         },
-        async completeVote() {
-            /*** 
-             * To complete a vote, the contract needs to have an interaction run so that the concludeVotes function can run.
-             * To do this, just do a dry run interaction.
-             */
-            let arweave = {};
+        // async completeVote() {
+        //     /*** 
+        //      * To complete a vote, the contract needs to have an interaction run so that the concludeVotes function can run.
+        //      * To do this, just do a dry run interaction.
+        //      */
 
-            arweave = await Arweave.init({
-                host: this.arweaveHost,
-                port: this.arweavePort,
-                protocol: this.arweaveProtocol,
-                timeout: 20000,
-                logging: true,
-            });
+        //      /*** UPDATE:
+        //       * Using Warp, there is no longer the need to complete a vote b/c it happens when readState is run.
+        //       */
+        //     let arweave = {};
 
-            const wallet = "use_wallet";
+        //     arweave = await Arweave.init({
+        //         host: this.arweaveHost,
+        //         port: this.arweavePort,
+        //         protocol: this.arweaveProtocol,
+        //         timeout: 20000,
+        //         logging: true,
+        //     });
 
-            // Call SmartWeave
-            try {
-                const input = {
-                    function: "balance",
-                    target: this.getActiveAddress
-                };
-                // const input = {
-                //     function: "propose",
-                //     type: "set",
-                //     key: "settings.quorum",
-                //     value: 0.5
-                // };
+        //     const wallet = "use_wallet";
+
+        //     // Call SmartWeave
+        //     try {
+        //         const input = {
+        //             function: "balance",
+        //             target: this.getActiveAddress
+        //         };
+        //         // const input = {
+        //         //     function: "propose",
+        //         //     type: "set",
+        //         //     key: "settings.quorum",
+        //         //     value: 0.5
+        //         // };
             
-                const tx = await interactWriteDryRun(
-                    arweave,
-                    wallet,
-                    this.vehicle.id,
-                    input
-                );         
-                /**** IN ORDER FOR THIS TO PROCESS, YOU NEED TO RUN http://localhost:1984/mine */
-                if(Boolean(this.arweaveMine)){
-                    const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
-                    const response = await fetch(mineUrl);
-                }
-            } catch(e) {
-                this.$swal({
-                    icon: "error",
-                    html: "The Complete Vote action failed.",
-                    showConfirmButton: true,
-                    allowOutsideClick: false,
-                });
-            }
-            this.$swal({
-                icon: "success",
-                html: "The complete vote action has been submitted.  Once the contract processes the vote, the vehicle will be updated.",
-                showConfirmButton: true,
-                allowOutsideClick: false
-            });
+        //         const tx = await interactWriteDryRun(
+        //             arweave,
+        //             wallet,
+        //             this.vehicle.id,
+        //             input
+        //         );         
+        //         /**** IN ORDER FOR THIS TO PROCESS, YOU NEED TO RUN http://localhost:1984/mine */
+        //         if(Boolean(this.arweaveMine)){
+        //             const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
+        //             const response = await fetch(mineUrl);
+        //         }
+        //     } catch(e) {
+        //         this.$swal({
+        //             icon: "error",
+        //             html: "The Complete Vote action failed.",
+        //             showConfirmButton: true,
+        //             allowOutsideClick: false,
+        //         });
+        //     }
+        //     this.$swal({
+        //         icon: "success",
+        //         html: "The complete vote action has been submitted.  Once the contract processes the vote, the vehicle will be updated.",
+        //         showConfirmButton: true,
+        //         allowOutsideClick: false
+        //     });
 
-            this.$router.push({ name: "vehicle", params: { vehicleId: this.vehicle.id } });
-        },
+        //     this.$router.push({ name: "vehicle", params: { vehicleId: this.vehicle.id } });
+        // },
         votedText(vote) {
             if (!this.arConnected) {
                 return 'na';
