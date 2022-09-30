@@ -99,8 +99,6 @@ import VehicleVoteHistory from './votes/VehicleVoteHistory.vue';
 import { mapGetters } from 'vuex';
 import { capitalize } from '../utils/shared.js';
 import VoteSimulator from "./VoteSimulator.vue";
-import { interactWriteDryRun } from "smartweave";
-import Arweave from "arweave";
 
 export default {
     props: ['vehicle', 'contractId', 'isMember'],
