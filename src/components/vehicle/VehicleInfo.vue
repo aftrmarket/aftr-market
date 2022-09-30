@@ -206,7 +206,7 @@ export default {
                 return "File size: " + this.formatNumber(this.totalSize);
             }
         },
-        ...mapGetters(['arConnected', 'getActiveAddress', 'keyFile']),
+        ...mapGetters(['arConnected', 'getActiveAddress']),
     },
     methods: {
         formatNumber(num, dec = false) {
@@ -347,7 +347,7 @@ export default {
 
             if (this.fileUpload){
                 if (import.meta.env.VITE_ENV === "DEV") {
-                    await this.deployFile(this.files, arweave, JSON.parse(this.keyFile));
+                    await this.deployFile(this.files, arweave, "use_wallet");
                     const mineUrl =
                             import.meta.env.VITE_ARWEAVE_PROTOCOL +
                             "://" +
@@ -459,20 +459,8 @@ export default {
                 // this.$log.info("VehicleInfo : updateVehicle :: ", JSON.stringify(input));
                 this.$log.info("VehicleInfo : updateVehicle :: ", "Contract ID: " + this.contractId);
                 
-                //const txid = await interactWrite(arweave, "use_wallet", this.contractId, JSON.stringify(action));
-                /**** INSTEAD OF USING "use_wallet", copy the information out of your keyfile.json file and hardcode it below until I can figure out what's going on with ArConnect. */
-                let wallet;
-                if (import.meta.env.VITE_ENV === "DEV") {
-                    if(this.keyFile.length){
-                        wallet =  JSON.parse(this.keyFile)
-                    } else {
-                        // alert("Please attach your keyfile")
-                        this.$swal({
-                            icon: 'warning',
-                            html: "Please attach your keyfile",
-                        })
-                    }        
-                } 
+                
+                const wallet = "use_wallet";
                 this.$swal({
                     icon: "info",
                     html: "Please wait while the vehicle is updated.",
@@ -483,15 +471,9 @@ export default {
                     },
                 });
                 try {
-                    if (import.meta.env.VITE_ENV === "DEV") {
-                        // const txid = await interactWrite(arweave, wallet, this.contractId, input);
-                        const txid = await client.vehicle.editVehicle(wallet, this.contractId, [...changeMap.entries()])
-                        this.$log.info("VehicleInfo : updateVehicle :: ", "TX: " + txid);
-                    } else {
-                        // const txid = await interactWrite(arweave, "use_wallet", this.contractId, input);
-                        const txid = await client.vehicle.editVehicle("use_wallet", this.contractId, [...changeMap.entries()])
-                        this.$log.info("VehicleInfo : updateVehicle :: ", "TX: " + txid);
-                    }
+                    // const txid = await interactWrite(arweave, wallet, this.contractId, input);
+                    const txid = await client.vehicle.editVehicle(wallet, this.contractId, [...changeMap.entries()])
+                    this.$log.info("VehicleInfo : updateVehicle :: ", "TX: " + txid);
                 } catch(e) {
                     this.$swal({
                         icon: "error",

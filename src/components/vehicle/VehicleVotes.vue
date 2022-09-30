@@ -129,7 +129,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters(['arConnected', 'getActiveAddress', 'currentBlock', 'keyFile']),
+        ...mapGetters(['arConnected', 'getActiveAddress', 'currentBlock']),
         filteredVotes() {
 			let status = this.selectedVoteCategory;
             let vote = this.votes
@@ -243,19 +243,7 @@ export default {
                 logging: true,
             });
 
-            let wallet;
-            if (import.meta.env.VITE_ENV === "DEV") {
-                if (this.keyFile.length) {
-                    wallet = JSON.parse(this.keyFile);
-                } else {
-                    this.$swal({
-                        icon: 'warning',
-                        html: "Please attach your keyfile",
-                    })
-                }
-            } else {
-                wallet = "use_wallet";
-            }
+            const wallet = "use_wallet";
 
             // Call SmartWeave
             try {

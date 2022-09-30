@@ -124,7 +124,7 @@ export default {
     },
     computed: {
 
-        ...mapGetters(['arConnected', 'getActiveAddress', 'keyFile', 'getAftrContractSrcId']),
+        ...mapGetters(['arConnected', 'getActiveAddress', 'getAftrContractSrcId']),
     },
     methods: {
         walletAddressSubstr(addr, chars = 10) {
@@ -192,18 +192,7 @@ export default {
             this.vehicleTemplate.creator = this.getActiveAddress;
             this.vehicleTemplate.balances[this.getActiveAddress] = 1;
 
-            let use_wallet;
-            if (import.meta.env.VITE_ENV === "DEV") {
-                if (this.keyFile.length) {
-                    use_wallet = JSON.parse(this.keyFile);
-                } else {
-                    this.$swal({
-                        icon: 'warning',
-                        html: "Please attach your keyfile",
-                    })
-                    return false;
-                }
-            }
+            const use_wallet = "use_wallet";
 
             let initTags = [{ name: "Protocol", value: this.tagProtocol }];
             if (import.meta.env.VITE_ENV !== "PROD") {

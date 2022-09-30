@@ -505,7 +505,7 @@ export default {
                 return "File size: " + this.formatNumber(this.totalSize);
             }
         },
-        ...mapGetters(["arConnected", "keyFile", "getAftrContractSrcId"]),
+        ...mapGetters(["arConnected", "getAftrContractSrcId"]),
         // Code to handle a checkbox in the table to check/uncheck all rows.
         /******
       selectAll: {
@@ -949,18 +949,7 @@ export default {
 
             // Default Settings
             /*** TODO: ADD LOGO (communityLogo) to settings when implemented */
-            let use_wallet;
-            if (import.meta.env.VITE_ENV === "DEV") {
-                if (this.keyFile.length) {
-                    use_wallet = JSON.parse(this.keyFile);
-                } else {
-                    this.$swal({
-                        icon: 'warning',
-                        html: "Please attach your keyfile",
-                    })
-                    return false;
-                }
-            }
+            const use_wallet = "use_wallet";
             if (this.fileUpload){
                 this.$swal({
                     icon: "info",

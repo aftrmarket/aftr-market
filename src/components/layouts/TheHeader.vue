@@ -58,18 +58,17 @@
                 <!-- Network Selection End -->
 
               <!-- ArConnect Begin -->
-              <div>
-                    <div v-if="!$store.getters.arConnected" class="flex items-center">
-                        <div class="text-aftrDarkGrey-light text-sm font-light">
-                            No Wallet Connected
-                        </div>
-                        <button @click.prevent="arConnectClick" type="submit" class="inline-flex items-center p-1 border border-transparent shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed">
-                            <img src="../../assets/arconnect-logo.png" alt="Login to ArConnect" width="24" />
-                        </button>
+            <div>
+                <div v-if="!$store.getters.arConnected" class="flex items-center">
+                    <div class="text-aftrDarkGrey-light text-sm font-light">
+                        No Wallet Connected
                     </div>
-                    <div v-else class="flex items-center">
-                        <div class="text-aftrGo text-sm font-light">
-                        <input v-if="siteMode==='DEV'" type="file" ref="doc" @change="readFile()" />
+                    <button @click.prevent="arConnectClick" type="submit" class="inline-flex items-center p-1 border border-transparent shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed">
+                        <img src="../../assets/arconnect-logo.png" alt="Login to ArConnect" width="24" />
+                    </button>
+                </div>
+                <div v-else class="flex items-center">
+                    <div class="text-aftrGo text-sm font-light">
                         {{ walletAddressSubstr }}
                     </div>
                     <div>
@@ -186,18 +185,6 @@ export default {
             url = import.meta.env.VITE_AFTR_DEV;
         }
         window.location.href = url;
-    },
-    readFile() {
-        this.file = this.$refs.doc.files[0];
-        const reader = new FileReader();
-        this.content = "check the console for file output";
-        reader.onload = (res) => {
-            this.$log.info("TheHeader : readFile :: ", res.target.result);
-            this.content = res.target.result
-            this.$store.commit("addKeyFile", this.content);
-        };
-        reader.onerror = (err) => this.$log.error("TheHeader : readFile :: ", err);
-        reader.readAsText(this.file);
     },
     closeModal() {
         this.showArconnect = false;

@@ -289,7 +289,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters(["arConnected","keyFile","arConnectConfig","getTestLaunchFlag",]),
+        ...mapGetters(["arConnected","arConnectConfig","getTestLaunchFlag",]),
     },
     methods: {
         voteSimulatorTest(){
@@ -375,20 +375,8 @@ export default {
                     this.$log.info("OverviewTest : init :: ", "Error connecting to Arweave " + e);
                 }
 
-                let use_wallet;
-                if (this.env === "DEV") {
-                    if (this.keyFile.length) {
-                        use_wallet = JSON.parse(this.keyFile);
-                    } else {
-                        this.$swal({
-                            icon: "warning",
-                            html: "Please attach your keyfile",
-                        });
-                        return false;
-                    }
-                } else {
-                    use_wallet = "use_wallet";
-                }
+                const use_wallet = "use_wallet";
+
                 this.$swal({
                     icon: "info",
                     html: "Checking user wallet.",

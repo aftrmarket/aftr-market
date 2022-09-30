@@ -253,7 +253,7 @@ export default {
                 return "Membership changes will be proposed as votes because this is a DAO owned vehicle";
             }
         },
-        ...mapGetters(['arConnected', 'getActiveAddress', 'keyFile']),
+        ...mapGetters(['arConnected', 'getActiveAddress']),
     },
     methods: {
         formatNumber(num, dec = false) {
@@ -403,19 +403,8 @@ export default {
             }
             // this.$log.info("VehicleMembers : submit :: ", JSON.stringify(input));
 
-            let wallet;
-            if (import.meta.env.VITE_ENV === "DEV") {
-                if(this.keyFile.length){
-                    wallet =  JSON.parse(this.keyFile);
-                } else {
-                    // alert("Please attach your keyfile");
-                    this.$swal({
-                        icon: 'warning',
-                        html: "Please attach your keyfile",
-                    })
-                }        
-            }
-
+            const wallet = "use_wallet";
+            
             // Determine changes
             const count = this.memberRemoves.length + this.memberAdds.length + Object.keys(this.memberUpdates).length;
             let recipient = '';

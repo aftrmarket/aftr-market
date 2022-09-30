@@ -93,7 +93,6 @@ export default {
                 return this.input;
             }
         },
-        ...mapGetters(['keyFile']),
     },
     methods: {
         cleanupState(){
@@ -162,20 +161,7 @@ export default {
             }
 
 
-            let wallet;
-            if (import.meta.env.VITE_ENV === "DEV") {
-                if(this.keyFile.length){
-                    wallet =  JSON.parse(this.keyFile)
-                } else {
-                    // alert("Please attach your keyfile")
-                    this.$swal({
-                        icon: 'warning',
-                        html: "Please attach your keyfile",
-                    })
-                }        
-            } else {
-                return;
-            }
+            const wallet = "use_wallet";
             this.$swal({
                 icon: "info",
                 html: "Please wait while the input test is running...",

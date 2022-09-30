@@ -60,7 +60,7 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(["keyFile", "getActiveAddress", "arConnectConfig", "getActiveWallet"]),
+        ...mapGetters(["getActiveAddress", "arConnectConfig", "getActiveWallet"]),
     },
     methods: {
         async buttonClick() {
@@ -87,17 +87,7 @@ export default {
                 return;
             }
 
-            let wallet;
-            if (import.meta.env.VITE_ENV === "DEV") {
-                if(this.keyFile.length){
-                    wallet =  JSON.parse(this.keyFile);
-                } else {
-                    this.$swal({
-                        icon: 'warning',
-                        html: "Please attach your keyfile",
-                    })
-                }        
-            } 
+            const wallet = "use_wallet";
             this.$swal({
                 icon: "info",
                 html: "Please wait while the vehicle is updated.",

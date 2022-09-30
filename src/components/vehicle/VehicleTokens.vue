@@ -258,7 +258,7 @@ export default {
                 return this.vehicle.creator;
             }
         },
-        ...mapGetters(['arConnected', 'getActiveAddress', 'keyFile']),
+        ...mapGetters(['arConnected', 'getActiveAddress']),
     },
     watch: {
         arConnected(value) {
