@@ -118,8 +118,6 @@ export default {
   },
   data() {
     return {
-      // voteData : this.vehicle.votes[0],
-      voteData : this.voteData,
       total: 0
     };
   },
@@ -144,9 +142,9 @@ export default {
     },
      totalBalance(){
        console.log("voteData", this.vehicle, this.voteData , this.vehicle.settings[0][1])
-      this.total = Object.values(this.vehicle.balances).reduce((accumulator, object) => {
+        this.total = Object.values(this.vehicle.balances).reduce((accumulator, object) => {
             return accumulator + object;
-          }, 0)
+        }, 0)
     }
   },
   setup() {
