@@ -1,4 +1,5 @@
 import { WarpFactory } from "warp-contracts/web";
+import Arweave from "arweave";
 
 function warpInit() {
     let warp = {};
@@ -52,5 +53,15 @@ async function warpWrite(contractId, input, internalWrites = true, bundling = tr
     }
 };
 
+function arweaveInit() {
+    const arweave = Arweave.init({
+        host: import.meta.env.VITE_ARWEAVE_HOST,
+        port: import.meta.env.VITE_ARWEAVE_PORT,
+        protocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
+        timeout: 20000,
+        logging: true,
+    });
+    return arweave;
+};
 
-export { warpInit, warpRead, warpWrite };
+export { warpInit, warpRead, warpWrite, arweaveInit };

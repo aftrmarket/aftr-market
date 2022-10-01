@@ -1,5 +1,78 @@
 import {createStore } from 'vuex';
 import { fetchBalancesForAddress } from "verto-cache-interface";
+import { warpRead, arweaveInit } from './components/utils/warpUtils';
+
+async function buildWalletPsts(aftrId, userAddr) {
+    if (aftrId === "") {
+        return {};
+    }
+
+    let queryval = {
+        query: `
+            query($cursor: String) {
+                transactions(
+                    tags: [
+                        { name: "App-Name", values: ["SmartWeaveContract"] },
+                        { name: "Contract-Src", values: ["${ aftrId }"] }
+                    ]
+                    first: 100
+                    after: $cursor
+                ) {
+                    pageInfo {
+                        hasNextPage
+                    }
+                    edges {
+                        cursor
+                        node { id } 
+                    }
+                }
+            }`,
+    };
+
+    const arweave = arweaveInit();
+
+    const responseValue = await arweave.api.post("graphql", { query: queryval.query,});
+    console.log(responseValue.data.data.transactions.edges);
+
+    let wallet = {
+        address: userAddr,
+        ar: 0,
+        psts: [],
+    };
+
+    const balInWinstons = await arweave.wallets.getBalance(userAddr);
+    wallet.ar = balInWinstons / 1000000000000;
+
+    for (let edge of responseValue.data.data.transactions.edges) {
+        console.log(edge.node.id);
+        try {
+            const cachedValue = await warpRead(edge.node.id);
+            let vehicle = cachedValue.state;
+    
+            if (vehicle && Object.keys(vehicle.balances).length != 0 && vehicle.name) {
+                let data = {
+                    contractId: edge.node.id,
+                    balance: 0,
+                    name: vehicle.name,
+                    ticker: vehicle.ticker
+                };
+
+                Object.keys(vehicle.balances).some((walletId) => {
+                    if (walletId == wallet.address) {
+                        data.balance = vehicle.balances[wallet.address];
+                    }
+                });
+
+                if (data.balance > 0) {
+                    wallet.psts.push(data);
+                }
+            }
+        } catch (e) {
+            console.log("ERROR reading contract for " + edge.node.id + ": " + e);
+        }
+    }
+    return wallet;
+};
 
 const store = createStore({
     state() {
@@ -23,6 +96,9 @@ const store = createStore({
         },
         getActiveAddress(state) {
             return state.activeWallet.address;
+        },
+        getActiveWalletAr(state) {
+            return state.activeWallet.ar;
         },
         getSmartWeaveConfig() {
             return state.smartWeaveConfig;
@@ -72,6 +148,9 @@ const store = createStore({
             ***/
             state.activeWallet.psts[payload.index].balance = payload.balance;
         },
+        updateWalletArBalance(state) {
+
+        },
         setArConnectConfig (state, arConnectConfig) {
             state.arConnectConfig = arConnectConfig;
         },
@@ -112,6 +191,7 @@ const store = createStore({
         async arConnect(context) {
             let wallet = {
                 address: "",
+                ar: 0,
                 psts: [],
             };
 
@@ -237,6 +317,13 @@ const store = createStore({
                     }
                 }
     /*** END ONLY RUNS IN PROD */
+            } else {
+                if (context.state.aftrContractSrcId !== "") {
+                    wallet = await buildWalletPsts(context.state.aftrContractSrcId, wallet.address);
+                    if (wallet !== {}) {
+                        context.commit("arConnect", wallet);
+                    }
+                }
             }
         },
         async arDisconnect(context) {
@@ -246,7 +333,21 @@ const store = createStore({
                 console.log("ERROR during ArDisconnection: " + error);
             }
             context.commit('arDisconnect');
-        }
+        },
+        async arRefresh(context, buildWallet = false) {
+            if (buildWallet) {
+                if (context.state.aftrContractSrcId !== "") {
+                    const wallet = await buildWalletPsts(context.state.aftrContractSrcId, context.state.activeWallet.address);
+                    if (wallet !== {}) {
+                        context.commit("arConnect", wallet);
+                    }
+                }
+            } else {
+                const arweave = arweaveInit();
+                const balInWinstons = await arweave.wallets.getBalance(context.state.activeWallet.address);
+                context.state.activeWallet.ar = balInWinstons / 1000000000000;
+            }
+        },
     }
 });
 

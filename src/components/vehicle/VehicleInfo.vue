@@ -104,7 +104,6 @@ import { mapGetters } from 'vuex';
 import numeral from "numeral";
 import VehicleInfoRead from './VehicleInfoRead.vue';
 import VehicleStatusText from './VehicleStatusText.vue';
-import { interactWrite } from "smartweave";
 import Aftr from "aftr-market";
 
 const client = new Aftr();

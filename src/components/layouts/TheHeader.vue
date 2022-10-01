@@ -68,6 +68,9 @@
                     </button>
                 </div>
                 <div v-else class="flex items-center">
+                    <div class="text-aftrGo text-sm font-light mr-20">
+                        {{ currentArBalance }}
+                    </div>
                     <div class="text-aftrGo text-sm font-light">
                         {{ walletAddressSubstr }}
                     </div>
@@ -96,6 +99,7 @@
 <script>
 
 import ArConnectWindow from './ArConnectWindow.vue';
+import { arweaveInit } from './../utils/warpUtils.js';
 
 export default {
     components: { ArConnectWindow },
@@ -109,6 +113,8 @@ export default {
         file: null, 
         content: {},
         showArconnect: false,
+        arweave: {},
+        arBal: this.$store.getters.getActiveWalletAr,
     };
   },
   computed: {
@@ -137,11 +143,17 @@ export default {
     },
     walletAddressSubstr() {
         const addr = this.$store.getters.getActiveAddress;
-        //return addr.substr(0, 5) + '...' + addr.substr(-5);
         return addr.substring(0, 5) + '...' + addr.substring(addr.length - 5);
     },
     launchSetupCorrect() {
         return this.$store.getters.getTestLaunchConfigState;
+    },
+    currentArBalance() {
+        if (this.arBal > 0) {
+            return this.arBal;
+        } else {
+            return "";
+        }
     },
   },
   methods: {
@@ -190,5 +202,8 @@ export default {
         this.showArconnect = false;
     },
   },
+  mounted() {
+    this.arweave = arweaveInit();
+  }
 };
 </script>

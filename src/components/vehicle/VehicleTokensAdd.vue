@@ -250,6 +250,7 @@ export default {
                 updatedPst.balance = this.pstBalance - this.pstInputTokens;
                 /***  */
             }
+            await this.arConnect();
             this.$swal.close();
             this.$router.push("../vehicles");
             this.$emit("close");
@@ -271,6 +272,9 @@ export default {
             } else {
                 this.pstInputValid = false;
             }
+        },
+        async arConnect() {
+            await this.$store.dispatch('arConnect');
         },
     },
     created() {

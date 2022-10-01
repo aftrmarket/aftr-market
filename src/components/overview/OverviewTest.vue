@@ -222,9 +222,8 @@ import aftrChillinInitState from "./../../testnet/contracts/aftrChillinInitState
 import aftrSourcePlayground from "./../../testnet/contracts/aftrSourcePlayground.js?raw";
 import aftrInitStatePlayground from "./../../testnet/contracts/aftrInitStatePlayground.json";
 import VoteSimulator from "./../vehicle/VoteSimulator.vue";
-import { warpRead, warpWrite } from './../utils/warpUtils.js';
+import { warpRead, warpWrite, arweaveInit } from './../utils/warpUtils.js';
 
-import Arweave from "arweave";
 import { mapGetters } from "vuex";
 
 import { createContractFromTx, createContract } from "smartweave";
@@ -362,18 +361,7 @@ export default {
                 }
 
                 // Initializing Arweave
-                let arweave = {};
-                try {
-                    arweave = await Arweave.init({
-                        host: this.arweaveHost,
-                        port: this.arweavePort,
-                        protocol: this.arweaveProtocol,
-                        timeout: 20000,
-                        logging: true,
-                    });
-                } catch (e) {
-                    this.$log.info("OverviewTest : init :: ", "Error connecting to Arweave " + e);
-                }
+                const arweave = arweaveInit();
 
                 const use_wallet = "use_wallet";
 
@@ -557,7 +545,8 @@ export default {
                  * and the wallet.psts are built during the Arconnection.
                  */
                 if (this.env === "DEV" || import.meta.env.VITE_BUILD_PSTS) {
-                    await this.buildWalletPsts(arweave, aftrContractSrcId, userAddr);
+                    //await this.buildWalletPsts(arweave, aftrContractSrcId, userAddr);
+                    await this.$store.dispatch("arRefresh");
                 }
 
                 this.$swal.close();
@@ -567,71 +556,6 @@ export default {
                     icon: "error",
                     html: error,
                 });
-            }
-        },
-        async buildWalletPsts(arweave, aftrId, userAddr) {
-            let queryval = {
-                query: `
-                    query($cursor: String) {
-                        transactions(
-                            tags: [
-                                { name: "App-Name", values: ["SmartWeaveContract"] },
-                                { name: "Contract-Src", values: ["${ aftrId }"] }
-                            ]
-                            first: 100
-                            after: $cursor
-                        ) {
-                            pageInfo {
-                                hasNextPage
-                            }
-                            edges {
-                                cursor
-                                node { id } 
-                            }
-                        }
-                }`,
-            };
-
-            const responseValue = await arweave.api.post("graphql", { query: queryval.query,});
-
-            let wallet = {
-                address: "",
-                psts: [],
-            };
-
-            wallet.address = userAddr;
-
-            for (let edge of responseValue.data.data.transactions.edges) {
-                try {
-                    const cachedValue = await warpRead(edge.node.id);
-                    let vehicle = cachedValue.state;
-            
-
-                    if (vehicle && Object.keys(vehicle.balances).length != 0 && vehicle.name) {
-                        let data = {
-                            contractId: edge.node.id,
-                            balance: 0,
-                            name: vehicle.name,
-                            ticker: vehicle.ticker
-                        };
-
-                        Object.keys(vehicle.balances).some((walletId) => {
-                            if (walletId == wallet.address) {
-                                data.balance = vehicle.balances[wallet.address];
-                            }
-                        });
-
-                        if (data.balance > 0) {
-                            wallet.psts.push(data);
-                        }
-
-                        this.$log.info("OverviewTest : init :: ", wallet);
-                    }
-                } catch (e) {
-                    this.$log.error("ERROR reading contract for " + edge.node.id + ": " + e);
-                }
-                this.$log.info("PSTS: " + JSON.stringify(wallet.psts));
-                this.$store.commit("arConnect", wallet);
             }
         },
         async createAftrVehicle(arweave, wallet, aftrId, initState) {
