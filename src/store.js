@@ -318,7 +318,6 @@ const store = createStore({
                 }
     /*** END ONLY RUNS IN PROD */
             } else {
-                console.log("**SRC: " + context.state.aftrContractSrcId);
                 if (context.state.aftrContractSrcId !== "") {
                     wallet = await buildWalletPsts(context.state.aftrContractSrcId, wallet.address);
                     if (wallet !== {}) {
