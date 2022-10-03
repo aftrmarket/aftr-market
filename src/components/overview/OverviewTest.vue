@@ -546,7 +546,7 @@ export default {
                  */
                 if (this.env === "DEV" || import.meta.env.VITE_BUILD_PSTS) {
                     //await this.buildWalletPsts(arweave, aftrContractSrcId, userAddr);
-                    await this.$store.dispatch("arRefresh");
+                    await this.$store.dispatch("arRefresh", true);
                 }
 
                 this.$swal.close();
