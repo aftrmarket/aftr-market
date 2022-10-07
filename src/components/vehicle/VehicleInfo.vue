@@ -104,9 +104,10 @@ import { mapGetters } from 'vuex';
 import numeral from "numeral";
 import VehicleInfoRead from './VehicleInfoRead.vue';
 import VehicleStatusText from './VehicleStatusText.vue';
-import Aftr from "aftr-market";
+// import Aftr from "aftr-market";
+import { warpWrite } from "./../utils/warpUtils.js";
 
-const client = new Aftr();
+// const client = new Aftr();
 
 export default {
     props: ['vehicle', 'contractId', 'isMember'],
@@ -412,84 +413,90 @@ export default {
                 /**** */
 
                 
-                // let input = {
-                //     function: '',
-                //     type: 'set',
-                //     recipient: '',
-                //     target: '',
-                //     qty: 0,
-                //     key: '',
-                //     value: '',
-                //     note: ''
-                // };
+                let input = {
+                    function: '',
+                    type: 'set',
+                    recipient: '',
+                    target: '',
+                    qty: 0,
+                    key: '',
+                    value: '',
+                    note: ''
+                };
                 
-                // // If more than one change, build multi-interaction input
-                // if (changeMap.size > 1) {
-                //     input.function = 'multiInteraction';
-                //     input.key = 'multi';
-                //     input.note = 'Multi-Interaction';
+                // If more than one change, build multi-interaction input
+                if (changeMap.size > 1) {
+                    input.function = 'multiInteraction';
+                    input.key = 'multi';
+                    input.note = 'Multi-Interaction';
                     
-                //     let actions = [];
-                //     for (let [key, value] of changeMap) {
-                //         let multiAction = {
-                //             input : {
-                //                 function: 'propose',
-                //                 type: 'set',
-                //                 key: key,
-                //                 value: value
-                //             }
-                //         }
-                //         actions.push(multiAction);
-                //     }
-                //     input.actions = actions;
-                // } else if (changeMap.size === 1) {
-                //     input.function = 'propose';
-                //     for (let [key, value] of changeMap) {
-                //         input.key = key;
-                //         input.value = value;
-                //     }
-                // } else {
-                //     // Invalid
-                //     return;
-                // }
+                    let actions = [];
+                    for (let [key, value] of changeMap) {
+                        let multiAction = {
+                            input : {
+                                function: 'propose',
+                                type: 'set',
+                                key: key,
+                                value: value
+                            }
+                        }
+                        actions.push(multiAction);
+                    }
+                    input.actions = actions;
+                } else if (changeMap.size === 1) {
+                    input.function = 'propose';
+                    for (let [key, value] of changeMap) {
+                        input.key = key;
+                        input.value = value;
+                    }
+                } else {
+                    // Invalid
+                    return;
+                }
 
                 // Call Smartweave
                 this.$log.info("VehicleInfo : updateVehicle :: ", "CALL TO SMARTWEAVE");
                 // this.$log.info("VehicleInfo : updateVehicle :: ", JSON.stringify(input));
                 this.$log.info("VehicleInfo : updateVehicle :: ", "Contract ID: " + this.contractId);
                 
-                
-                const wallet = "use_wallet";
-                this.$swal({
-                    icon: "info",
-                    html: "Please wait while the vehicle is updated.",
-                    showConfirmButton: false,
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        this.$swal.showLoading()
-                    },
-                });
-                try {
-                    // const txid = await interactWrite(arweave, wallet, this.contractId, input);
-                    const txid = await client.vehicle.editVehicle(wallet, this.contractId, [...changeMap.entries()])
-                    this.$log.info("VehicleInfo : updateVehicle :: ", "TX: " + txid);
-                } catch(e) {
-                    this.$swal({
-                        icon: "error",
-                        html: "Failed to write to the Permaweb.  Please try again.",
-                        showConfirmButton: true,
-                        allowOutsideClick: false
-                    });
-                }
+                const txid = await warpWrite(this.contractId, input);
 
-                /**** IN ORDER FOR THIS TO PROCESS, YOU NEED TO RUN http://localhost:1984/mine */
-                if(Boolean(this.arweaveMine)){
-                    const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
-                    const response = await fetch(mineUrl);
-                }
-                this.$swal.close();
+            /**** CODE USING AFTR-JS */
+                // const wallet = "use_wallet";
+                // this.$swal({
+                //     icon: "info",
+                //     html: "Please wait while the vehicle is updated.",
+                //     showConfirmButton: false,
+                //     allowOutsideClick: false,
+                //     didOpen: () => {
+                //         this.$swal.showLoading()
+                //     },
+                // });
+                // try {
+                //     // const txid = await interactWrite(arweave, wallet, this.contractId, input);
+                //     const txid = await client.vehicle.editVehicle(wallet, this.contractId, [...changeMap.entries()])
+                //     this.$log.info("VehicleInfo : updateVehicle :: ", "TX: " + txid);
+                // } catch(e) {
+                //     this.$swal({
+                //         icon: "error",
+                //         html: "Failed to write to the Permaweb.  Please try again.",
+                //         showConfirmButton: true,
+                //         allowOutsideClick: false
+                //     });
+                // }
+
+                // /**** IN ORDER FOR THIS TO PROCESS, YOU NEED TO RUN http://localhost:1984/mine */
+                // if(Boolean(this.arweaveMine)){
+                //     const mineUrl = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/mine";
+                //     const response = await fetch(mineUrl);
+                // }
+                // this.$swal.close();
+                
+                /*** END AFTR-JS CODE */
+
                 this.$router.push("/vehicles");
             }
+
         },
         async onFileChange(e) {
             this.fileUpload = true

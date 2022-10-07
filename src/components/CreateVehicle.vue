@@ -378,9 +378,10 @@ import ActionInput from "./layouts/ActionInput.vue";
 
 import { mapGetters } from "vuex";
 import { JWKInterface } from "arweave/web/lib/wallet";
-import Aftr from "aftr-market";
+import { warpRead, warpWrite, arweaveInit } from "./utils/warpUtils.js";
+// import Aftr from "aftr-market";
 
-const client = new Aftr();
+// const client = new Aftr();
 
 export default {
     components: { FormContainer, ActionInput, VoteSimulator },
@@ -1035,11 +1036,11 @@ export default {
 
                 console.log("option", option)
                 if (import.meta.env.VITE_ENV === "DEV") {
-                    this.vehicle["id"] = await client.vehicle.createVehicle(this.vehicle, use_wallet, option)
-                    // this.vehicle["id"] = await createContractFromTx(arweave, use_wallet, this.getAftrContractSrcId, JSON.stringify(this.vehicle), initTags);  
+                    //this.vehicle["id"] = await client.vehicle.createVehicle(this.vehicle, use_wallet, option)
+                    this.vehicle["id"] = await createContractFromTx(arweave, use_wallet, this.getAftrContractSrcId, JSON.stringify(this.vehicle), initTags);  
                 } else {
-                    this.vehicle["id"] = await client.vehicle.createVehicle(this.vehicle, "use_wallet", option)
-                    // this.vehicle["id"] = await createContractFromTx(arweave, "use_wallet", this.getAftrContractSrcId, JSON.stringify(this.vehicle), initTags);
+                    //this.vehicle["id"] = await client.vehicle.createVehicle(this.vehicle, "use_wallet", option)
+                    this.vehicle["id"] = await createContractFromTx(arweave, "use_wallet", this.getAftrContractSrcId, JSON.stringify(this.vehicle), initTags);
                 }
 
                 if (import.meta.env.VITE_ENV === "DEV" || import.meta.env.VITE_BUILD_PSTS) {
