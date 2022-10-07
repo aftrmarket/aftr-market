@@ -3,14 +3,17 @@ import Arweave from "arweave";
 
 function warpInit() {
     let warp = {};
+    
     try {
+        const arweave = arweaveInit();
+
         // Using Warp
         if (import.meta.env.VITE_ENV === "PROD") {
             warp = WarpFactory.forMainnet();
         } else if (import.meta.env.VITE_ENV === "TEST") {
-            warp = WarpFactory.forTestnet();
+            warp = WarpFactory.forTestnet(arweave);
         } else if (import.meta.env.VITE_ENV === "DEV") {
-            warp = WarpFactory.forLocal();
+            warp = WarpFactory.forLocal(import.meta.env.VITE_ARWEAVE_PORT, arweave);
         } else {
             warp = WarpFactory.forTestnet();
         }
