@@ -11,7 +11,7 @@ function warpInit() {
         if (import.meta.env.VITE_ENV === "PROD") {
             warp = WarpFactory.forMainnet();
         } else if (import.meta.env.VITE_ENV === "TEST") {
-            warp = WarpFactory.forTestnet(arweave);
+            warp = WarpFactory.forTestnet(import.meta.env.VITE_ARWEAVE_PORT, arweave);
         } else if (import.meta.env.VITE_ENV === "DEV") {
             warp = WarpFactory.forLocal(import.meta.env.VITE_ARWEAVE_PORT, arweave);
         } else {
