@@ -73,8 +73,9 @@
 import { ref } from 'vue';
 import { Dialog, DialogOverlay, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
 import { mapGetters } from "vuex";
-import Arweave from "arweave";
-import { createContractFromTx } from "smartweave";
+// import Arweave from "arweave";
+// import { createContractFromTx } from "smartweave";
+import { warpCreateFromTx } from "./utils/warpUtils.js";
 import Swal from 'sweetalert2';
 
 
@@ -166,25 +167,25 @@ export default {
                     this.$swal.showLoading()
                 },
             });
-            let arweave = {};
-            try {
-                arweave = await Arweave.init({
-                    host: this.arweaveHost,
-                    port: this.arweavePort,
-                    protocol: this.arweaveProtocol,
-                    timeout: 20000,
-                    logging: true,
-                });
-            } catch (error) {
-                this.$swal.fire({
-                    icon: "error",
-                    html: "An error occurred when trying to connect to Arweave.  You can try again and/or let us know that you're having trouble.",
-                    showConfirmButton: true,
-                    allowOutsideClick: false,
-                }).then((result) => {
-                    this.$router.push("vehicles");
-                });
-            }
+            // let arweave = {};
+            // try {
+            //     arweave = await Arweave.init({
+            //         host: this.arweaveHost,
+            //         port: this.arweavePort,
+            //         protocol: this.arweaveProtocol,
+            //         timeout: 20000,
+            //         logging: true,
+            //     });
+            // } catch (error) {
+            //     this.$swal.fire({
+            //         icon: "error",
+            //         html: "An error occurred when trying to connect to Arweave.  You can try again and/or let us know that you're having trouble.",
+            //         showConfirmButton: true,
+            //         allowOutsideClick: false,
+            //     }).then((result) => {
+            //         this.$router.push("vehicles");
+            //     });
+            // }
 
             // Complete vehicleTemplate values
             this.vehicleTemplate.name = this.vehicleName;
@@ -192,18 +193,23 @@ export default {
             this.vehicleTemplate.creator = this.getActiveAddress;
             this.vehicleTemplate.balances[this.getActiveAddress] = 1;
 
-            const use_wallet = "use_wallet";
+            // const use_wallet = "use_wallet";
 
-            let initTags = [{ name: "Protocol", value: this.tagProtocol }];
-            if (import.meta.env.VITE_ENV !== "PROD") {
-                initTags.push({ name: "Aftr-Playground", value: this.vehicleTemplate.ticker});
-            }
+            // let initTags = [{ name: "Protocol", value: this.tagProtocol }];
+            // if (import.meta.env.VITE_ENV !== "PROD") {
+            //     initTags.push({ name: "Aftr-Playground", value: this.vehicleTemplate.ticker});
+            // }
+
+            const tags = [ { name: "Title", value: this.vehicleTemplate.name } ];
+            const txIds = await warpCreateFromTx(JSON.stringify(this.vehicleTemplate), this.getAftrContractSrcId, tags, true);
+            this.vehicleTemplate["id"] = txIds.contractTxId;
+
             try {
-                if (import.meta.env.VITE_ENV === "DEV") {
-                    this.vehicleTemplate["id"] = await createContractFromTx(arweave, use_wallet, this.getAftrContractSrcId, JSON.stringify(this.vehicleTemplate), initTags);  
-                } else {
-                    this.vehicleTemplate["id"] = await createContractFromTx(arweave, "use_wallet", this.getAftrContractSrcId, JSON.stringify(this.vehicleTemplate), initTags);
-                }
+                // if (import.meta.env.VITE_ENV === "DEV") {
+                //     this.vehicleTemplate["id"] = await createContractFromTx(arweave, use_wallet, this.getAftrContractSrcId, JSON.stringify(this.vehicleTemplate), initTags);  
+                // } else {
+                //     this.vehicleTemplate["id"] = await createContractFromTx(arweave, "use_wallet", this.getAftrContractSrcId, JSON.stringify(this.vehicleTemplate), initTags);
+                // }
 
                 if (import.meta.env.VITE_ENV === "DEV" || import.meta.env.VITE_BUILD_PSTS) {
                     // Add to Wallet PSTs if the Verto Cache is not being used
@@ -218,9 +224,9 @@ export default {
                     this.$store.commit("addWalletPst", pst);
                 }
 
-                if(Boolean(this.arweaveMine)){
-                    await fetch(this.mineUrl);
-                }
+                // if(Boolean(this.arweaveMine)){
+                //     await fetch(this.mineUrl);
+                // }
             } catch(error) {
                 this.$swal.fire({
                     icon: 'error',

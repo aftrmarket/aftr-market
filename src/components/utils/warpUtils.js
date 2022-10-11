@@ -1,5 +1,5 @@
 import { WarpFactory } from "warp-contracts/web";
-import Arweave from "arweave";
+import Arweave, { init } from "arweave";
 
 function warpInit() {
     let warp = {};
@@ -56,6 +56,51 @@ async function warpWrite(contractId, input, internalWrites = true, bundling = tr
     }
 };
 
+async function warpCreateContract(source, initState, currentTags = undefined, aftr = false) {
+    /*** 
+     * Returns:
+     * { contractTxId: string, srcTxId: string }
+     */
+
+    let tags = addTags(currentTags, aftr);
+    const warp = warpInit();
+    try {
+        let txIds = await warp.createContract.deploy({
+            wallet: "use_wallet",
+            initState: initState,
+            src: source,
+            tags
+        });
+        return txIds;
+    } catch(e) {
+        console.log("ERROR deploying AFTR contract: " + e);
+        return {};
+    }
+};
+
+async function warpCreateFromTx(initState, srcId, currentTags = undefined, aftr = false) {
+    /*** 
+     * Returns:
+     * { contractTxId: string, srcTxId: string }
+     */
+
+    let tags = addTags(currentTags, aftr);
+
+    const warp = warpInit();
+    try {
+        let txIds = await warp.createContract.deployFromSourceTx({
+            wallet: "use_wallet",
+            initState: initState,
+            srcTxId: srcId,
+            tags
+        });
+        return txIds;
+    } catch(e) {
+        console.log("ERROR deploying AFTR contract: " + e);
+        return {};
+    }
+};
+
 function arweaveInit() {
     const arweave = Arweave.init({
         host: import.meta.env.VITE_ARWEAVE_HOST,
@@ -67,4 +112,18 @@ function arweaveInit() {
     return arweave;
 };
 
-export { warpInit, warpRead, warpWrite, arweaveInit };
+function addTags(currentTags, aftr = false) {
+    let tags = [];
+    if (currentTags) {
+        tags = currentTags;
+    }
+    if (aftr) {
+        tags.push( { name: "Protocol", value: import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL } );
+        tags.push( { name: "Implements", value: ["ANS-110"] });
+        tags.push( { name: "Type", value: ["token", "vehicle"] } );
+    }
+
+    return tags;
+};
+
+export { warpInit, warpRead, warpWrite, warpCreateContract, warpCreateFromTx, arweaveInit };

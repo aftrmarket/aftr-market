@@ -368,7 +368,7 @@
 import Arweave from "arweave";
 import numeral from "numeral";
 import numberAbbreviate from "number-abbreviate";
-import { createContractFromTx, interactWrite } from "smartweave";
+// import { createContractFromTx, interactWrite } from "smartweave";
 import VoteSimulator from "./vehicle/VoteSimulator.vue";
 
 // @ts-expect-error
@@ -378,7 +378,7 @@ import ActionInput from "./layouts/ActionInput.vue";
 
 import { mapGetters } from "vuex";
 import { JWKInterface } from "arweave/web/lib/wallet";
-import { warpRead, warpWrite, arweaveInit } from "./utils/warpUtils.js";
+import { warpCreateFromTx } from "./utils/warpUtils.js";
 // import Aftr from "aftr-market";
 
 // const client = new Aftr();
@@ -1024,24 +1024,30 @@ export default {
             // }
 
             // Create SmartWeave contract
+
+            const tags = [ { name: "Title", value: this.vehicle.name } ];
+            const txIds = await warpCreateFromTx(JSON.stringify(this.vehicle), this.getAftrContractSrcId, tags, true);
+            this.vehicle["id"] = txIds.contractTxId;
+
             try {
                 this.$log.info("CreateVehicle : createVehicle :: ", "vehicle: " + JSON.stringify(this.vehicle));
-                this.$log.info("CreateVehicle : createVehicle :: ", "tags: " + JSON.stringify(initTags));
+                //this.$log.info("CreateVehicle : createVehicle :: ", "tags: " + JSON.stringify(initTags));
 
-                let option = {
-                    aftrSourceContractId: this.getAftrContractSrcId,  // Allows user to add a contract Id for test purposes. If no value is supplied, then the hardcoded value is used.
-                    aftrProtocolTag: initTags,    // Allows user to customize Protocol tag. If no value provided, "AFTR" is hardcoded.
-                    // customTags ?: []
-                }
+                // let option = {
+                //     aftrSourceContractId: this.getAftrContractSrcId,  // Allows user to add a contract Id for test purposes. If no value is supplied, then the hardcoded value is used.
+                //     aftrProtocolTag: initTags,    // Allows user to customize Protocol tag. If no value provided, "AFTR" is hardcoded.
+                //     // customTags ?: []
+                // }
 
-                console.log("option", option)
-                if (import.meta.env.VITE_ENV === "DEV") {
-                    //this.vehicle["id"] = await client.vehicle.createVehicle(this.vehicle, use_wallet, option)
-                    this.vehicle["id"] = await createContractFromTx(arweave, use_wallet, this.getAftrContractSrcId, JSON.stringify(this.vehicle), initTags);  
-                } else {
-                    //this.vehicle["id"] = await client.vehicle.createVehicle(this.vehicle, "use_wallet", option)
-                    this.vehicle["id"] = await createContractFromTx(arweave, "use_wallet", this.getAftrContractSrcId, JSON.stringify(this.vehicle), initTags);
-                }
+                // console.log("option", option)
+                // if (import.meta.env.VITE_ENV === "DEV") {
+                //     //this.vehicle["id"] = await client.vehicle.createVehicle(this.vehicle, use_wallet, option)
+                //     this.vehicle["id"] = await createContractFromTx(arweave, use_wallet, this.getAftrContractSrcId, JSON.stringify(this.vehicle), initTags);  
+                // } else {
+                //     //this.vehicle["id"] = await client.vehicle.createVehicle(this.vehicle, "use_wallet", option)
+                //     this.vehicle["id"] = await createContractFromTx(arweave, "use_wallet", this.getAftrContractSrcId, JSON.stringify(this.vehicle), initTags);
+                // }
+
 
                 if (import.meta.env.VITE_ENV === "DEV" || import.meta.env.VITE_BUILD_PSTS) {
                     // Add to Wallet PSTs if the Verto Cache is not being used
@@ -1057,9 +1063,9 @@ export default {
                 }
 
                 this.$log.info("CreateVehicle : createVehicle :: ", "ID = " + this.vehicle["id"]);
-                if(Boolean(this.arweaveMine)){
-                    await fetch(this.mineUrl);
-                }
+                // if(Boolean(this.arweaveMine)){
+                //     await fetch(this.mineUrl);
+                // }
 
                 this.$swal.fire({
                     icon: "success",
