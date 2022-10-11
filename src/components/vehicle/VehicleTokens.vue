@@ -276,7 +276,7 @@ export default {
             const cachedValue = await warpRead(id);
 
             const state = cachedValue.state;
-            let title = JSON.stringify(state.name)
+            let title = JSON.stringify(state.name);
             
             this.$swal({
                 title: '<span style="vertical-align:middle" >' + title.replace(/^"(.*)"$/, '$1') + '</span><hr size="8">',
