@@ -114,7 +114,7 @@ export default {
         content: {},
         showArconnect: false,
         arweave: {},
-        arBal: this.$store.getters.getActiveWalletAr,
+        arBal: 0,
     };
   },
   computed: {
@@ -149,8 +149,9 @@ export default {
         return this.$store.getters.getTestLaunchConfigState;
     },
     currentArBalance() {
-        if (this.arBal > 0) {
-            return this.arBal;
+        let newBal = this.$store.getters.getActiveWalletAr;
+        if (newBal > 0) {
+            return String(newBal);
         } else {
             return "";
         }
