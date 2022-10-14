@@ -44,7 +44,8 @@
                       </perfect-scrollbar>
                       <div class="mt-4 mb-4 grid grid-cols-3 gap-x-4 border-t border-gray-300">
                         <div class="ml-6 text-gray-500">TOTAL :</div>
-                        <div class="text-gray-500">{{ total }}</div>
+                        <div v-if="vehicle.ownership == 'single'" class="text-gray-500">1</div>
+                        <div v-if="vehicle.ownership == 'dao'" class="text-gray-500">{{ total }}</div>
                       </div> 
                     </dl>
 

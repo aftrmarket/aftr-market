@@ -67,12 +67,23 @@
                                     <th v-if="allowTransfer" scope="col" class="py-3 text-left font-medium text-gray-500 uppercase tracking-wider"> W/D</th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-for="(pst, index) in vehicle.tokens" :key="pst.txID" class="hover:bg-gray-50" >
-                                    <!--
-                                    <td v-if="allowTransfer" class="text-center py-2 pl-3">
-                                        <input type="checkbox" :value="pst.txID" v-model="tokenSelected" :class="checkboxClass" />
-                                    </td>-->
+                            <tbody class="bg-white divide-y divide-gray-200" v-for="(pst1) in getVehicle1()" :key="pst1.tokenId">
+                                <tr @click="toggle(pst1.tokenId)" :class="{ opened: opened.includes(pst1.tokenId)}">
+                                    <div class="flex items-center">
+                                            <div class="ml-4">
+                                                <div class="mt-4 mb-4 font-large text-gray-900"> {{ pst1.name + " (" + pst1.ticker + ")" }} </div>
+                                            </div>
+                                            <svg v-if="arrow" xmlns="http://www.w3.org/2000/svg" class="ml-2 h-3 w-3 align-middle" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                            <svg v-if="!arrow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="ml-2 h-3 w-3" >
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+                                            </svg>
+                                    </div>                                
+                                </tr>
+                            <div v-if="opened.includes(pst1.tokenId)">
+                               <tr  v-for="(pst, index) in getVehicle(pst1.tokenId)" :key="pst.tokenId"  class="bg-gray-100" >
+                                  
                                     <td class="px-6 py-4 whitespace-nowrap cursor-pointer">
                                         <div class="flex items-center">
                                             <div class="flex-shrink-0 h-10 w-10" @click.prevent="showTokenState( pst.tokenId, pstLogo(pst.tokenId, pst.logo) )">
@@ -106,6 +117,7 @@
                                         </button>
                                     </td>
                                 </tr>
+                                </div>
                             </tbody>
                         </table>
                     </div>
@@ -193,12 +205,12 @@ import numeral from "numeral";
 import { mapGetters } from 'vuex';
 import VehicleTokensAdd from './VehicleTokensAdd.vue';
 import { warpRead, warpWrite } from './../utils/warpUtils.js';
-
+import SlideUpDown from 'vue3-slide-up-down'
 
 
 export default {
     props: ['vehicle', 'isMember'],
-    components: { VehicleTokensAdd },
+    components: { VehicleTokensAdd ,SlideUpDown},
     data() {
         return {
             allowAdd: false,
@@ -211,6 +223,10 @@ export default {
             proposedChanges: [],
             transferAmtValid: true,
             transferAddrValid: true,
+            active: false,
+            opened: [],
+            vehicleToken: [],
+            arrow : true
 
 /*** TODO: HANDLE TOKENS THAT ARE LOCKED! */
 /**************************************** */
@@ -266,6 +282,30 @@ export default {
         }
     },
     methods: {
+        getVehicle1(){
+            let data = [...new Map(this.vehicle.tokens.map(item => [item['tokenId'], item])).values()]
+            return data
+            
+        },
+        getVehicle(id){
+            console.log(id)
+            let data =  this.vehicle.tokens
+.filter(people => people.tokenId == id)    
+.map(person => person)
+            console.log(data)
+            // [...new Map(this.vehicle.tokens.map(item => [item['tokenId'], item])).values()]
+            return data
+            
+        },
+        toggle(id) {
+    	    const index = this.opened.indexOf(id);
+            this.arrow = !this.arrow
+            if (index > -1) {
+                this.opened.splice(index, 1)
+            } else {
+                this.opened.push(id)
+            }
+        },
         async showWalletAddress(walletAddress){
             this.$swal({
                 html: walletAddress,

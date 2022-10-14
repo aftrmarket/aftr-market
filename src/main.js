@@ -20,6 +20,7 @@ import 'sweetalert2/dist/sweetalert2.min.css';
 //import { readContract } from 'smartweave';
 import PerfectScrollbar from 'vue3-perfect-scrollbar'
 import 'vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css'
+import { VueClipboard } from '@soerenmartius/vue3-clipboard'
 
 
 let logLevel = "";
@@ -68,6 +69,7 @@ app.use(router);
 app.use(VueLogger, options);
 app.use(VueSweetalert2);
 app.use(PerfectScrollbar)
+app.use(VueClipboard)
 //app.use(uuid);
 
 app.mount('#app');

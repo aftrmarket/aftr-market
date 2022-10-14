@@ -10,6 +10,7 @@
     "@headlessui/vue": "^1.6.5",
     "@heroicons/vue": "^1.0.1",
     "@ocrv/vue-tailwind-pagination": "^0.0.4",
+    "@soerenmartius/vue3-clipboard": "^0.1.2",
     "@tailwindcss/forms": "^0.2.1",
     "@tailwindcss/line-clamp": "^0.3.1",
     "@three-em/js": "^0.2.13",
@@ -19,6 +20,7 @@
     "arweave": "^1.10.18",
     "dotenv": "^16.0.0",
     "install": "^0.13.0",
+    "lodash": "^4.17.21",
     "material-design-icons": "^3.0.1",
     "node": "^16.17.1",
     "number-abbreviate": "^2.0.0",
@@ -31,6 +33,7 @@
     "vue-sweetalert2": "^5.0.2",
     "vue-uuid": "^2.0.2",
     "vue3-perfect-scrollbar": "^1.6.0",
+    "vue3-slide-up-down": "^1.2.5",
     "vuejs3-logger": "1.0.0",
     "vuex": "^4.0.2",
     "warp-contracts": "^1.2.13"
