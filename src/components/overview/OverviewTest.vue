@@ -225,6 +225,7 @@ import aftrInitStatePlayground from "./../../testnet/contracts/aftrInitStatePlay
 import VoteSimulator from "./../vehicle/VoteSimulator.vue";
 import { warpRead, warpWrite, arweaveInit, warpCreateContract, warpCreateFromTx } from './../utils/warpUtils.js';
 import { mapGetters } from "vuex";
+import Transaction from 'arweave/node/lib/transaction';
 
 const initProcess = [
     {
