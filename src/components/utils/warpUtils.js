@@ -126,4 +126,83 @@ function addTags(currentTags, aftr = false) {
     return tags;
 };
 
-export { warpInit, warpRead, warpWrite, warpCreateContract, warpCreateFromTx, arweaveInit };
+function readFile(file) {
+    // Thanks to https://dilshankelsen.com/convert-file-to-byte-array/
+    return new Promise((resolve, reject) => {
+        // Create file reader
+        let reader = new FileReader();
+
+        // Register event listeners
+        reader.addEventListener("loadend", e => resolve(e.target.result));
+        reader.addEventListener("error", reject);
+
+        // Read file
+        reader.readAsArrayBuffer(file);
+    });
+};
+
+async function getAsByteArray(file) {
+    return new Uint8Array(await readFile(file));
+};
+
+async function upload(file) {
+    const arweave = arweaveInit();
+
+    const tx =  await arweave.createTransaction({
+        data: await getAsByteArray(file)
+    }, "use_wallet");
+    tx.addTag('Content-Type', file.type)
+    await arweave.transactions.sign(tx)
+    const res = await arweave.transactions.post(tx)
+        if (!res.statusText == "OK") { 
+            throw new Error('Can not upload data')
+        }
+   
+    return { file, assetId: tx.id }
+};
+
+async function dispatch(file) {
+    const tx = await createAndTag(file)
+    const result = await window.arweaveWallet.dispatch(tx)
+    return { file, atomicId: result.id }
+};
+
+async function createAndTag(ctx) {
+    const arweave = arweaveInit();
+   
+    const { assetId, name, addr, contentType, description} = ctx
+    const tx = await arweave.createTransaction({
+        data: JSON.stringify({
+        manifest: "arweave/paths",
+        version: "0.1.0",
+        index: {
+            path: "asset"
+        },
+        paths: {
+            asset: {
+            id: assetId
+            }
+        }
+        })
+    }, "use_wallet")
+
+    return tx
+};
+
+async function post(ctx) {
+    const tx = await createAndTag(ctx)
+    await arweave.transactions.sign(tx)
+    tx.id = ctx.atomicId
+    const result = await fetch(URL, {
+        method: 'POST',
+        body: JSON.stringify({ contractTx: tx }),
+        headers: {
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+        }
+    })
+    return { id: ctx.atomicId }
+}
+
+export { warpInit, warpRead, warpWrite, warpCreateContract, warpCreateFromTx, arweaveInit, upload, getAsByteArray, readFile, dispatch, post };

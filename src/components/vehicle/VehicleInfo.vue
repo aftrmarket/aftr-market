@@ -106,6 +106,7 @@ import VehicleInfoRead from './VehicleInfoRead.vue';
 import VehicleStatusText from './VehicleStatusText.vue';
 // import Aftr from "aftr-market";
 import { warpWrite } from "./../utils/warpUtils.js";
+import { warpCreateFromTx, upload, dispatch, post } from "./../utils/warpUtils.js";
 
 // const client = new Aftr();
 
@@ -550,21 +551,31 @@ export default {
         async getAsByteArray(file) {
             return new Uint8Array(await this.readFile(file));
         },
-        async deployFile(file, arweave, wallet) {
+        // async deployFile(file, arweave, wallet) {
 
-            const tx = await arweave.createTransaction({
-                data: await this.getAsByteArray(file)
-            }, wallet);
+        //     const tx = await arweave.createTransaction({
+        //         data: await this.getAsByteArray(file)
+        //     }, wallet);
 
-            tx.addTag("Content-Type", file.type);
-            //tx.addTag("User-Agent", `AFTR.Market/this.version`);
-            tx.addTag("User-Agent", "AFTR.Market")
+        //     tx.addTag("Content-Type", file.type);
+        //     //tx.addTag("User-Agent", `AFTR.Market/this.version`);
+        //     tx.addTag("User-Agent", "AFTR.Market")
 
-            await arweave.transactions.sign(tx, wallet);
-            await arweave.transactions.post(tx);
-            this.newLogo = tx.id;
+        //     await arweave.transactions.sign(tx, wallet);
+        //     await arweave.transactions.post(tx);
+        //     this.newLogo = tx.id;
             
-            this.$log.info("VehicleInfo : deployFile :: ", "txid", tx.id);
+        //     this.$log.info("VehicleInfo : deployFile :: ", "txid", tx.id);
+        // },
+        async deployFile(file, arweave, wallet) {
+            return await upload(file)
+                .then((tx) => {
+                    this.newLogo = tx.assetId;
+                    dispatch(tx)
+                })
+                .then((data) => {
+                    post(data)
+                })
         },
     },
     created() {

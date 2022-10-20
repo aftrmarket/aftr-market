@@ -223,7 +223,7 @@ import aftrChillinInitState from "./../../testnet/contracts/aftrChillinInitState
 import aftrSourcePlayground from "./../../testnet/contracts/aftrSourcePlayground.js?raw";
 import aftrInitStatePlayground from "./../../testnet/contracts/aftrInitStatePlayground.json?raw";
 import VoteSimulator from "./../vehicle/VoteSimulator.vue";
-import { warpRead, warpWrite, arweaveInit, warpCreateContract, warpCreateFromTx } from './../utils/warpUtils.js';
+import { warpRead, warpWrite, arweaveInit, warpCreateContract, warpCreateFromTx, upload, dispatch, post  } from './../utils/warpUtils.js';
 import { mapGetters } from "vuex";
 import Transaction from 'arweave/node/lib/transaction';
 
@@ -765,21 +765,30 @@ export default {
                 this.$log.info("OverviewTest : getLogoId :: ", "response", response);
                 const imgBlob = await response.blob();
                 this.$log.info("OverviewTest : getLogoId :: ", "imgBlob", imgBlob);
-                const imgByteArray = await this.getAsByteArray(imgBlob);
+                // const imgByteArray = await this.getAsByteArray(imgBlob);
 
-                const tx = await arweave.createTransaction({ data: imgByteArray, }, wallet);
+                // const tx = await arweave.createTransaction({ data: imgByteArray, }, wallet);
 
-                tx.addTag("Content-Type", imgBlob.type);
-                tx.addTag("User-Agent", "AFTR.Market");
-                tx.addTag("Aftr-Playground", name);
+                // tx.addTag("Content-Type", imgBlob.type);
+                // tx.addTag("User-Agent", "AFTR.Market");
+                // tx.addTag("Aftr-Playground", name);
 
-                await arweave.transactions.sign(tx, wallet);
-                await arweave.transactions.post(tx);
-                logoId = tx.id;
+                // await arweave.transactions.sign(tx, wallet);
+                // await arweave.transactions.post(tx);
+                // logoId = tx.id;
 
-                if (Boolean(this.arweaveMine)) {
-                    await fetch(this.mineUrl);
-                }
+                // if (Boolean(this.arweaveMine)) {
+                //     await fetch(this.mineUrl);
+                // }
+                
+                await upload(imgBlob)
+                .then((tx) => {
+                    logoId = tx.assetId;
+                    dispatch(tx)
+                })
+                .then((data) => {
+                    post(data)
+                })
             }
             if (name === "Vint") {
                 this.logoVintId = logoId;

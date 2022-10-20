@@ -378,7 +378,7 @@ import ActionInput from "./layouts/ActionInput.vue";
 
 import { mapGetters } from "vuex";
 import { JWKInterface } from "arweave/web/lib/wallet";
-import { warpCreateFromTx } from "./utils/warpUtils.js";
+import { warpCreateFromTx, upload, dispatch, post } from "./utils/warpUtils.js";
 // import Aftr from "aftr-market";
 
 // const client = new Aftr();
@@ -866,22 +866,34 @@ export default {
         async getAsByteArray(file) {
             return new Uint8Array(await this.readFile(file));
         },
+        // async deployFile(file, arweave, wallet) {
+
+        //     const tx = await arweave.createTransaction({
+        //         data: await this.getAsByteArray(file)
+        //     }, wallet);
+
+        //     tx.addTag("Content-Type", file.type);
+        //     //tx.addTag("User-Agent", `AFTR.Market/this.version`);
+        //     tx.addTag("User-Agent", "AFTR.Market")
+
+        //     await arweave.transactions.sign(tx, wallet);
+        //     await arweave.transactions.post(tx);
+        //     this.communityLogoValue = tx.id;
+        //     this.$log.info("CreateVehicle : deployFile :: ","communityLogoValue", this.communityLogoValue);
+        //     this.$log.info("CreateVehicle : deployFile :: ", "txid", tx.id);
+        // },
+
         async deployFile(file, arweave, wallet) {
-
-            const tx = await arweave.createTransaction({
-                data: await this.getAsByteArray(file)
-            }, wallet);
-
-            tx.addTag("Content-Type", file.type);
-            //tx.addTag("User-Agent", `AFTR.Market/this.version`);
-            tx.addTag("User-Agent", "AFTR.Market")
-
-            await arweave.transactions.sign(tx, wallet);
-            await arweave.transactions.post(tx);
-            this.communityLogoValue = tx.id;
-            this.$log.info("CreateVehicle : deployFile :: ","communityLogoValue", this.communityLogoValue);
-            this.$log.info("CreateVehicle : deployFile :: ", "txid", tx.id);
+            return await upload(file)
+                .then((tx) => {
+                    this.communityLogoValue = tx.assetId;
+                    dispatch(tx)
+                })
+                .then((data) => {
+                    post(data)
+                })
         },
+
         async createVehicle() {
             if (!this.nameValid) {
                 this.$refs.vehicleName.focus();
