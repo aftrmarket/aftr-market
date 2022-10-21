@@ -81,8 +81,8 @@
                                             </svg>
                                     </div>                                
                                 </tr>
-                            <div v-if="opened.includes(pst1.tokenId)">
-                               <tr  v-for="(pst, index) in getVehicle(pst1.tokenId)" :key="pst.tokenId"  class="bg-gray-100" >
+                            <!-- <div v-if="opened.includes(pst1.tokenId)"> -->
+                               <tr  v-for="(pst, index) in getVehicle(pst1.tokenId)" v-show="opened.includes(pst1.tokenId)" :key="pst.tokenId"  class="bg-gray-100" >
                                   
                                     <td class="px-6 py-4 whitespace-nowrap cursor-pointer">
                                         <div class="flex items-center">
@@ -117,7 +117,7 @@
                                         </button>
                                     </td>
                                 </tr>
-                                </div>
+                                <!-- </div> -->
                             </tbody>
                         </table>
                     </div>
@@ -290,8 +290,11 @@ export default {
         getVehicle(id){
             console.log(id)
             let data =  this.vehicle.tokens
+                    .filter(people => people.tokenId == id)    
 .filter(people => people.tokenId == id)    
-.map(person => person)
+                    .filter(people => people.tokenId == id)    
+                    .map(person => person)
+
             console.log(data)
             // [...new Map(this.vehicle.tokens.map(item => [item['tokenId'], item])).values()]
             return data
