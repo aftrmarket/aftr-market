@@ -162,33 +162,25 @@ export default {
             }
         },
         async isDepositAllowed(contractId) {
+            let msg = "";
+
             // Is internalWrite Supported?
             const stateInteractions = await warpRead(contractId);
             
             /*** Changing to look for Warp's version of FCP which will require claims and claimable arrays. */
             //if (!stateInteractions.state.invocations || !stateInteractions.state.foreignCalls) {
                 if (!stateInteractions.state.claims || !stateInteractions.state.claimable) {
-                this.$swal({
-                    icon: "error",
-                    html: "This asset doesn't support cross-contract communication so it can't be deposited into an AFTR vehicle.",
-                    showConfirmButton: true,
-                    allowOutsideClick: false
-                });
-                return false;
+                msg = "This asset doesn't support cross-contract communication so it can't be deposited into an AFTR vehicle.";
+                return msg;
             }
 
             // Test to see if creator's balance would be 0
             if ((stateInteractions.state.ownership === "single") && (this.getActiveAddress === stateInteractions.state.creator) && (stateInteractions.state.balances[this.getActiveAddress] - Number(this.pstInputTokens) <= 0)) {
-                this.$swal({
-                    icon: "error",
-                    html: "Can't deposit this asset because the owner's balance of a single-owner vehicle would become 0.",
-                    showConfirmButton: true,
-                    allowOutsideClick: false
-                });
-                return false;
+                msg = "Can't deposit this asset because the owner's balance of a single-owner vehicle would become 0.";
+                return msg;
             }
 
-            return true;
+            return msg;
         },
         async transferTokens() {
             this.msg = "Please wait for deposit into vehicle to complete..."
@@ -205,11 +197,11 @@ export default {
             const pstId = currentPst.contractId;
 
             // Does PST support internalWrites?
-            const ok = await this.isDepositAllowed(currentPst.contractId);
-            if (!ok) {
+            const msg = await this.isDepositAllowed(currentPst.contractId);
+            if (msg !== "") {
                 this.$swal({
                     icon: "error",
-                    html: "The selected token does not support cross-contract communication, therefore you can't deposit this token.",
+                    html: msg,
                     showConfirmButton: true,
                     allowOutsideClick: false,
                 });
