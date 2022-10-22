@@ -204,7 +204,7 @@
 import numeral from "numeral";
 import { mapGetters } from 'vuex';
 import VehicleTokensAdd from './VehicleTokensAdd.vue';
-import { warpRead, warpWrite } from './../utils/warpUtils.js';
+import { warpRead, warpWrite, arweaveInit } from './../utils/warpUtils.js';
 import SlideUpDown from 'vue3-slide-up-down'
 
 
@@ -288,14 +288,12 @@ export default {
             
         },
         getVehicle(id){
-            console.log(id)
             let data =  this.vehicle.tokens
                     .filter(people => people.tokenId == id)    
-.filter(people => people.tokenId == id)    
+                    .filter(people => people.tokenId == id)    
                     .filter(people => people.tokenId == id)    
                     .map(person => person)
 
-            console.log(data)
             // [...new Map(this.vehicle.tokens.map(item => [item['tokenId'], item])).values()]
             return data
             
@@ -399,7 +397,59 @@ export default {
                 return '';
             }
         },
-        onTransferPstClick(txID, index, tokenId) {
+
+        async findIdType(id) {
+            const arweave = arweaveInit();
+            let txType = "";
+            try {
+                let smartweaveContract = false;
+                let aftrVehicle = false;
+                const tx = await arweave.transactions.get(id);
+                for (let tag of tx.tags) {
+                    let key = tag.get("name", {decode: true, string: true});
+                    let value = tag.get('value', {decode: true, string: true});
+                    if (key === "App-Name" && value === "SmartWeaveContract") {
+                        smartweaveContract = true;
+                    }
+                    if (key === "Protocol" && value === "AFTR-PLAY") {
+                        aftrVehicle = true;
+                    }
+                }
+                if (aftrVehicle) {
+                    txType = "AFTR Vehicle";
+                } else if (smartweaveContract) {
+                    txType = "SmartWeave Contract";
+                } else {
+                    txType = "UNSURE";
+                }
+            } catch(e) {
+                this.$log.info("VehicleTokens : findIdType :: ", "ERROR when getting the tx. " + e);
+                txType = "UNSURE";
+            }
+
+            if (txType !== "UNSURE") {
+                return txType;
+            }
+
+            // Test for address
+            try {
+                const balance = await arweave.wallets.getBalance(id);
+                let winston = balance;
+                let ar = arweave.ar.winstonToAr(balance);
+            
+                if (Number(ar) > 0) {
+                    txType = "Address";
+                } else {
+                    txType = "Unknown - could be a wallet address with 0 AR";
+                }
+            } catch(e) {
+                this.$log.info("VehicleTokens : findIdType :: ", "ERROR when getting balance. " + e);
+            }
+
+            return txType;
+        },
+
+        async onTransferPstClick(txID, index, tokenId) {
             const pst = this.vehicle.tokens.find( token => token.txID === txID);
 
             // Validate the amount
@@ -407,23 +457,70 @@ export default {
                 this.transferAmtValid = true;
             } else {
                 this.transferAmtValid = false;
+                this.$swal({
+                    icon: "error",
+                    html: "The Transfer Amount is invalid.",
+                    showConfirmButton: true,
+                    allowOutsideClick: false,
+                });
+                return;
+            }
+            if (!this.isAddrValid(this.transferAddrs[index])) {
+                this.$swal({
+                    icon: "error",
+                    html: "The Address is invalid.",
+                    showConfirmButton: true,
+                    allowOutsideClick: false,
+                });
+                return;
+            }
+            let txType = await this.findIdType(this.transferAddrs[index]);
+            if (txType === "AFTR Vehicle" || txType === "SmartWeave Contract") {
+                let msg = "";
+                if (txType === "AFTR Vehicle") {
+                    msg = "You are trying to withdraw to an " + txType + ". Currently, you must transfer to a wallet first. In the future, this functionality will be available.";
+                } else {
+                    msg = "You are trying to withdraw to a " + txType + ". Currently, you must transfer to a wallet first. In the future, this functionality will be available.";
+                }
+                this.$swal({
+                    icon: "error",
+                    html: msg,
+                    showConfirmButton: true,
+                    allowOutsideClick: false,
+                });
+                return;
+            }
+            if (txType !== "Address") {
+                let msg = "We cannot determine the type of ID because if you entered a wallet address, the AR balance may be 0. Currently, you can only withdrawal directly to a wallet (the ability to withdraw to a Smart Contract will be added in the future.) If you did not enter a wallet address, then these tokens may be lost forever! Do you wish to proceed?";                
+                const result = await this.$swal.fire({
+                    title: "Confirm Transfer Address",
+                    icon: "warning",
+                    html: msg,
+                    showConfirmButton: true,
+                    confirmButtonText: "Yes",
+                    confirmButtonColor: "#6C8CFF",
+                    showCancelButton: true,
+                    cancelButtonText: "No",
+                    cancelButtonColor: "#FF6C8C",
+                });
+                if (!result.isConfirmed) {
+                    return;
+                }
             }
 
-            if (this.transferAmtValid && this.isAddrValid(this.transferAddrs[index])) {
-                const foundIndex = this.proposedChanges.findIndex( tx => tx.txID === txID);
-                if (foundIndex === -1) {
-                    this.proposedChanges.push(
-                        {
-                            txID: txID,
-                            tokenId: tokenId,
-                            target: this.transferAddrs[index],
-                            qty: this.transferAmounts[index]
-                        }
-                    );
-                } else {
-                    this.proposedChanges[foundIndex].qty = this.transferAmounts[index];
-                    this.proposedChanges[foundIndex].target = this.transferAddrs[index];
-                }
+            const foundIndex = this.proposedChanges.findIndex( tx => tx.txID === txID);
+            if (foundIndex === -1) {
+                this.proposedChanges.push(
+                    {
+                        txID: txID,
+                        tokenId: tokenId,
+                        target: this.transferAddrs[index],
+                        qty: this.transferAmounts[index]
+                    }
+                );
+            } else {
+                this.proposedChanges[foundIndex].qty = this.transferAmounts[index];
+                this.proposedChanges[foundIndex].target = this.transferAddrs[index];
             }
         },
         onRemoveProposalClick(index) {
