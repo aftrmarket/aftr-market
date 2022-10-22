@@ -33,23 +33,11 @@
                <span :class="vehicleStatusAlert">{{ vehicleStatusText }}</span>
             </div>
             <div class="justify-self-center">
-                <div v-if="anyWithdrawals" class="tooltip">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#FF6C8C" class="w-5 h-5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
-                    </svg>
-                    <span class="tooltiptext">{{ wdText }}</span>
-                </div>
                 <div v-if="evolveNeeded" class="tooltip">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="#FF6C8C">
                         <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
                     </svg>
                     <span class="tooltiptext">{{ evolveText }}</span>
-                </div>
-                <div v-if="concludeVote" class="tooltip">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="#FF6C8C" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                    </svg>
-                    <span class="tooltiptext">{{ concludeVoteText }}</span>
                 </div>
             </div>
             <div class="pr-3 justify-self-end">
@@ -78,27 +66,19 @@ export default {
     props: ["vehicle"],
     data() {
         return {
-            anyWithdrawals: false,
             evolveNeeded: false,
-            concludeVote: false,
         };
     },
     computed: {
         actionRequiredClass() {
-            if (this.anyWithdrawals || this.evolveNeeded || this.concludeVote) {
+            if (this.evolveNeeded) {
                 return "text-aftrRed text-xl font-normal line-clamp-1 break-all";
             } else {
                 return "text-gray-900 text-xl font-normal line-clamp-1 break-all";
             }
         },
-        wdText() {
-            return "Withdrawal Confirmation Needed";
-        },
         evolveText() {
             return "Contract Update Needed";
-        },
-        concludeVoteText() {
-            return "Vote Confirmation Needed";
         },
         vehicleStatusAlert() {
             if (typeof this.vehicle.status === 'undefined' || this.vehicle.status === 'stopped' || this.vehicle.status === '') {
@@ -147,15 +127,6 @@ export default {
         // Does vehicle contract need to be evolved? Only show to members of the vehicle
         if (this.vehicle.evolve && (this.vehicle.creator === this.getActiveAddress || this.getActiveAddress in this.vehicle.balances)) {
             this.evolveNeeded = true;
-        }
-
-        // Are there any withdrawals waiting to be processed?
-        if (this.vehicle.anyWithdrawals) {
-            this.anyWithdrawals = true;
-        }
-
-        if (this.vehicle.concludeVoteNeeded) {
-            this.concludeVote = true;
         }
     }
 };

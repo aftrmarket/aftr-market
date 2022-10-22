@@ -252,9 +252,7 @@ export default {
             }
 
             if (this.searchType == "Needs Attention") {
-                const vehicle = this.vehicles.filter( (vehicle) => {
-                    vehicle.evolve == true || vehicle.concludeVoteNeeded == true || vehicle.anyWithdrawals == true
-                });
+                const vehicle = this.vehicles.filter( (vehicle) => { vehicle.evolve == true });
                 this.numVehicles = vehicle.length;
                 return vehicle;
             }
@@ -379,33 +377,35 @@ export default {
                     if (typeof vehicle.votes !== "undefined" && vehicle.votes.length !== 0) {
                         const activeVotes = vehicle.votes.filter((vote) => vote.status === "active");
                         vehicle.totalActiveVotes = activeVotes.length;
-                        
+
+                        /*** The concludedVoteNeeded proporty was added before using Warp.  Since switching to Warp, we don't need to check this anymore b/c contract functions run during a read of the contract. */
                         // Show vehicle notices to members
-                        if (isMember) {
-                            // Look for votes that need to be concluded
-                            this.$store.dispatch('loadCurrentBlock');
-                            let currentBlock = +this.currentBlock.height;
-                            activeVotes.forEach((vote) => {
-                                let start = +vote.start;
-                                let voteLength = +vote.voteLength;
-                                if (start + voteLength < currentBlock) {
-                                    vehicle.concludeVoteNeeded = true;
-                                }
-                            });
-                        }
+                        // if (isMember) {
+                        //     // Look for votes that need to be concluded
+                        //     this.$store.dispatch('loadCurrentBlock');
+                        //     let currentBlock = +this.currentBlock.height;
+                        //     activeVotes.forEach((vote) => {
+                        //         let start = +vote.start;
+                        //         let voteLength = +vote.voteLength;
+                        //         if (start + voteLength < currentBlock) {
+                        //             vehicle.concludeVoteNeeded = true;
+                        //         }
+                        //     });
+                        // }
                     } else {
                         vehicle.totalActiveVotes = 0;
                     }
 
+                    /*** The anyWithdrawals property was added during the use of FCP.  Since switching to Internal Writes with Warp, we don't need to check this anymore. */
                     // Are there any withdrawals waiting to be processed?
-                    if (typeof vehicle.tokens !== "undefined") {
-                        for (let token of vehicle.tokens) {
-                            if (token.withdrawals && token.withdrawals.length > 0) {
-                                vehicle.anyWithdrawals = true;
-                                break;
-                            }
-                        }
-                    }
+                    // if (typeof vehicle.tokens !== "undefined") {
+                    //     for (let token of vehicle.tokens) {
+                    //         if (token.withdrawals && token.withdrawals.length > 0) {
+                    //             vehicle.anyWithdrawals = true;
+                    //             break;
+                    //         }
+                    //     }
+                    // }
                     
                     this.vehicles.push(vehicle);
                 }
