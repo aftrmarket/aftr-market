@@ -11,7 +11,7 @@
                 </div>
                 <div class="pl-8 pb-4">
                     <span v-html="getAllInputs(activity.input)"></span>
-                     <span v-if="isError" v-html="getErrorInputs(activity)"></span>
+                    <span v-if="isError" v-html="getErrorInputs(activity)"></span>
                 </div>
                 <div class="flex flex-row">
                     <div v-if="activity.result">
@@ -119,7 +119,11 @@ export default {
 
                     for (let key in action.input) {
                         if (action.input[key]) {
-                            actionText += "<p class='pl-8 text-sm'>- " + key + ": <span class='font-mono text-gray-600'>" + action.input[key] + "</span></p>";
+                            let value = action.input[key];
+                            if (typeof value === "object") {
+                                value = JSON.stringify(value);
+                            }
+                            actionText += "<p class='pl-8 text-sm'>- " + key + ": <span class='font-mono text-gray-600'>" + value + "</span></p>";
                         }
                     }
                     count++;
@@ -129,7 +133,11 @@ export default {
                 // Loop through keys
                 for (let i = 0; i < keys.length; i++) {
                     if (keys[i] !== "function" && obj[keys[i]] != "") {
-                        htmlText += "<p class='pl-4 text-sm'>- " + keys[i] + ": <span class='font-mono text-sm text-gray-600'>" + obj[keys[i]] + "</span></p>";
+                        let value = obj[keys[i]];
+                        if (typeof value === "object") {
+                            value = JSON.stringify(value);
+                        }
+                        htmlText += "<p class='pl-4 text-sm'>- " + keys[i] + ": <span class='font-mono text-sm text-gray-600'>" + value + "</span></p>";
                     }
                 }
             }
