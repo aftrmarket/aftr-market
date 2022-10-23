@@ -129,7 +129,7 @@
                     <div class="bg-white sm:p-6">
                         <div v-if="arConnected" class="pt-6">
                             <label class="block text-sm font-medium text-gray-700">
-                                Creator:
+                                Owner:
                                 <span class="font-bold text-aftrBlue">{{ walletAddressSubstr($store.getters.getActiveAddress) }}</span>
                             </label>
                         </div>
@@ -256,7 +256,7 @@
                             <div class="mt-6 pl-4 flex flex-col inline-flex">
                                 <div v-if="!memberAmountValid">
                                     <label class="pl-4 flex flex-col inline-flex block text-sm text-aftrRed">
-                                        The Creator is assumed be a DAO member.
+                                        The Owner is assumed be a DAO member.
                                         <br />
                                         Be Sure to update token balance below.
                                     </label>
@@ -526,7 +526,7 @@ export default {
     },
     watch: {
         arConnected(value) {
-            // Update DAO Members with creator address if user is already ArConnected
+            // Update DAO Members with owner address if user is already ArConnected
             if (value) {
                 this.daoMembers.push({
                     wallet: this.$store.getters.getActiveAddress,
@@ -942,7 +942,7 @@ export default {
             if (import.meta.env.VITE_ENV !== "PROD") {
                 initTags.push({ name: "Aftr-Playground", value: this.vehicle.ticker});
             }
-            this.vehicle.creator = this.$store.getters.getActiveAddress;
+            this.vehicle.owner = this.$store.getters.getActiveAddress;
             //this.vehicle.seats = this.seats;  /*** NO LONGER USED */
             this.vehicle.lockPeriod = this.lockPeriod;
             //this.vehicle.minLease = this.minLease;
@@ -1065,7 +1065,7 @@ export default {
                     // Add to Wallet PSTs if the Verto Cache is not being used
                     let pst = {
                         contractId: this.vehicle["id"],
-                        balance: this.vehicle.balances[this.vehicle.creator],
+                        balance: this.vehicle.balances[this.vehicle.owner],
                         name: this.vehicle.name,
                         ticker: this.vehicle.ticker,
                         //logo: this.communityLogoValue,
@@ -1163,7 +1163,7 @@ export default {
         },
     },
     created() {
-        // Update DAO Members with creator address if user is already ArConnected
+        // Update DAO Members with owner address if user is already ArConnected
         if (this.$store.getters.arConnected) {
             this.daoMembers.push({
                 wallet: this.$store.getters.getActiveAddress,

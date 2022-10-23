@@ -80,9 +80,9 @@
                     <input @change="formDirty" v-model="newVoteLength" class="w-3/4" type="number" name="newVoteLength" :class="inputBox(voteLengthIsValid)" />
                     <div/>
                     <div/>
-                    <label class="pt-4 pb-2 grid col-span-2 block text-sm font-medium text-gray-700">Creator (transferring ownership not recommended!)</label>
+                    <label class="pt-4 pb-2 grid col-span-2 block text-sm font-medium text-gray-700">Owner (transferring ownership not recommended!)</label>
                     <div/>
-                    <input @change="formDirty" v-model="newCreator" class="grid col-span-2 w-3/4" type="text" name="newCreator" :class="inputBox(creatorIsValid)" />
+                    <input @change="formDirty" v-model="newOwner" class="grid col-span-2 w-3/4" type="text" name="newOwner" :class="inputBox(ownerIsValid)" />
                 </div>
             </div>
             <div class="flex justify-end">
@@ -139,11 +139,11 @@ export default {
             newVoteLength: 0,
             newQuorum: 0,
             newSupport: 0,
-            newCreator: '',
+            newOwner: '',
             quorumIsValid: true,
             supportIsValid: true,
             voteLengthIsValid: true,
-            creatorIsValid: true,
+            ownerIsValid: true,
             totalSize: 0,
             fileInvalid: false,
             fileUpload: false,
@@ -152,12 +152,12 @@ export default {
     },
     watch: {
         arConnected(value) {
-            // Allow edits if user is creator and vehicle is not running, otherwise changes must be via vote
+            // Allow edits if user is owner and vehicle is not running, otherwise changes must be via vote
             this.checkEditStatus();
         },
         statusSwitchEnabled() {
             // If vehicle is turned on, a vote must take place to turn it off (unless it's a single-owned vehicle)
-            if (this.getActiveAddress === this.creatorAddress && (this.vehicle.status !== 'started' || this.vehicle.ownership === 'single')) {
+            if (this.getActiveAddress === this.ownerAddress && (this.vehicle.status !== 'started' || this.vehicle.ownership === 'single')) {
                 this.allowVehicleEdits = true;
             } else {
                 this.allowVehicleEdits = false;
@@ -191,11 +191,11 @@ export default {
                 return this.vehicle.status;
             }
         },
-        creatorAddress() {
-            if (typeof this.vehicle.creator === 'undefined' || this.vehicle.creator === null || this.vehicle.creator === '') {
+        ownerAddress() {
+            if (typeof this.vehicle.owner === 'undefined' || this.vehicle.owner === null || this.vehicle.owner === '') {
                 return '~NO ONE~';
             } else {
-                return this.vehicle.creator;
+                return this.vehicle.owner;
             }
         },
         fileMessage() {
@@ -241,7 +241,7 @@ export default {
             }
         },
         checkEditStatus() {
-            if (this.getActiveAddress === this.creatorAddress && (this.vehicle.status !== 'started' || this.vehicle.ownership === 'single')) {
+            if (this.getActiveAddress === this.ownerAddress && (this.vehicle.status !== 'started' || this.vehicle.ownership === 'single')) {
                 this.allowVehicleEdits = true;
                 if (this.vehicle.status === 'started') {
                     this.statusSwitchEnabled = true;
@@ -282,7 +282,7 @@ export default {
                 } else {
                     this.newVotingSystem = this.vehicle.votingSystem;
                 }
-                this.newCreator = this.vehicle.creator;
+                this.newOwner = this.vehicle.owner;
 
                 // Get the settings map values
                 this.newQuorum = this.currentVehicleSettings.get('quorum');
@@ -296,7 +296,7 @@ export default {
             this.quorumIsValid = true;
             this.supportIsValid = true;
             this.voteLengthIsValid = true;
-            this.creatorIsValid = true;
+            this.ownerIsValid = true;
 
             // Validate form
             if (!this.newName || this.newName === '') {
@@ -320,9 +320,9 @@ export default {
                 this.isFormValid = false;
                 this.voteLengthIsValid = false;
             }
-            if (!this.newCreator || this.newCreator.length != 43) {
+            if (!this.newOwner || this.newOwner.length != 43) {
                 this.isFormValid = false;
-                this.creatorIsValid = false;
+                this.ownerIsValid = false;
             }
         },
        async updateVehicle() {
@@ -389,8 +389,8 @@ export default {
                 if (this.newVotingSystem !== this.vehicle.votingSystem) {
                     changeMap.set('votingSystem', this.newVotingSystem);
                 }
-                if (this.newCreator !== this.vehicle.creator) {
-                    changeMap.set('creator', this.newCreator);
+                if (this.newOwner !== this.vehicle.owner) {
+                    changeMap.set('owner', this.newOwner);
                 }
 
                 // Settings

@@ -6,8 +6,8 @@ function isVehicleMember(vehicle, userAddr) {
     const addr = userAddr;
     let found = false;
     
-    // If single ownership, check for creator
-    if (vehicle.ownership === "single" && addr === vehicle.creator) {
+    // If single ownership, check for owner
+    if (vehicle.ownership === "single" && addr === vehicle.owner) {
         return true;
     }
 

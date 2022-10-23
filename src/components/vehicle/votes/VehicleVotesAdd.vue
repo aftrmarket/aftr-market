@@ -190,7 +190,7 @@ export default {
                 { id: "status", desc: "Status", valid: ['stopped', 'started', 'expired'] },
                 { id: "name", desc: "Name" },
                 { id: "ticker", desc: "Ticker" },
-                { id: "creator", desc: "Creator" },
+                { id: "owner", desc: "Owner" },
                 { id: "ownership", desc: "Ownership", valid: ['single', 'dao'] },
                 { id: "settings.quorum", desc: "Quorum", type: 'number' },
                 { id: "settings.voteLength", desc: "Vote Length", type: 'number' },
@@ -306,7 +306,7 @@ export default {
             // Fields have changed, update totals and determine if data is invalid
             this.dataValid = true;
             if (this.voteType === 'change') {
-                if (this.stateKey === '' || this.stateValue === '' || this.stateValue == this.currentValue || (this.stateKey === 'creator' && !this.isValidAddr(this.stateValue))) {
+                if (this.stateKey === '' || this.stateValue === '' || this.stateValue == this.currentValue || (this.stateKey === 'owner' && !this.isValidAddr(this.stateValue))) {
                     this.dataValid = false;
                 }
             } else if (this.voteType === 'member') {

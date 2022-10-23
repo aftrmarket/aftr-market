@@ -174,8 +174,8 @@ export default {
                 return msg;
             }
 
-            // Test to see if creator's balance would be 0
-            if ((stateInteractions.state.ownership === "single") && (this.getActiveAddress === stateInteractions.state.creator) && (stateInteractions.state.balances[this.getActiveAddress] - Number(this.pstInputTokens) <= 0)) {
+            // Test to see if owner's balance would be 0
+            if ((stateInteractions.state.ownership === "single") && (this.getActiveAddress === stateInteractions.state.owner) && (stateInteractions.state.balances[this.getActiveAddress] - Number(this.pstInputTokens) <= 0)) {
                 msg = "Can't deposit this asset because the owner's balance of a single-owner vehicle would become 0.";
                 return msg;
             }

@@ -20,7 +20,7 @@ this.contractSourceId = "BTxbGwMEyVv94ak2CDeuCAXLWnAhwLb_hK4qw8_a-JU";  // Contr
  {
   "name": "Test Vehicle",
   "ticker": "AFTR-Test-1",
-  "creator": "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
+  "owner": "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
   "seats": 0,
   "lockPeriod": 0,
   "minLease": 2,

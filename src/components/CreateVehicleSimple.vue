@@ -108,7 +108,7 @@ export default {
                 "vault": {},
                 "votes": [],
                 "status": "started",
-                "creator" : "",
+                "owner" : "",
                 "ownership" : "single",
                 "votingSystem" : "weighted",
                 "claims": [],
@@ -190,7 +190,7 @@ export default {
             // Complete vehicleTemplate values
             this.vehicleTemplate.name = this.vehicleName;
             this.vehicleTemplate.ticker = this.vehicleTicker;
-            this.vehicleTemplate.creator = this.getActiveAddress;
+            this.vehicleTemplate.owner = this.getActiveAddress;
             this.vehicleTemplate.balances[this.getActiveAddress] = 1;
 
             // const use_wallet = "use_wallet";
@@ -215,7 +215,7 @@ export default {
                     // Add to Wallet PSTs if the Verto Cache is not being used
                     let pst = {
                         contractId: this.vehicleTemplate["id"],
-                        balance: this.vehicleTemplate.balances[this.vehicleTemplate.creator],
+                        balance: this.vehicleTemplate.balances[this.vehicleTemplate.owner],
                         name: this.vehicleTemplate.name,
                         ticker: this.vehicleTemplate.ticker,
                         //logo: this.communityLogoValue,

@@ -230,15 +230,15 @@ export default {
                 return "text-gray-500 text-sm";
             }
         },
-        creatorAddress() {
-            if (typeof this.vehicle.creator === 'undefined' || this.vehicle.creator === null || this.vehicle.creator === '') {
+        ownerAddress() {
+            if (typeof this.vehicle.owner === 'undefined' || this.vehicle.owner === null || this.vehicle.owner === '') {
                 return '~NO ONE~';
             } else {
-                return this.vehicle.creator;
+                return this.vehicle.owner;
             }
         },
         statusMessage() {
-            if (this.getActiveAddress === this.creatorAddress && this.vehicle.ownership === 'single') {
+            if (this.getActiveAddress === this.ownerAddress && this.vehicle.ownership === 'single') {
                 return "Settings changes will process immediately because you are the owner of the vehicle";
             } else {
                 return "Settings changes will be proposed as votes because this is a DAO owned vehicle";

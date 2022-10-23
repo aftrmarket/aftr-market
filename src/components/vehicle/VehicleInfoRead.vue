@@ -74,7 +74,7 @@
                 <div class="px-4 sm:px-6 max-w-2xl text-sm text-gray-500">Created By</div>
                 <div class="flex items-center justify-between pb-4">
                     <div class="px-4 sm:px-6 text-left text-sm font-mono tracking-wider">
-                        {{ walletAddressSubstr(vehicle.creator) }}
+                        {{ walletAddressSubstr(vehicle.owner) }}
                     </div>
                 </div>
             </div>
@@ -164,7 +164,7 @@ export default {
         },
         getOwnership() {
             if (this.vehicle.ownership === 'single') {
-                return 'Owned by creator';
+                return 'Owned by owner';
             } else {
                 return 'DAO Owned'
             }

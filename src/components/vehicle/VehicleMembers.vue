@@ -190,8 +190,8 @@ export default {
             newMember: '',
             newQty: null,
             addRow: false,
-            // allowVehicleAdds: false,            // Allow adding members if Creator and Not Started
-            // allowVehicleRemoves: false,         // Allow removing members if Creator, Single Ownership, and Not Started
+            // allowVehicleAdds: false,            // Allow adding members if Owner and Not Started
+            // allowVehicleRemoves: false,         // Allow removing members if Owner, Single Ownership, and Not Started
             showAddModal: false,                 // ADD THIS FUNCTIONALITY LATER
             allowEdits: false,
             isDirty: false,
@@ -238,15 +238,15 @@ export default {
                 return "text-gray-500 text-sm";
             }
         },
-        creatorAddress() {
-            if (typeof this.vehicle.creator === 'undefined' || this.vehicle.creator === null || this.vehicle.creator === '') {
+        ownerAddress() {
+            if (typeof this.vehicle.owner === 'undefined' || this.vehicle.owner === null || this.vehicle.owner === '') {
                 return '~NO ONE~';
             } else {
-                return this.vehicle.creator;
+                return this.vehicle.owner;
             }
         },
         statusMessage() {
-            if (this.getActiveAddress === this.creatorAddress && this.vehicle.ownership === 'single') {
+            if (this.getActiveAddress === this.ownerAddress && this.vehicle.ownership === 'single') {
                 return "Membership changes will process immediately because you are the owner of the vehicle";
             } else {
                 return "Membership changes will be proposed as votes because this is a DAO owned vehicle";
@@ -297,8 +297,8 @@ export default {
             }
         },
         // setFlags() {
-        //     // Allow member add/remove if user is creator and (ownership is single or vehicle is not running), otherwise changes must be via vote
-        //     if (this.getActiveAddress === this.creatorAddress && (this.vehicle.ownership === 'single' || this.vehicle.status !== 'started')) {
+        //     // Allow member add/remove if user is owner and (ownership is single or vehicle is not running), otherwise changes must be via vote
+        //     if (this.getActiveAddress === this.ownerAddress && (this.vehicle.ownership === 'single' || this.vehicle.status !== 'started')) {
         //         this.allowVehicleAdds = true;
         //         this.allowVehicleRemoves = true;
         //     } else {
