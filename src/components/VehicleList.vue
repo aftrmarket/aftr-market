@@ -9,8 +9,8 @@
                 <div class="pb-5 sm:flex sm:items-center sm:justify-between">
                     <div class="flex items-center">
                         <select @change="filterChange" v-model="filter" class="mt-1 mr-2 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                            <option value="all">All Vehicles</option>
-                            <option value="my" selected>My Vehicles</option>
+                            <option value="all" selected>All Vehicles</option>
+                            <option value="my">My Vehicles</option>
                         </select>
                         <button type="button" @click.prevent="toggleLayout" class="mr-2">
                             <svg v-if="!layoutGrid" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="#FFFC79" stroke-width="2">
@@ -137,7 +137,7 @@ export default {
             my_vehicle: "my_vehicle",
             getVehicleList: false,
             vehicles: [],
-            filter: "my",
+            filter: "all",
             cursor: "",
             noResult: false,
             message: "",

@@ -105,7 +105,7 @@
                 <div class="px-4 sm:px-6 max-w-2xl text-sm text-gray-500">Quorum</div>
                 <div class="flex items-center justify-between pb-4">
                     <div class="px-4 sm:px-6">
-                        {{ formatNumber(currentVehicleSettings.get('quorum'), true) }}
+                        {{ formatNumber(currentVehicleSettings.get('quorum'), true) }} %
                     </div>
                 </div>
             </div>
@@ -113,7 +113,7 @@
                 <div class="px-4 sm:px-6 max-w-2xl text-sm text-gray-500">Support</div>
                 <div class="flex items-center justify-between pb-4">
                     <div class="px-4 sm:px-6">
-                        {{ formatNumber(currentVehicleSettings.get('support'), true) }}
+                        {{ formatNumber(currentVehicleSettings.get('support'), true) }} %
                     </div>
                 </div>
             </div>
@@ -188,7 +188,8 @@ export default {
         },
         formatNumber(num, dec = false) {
             if (dec) {
-                return numeral(num).format("0,0.0000");
+                return num * 100
+                // numeral(num).format("0,0.0000");
             } else {
                 return numeral(num).format("0,0");
             }
