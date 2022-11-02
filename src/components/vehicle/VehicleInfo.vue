@@ -306,12 +306,12 @@ export default {
                 this.isFormValid = false;
             }
             if (!this.newQuorum || this.newQuorum === '' || +this.newQuorum < 0.01 || +this.newQuorum > 0.99) {
-                // Quarum needs to be in the following range:  0.01 - 0.99
+                // Quorum needs to be in the following range:  0.01 - 0.99
                 this.isFormValid = false;
                 this.quorumIsValid = false;
             }
             if (!this.newSupport || this.newSupport === '' || +this.newSupport < 0.01 || +this.newSupport > 0.99) {
-                // Quarum needs to be in the following range:  0.01 - 0.99
+                // Support needs to be in the following range:  0.01 - 0.99
                 this.isFormValid = false;
                 this.supportIsValid = false;
             }
@@ -401,7 +401,7 @@ export default {
                     changeMap.set('settings.quorum', this.newQuorum);
                 }
                 if (this.newSupport !== this.currentVehicleSettings.get('support')) {
-                    changeMap.set('settings.quorum', this.newSupport);
+                    changeMap.set('settings.support', this.newSupport);
                 }
                 if (this.newVoteLength !== this.currentVehicleSettings.get('voteLength')) {
                     changeMap.set('settings.voteLength', this.newVoteLength);
