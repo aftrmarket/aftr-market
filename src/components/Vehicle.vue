@@ -200,6 +200,17 @@ export default {
     methods: {
         showPopup(){
             this.show = true;
+
+            let timer = 3;
+            let interval = setInterval(() => {
+            if (timer === 0) {
+                clearInterval(interval)   
+                 this.show = false;             
+            } else {
+                timer--
+                console.log(timer)
+            }             
+            }, 1000)
         },
         tabText(tab) {
             let cssText = "w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm ";

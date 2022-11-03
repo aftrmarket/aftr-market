@@ -188,7 +188,7 @@ export default {
         },
         formatNumber(num, dec = false) {
             if (dec) {
-                return num * 100
+                return (num * 100).toFixed(2);
                 // numeral(num).format("0,0.0000");
             } else {
                 return numeral(num).format("0,0");

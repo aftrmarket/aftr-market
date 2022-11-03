@@ -43,6 +43,9 @@
                 </div>
             </div>
         </div>
+         <div class="text-center">
+            <button v-if="hasNextPage" @click.prevent="load" type="submit" class="mt-4 px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Load More</button>
+        </div>
     </perfect-scrollbar>
 </template>
 
@@ -54,7 +57,9 @@ export default {
             isLoading: true,
             edges: [],
             activities: [],
-            isError: true
+            isError: true,
+            hasNextPage: false,
+            cursor: "",
         };
     },
     computed: {
@@ -156,7 +161,8 @@ export default {
         async runQuery(query, errorMsg) {
             try {
                 let response = await this.arweave.api.post("graphql", {
-                    query: query
+                    query: query,
+                    variables: { "cursor": this.cursor }
                 });
 
                 if (response.status !== 200) {
@@ -168,18 +174,48 @@ export default {
                 this.$log.error("VehicleActivity : runQuery :: ", errorMsg + e);
             }
         },
+        async load() {
+            // Get the AFTR Contract Source ID for Prod
+            if (import.meta.env.VITE_ENV === "PROD") {
+                this.$store.commit("setAftrContractSrcId", import.meta.env.VITE_SMARTWEAVE_CONTRACT_SOURCE_ID);
+                this.$store.commit("setEvolvedContractSrcId", import.meta.env.VITE_EVOLVED_CONTRACT_SOURCE_ID);
+            }
+
+            // Get all aftr vehicle contracts, then load all vehicles
+            let txs = await this.readInteractions();
+
+            console.log("txs",txs)
+            // for (let edge of txs.edges) {
+            //     await this.loadAllVehicles(edge.node.id);
+            // }
+
+            this.numVehicles = this.vehicles.length;
+        },
         async readInteractions() {
+            console.log("this.interactions", this.interactions, this.activities)
+            
             // Get all interaction ids for query
             let interactionStrings = '[';
             for (const i in this.interactions) {
+                console.log("i",i)
                     interactionStrings += '"' + i + '",';
             }
             interactionStrings += ']';
+            // let interactionStrings = []
+            // for (const i in this.interactions) {
+            //         interactionStrings.push(i)
+            // }
+            
+            // let ids = this.activities.map(c => c.id);
+            // console.log("ids", ids,interactionStrings,typeof(interactionStrings))
+            // let test = ids.length != 0 ? interactionStrings.filter(id => !ids.includes(id)) : interactionStrings
+            console.log("test", interactionStrings);
             let query = `
                 query($cursor: String) {
                     transactions(
                         ids: ${interactionStrings}
                         after: $cursor
+                        first: 2
                     ) {
                         pageInfo {
                             hasNextPage
@@ -192,8 +228,23 @@ export default {
                 }
             `;
             // Return data about each interation
-            const responseData = await this.runQuery(query, "Error querying interactions. ");
-            this.edges = responseData.data.data.transactions.edges;
+            const response = await this.runQuery(query, "Error querying interactions. ");
+            
+             if(response.data.data.transactions.pageInfo.hasNextPage) {
+                this.hasNextPage = true;
+                const [lastNumber] = response.data.data.transactions.edges.slice(-1);
+                console.log("this.cursor " ,this.cursor)
+                this.cursor = lastNumber.cursor;
+
+                console.log("this.cursor " ,this.cursor)
+                } else {
+                    this.hasNextPage = false;
+                }
+
+            
+            this.edges = response.data.data.transactions.edges;
+            // console.log("this.edges", response.data.data.transactions.edges)
+
         },
     },
     async created() {
