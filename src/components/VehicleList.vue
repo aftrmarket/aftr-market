@@ -137,7 +137,7 @@ export default {
             my_vehicle: "my_vehicle",
             getVehicleList: false,
             vehicles: [],
-            filter: "all",
+            filter: "my",
             cursor: "",
             noResult: false,
             message: "",
@@ -533,6 +533,11 @@ export default {
         this.isLoading = true;
         this.getUserPsts();
         await this.load();
+
+        if (this.filter === "my" && this.vehicles.length == 0) {
+            this.filter = "all"
+            await this.filterChange();
+        }
         this.isLoading = false;
     },
     

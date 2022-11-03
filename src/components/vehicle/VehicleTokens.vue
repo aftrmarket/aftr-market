@@ -68,18 +68,30 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200" v-for="(pst1) in getVehicle1()" :key="pst1.tokenId">
-                                <tr @click="toggle(pst1.tokenId)" :class="{ opened: opened.includes(pst1.tokenId)}">
-                                    <div class="flex items-center">
-                                            <div class="ml-4">
-                                                <div class="mt-4 mb-4 font-large text-gray-900"> {{ pst1.name + " (" + pst1.ticker + ")" }} </div>
+                                <tr @click="toggle(pst1.tokenId)" :class="{opened: opened.includes(pst1.tokenId)}">
+                                    <td class="px-6 py-4 whitespace-nowrap cursor-pointer">
+                                         <div class="flex items-center mt-3 ml-3 mb-3">
+                                            <div class="flex-shrink-0 h-10 w-10">
+                                                <img class="h-10 w-10 rounded-full" :src="pstLogo(pst1.tokenId, pst1.logo)" alt="" />
                                             </div>
-                                            <svg v-if="arrow" xmlns="http://www.w3.org/2000/svg" class="ml-2 h-3 w-3 align-middle" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                                            </svg>
-                                            <svg v-if="!arrow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="ml-2 h-3 w-3" >
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
-                                            </svg>
-                                    </div>                                
+                                            <div class="ml-4">
+                                                <div class="font-medium text-gray-900"> {{ pst1.name + " (" + pst1.ticker + ")" }}  ({{ pst1.count }})</div>
+                                            </div>
+                                         </div>
+                                    </td>
+                                     <td class="px-1 py-3 text-gray-500 font-mono cursor-pointer" ></td>    
+                                    <td class="text-right px-1 py-3 text-gray-500">{{ formatNumber(pst1.tokens) }}</td>   
+                                    <td class="text-right px-6 py-3 text-gray-500"></td>
+                                    <td class="text-right px-6 py-3 text-gray-500"></td>
+                                    <td class="text-right px-6 py-3 text-gray-500"></td>
+                                    <td class="text-right px-6 py-3 text-gray-500">
+                                        <svg v-if="arrow" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                        <svg v-if="!arrow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-3 w-3" >
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+                                        </svg> 
+                                    </td>                    
                                 </tr>
                             <!-- <div v-if="opened.includes(pst1.tokenId)"> -->
                                <tr  v-for="(pst, index) in getVehicle(pst1.tokenId)" v-show="opened.includes(pst1.tokenId)" :key="pst.tokenId"  class="bg-gray-100" >
@@ -283,9 +295,23 @@ export default {
     },
     methods: {
         getVehicle1(){
-            let data = [...new Map(this.vehicle.tokens.map(item => [item['tokenId'], item])).values()]
-            return data
-            
+
+            let data = this.vehicle.tokens
+            let result = Object.values(data.reduce((r, { balance,lockLength,logo,name,source,start,ticker,tokenId,txID}) => {
+                    r[tokenId] ??= { tokenId, count: 0, tokens: 0};
+                    r[tokenId].count++;
+                    r[tokenId].tokens += balance;
+                    r[tokenId].lockLength = lockLength;
+                    r[tokenId].logo = logo;
+                    r[tokenId].name = name;
+                    r[tokenId].source = source;
+                    r[tokenId].start = start;
+                    r[tokenId].ticker = ticker;
+                    r[tokenId].txID = txID;
+                return r;
+            }, {}));
+            // let data = [...new Map(this.vehicle.tokens.map(item => [item['tokenId'] , item])).values()]
+            return result;
         },
         getVehicle(id){
             let data =  this.vehicle.tokens
