@@ -199,10 +199,9 @@
         ]
     },
     "votes": [],
-    "invocations": [],
-    "foreignCalls": [],
     "claimable": [],
     "claims": [],
+    "evolve": "",
     "settings" : [
         [ "quorum", 0.5 ],
         [ "support", 0.5],
@@ -212,7 +211,6 @@
         [ "communityAppUrl", "https://aftr.market" ],
         [ "communityDiscussionLinks", "" ],
         [ "communityDescription", "" ],
-        [ "communityLogo", "1RgJQENTmMlYxlL4I3BS9gnMasztmxpcXvRVhpsw4Oc"],
-        [ "evolve", null ]
+        [ "communityLogo", "1RgJQENTmMlYxlL4I3BS9gnMasztmxpcXvRVhpsw4Oc"]
     ]
 }
