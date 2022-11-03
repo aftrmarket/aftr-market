@@ -113,12 +113,12 @@ export default {
                 "votingSystem" : "weighted",
                 "claims": [],
                 "claimable": [],
+                "evolve": "",
                 "settings": [
                     [ "quorum", 0.5 ],
                     [ "support", 0.5 ],
                     [ "voteLength", 2160 ],
-                    [ "communityLogo", "" ],
-                    [ "evolve", null ]
+                    [ "communityLogo", "" ]
                 ]
             }
         }

@@ -954,11 +954,9 @@ export default {
             this.vehicle.status = "started";
             this.vehicle.vault = {};
             this.vehicle.votes = [];
-            this.vehicle.tipsAr = 0;
-            this.vehicle.tipsMisc = 0;
-            this.vehicle.treasury = 0;
-            this.vehicle.invocations = [];
-            this.vehicle.foreignCalls = [];
+            this.vehicle.claimable = [];
+            this.vehicle.claims = [];
+            this.vehicle.evolve = "";
 
             // Default Settings
             /*** TODO: ADD LOGO (communityLogo) to settings when implemented */
@@ -988,8 +986,7 @@ export default {
                 ["support", this.newSupport],
                 ["voteLength", 2160],
                 ["communityDescription", this.vehicle.desc],
-                ["communityLogo", this.communityLogoValue],
-                ["evolve", null]
+                ["communityLogo", this.communityLogoValue]
             ];
             /*************** */
 
