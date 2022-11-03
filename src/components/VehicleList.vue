@@ -350,7 +350,7 @@ export default {
                     });
 
                     // Treasury
-                    let treasuryTotal = 0;
+                    //let treasuryTotal = 0;
                     /*** TAKING THIS OUT B/C IT FAILS ON TESTNET */
                     // for (let token of vehicle.tokens) {
                     //     try {
@@ -363,7 +363,7 @@ export default {
                     //         this.$log.error("VehicleList : loadAllVehicles :: ", "ERROR calling Verto cache on " + token.name + ": " + error);
                     //     }
                     // }
-                    vehicle.treasury = treasuryTotal;
+                    //vehicle.treasury = treasuryTotal;
 
                     // Tips (AR)
                     /*** HOW CAN THIS BE DETERMINED? */

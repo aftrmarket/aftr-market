@@ -298,29 +298,30 @@ export default {
 
             // Tokens
             // Treasury
-            let treasuryTotal = 0;
-            if (this.vehicle.tokens) {
-                for (let token of this.vehicle.tokens) {
-                    // Are there any withdrawals waiting to be processed?
-                    if (token.withdrawals && token.withdrawals.length > 0) {
-                        this.anyWithdrawals = true;
-                    }
+            // let treasuryTotal = 0;
+            /*** VERTO CACHE NOT FUNCTIONING AND NO LONGER USING FCP FOR WITHDRAWALS */
+            // if (this.vehicle.tokens) {
+            //     for (let token of this.vehicle.tokens) {
+            //         // Are there any withdrawals waiting to be processed?
+            //         if (token.withdrawals && token.withdrawals.length > 0) {
+            //             this.anyWithdrawals = true;
+            //         }
 
-                    try {
-                        const response = await fetch(import.meta.env.VITE_VERTO_CACHE_URL + "token/" + token.tokenId + "/price");
-                        const responseObj = await response.json();
-                        const pricePerToken = responseObj.price;
-                        token.name = responseObj.name;
-                        token.total = pricePerToken * token.balance;
-                        treasuryTotal += token.total;
-                    } catch(error) {
-                        this.$log.info("Vehicle : loadVehicle :: ", "ERROR calling Verto cache on " + token.name + ": " + error);
-                    }
-                }
-            } else {
-                this.vehicle.tokens = [];
-            }
-            this.vehicle.treasury = treasuryTotal;
+            //         try {
+            //             const response = await fetch(import.meta.env.VITE_VERTO_CACHE_URL + "token/" + token.tokenId + "/price");
+            //             const responseObj = await response.json();
+            //             const pricePerToken = responseObj.price;
+            //             token.name = responseObj.name;
+            //             token.total = pricePerToken * token.balance;
+            //             treasuryTotal += token.total;
+            //         } catch(error) {
+            //             this.$log.info("Vehicle : loadVehicle :: ", "ERROR calling Verto cache on " + token.name + ": " + error);
+            //         }
+            //     }
+            // } else {
+            //     this.vehicle.tokens = [];
+            // }
+            // this.vehicle.treasury = treasuryTotal;
 
             // Votes
             if (this.vehicle.votes) {
