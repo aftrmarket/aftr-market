@@ -252,7 +252,7 @@ export default {
             }
 
             if (this.searchType == "Needs Attention") {
-                const vehicle = this.vehicles.filter( (vehicle) => { vehicle.evolve == true });
+                const vehicle = this.vehicles.filter( (vehicle) => { vehicle.evolveNeeded == true });
                 this.numVehicles = vehicle.length;
                 return vehicle;
             }
@@ -334,18 +334,16 @@ export default {
                     if (!vehicle.tokens) {
                         vehicle.tokens = [];
                     }
-                    // Logo, Description, and evolve
+                    if (isMember && ((this.getAftrContractSrcId !== this.getEvolvedContractSrcId) && (vehicle.evolve !== this.getEvolvedContractSrcId))) {
+                        // Contract needs to be evolved
+                        vehicle.evolveNeeded = true;
+                    }
+                    // Logo and Description
                     vehicle.settings.forEach((setting) => {
                         if (setting[0] === "communityLogo") {
                             vehicle.logo = setting[1];
                         } else if (setting[0] === "communityDescription") {
                             vehicle.desc = setting[1];
-                        } else if (setting[0] === "evolve" && isMember) {
-                            const evolvedValue = setting[1];
-                            if ((this.getAftrContractSrcId !== this.getEvolvedContractSrcId) && (evolvedValue !== this.getEvolvedContractSrcId)) {
-                                // Contract needs to be evolved
-                                vehicle.evolve = true;
-                            }
                         }
                     });
 

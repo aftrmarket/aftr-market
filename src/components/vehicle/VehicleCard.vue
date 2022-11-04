@@ -125,7 +125,7 @@ export default {
     },
     created() {
         // Does vehicle contract need to be evolved? Only show to members of the vehicle
-        if (this.vehicle.evolve && (this.vehicle.owner === this.getActiveAddress || this.getActiveAddress in this.vehicle.balances)) {
+        if (this.vehicle.evolveNeeded && (this.vehicle.owner === this.getActiveAddress || this.getActiveAddress in this.vehicle.balances)) {
             this.evolveNeeded = true;
         }
     }

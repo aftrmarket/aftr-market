@@ -103,7 +103,7 @@ export default {
                 type: "set",
                 recipient: "",
                 qty: "",
-                key: "settings.evolve",
+                key: "evolve",
                 value: import.meta.env.VITE_EVOLVED_CONTRACT_SOURCE_ID,
                 note: ""
             };
