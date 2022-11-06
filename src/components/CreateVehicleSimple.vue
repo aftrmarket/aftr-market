@@ -201,7 +201,10 @@ export default {
             // }
 
             const tags = [ { name: "Title", value: this.vehicleTemplate.name } ];
-            const latestAftrSourceId = this.getAftrContractSources[this.getAftrContractSources - 1];
+
+            const csArray = this.getAftrContractSources;
+            const latestAftrSourceId = csArray[csArray.length - 1];
+
             const txIds = await warpCreateFromTx(JSON.stringify(this.vehicleTemplate), latestAftrSourceId, tags, true);
             this.vehicleTemplate["id"] = txIds.contractTxId;
 

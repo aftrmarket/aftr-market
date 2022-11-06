@@ -1035,7 +1035,8 @@ export default {
             // Create SmartWeave contract
 
             const tags = [ { name: "Title", value: this.vehicle.name } ];
-            const latestAftrSourceId = this.getAftrContractSources[this.getAftrContractSources - 1];
+            const csArray = this.getAftrContractSources;
+            const latestAftrSourceId = csArray[csArray.length - 1];
             const txIds = await warpCreateFromTx(JSON.stringify(this.vehicle), latestAftrSourceId, tags, true);
             this.vehicle["id"] = txIds.contractTxId;
 
