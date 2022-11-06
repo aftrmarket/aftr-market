@@ -201,14 +201,13 @@ export default {
         showPopup(){
             this.show = true;
 
-            let timer = 3;
+            let timer = 2;
             let interval = setInterval(() => {
             if (timer === 0) {
                 clearInterval(interval)   
                  this.show = false;             
             } else {
                 timer--
-                console.log(timer)
             }             
             }, 1000)
         },
