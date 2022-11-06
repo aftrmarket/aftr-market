@@ -195,7 +195,7 @@ export default {
                 return logoUrl;
             }
         },
-        ...mapGetters(["getActiveAddress", "getAftrContractSrcId", "getEvolvedContractSrcId", "currentBlock"]),
+        ...mapGetters(["getActiveAddress", "currentBlock", "getAftrContractSources"]),
     },
     methods: {
         showPopup(){
@@ -272,12 +272,14 @@ export default {
             this.vehicle.id = this.contractId;
 
             // Evolve
-            if ((this.getAftrContractSrcId !== this.getEvolvedContractSrcId) && (this.vehicle.evolve !== this.getEvolvedContractSrcId)) {
+            const csArray = this.getAftrContractSources;
+            const latestContractSourceId = csArray[csArray.length - 1];
+            if (this.vehicle.contractSrc !== latestContractSourceId && this.vehicle.evolve !== latestContractSourceId) {
                 // Contract needs to be evolved
-                this.vehicle.evolve = true;
+                this.vehicle.evolveNeeded = true;
 
                 // Check to see if evolve vote was already proposed
-                const evolveVote = this.vehicle.votes.findIndex( vote => vote.status === "active" && vote.key === "evolve" );
+                const evolveVote = this.vehicle.votes.findIndex( vote => vote.status === "active" && vote.type === "evolve" );
                 if (evolveVote > -1) {
                     this.evolvePressedAlready = true;
                 } else {
@@ -379,9 +381,10 @@ export default {
                         
             // Ensure AFTR Vehicle
             const contractSrc = await this.returnContractSrc(this.arweave, this.contractId);
-            if (contractSrc !== this.getAftrContractSrcId) {
-                throw "Not valid AFTR Vehicle";
-            }
+            this.vehicle.contractSrc = contractSrc;
+            // if (contractSrc !== this.getAftrContractSrcId) {
+            //     throw "Not valid AFTR Vehicle";
+            // }
 
             await this.loadVehicle();
         } catch (error) {

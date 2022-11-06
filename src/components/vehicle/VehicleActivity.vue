@@ -175,11 +175,11 @@ export default {
             }
         },
         async load() {
-            // Get the AFTR Contract Source ID for Prod
-            if (import.meta.env.VITE_ENV === "PROD") {
-                this.$store.commit("setAftrContractSrcId", import.meta.env.VITE_SMARTWEAVE_CONTRACT_SOURCE_ID);
-                this.$store.commit("setEvolvedContractSrcId", import.meta.env.VITE_EVOLVED_CONTRACT_SOURCE_ID);
-            }
+            // Get the AFTR Contract Source ID for Prod - WHY ARE WE DOING THIS HERE???
+            // if (import.meta.env.VITE_ENV === "PROD") {
+            //     this.$store.commit("setAftrContractSrcId", import.meta.env.VITE_SMARTWEAVE_CONTRACT_SOURCE_ID);
+            //     this.$store.commit("setEvolvedContractSrcId", import.meta.env.VITE_EVOLVED_CONTRACT_SOURCE_ID);
+            // }
 
             // Get all aftr vehicle contracts, then load all vehicles
             let txs = await this.readInteractions();

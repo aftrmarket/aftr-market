@@ -506,7 +506,7 @@ export default {
                 return "File size: " + this.formatNumber(this.totalSize);
             }
         },
-        ...mapGetters(["arConnected", "getAftrContractSrcId"]),
+        ...mapGetters(["arConnected", "getAftrContractSources"]),
         // Code to handle a checkbox in the table to check/uncheck all rows.
         /******
       selectAll: {
@@ -1035,28 +1035,12 @@ export default {
             // Create SmartWeave contract
 
             const tags = [ { name: "Title", value: this.vehicle.name } ];
-            const txIds = await warpCreateFromTx(JSON.stringify(this.vehicle), this.getAftrContractSrcId, tags, true);
+            const latestAftrSourceId = this.getAftrContractSources[this.getAftrContractSources - 1];
+            const txIds = await warpCreateFromTx(JSON.stringify(this.vehicle), latestAftrSourceId, tags, true);
             this.vehicle["id"] = txIds.contractTxId;
 
             try {
                 this.$log.info("CreateVehicle : createVehicle :: ", "vehicle: " + JSON.stringify(this.vehicle));
-                //this.$log.info("CreateVehicle : createVehicle :: ", "tags: " + JSON.stringify(initTags));
-
-                // let option = {
-                //     aftrSourceContractId: this.getAftrContractSrcId,  // Allows user to add a contract Id for test purposes. If no value is supplied, then the hardcoded value is used.
-                //     aftrProtocolTag: initTags,    // Allows user to customize Protocol tag. If no value provided, "AFTR" is hardcoded.
-                //     // customTags ?: []
-                // }
-
-                // console.log("option", option)
-                // if (import.meta.env.VITE_ENV === "DEV") {
-                //     //this.vehicle["id"] = await client.vehicle.createVehicle(this.vehicle, use_wallet, option)
-                //     this.vehicle["id"] = await createContractFromTx(arweave, use_wallet, this.getAftrContractSrcId, JSON.stringify(this.vehicle), initTags);  
-                // } else {
-                //     //this.vehicle["id"] = await client.vehicle.createVehicle(this.vehicle, "use_wallet", option)
-                //     this.vehicle["id"] = await createContractFromTx(arweave, "use_wallet", this.getAftrContractSrcId, JSON.stringify(this.vehicle), initTags);
-                // }
-
 
                 if (import.meta.env.VITE_ENV === "DEV" || import.meta.env.VITE_BUILD_PSTS) {
                     // Add to Wallet PSTs if the Verto Cache is not being used

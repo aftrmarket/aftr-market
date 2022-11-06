@@ -112,7 +112,7 @@ import { mapGetters } from "vuex";
 import CreateVehicleSimple from "./CreateVehicleSimple.vue";
 import VehicleTable from './VehicleTable.vue';
 import { isVehicleMember } from './utils/shared.js';
-import axios from 'axios'
+import Transaction from 'arweave/node/lib/transaction';
 
 export default {
     components: { VehicleCard, VehicleCardPlaceholder, CreateVehicleSimple, VehicleTable },
@@ -123,6 +123,7 @@ export default {
             arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
             arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
             arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
+            gatewayUrl: import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/",
             initTags: [
                 {
                     name: "Protocol",
@@ -160,7 +161,7 @@ export default {
         searchTypeText() {
             return "Enter " + this.searchType;
         },  
-        ...mapGetters(["getAftrContractSrcId", "getEvolvedContractSrcId", "currentBlock", "getActiveAddress"]),
+        ...mapGetters(["currentBlock", "getActiveAddress", "getAftrContractSources"]),
     },
     methods: {
         clearData(){
@@ -314,15 +315,15 @@ export default {
  */
                 // Check to make sure contract source matches AFTR Contract Source
                 let isAftrVehicle = true;
-                // const contractSrc = await this.returnContractSrc(contractId);
-                // if (contractSrc !== this.getAftrContractSrcId) {
-                //     console.log("FAILED CONTRACT SRC: " + contractSrc);
-                    
-                //     //throw "Not valid AFTR Vehicle";
-                //     this.$log.error("VehicleList : loadAllVehicles :: ", "Invalid AFTR Vehicle found - Contract ID: " + contractId);
-                //     //isAftrVehicle = false;
-                //     return;
-                // }
+                const contractSrc = await this.returnContractSrc(contractId);
+
+                const csArray = this.getAftrContractSources;
+                if (!csArray.find( id => id === contractSrc)) {
+                    this.$log.error("VehicleList : loadAllVehicles :: ", "Invalid AFTR Vehicle found - Contract ID: " + contractId);
+                    isAftrVehicle = false;
+                }
+
+                const latestContractSourceId = csArray[csArray.length - 1];
                 
 /*** END OF COMMENTING OUT */           
      
@@ -334,9 +335,14 @@ export default {
                     if (!vehicle.tokens) {
                         vehicle.tokens = [];
                     }
-                    if (isMember && ((this.getAftrContractSrcId !== this.getEvolvedContractSrcId) && (vehicle.evolve !== this.getEvolvedContractSrcId))) {
-                        // Contract needs to be evolved
-                        vehicle.evolveNeeded = true;
+                    /*** Determine if an Evolve is needed.
+                     * Check to see if the latest AFTR Source ID is equal to the Vehicle Contract Source ID or the Vehicle's evolve property.
+                    */
+
+                    if (isMember) {
+                        if (latestContractSourceId !== contractSrc && latestContractSourceId !== vehicle.evolve) {
+                            vehicle.evolveNeeded = true;
+                        }
                     }
                     // Logo and Description
                     vehicle.settings.forEach((setting) => {
@@ -414,8 +420,7 @@ export default {
         async load() {
             // Get the AFTR Contract Source ID for Prod
             if (import.meta.env.VITE_ENV === "PROD") {
-                this.$store.commit("setAftrContractSrcId", import.meta.env.VITE_SMARTWEAVE_CONTRACT_SOURCE_ID);
-                this.$store.commit("setEvolvedContractSrcId", import.meta.env.VITE_EVOLVED_CONTRACT_SOURCE_ID);
+                this.$store.commit("setAftrContractSoures");
             }
 
             // Get all aftr vehicle contracts, then load all vehicles
@@ -446,13 +451,18 @@ export default {
                     logging: true,
                 });
                 let query = "";
+
+                // Turn array into string so it can be put into the query string
+                const aftrContractSourcesString = JSON.stringify(this.getAftrContractSources);
+
                 if (this.filter === "my") {
                     query = `
                         query($cursor: String) {
                             transactions(
                                 tags: [ 
                                     { name: "Protocol", values: ["${ import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL }"] },
-                                    { name: "Contract-Src", values: ["${ this.getAftrContractSrcId }"] }
+                                    { name: "Contract-Src", values: ${ aftrContractSourcesString } }
+
                                 ]
                                 ids: ${ JSON.stringify(this.myPsts) }
                                 first: 9
@@ -473,7 +483,7 @@ export default {
                             transactions(
                                 tags: [ 
                                     { name: "Protocol", values: ["${ import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL }"] },
-                                    { name: "Contract-Src", values: ["${ this.getAftrContractSrcId }"] }
+                                    { name: "Contract-Src", values: ${ aftrContractSourcesString } }
                                 ]
                                 first: 9
                                 after: $cursor

@@ -40,7 +40,7 @@
                     <div class="mt-3 text-base text-gray-300 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
                         Please note that the Playground will be refreshed periodically, so you will see your vehicles disappear when this happens.
                         //contractRead
-                        <button @click.prevent="getArBal" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">SW vs 3EM</button> 
+                        <button @click.prevent="readContractSources" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">SW vs 3EM</button> 
                         For more information, see below 👇
                     </div>
                 </div>
@@ -313,6 +313,15 @@ export default {
             let arBal = this.$store.getters.getActiveWalletAr;
             alert(arBal);
         },
+        readContractSources() {
+            const cs = JSON.parse(import.meta.env.VITE_AFTR_CONTRACT_SOURCES);
+            let last = cs[cs.length - 1];
+            //alert(last);
+            let arr = JSON.parse(import.meta.env.VITE_AFTR_CONTRACT_SOURCES);
+            let arrString = JSON.stringify(arr);
+            let str = `{ name: "Contract-Src", values: ${ arrString } }`;
+            console.log(str);
+        },
         async init() {
             await this.$store.dispatch('arConnect');
 
@@ -457,8 +466,7 @@ export default {
                     contractTxId = txIds.contractTxId;
                     aftrContractSrcId = txIds.srcTxId;
                 }
-                this.$store.commit("setAftrContractSrcId", aftrContractSrcId);
-                this.$store.commit("setEvolvedContractSrcId", aftrContractSrcId);
+                this.$store.commit("addAftrContractSource", aftrContractSrcId);
 
                 this.$log.info("OverviewTest : init :: ", "AFTR Source ID: " + aftrContractSrcId);
 

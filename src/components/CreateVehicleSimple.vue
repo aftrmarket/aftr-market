@@ -125,7 +125,7 @@ export default {
     },
     computed: {
 
-        ...mapGetters(['arConnected', 'getActiveAddress', 'getAftrContractSrcId']),
+        ...mapGetters(['arConnected', 'getActiveAddress', 'getAftrContractSources']),
     },
     methods: {
         walletAddressSubstr(addr, chars = 10) {
@@ -201,16 +201,11 @@ export default {
             // }
 
             const tags = [ { name: "Title", value: this.vehicleTemplate.name } ];
-            const txIds = await warpCreateFromTx(JSON.stringify(this.vehicleTemplate), this.getAftrContractSrcId, tags, true);
+            const latestAftrSourceId = this.getAftrContractSources[this.getAftrContractSources - 1];
+            const txIds = await warpCreateFromTx(JSON.stringify(this.vehicleTemplate), latestAftrSourceId, tags, true);
             this.vehicleTemplate["id"] = txIds.contractTxId;
 
             try {
-                // if (import.meta.env.VITE_ENV === "DEV") {
-                //     this.vehicleTemplate["id"] = await createContractFromTx(arweave, use_wallet, this.getAftrContractSrcId, JSON.stringify(this.vehicleTemplate), initTags);  
-                // } else {
-                //     this.vehicleTemplate["id"] = await createContractFromTx(arweave, "use_wallet", this.getAftrContractSrcId, JSON.stringify(this.vehicleTemplate), initTags);
-                // }
-
                 if (import.meta.env.VITE_ENV === "DEV" || import.meta.env.VITE_BUILD_PSTS) {
                     // Add to Wallet PSTs if the Verto Cache is not being used
                     let pst = {

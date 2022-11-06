@@ -33,6 +33,8 @@ export default {
            delete this.state.id;
            delete this.state.logo;
            delete this.state.desc;
+           delete this.state.contractSrc;
+           delete this.state.evolveNeeded;
         }
     },
     async created() {

@@ -2,18 +2,15 @@ import {createStore } from 'vuex';
 import { fetchBalancesForAddress } from "verto-cache-interface";
 import { warpRead, arweaveInit } from './components/utils/warpUtils';
 
-async function buildWalletPsts(aftrId, userAddr) {
-    if (aftrId === "") {
-        return {};
-    }
-
+async function buildWalletPsts(aftrSourcesArray, userAddr) {
+    const aftrContractSourcesString = JSON.stringify(aftrSourcesArray);
     let queryval = {
         query: `
             query($cursor: String) {
                 transactions(
                     tags: [
                         { name: "App-Name", values: ["SmartWeaveContract"] },
-                        { name: "Contract-Src", values: ["${ aftrId }"] }
+                        { name: "Contract-Src", values: ${ aftrContractSourcesString } }
                     ]
                     first: 100
                     after: $cursor
@@ -83,8 +80,7 @@ const store = createStore({
             currentBlock: [],
             keyFile : {},
             arConnectConfig: {},
-            aftrContractSrcId: "",
-            evolvedContractSrcId: "",
+            aftrContractSources: [],
         };
     },
     getters: {
@@ -112,15 +108,12 @@ const store = createStore({
         arConnectConfig(state) {
             return state.arConnectConfig;
         },
-        getAftrContractSrcId(state) {
-            return state.aftrContractSrcId;
-        },
-        getEvolvedContractSrcId(state) {
-            return state.evolvedContractSrcId;
-        },
         getTestLaunchConfigState(state) {
             return state.testLaunchConfigCorrect;
-        }
+        },
+        getAftrContractSources(state) {
+            return state.aftrContractSources;
+        },
     },
     mutations: {
         addKeyFile(state, item) {
@@ -154,12 +147,6 @@ const store = createStore({
         setArConnectConfig (state, arConnectConfig) {
             state.arConnectConfig = arConnectConfig;
         },
-        setAftrContractSrcId(state, item) {
-            state.aftrContractSrcId = item;
-        },
-        setEvolvedContractSrcId(state, item) {
-            state.evolvedContractSrcId = item;
-        },
         setTestLaunchConfigState(state) {
             // If user tries to press the Launch button without Arconnecting, then turn flag on.
             if (state.arConnect) {
@@ -170,6 +157,14 @@ const store = createStore({
         },
         addWalletPst(state, pst) {
             state.activeWallet.psts.push(pst);
+        },
+        addAftrContractSource(state, sourceId) {
+            // Called in Test/Dev to set add the AFTR Contract Source
+            state.aftrContractSources.push(sourceId);
+        },
+        setAftrContractSources(state) {
+            // Called in Prod to load all the AFTR Contract Sources
+            state.aftrContractSources = JSON.parse(import.meta.env.VITE_AFTR_CONTRACT_SOURCES);
         },
     },
     actions: {
@@ -318,8 +313,8 @@ const store = createStore({
                 }
     /*** END ONLY RUNS IN PROD */
             } else {
-                if (context.state.aftrContractSrcId !== "") {
-                    wallet = await buildWalletPsts(context.state.aftrContractSrcId, wallet.address);
+                if (context.state.aftrContractSources.length !== 0) {
+                    wallet = await buildWalletPsts(context.state.aftrContractSources, wallet.address);
                     if (wallet !== {}) {
                         context.commit("arConnect", wallet);
                     }
@@ -336,8 +331,8 @@ const store = createStore({
         },
         async arRefresh(context, buildWallet = false) {
             if (buildWallet) {
-                if (context.state.aftrContractSrcId !== "") {
-                    const wallet = await buildWalletPsts(context.state.aftrContractSrcId, context.state.activeWallet.address);
+                if (context.state.aftrContractSources.length !== 0) {
+                    const wallet = await buildWalletPsts(context.state.aftrContractSources, context.state.activeWallet.address);
                     if (wallet !== {}) {
                         context.commit("arConnect", wallet);
                     }
