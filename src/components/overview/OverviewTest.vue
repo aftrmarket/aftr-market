@@ -287,7 +287,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters(["arConnected","arConnectConfig","getTestLaunchFlag",]),
+        ...mapGetters(["arConnected","arConnectConfig","getTestLaunchFlag","getAftrContractSources"]),
     },
     methods: {
         voteSimulatorTest(){
@@ -466,10 +466,12 @@ export default {
                     contractTxId = txIds.contractTxId;
                     aftrContractSrcId = txIds.srcTxId;
                 }
-                this.$store.commit("addAftrContractSource", aftrContractSrcId);
 
+                if (!this.getAftrContractSources.find( srcId => srcId === aftrContractSrcId)) {
+                    this.$store.commit("addAftrContractSource", aftrContractSrcId);
+                }
+                
                 this.$log.info("OverviewTest : init :: ", "AFTR Source ID: " + aftrContractSrcId);
-
                 this.$log.info("OverviewTest : init :: ", "3. Sample PSTs");
 
                 this.isLoading = "Initializing PSTs";
