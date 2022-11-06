@@ -466,8 +466,9 @@ export default {
                     contractTxId = txIds.contractTxId;
                     aftrContractSrcId = txIds.srcTxId;
                 }
-
-                if (!this.getAftrContractSources.find( srcId => srcId === aftrContractSrcId)) {
+                
+                const csArray = this.getAftrContractSources;
+                if (!csArray.find( srcId => srcId === aftrContractSrcId)) {
                     this.$store.commit("addAftrContractSource", aftrContractSrcId);
                 }
                 
