@@ -31,9 +31,12 @@
                     </div>
                 </div>
             </div>
-            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row">
+            <div class="bg-gray-50 px-4 py-3 flex justify-between sm:px-6 sm:flex sm:flex-row">
                 <button @click="buttonClick" type="button" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-green-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
                     Evolve
+                </button>
+                <button @click="$emit('close')" type="button" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-aftrRed hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed sm:ml-3 sm:w-auto sm:text-sm">
+                    Cancel
                 </button>
             </div>
           </div>
@@ -47,7 +50,6 @@
 import { ref } from 'vue';
 import { Dialog, DialogOverlay, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
 import { mapGetters } from "vuex";
-import { interactWrite } from "smartweave";
 import { warpWrite } from './../utils/warpUtils.js';
 
 
@@ -60,34 +62,13 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(["getActiveAddress", "arConnectConfig", "getActiveWallet"]),
+        ...mapGetters(["getAftrContractSources"]),
     },
     methods: {
         async buttonClick() {
             await this.proposeVote();
         },
         async proposeVote() {
-            let arweave = {};
-
-            try {
-                arweave = await Arweave.init({
-                    host: import.meta.env.VITE_ARWEAVE_HOST,
-                    port: import.meta.env.VITE_ARWEAVE_PORT,
-                    protocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
-                    timeout: 20000,
-                    logging: true,
-                });
-            } catch(e) {
-                this.$swal({
-                    icon: "error",
-                    html: "Failed to connect to the Arweave Gateway.",
-                    showConfirmButton: true,
-                    allowOutsideClick: false
-                });
-                return;
-            }
-
-            const wallet = "use_wallet";
             this.$swal({
                 icon: "info",
                 html: "Please wait while the vehicle is updated.",
@@ -98,17 +79,20 @@ export default {
                 },
             });
         
+            const csArray = this.getAftrContractSources;
+            const latestContractSourceId = csArray[csArray.length - 1];
+        
             const input = {
                 function: "propose",
-                type: "set",
+                type: "evolve",
                 recipient: "",
                 qty: "",
-                key: "evolve",
-                value: import.meta.env.VITE_EVOLVED_CONTRACT_SOURCE_ID,
+                key: "",
+                value: latestContractSourceId,
                 note: ""
             };
 
-            let txid = await warpWrite(this.vehicle.id, input);
+            let txid = await warpWrite(this.vehicleId, input);
             this.$log.info("VehicleEvolve : proposeVote :: ", "TX: " + txid);
             
             this.$swal.close();
