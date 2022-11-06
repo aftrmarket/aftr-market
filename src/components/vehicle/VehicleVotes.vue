@@ -194,6 +194,8 @@ export default {
                 return vote.note;
             } else if (vote.type=== 'set') {
                 return "Change " + capitalize(vote.key) + " to " + capitalize(String(vote.value));
+            } else if (vote.type === 'evolve') {
+                return "Evolve contract proposal. Press the Vote ID to see more."
             } else if (vote.type === '?') {
                 return "?";
             } else if (vote.type === '???') {
