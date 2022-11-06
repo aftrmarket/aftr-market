@@ -420,7 +420,7 @@ export default {
         async load() {
             // Get the AFTR Contract Source ID for Prod
             if (import.meta.env.VITE_ENV === "PROD") {
-                this.$store.commit("setAftrContractSoures");
+                this.$store.commit("setAftrContractSources");
             }
 
             // Get all aftr vehicle contracts, then load all vehicles
@@ -547,6 +547,7 @@ export default {
             await this.filterChange();
         }
         this.isLoading = false;
+        console.log(this.getAftrContractSources);
     },
     
 };
