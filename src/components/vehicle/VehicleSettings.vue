@@ -205,11 +205,6 @@ export default {
         arConnected() {
             this.checkEditStatus();
         },
-        uiEditMode() {
-            if (!this.uiEditMode) {
-                //alert(this.settingArray.length);
-            }
-        }
     },
     computed: {
         editClass() {
