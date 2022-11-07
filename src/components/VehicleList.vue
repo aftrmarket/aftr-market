@@ -340,8 +340,13 @@ export default {
                     */
 
                     if (isMember) {
-                        if (latestContractSourceId !== contractSrc && latestContractSourceId !== vehicle.evolve) {
+                        if (latestContractSourceId !== contractSrc) {
                             vehicle.evolveNeeded = true;
+                        }
+                        if (vehicle.evolve !== "") {
+                            if (latestContractSourceId !== vehicle.evolve) {
+                            vehicle.evolveNeeded = true;
+                            }
                         }
                     }
                     // Logo and Description
