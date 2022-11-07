@@ -30,20 +30,27 @@
                             <label class="text-gray-700 text-sm">Vehicle Ticker</label>
                             <input v-model="vehicleTicker" ref="inputTicker" type="text" placeholder="Ticker" class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md" />
                         </div>
+                        <!--
                         <div class="pt-4 relative flex items-start">
                             <div class="flex items-center h-5">
                                 <input v-model="transferAssets" @click="transferClick" type="checkbox" class="focus:ring-aftrBlue h-4 w-4 text-aftrBlue border-gray-300 rounded" />
                             </div>
                             <div class="ml-3 text-sm">
                                 <label class="text-gray-700">Transfer your assets into your new vehicle</label>
-                                <!--<p class="text-gray-500">Transfer your assets into the new vehicle.</p>-->
-                            </div>
-                            <div v-if="transferAssets && false">
-                                <label v-for="pst in walletPsts" :key="pst.contractId" :value="pst.contractId">
-                                    {{ pst.name }} ({{ pst.contractId }})
-                                </label>
                             </div>
                         </div>
+
+                        <div v-if="transferAssets">
+                            <label v-for="pst in walletPsts" :key="pst.contractId" :value="pst.contractId" class="text-gray-700 text-sm">
+                                {{ pst.name }} ({{ walletAddressSubstr(pst.contractId) }}) <br/>
+                            </label>
+                        </div>
+                        <div class="text-aftrRed text-sm">
+                            <span>
+                                Selecting this option will transfer all Arweave assets in your wallet to this newly created AFTR Vehicle. Your assets will now be stored on-chain with you as the owner.
+                            </span>
+                        </div>
+                        -->
                     </div>
                     <div class="flex flex-col text-sm text-gray-700 mt-4 border-t border-gray-200">
                         <label class="mt-4">Owner: &nbsp;&nbsp;&nbsp;&nbsp; <span class="font-mono font-medium text-aftrBlue">{{ walletAddressSubstr(getActiveAddress) }}</span></label>
@@ -51,16 +58,19 @@
                         <label>Support: &nbsp; <span class="font-mono font-medium">50%</span></label>
 
                     </div>
+                    <div class="flex flex-col text-sm text-aftrRed mt-4">
+                            Quickly create an AFTR Vehicle with these default settings.  You can easily modify these settings and add your assets after creation.
+                    </div>
                 </div>
               </div>
             </div>
-            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row">
-              <button v-if="dataValid" @click="createVehicle" type="button" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-green-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
-                Create
-              </button>
-              <button v-if="dataValid" type="button" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-green-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
-                Add to Existing
-              </button>
+            <div class="bg-gray-50 px-4 py-3 flex justify-between sm:px-6 sm:flex sm:flex-row">
+                <button v-if="dataValid" @click="createVehicle" type="button" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-green-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
+                    Create
+                </button>
+                <button @click="$emit('close')" type="button" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-aftrRed hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed sm:ml-3 sm:w-auto sm:text-sm">
+                    Cancel
+                </button>
             </div>
           </div>
         </TransitionChild>
@@ -73,10 +83,7 @@
 import { ref } from 'vue';
 import { Dialog, DialogOverlay, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
 import { mapGetters } from "vuex";
-// import Arweave from "arweave";
-// import { createContractFromTx } from "smartweave";
 import { warpCreateFromTx } from "./utils/warpUtils.js";
-import Swal from 'sweetalert2';
 
 
 export default {
@@ -97,8 +104,6 @@ export default {
             transferAssets: false,
             dataValid: true,
             walletPsts: [],
-
-
 
             vehicleTemplate: {
                 "name": "",
@@ -250,7 +255,7 @@ export default {
         }
     },
     created() {
-        //this.walletPsts = this.$store.getters.getActiveWallet.psts;
+        this.walletPsts = this.$store.getters.getActiveWallet.psts;
         this.vehicleName = this.walletAddressSubstr(this.getActiveAddress);
         this.vehicleTicker = this.walletAddressSubstr(this.getActiveAddress).substring(0, 5);
     },
