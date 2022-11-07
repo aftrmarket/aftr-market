@@ -169,7 +169,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import { Switch, SwitchGroup, SwitchLabel } from '@headlessui/vue';
-import { warpWrite } from './../utils/warpUtils.js';
+import { warpWrite } from '../utils/warpUtils.js';
 
 const excludeSettings = [ "quorum", "support", "voteLength", "communityDescription", "communityLogo" ];
 
@@ -410,7 +410,7 @@ export default {
                 }
             }
 
-            this.$log.info("VehicleSetting : submit :: ", JSON.stringify(input));
+            this.$log.info("VehicleSettings : submit :: ", JSON.stringify(input));
             this.$swal({
                 icon: "info",
                 html: "Please wait while setting changes are sent to the contract...",
@@ -422,7 +422,7 @@ export default {
             });
 
             let txid = await warpWrite(this.vehicle.id, input);
-            this.$log.info("VehicleSetting : sumbit :: ", "TX: " + txid);
+            this.$log.info("VehicleSettings : sumbit :: ", "TX: " + txid);
             this.$swal.close();
 
             let msg = "Your setting changes have been submitted to the Permaweb.  Your changes will be reflected in the next block.";
