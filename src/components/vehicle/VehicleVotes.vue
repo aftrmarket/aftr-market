@@ -55,7 +55,7 @@
             </thead>
             <tbody class="bg-white divide-y divide-gray-200" v-for="vote in filteredVotes" :key="vote.id">
               <tr class="hover:bg-gray-50">
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 cursor-pointer" @click.prevent="voteHistoryModel(vote)">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-aftrBlue cursor-pointer" @click.prevent="voteHistoryModel(vote)">
                   {{ walletAddressSubstr(vote.id) }}
                 </td>
                 <td class="px-6 py-4 whitespace-normal text-sm text-gray-500 break-all">
