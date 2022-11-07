@@ -14,7 +14,7 @@
     <perfect-scrollbar>
     <div :class="editClass">
         <!-- Setting Table -->
-        <div class="shadow col-span-3 overflow-hidden border-b border-gray-200 sm:rounded-lg">
+        <div v-if="uiEditMode || settingArray.length > 0" class="shadow col-span-3 overflow-hidden border-b border-gray-200 sm:rounded-lg">
             <table class="w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
@@ -205,6 +205,11 @@ export default {
         arConnected() {
             this.checkEditStatus();
         },
+        uiEditMode() {
+            if (!this.uiEditMode) {
+                //alert(this.settingArray.length);
+            }
+        }
     },
     computed: {
         editClass() {
