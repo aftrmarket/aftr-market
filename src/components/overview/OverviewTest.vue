@@ -39,9 +39,6 @@
                     </div>
                     <div class="mt-3 text-base text-gray-300 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
                         Please note that the Playground will be refreshed periodically, so you will see your vehicles disappear when this happens.
-                        //contractRead
-                        <button @click.prevent="readContractSources" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">SW vs 3EM</button> 
-                        For more information, see below 👇
                     </div>
                 </div>
             </div>
@@ -300,27 +297,6 @@ export default {
             if (site === "PROD") {
                 window.location.href = import.meta.env.VITE_AFTR_PROD;
             }
-        },
-        contractRead() {
-            if (this.env === "TEST") {
-                this.$router.push({ name: "read", params: { contractId: "Ec4RtO4woGOq5HOmu6YWbCP9bXJZ3otL1kJxTUEuZGg" } });
-            } else if (this.env === "DEV") {
-                this.$router.push({ name: "read", params: { contractId: "RlgLcFOzm6xVho6w76PCg_WbShb3n62jjH6HKSJw9WM" } });
-            }
-        },
-        async getArBal() {
-            await this.$store.dispatch("arRefresh");
-            let arBal = this.$store.getters.getActiveWalletAr;
-            alert(arBal);
-        },
-        readContractSources() {
-            const cs = JSON.parse(import.meta.env.VITE_AFTR_CONTRACT_SOURCES);
-            let last = cs[cs.length - 1];
-            //alert(last);
-            let arr = JSON.parse(import.meta.env.VITE_AFTR_CONTRACT_SOURCES);
-            let arrString = JSON.stringify(arr);
-            let str = `{ name: "Contract-Src", values: ${ arrString } }`;
-            console.log(str);
         },
         async init() {
             await this.$store.dispatch('arConnect');
