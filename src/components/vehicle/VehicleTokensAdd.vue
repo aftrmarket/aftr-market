@@ -10,7 +10,7 @@
         <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
         <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
           <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+            <div class="bg-white px-4 pt-5 pb-2">
               <div class="sm:flex sm:items-start">
                 <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="green">
@@ -29,9 +29,31 @@
                             <option v-for="pst in walletPsts" :key="pst.contractId" :value="pst.contractId">
                                 {{ pst.name }} ({{ pst.contractId }})
                             </option>
+                            <option value="NOT-FOUND">
+                                --Token Not In List--
+                            </option>
                         </select>
                     </div>
-                    <div v-if="selectedPstId !== ''">
+                    <div v-if="selectedPstId === 'NOT-FOUND'">
+                        <div class="pt-6 pb-4 flex flex-col">
+                            <label class="block text-sm font-medium text-gray-700">
+                                Please paste the Contract ID of the asset that you'd like to deposit.
+                            </label>
+                            <input type="text" placeholder="Asset ID (i.e. Contract ID)" v-model="nfTokenId" @input="readAssetContract" :class="inputBox(nfTokenId.length === 43)" />
+                            <div v-if="nfTokenValid" class="flex flex-col">
+                                <label class="block text-sm font-medium text-gray-700 pt-2 pb-2">
+                                    You have <span class="font-bold text-aftrBlue">{{ formatNumber(pstBalance - pstInputTokens) }} {{ pstTicker }}</span><span> available to use in your vehicle.</span>
+                                </label>
+                                <input type="number" placeholder="Amount" v-model="pstInputTokens" @input="calcPstPrice" :class="inputBox(pstInputValid)" />
+                            </div>
+                            <div v-else>
+                                <label class="block pt-2 text-sm font-medium text-aftrRed">
+                                    {{ nfMsg }}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-if="selectedPstId !== '' && selectedPstId !== 'NOT-FOUND'">
                         <div class="pt-6 pb-4">
                             <label class="block text-sm font-medium text-gray-700">
                                 You have <span class="font-bold text-aftrBlue">{{ formatNumber(pstBalance - pstInputTokens) }} {{ pstTicker }}</span><span> available to use in your vehicle.</span>
@@ -51,6 +73,7 @@
                 </div>
               </div>
             </div>
+            <Vehicle-Alert v-if="pstInputValid && pstInputTokens" :vehicle="msg"></Vehicle-Alert>
             <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
               <button type="button" v-if="pstInputValid && pstInputTokens" 
               class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm" @click="transferTokens">
@@ -60,7 +83,7 @@
                 Cancel
               </button>
             </div>
-             <Vehicle-Alert v-if="pstInputValid && pstInputTokens" :vehicle="msg"></Vehicle-Alert>
+            
           </div>
         </TransitionChild>
       </div>
@@ -105,16 +128,31 @@ export default {
             totalValue: null,
             msg: "",
             walletPsts: [],
+            nfTokenId: "",
+            nfAmountValid: false,
+            nfTokenValid: false,
+            nfTokenBal: 0,
+            nfTokenTicker: "",
+            nfTokenName: "",
+            nfMsg: "",
         }
     },
     computed : {
         pstBalance() {
-            const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.contractId === this.selectedPstId);
-            return currentPst.balance;
+            if (this.nfAmountValid) {
+                return this.nfTokenBal;
+            } else {
+                const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.contractId === this.selectedPstId);
+                return currentPst.balance;
+            }
         },
         pstTicker() {
-            const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.contractId === this.selectedPstId);
-            return currentPst.ticker;
+            if (this.nfAmountValid) {
+                return this.nfTokenTicker;
+            } else {
+                const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.contractId === this.selectedPstId);
+                return currentPst.ticker;
+            }
         },
         vehicleTokenBox() {
             if (this.vehicleTokensValid) {
@@ -161,11 +199,44 @@ export default {
                 return "mt-1 focus:ring-aftrRed focus:border-aftrRed shadow-sm sm:text-sm border-gray-300 rounded-md";
             }
         },
+        assetIdInputBox() {
+            
+        },
+        async readAssetContract() {
+            let msg = "";
+            this.nfAmountValid = false;
+            this.nfTokenValid = false;
+            if (this.nfTokenId.length === 43) {
+                msg = await this.isDepositAllowed(this.nfTokenId);
+                if (msg !== "") {
+                    this.nfMsg = msg;
+                } else {
+                    this.nfAmountValid = true;
+                    this.nfTokenValid = true;
+                }
+            }
+            if (!this.nfTokenValid) {
+                this.nfMsg = msg;
+            } else {
+                this.nfMsg = "";
+            }
+        },
         async isDepositAllowed(contractId) {
             let msg = "";
 
+            // Make sure user isn't trying to deposit asset of itself
+            if (this.vehicle.id === contractId) {
+                msg = "You can't deposit an asset to itself."
+                return msg;
+            }
+
             // Is internalWrite Supported?
             const stateInteractions = await warpRead(contractId);
+
+            if (!stateInteractions || Object.keys(stateInteractions).length === 0 || Object.getPrototypeOf(stateInteractions) === Object.prototype) {
+                msg = "This asset can't be found on the Permaweb."
+                return msg;
+            }
             
             /*** Changing to look for Warp's version of FCP which will require claims and claimable arrays. */
             //if (!stateInteractions.state.invocations || !stateInteractions.state.foreignCalls) {
@@ -180,6 +251,15 @@ export default {
                 return msg;
             }
 
+            // Test to see if user has enough balance on the contract
+            if (stateInteractions.state.balances[this.getActiveAddress] - Number(this.pstInputTokens) <= 0 || !stateInteractions.state.balances[this.getActiveAddress]) {
+                msg = "Can't deposit this asset because you don't appear to have a balance on this contract.";
+                return msg;
+            }
+
+            this.nfTokenBal = stateInteractions.state.balances[this.getActiveAddress];
+            this.nfTokenTicker = stateInteractions.state.ticker;
+
             return msg;
         },
         async transferTokens() {
@@ -190,22 +270,28 @@ export default {
              * 2. Call AFTR contract to claim tokens and update the AFTR vehicle tokens object.
              */
 
-             const quantity = Number(this.pstInputTokens);
-             const currentPst = this.$store.getters.getActiveWallet.psts.find(
-                (item) => item.contractId === this.selectedPstId
-            );
-            const pstId = currentPst.contractId;
+            const quantity = Number(this.pstInputTokens);
 
-            // Does PST support internalWrites?
-            const msg = await this.isDepositAllowed(currentPst.contractId);
-            if (msg !== "") {
-                this.$swal({
-                    icon: "error",
-                    html: msg,
-                    showConfirmButton: true,
-                    allowOutsideClick: false,
-                });
-                return;
+            let pstId = "";
+            if (this.selectedPstId === "NOT-FOUND" && this.nfTokenId !== "") {
+                pstId = this.nfTokenId;
+            } else {
+                const currentPst = this.$store.getters.getActiveWallet.psts.find(
+                    (item) => item.contractId === this.selectedPstId
+                );
+                pstId = currentPst.contractId;
+
+                // If the token was selected, then the contract hasn't been read yet for validation
+                const msg = await this.isDepositAllowed(pstId);
+                if (msg !== "") {
+                    this.$swal({
+                        icon: "error",
+                        html: msg,
+                        showConfirmButton: true,
+                        allowOutsideClick: false,
+                    });
+                    return;
+                }
             }
 
              // 1. Setup Claim
@@ -238,8 +324,19 @@ export default {
             if (import.meta.env.VITE_ENV !== "PROD") {
                 /*** This will not be needed when ArConnect is automatically updated on TESTNET */
                 // Update user's PST balance 
-                const updatedPst = this.$store.getters.getActiveWallet.psts.find((item) => item.contractId === this.selectedPstId);
-                updatedPst.balance = this.pstBalance - this.pstInputTokens;
+                const updatedPst = this.$store.getters.getActiveWallet.psts.find((item) => item.contractId === pstId);
+                if (updatedPst) {
+                    updatedPst.balance = +this.pstBalance - quantity;
+                } else {
+                    // Not found wallet, so add it
+                    let pst = {
+                        contractId: pstId,
+                        balance: +this.pstBalance - quantity,
+                        name: this.nfTokenName,
+                        ticker: this.nfTokenTicker,
+                    };
+                    this.$store.commit("addWalletPst", pst);
+                }
                 /***  */
             }
             await this.arConnect();
@@ -248,14 +345,22 @@ export default {
             this.$emit("close");
         },
         pstChange() {
-            this.pstInputTokens = null;
-            this.pricePerToken = null;
+            if (this.selectedPstId !== "NOT-FOUND") {
+                this.pstInputTokens = null;
+                this.pricePerToken = null;
+            }
         },
         calcPstPrice() {
-            const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.contractId === this.selectedPstId);
-            this.pricePerToken = currentPst.balance;
-            this.pstValue = currentPst.balance * this.pstInputTokens;
-            this.updatePstInputValid(currentPst.balance);
+            let bal = 0;
+            if (this.nfTokenValid) {
+                bal = this.nfTokenBal;
+            } else {
+                const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.contractId === this.selectedPstId);
+                this.pricePerToken = currentPst.balance;
+                this.pstValue = currentPst.balance * this.pstInputTokens;
+                bal = currentPst.balance;
+            }
+            this.updatePstInputValid(bal);
             this.msg = "WARNING: Are you sure you want to transfer these tokens from your wallet to the vehicle? This action cannot be undone."
         },
         updatePstInputValid(balance) {

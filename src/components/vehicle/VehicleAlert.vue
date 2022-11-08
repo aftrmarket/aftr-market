@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-md bg-yellow-50 p-4">
+  <div class="rounded-md bg-yellow-50 pr-4 pl-4 pt-2 pb-4">
     <div class="flex">
       <div class="flex-shrink-0">
         <ExclamationIcon class="h-5 w-5 text-yellow-400" aria-hidden="true" />
