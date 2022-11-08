@@ -158,6 +158,10 @@ const store = createStore({
         addWalletPst(state, pst) {
             state.activeWallet.psts.push(pst);
         },
+        removeWalletPst(state, pstId) {
+            let newWalletPsts = state.activeWallet.psts.filter(pst => pst.contractId !== pstId);
+            state.activeWallet.psts = newWalletPsts;
+        },
         addAftrContractSource(state, sourceId) {
             // Called in Test/Dev to set add the AFTR Contract Source
             state.aftrContractSources.push(sourceId);
