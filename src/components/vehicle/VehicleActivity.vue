@@ -3,18 +3,18 @@
         <div v-if="activities.length === 0" class="pl-4 pt-4">
             Not yet any activities to show on this vehicle.
         </div>
-        <div v-else>
-            <div v-for="(activity, index) in activities" :key="activity.id" class="pt-4 w-full">
-                <div class="">
-                    <span class="text-aftrBlue text-md font-medium uppercase tracking-wide">{{ activities.length - index }}. {{ interactionText(activity.input.function) }}</span>
-                    <span class="font-mono text-xs text-gray-500">({{ activity.id }})</span>
+        <div v-for="(commentIndex, index) in commentsToShow" :key="activities[index]" class="pt-4 w-full"> 
+            <div v-if="index < activities.length">
+                 <div class="">
+                    <span class="text-aftrBlue text-md font-medium uppercase tracking-wide">{{ activities.length - index }}. {{ interactionText(activities[index].input.function) }}</span>
+                    <span class="font-mono text-xs text-gray-500">({{ activities[index].id }})</span>
                 </div>
                 <div class="pl-8 pb-4">
-                    <span v-html="getAllInputs(activity.input)"></span>
-                    <span v-if="isError" v-html="getErrorInputs(activity)"></span>
+                    <span v-html="getAllInputs(activities[index].input)"></span>
+                    <span v-if="isError" v-html="getErrorInputs(activities[index])"></span>
                 </div>
                 <div class="flex flex-row">
-                    <div v-if="activity.result">
+                    <div v-if="activities[index].result">
                         <div class="pb-1 border-solid border border-green-500 rounded ">
                             <span class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium bg-white border-1 border-green text-green">
                                 <svg class="-ml-0.5 mr-1.5 h-2 w-2" fill="green" viewBox="0 0 8 8">
@@ -34,17 +34,19 @@
                             </span>
                         </div>
                     </div>
-                    <div class="pl-10 pt-2 text-xs">Block <span class="font-mono text-gray-500">{{ activity.block }}</span></div>
+                    <div class="pl-10 pt-2 text-xs">Block <span class="font-mono text-gray-500">{{ activities[index].block }}</span></div>
                     <div class="pl-10 pt-2 text-xs">
                         Caller 
-                            <span v-if="activity.result" class="font-mono text-green-600">{{ activity.owner }}</span>
-                            <span v-else class="font-mono text-red-600">{{ activity.owner }}</span>
+                            <span v-if="activities[index].result" class="font-mono text-green-600">{{ activities[index].owner }}</span>
+                            <span v-else class="font-mono text-red-600">{{ activities[index].owner }}</span>
                     </div>
                 </div>
             </div>
         </div>
-         <div class="text-center">
-            <button v-if="hasNextPage" @click.prevent="load" type="submit" class="mt-4 px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Load More</button>
+        <div v-if="commentsToShow < activities.length || activities.length > commentsToShow">
+            <button @click="commentsToShow += 10" class="mt-4 px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                show more activities
+            </button>
         </div>
     </perfect-scrollbar>
 </template>
@@ -58,9 +60,13 @@ export default {
             edges: [],
             activities: [],
             isError: true,
-            hasNextPage: false,
-            cursor: "",
+            commentsToShow: 10,
+            totalComments: 0
         };
+    },
+    mounted() {
+        this.totalComments = this.activities.length
+        console.log("Mount : ",this.activities.length)
     },
     computed: {
         interactionResult(interaction) {
@@ -161,8 +167,7 @@ export default {
         async runQuery(query, errorMsg) {
             try {
                 let response = await this.arweave.api.post("graphql", {
-                    query: query,
-                    variables: { "cursor": this.cursor }
+                    query: query
                 });
 
                 if (response.status !== 200) {
@@ -174,48 +179,13 @@ export default {
                 this.$log.error("VehicleActivity : runQuery :: ", errorMsg + e);
             }
         },
-        async load() {
-            // Get the AFTR Contract Source ID for Prod - WHY ARE WE DOING THIS HERE???
-            // if (import.meta.env.VITE_ENV === "PROD") {
-            //     this.$store.commit("setAftrContractSrcId", import.meta.env.VITE_SMARTWEAVE_CONTRACT_SOURCE_ID);
-            //     this.$store.commit("setEvolvedContractSrcId", import.meta.env.VITE_EVOLVED_CONTRACT_SOURCE_ID);
-            // }
-
-            // Get all aftr vehicle contracts, then load all vehicles
-            let txs = await this.readInteractions();
-
-            console.log("txs",txs)
-            // for (let edge of txs.edges) {
-            //     await this.loadAllVehicles(edge.node.id);
-            // }
-
-            this.numVehicles = this.vehicles.length;
-        },
-        async readInteractions() {
-            console.log("this.interactions", this.interactions, this.activities)
-            
+        async readInteractions(data) {
             // Get all interaction ids for query
-            let interactionStrings = '[';
-            for (const i in this.interactions) {
-                console.log("i",i)
-                    interactionStrings += '"' + i + '",';
-            }
-            interactionStrings += ']';
-            // let interactionStrings = []
-            // for (const i in this.interactions) {
-            //         interactionStrings.push(i)
-            // }
-            
-            // let ids = this.activities.map(c => c.id);
-            // console.log("ids", ids,interactionStrings,typeof(interactionStrings))
-            // let test = ids.length != 0 ? interactionStrings.filter(id => !ids.includes(id)) : interactionStrings
-            console.log("test", interactionStrings);
             let query = `
                 query($cursor: String) {
                     transactions(
-                        ids: ${interactionStrings}
+                        ids: ${JSON.stringify(data)}
                         after: $cursor
-                        first: 2
                     ) {
                         pageInfo {
                             hasNextPage
@@ -228,37 +198,34 @@ export default {
                 }
             `;
             // Return data about each interation
-            const response = await this.runQuery(query, "Error querying interactions. ");
-            
-             if(response.data.data.transactions.pageInfo.hasNextPage) {
-                this.hasNextPage = true;
-                const [lastNumber] = response.data.data.transactions.edges.slice(-1);
-                console.log("this.cursor " ,this.cursor)
-                this.cursor = lastNumber.cursor;
-
-                console.log("this.cursor " ,this.cursor)
-                } else {
-                    this.hasNextPage = false;
-                }
-
-            
-            this.edges = response.data.data.transactions.edges;
-            // console.log("this.edges", response.data.data.transactions.edges)
-
+            const responseData = await this.runQuery(query, "Error querying interactions. ");
+            this.edges = responseData.data.data.transactions.edges;
         },
     },
     async created() {
         this.isLoading = true;
         
-        // Read the tags for all contract interactions
-        await this.readInteractions();
-
-        // Build the activities array
-        for (let edge of this.edges) {
-            this.activities.push(this.parseActivity(edge));
+        let interactionStrings = []
+        for (const i in this.interactions) {
+            interactionStrings.push( i )
         }
 
-        this.isLoading = false;
+            const numChunks = Math.ceil(interactionStrings.length / 2);
+            let data = Array.from(
+                { length: numChunks },
+                (_, i) => interactionStrings.slice(i * interactionStrings.length / numChunks, (i + 1) * interactionStrings.length / numChunks)
+            );
+        // Read the tags for all contract interactions
+
+        for (let i = 0; i < data.length; i++) {
+            await this.readInteractions(data[i]);
+
+            for (let edge of this.edges) {
+                this.activities.push(this.parseActivity(edge));
+            }
+        }
+
+        console.log("this.activities" , this.activities)    
     }
 }
 </script>

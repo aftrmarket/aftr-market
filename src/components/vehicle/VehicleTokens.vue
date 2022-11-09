@@ -75,25 +75,25 @@
                                                 <img class="h-10 w-10 rounded-full" :src="pstLogo(pst1.tokenId, pst1.logo)" alt="" />
                                             </div>
                                             <div class="ml-4">
-                                                <div class="font-medium text-gray-900"> {{ pst1.name + " (" + pst1.ticker + ")" }}  ({{ pst1.count }})</div>
+                                                <div class="font-medium text-gray-900"> {{ idSubstr(pst1.tokenId) }}  ({{ pst1.count }})</div>
                                             </div>
                                          </div>
                                     </td>
                                      <td class="px-1 py-3 text-gray-500 font-mono cursor-pointer" ></td>    
                                     <td class="text-right px-1 py-3 text-gray-500">{{ formatNumber(pst1.tokens) }}</td>   
                                     <td class="text-right px-6 py-3 text-gray-500"></td>
-                                    <td class="text-right px-6 py-3 text-gray-500"></td>
-                                    <td class="text-right px-6 py-3 text-gray-500"></td>
-                                    <td class="text-right px-6 py-3 text-gray-500">
+                                    <td v-if="allowTransfer" class="text-right px-6 py-3 text-gray-500"></td>
+                                    <td v-if="allowTransfer" class="text-right px-6 py-3 text-gray-500"></td>
+                                    <td v-if="allowTransfer" class="text-right px-6 py-3 text-gray-500"></td>  
+                                    <td> 
                                         <svg v-if="arrow" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                                         </svg>
-                                        <svg v-if="!arrow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-3 w-3" >
+                                        <svg v-if="!arrow && opened == pst1.tokenId" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-3 w-3" >
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
                                         </svg> 
-                                    </td>                    
+                                    </td>
                                 </tr>
-                            <!-- <div v-if="opened.includes(pst1.tokenId)"> -->
                                <tr  v-for="(pst, index) in getVehicle(pst1.tokenId)" v-show="opened.includes(pst1.tokenId)" :key="pst.tokenId"  class="bg-gray-100" >
                                   
                                     <td class="px-6 py-4 whitespace-nowrap cursor-pointer">
@@ -103,7 +103,7 @@
                                             </div>
                                             <div class="ml-4">
                                                 <div class="font-medium text-gray-900"> {{ pst.name + " (" + pst.ticker + ")" }} </div>
-                                                <div class="text-gray-500 font-mono" @click.prevent="showWalletAddress(pst.tokenId)"> {{ idSubstr(pst.tokenId) }}</div>
+                                                <div class="text-gray-500 font-mono" @click.prevent="showWalletAddress(pst.txID)"> {{ idSubstr(pst.txID) }}</div>
                                             </div>
                                         </div>
                                     </td>
@@ -128,8 +128,8 @@
                                             </svg>
                                         </button>
                                     </td>
+                                    <td></td>
                                 </tr>
-                                <!-- </div> -->
                             </tbody>
                         </table>
                     </div>
