@@ -10,6 +10,7 @@
     "status" : "started",
     "vault" : {},
     "votes": [],
+    "tokens": [],
     "claimable": [],
     "claims": [],
     "evolve": "",

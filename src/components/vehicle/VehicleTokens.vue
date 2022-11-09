@@ -365,16 +365,20 @@ export default {
                 this.allowTransfer = false;
             }
             // Are there any withdrawals waiting to be processed?
-            this.vehicle.tokens.forEach ( token => {
-                if (token.withdrawals) {
-                    token.withdrawals.forEach( wd => {
-                        if (!wd.processed) {
-                            wd["name"] = token.name;
-                            this.wds.push(wd);
-                        }
-                    });
-                }
-            });
+            if (this.vehicle.tokens) {
+                this.vehicle.tokens.forEach ( token => {
+                    if (token.withdrawals) {
+                        token.withdrawals.forEach( wd => {
+                            if (!wd.processed) {
+                                wd["name"] = token.name;
+                                this.wds.push(wd);
+                            }
+                        });
+                    }
+                });
+            } else {
+                this.vehicle.tokens = [];
+            }
         },
         pstLogo(id, logo) {
             let logoUrl = "";
