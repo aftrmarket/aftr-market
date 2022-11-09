@@ -100,7 +100,8 @@
                                     </div>
                                 </div>
                                 <vehicle-info v-if="activeTab === 'Info'" :vehicle="vehicle" :contractId="contractId" :isMember="allowEdits"></vehicle-info>
-                                <vehicle-settings v-else-if="activeTab === 'Settings'" :vehicle="vehicle" :isMember="allowEdits"></vehicle-settings>
+                                <vehicle-settings v-else-if="activeTab === 'Names'" :vehicle="vehicle" :isMember="allowEdits"></vehicle-settings>
+                                <vehicle-settings v-else-if="activeTab === 'Custom Settings'" :vehicle="vehicle" :isMember="allowEdits"></vehicle-settings>
                                 <vehicle-members v-else-if="activeTab === 'Members'" :vehicle="vehicle" :isMember="allowEdits"></vehicle-members>
                                 <vehicle-tokens v-else-if="activeTab === 'Tokens'" :vehicle="vehicle" :isMember="allowEdits"></vehicle-tokens>
                                 <!--<vehicle-profits v-else-if="activeTab === 'Profits'"></vehicle-profits>-->
@@ -111,7 +112,7 @@
                                 <vehicle-state v-else-if="activeTab === 'State'" :vehicle="vehicle"></vehicle-state>
                                 <vehicle-activity v-else-if="activeTab === 'Activity'" :arweave="arweave" :interactions="interactions" :errorMessages="interactionErrorMsgs"></vehicle-activity>
 
-                                <vehicle-contract-test v-else-if="activeTab === 'Test Contract' && env === 'DEV'" :vehicle="vehicle"></vehicle-contract-test>
+                                <!--<vehicle-contract-test v-else-if="activeTab === 'Test Contract' && env === 'DEV'" :vehicle="vehicle"></vehicle-contract-test>-->
                             </div>
                         </section>
                         <!-- Tabs End -->
@@ -148,7 +149,8 @@ export default {
         return {
             tabs: [
                 { name: 'Info', href: '#', current: true },
-                { name: 'Settings', href: '#', current: false },
+                { name: 'Names', href: '#', current: false },
+                { name: 'Custom Settings', href: '#', current: false },
                 { name: 'Members', href: '#', current: false },
                 { name: 'Tokens', href: '#', current: false },
                 //{ name: 'Profits', href: '#', current: false },
@@ -157,7 +159,7 @@ export default {
                 { name: 'Votes', href: '#', current: false },
                 { name: 'State', href: '#', current: false },
                 { name: 'Activity', href: '#', current: false },
-                { name: 'Test Contract', href: '#', current: false },
+//                { name: 'Test Contract', href: '#', current: false },
             ],
             arweave: {},
             activeTab: "Info",
