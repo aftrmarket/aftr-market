@@ -441,7 +441,7 @@ export default {
                     if (key === "App-Name" && value === "SmartWeaveContract") {
                         smartweaveContract = true;
                     }
-                    if (key === "Protocol" && value === "AFTR-PLAY") {
+                    if (key === "Protocol" && value === import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL) {
                         aftrVehicle = true;
                     }
                 }
