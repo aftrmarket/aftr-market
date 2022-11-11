@@ -186,6 +186,7 @@ export default {
                     transactions(
                         ids: ${JSON.stringify(data)}
                         after: $cursor
+                        sort: HEIGHT_ASC
                     ) {
                         pageInfo {
                             hasNextPage
@@ -206,11 +207,12 @@ export default {
         this.isLoading = true;
         
         let interactionStrings = []
+        console.log("this.interactions",this.interactions)
         for (const i in this.interactions) {
             interactionStrings.push( i )
         }
 
-            const numChunks = Math.ceil(interactionStrings.length / 2);
+            const numChunks = Math.ceil(interactionStrings.length / 10);
             let data = Array.from(
                 { length: numChunks },
                 (_, i) => interactionStrings.slice(i * interactionStrings.length / numChunks, (i + 1) * interactionStrings.length / numChunks)
@@ -224,8 +226,10 @@ export default {
                 this.activities.push(this.parseActivity(edge));
             }
         }
-
+        this.activities.reverse()
         console.log("this.activities" , this.activities)    
+        this.isLoading = false;
+        return
     }
 }
 </script>

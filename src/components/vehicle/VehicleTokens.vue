@@ -65,6 +65,7 @@
                                     <th v-if="allowTransfer" scope="col" class="py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Transfer Amount</th>
                                     <th v-if="allowTransfer" scope="col" class="px-4 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Transfer To Address</th>
                                     <th v-if="allowTransfer" scope="col" class="py-3 text-left font-medium text-gray-500 uppercase tracking-wider"> W/D</th>
+                                    <th scope="col" class="py-3 text-left font-medium text-gray-500 uppercase tracking-wider"> </th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200" v-for="(pst1) in getVehicle1()" :key="pst1.tokenId">
@@ -75,7 +76,7 @@
                                                 <img class="h-10 w-10 rounded-full" :src="pstLogo(pst1.tokenId, pst1.logo)" alt="" />
                                             </div>
                                             <div class="ml-4">
-                                                <div class="font-medium text-gray-900"> {{ idSubstr(pst1.tokenId) }}  ({{ pst1.count }})</div>
+                                                <div class="font-medium text-gray-900"> {{ pst1.name + " (" + pst1.ticker + ")" }} ({{ pst1.count }})</div>
                                             </div>
                                          </div>
                                     </td>
@@ -98,9 +99,9 @@
                                   
                                     <td class="px-6 py-4 whitespace-nowrap cursor-pointer">
                                         <div class="flex items-center">
-                                            <div class="flex-shrink-0 h-10 w-10" @click.prevent="showTokenState( pst.tokenId, pstLogo(pst.tokenId, pst.logo) )">
+                                            <!-- <div class="flex-shrink-0 h-10 w-10" @click.prevent="showTokenState( pst.tokenId, pstLogo(pst.tokenId, pst.logo) )">
                                                 <img class="h-10 w-10 rounded-full" :src="pstLogo(pst.tokenId, pst.logo)" alt="" />
-                                            </div>
+                                            </div> -->
                                             <div class="ml-4">
                                                 <div class="font-medium text-gray-900"> {{ pst.name + " (" + pst.ticker + ")" }} </div>
                                                 <div class="text-gray-500 font-mono" @click.prevent="showWalletAddress(pst.txID)"> {{ idSubstr(pst.txID) }}</div>
