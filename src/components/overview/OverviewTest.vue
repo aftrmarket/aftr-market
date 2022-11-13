@@ -30,6 +30,9 @@
                                     </div>
                                 </form>
                             </div>
+                            <div>
+                                <button @click.prevent="mintPlayTokens"  type="submit" class="py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Mint PLAY</button>
+                            </div>
                         </div>
                     </div>
                     <div class="mt-6 sm:-mb-32 lg:relative">
@@ -219,6 +222,8 @@ import aftrBlueHorizonInitState from "./../../testnet/contracts/aftrBlueHorizonI
 import aftrChillinInitState from "./../../testnet/contracts/aftrChillinInitState.json?raw";
 import aftrSourcePlayground from "./../../testnet/contracts/aftrSourcePlayground.js?raw";
 import aftrInitStatePlayground from "./../../testnet/contracts/aftrInitStatePlayground.json?raw";
+import playTokenSrc from "./../../testnet/contracts/playTokenSrc.js?raw";
+import playTokenInitState from "./../../testnet/contracts/playTokenInitState.json?raw";
 import VoteSimulator from "./../vehicle/VoteSimulator.vue";
 import { warpRead, warpWrite, arweaveInit, warpCreateContract, warpCreateFromTx, upload, dispatch, post  } from './../utils/warpUtils.js';
 import { mapGetters } from "vuex";
@@ -284,7 +289,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters(["arConnected","arConnectConfig","getTestLaunchFlag","getAftrContractSources"]),
+        ...mapGetters(["arConnected","arConnectConfig","getTestLaunchFlag","getAftrContractSources", "getActiveAddress"]),
     },
     methods: {
         voteSimulatorTest(){
@@ -292,6 +297,54 @@ export default {
         },
         closeModal() {
             this.showVoteSimulator = false;
+        },
+        async mintPlayTokens() {
+            await this.$store.dispatch('arConnect');
+            let playTokenId = "";
+            
+            // Get contract ID
+            if (this.env !== "PROD") {
+
+                const query = `query($cursor: String) {
+                        transactions(
+                            tags: [ 
+                                { name: "Protocol", values: ["PLAY"] },
+                        ]
+                            after: $cursor
+                        )
+                        { pageInfo { hasNextPage }
+                            edges { cursor node { id } }
+                        }
+                    }`;
+
+                let response = await this.runQuery(this.arweave, query, "Failed when looking for PLAY Token.");
+                if (!response) {
+                    // Create PLAY
+                    let txIds = await warpCreateContract(playTokenSrc, playTokenInitState, [{ name: "Protocol", value: "PLAY" }], false);
+                    playTokenId = txIds.contractTxId;
+                }
+            }
+            let input = {
+                function: "mint",
+                qty: 1000
+            };
+            let tx = await warpWrite(playTokenId, input, false);
+            let walletAddr = this.getActiveAddress;
+
+            // Read Play contract
+            let response = await warpRead(playTokenId);
+
+            // Add Play token to user's wallet
+            let userTokenBal = response.state.balances[walletAddr];
+
+            let pst = {
+                contractId: playTokenId,
+                balance: userTokenBal,
+                name: response.state.name,
+                ticker: response.state.ticker,
+            };
+            this.$store.commit("addWalletPst", pst);
+
         },
         routeUser(site) {
             if (site === "PROD") {
