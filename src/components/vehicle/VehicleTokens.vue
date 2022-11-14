@@ -72,12 +72,12 @@
                                 <tr @click="toggle(pst1.tokenId)" :class="{opened: opened.includes(pst1.tokenId)}">
                                     <td class="px-6 py-4 whitespace-nowrap cursor-pointer">
                                          <div class="flex items-center mt-3 ml-3 mb-3">
-                                            <div class="flex-shrink-0 h-10 w-10">
+                                            <div class="flex-shrink-0 h-10 w-10" @click.prevent="showTokenState( pst1.tokenId, pstLogo(pst1.tokenId, pst1.logo) )">
                                                 <img class="h-10 w-10 rounded-full" :src="pstLogo(pst1.tokenId, pst1.logo)" alt="" />
                                             </div>
                                             <div class="ml-4">
                                                 <div class="font-medium text-gray-900"> {{ pst1.name + " (" + pst1.ticker + ")" }} ({{ pst1.count }})</div>
-                                                 <div class="text-gray-500 font-mono" @click.prevent="showWalletAddress(pst1.txID)"> {{ idSubstr(pst1.txID) }}</div>
+                                                 <div class="text-gray-500 font-mono" @click.prevent="showWalletAddress(pst1.tokenId)"> {{ idSubstr(pst1.tokenId) }}</div>
                                             </div>
                                          </div>
                                     </td>
@@ -297,7 +297,8 @@ export default {
     },
     methods: {
         getVehicle1(){
-
+            console.log("************")
+            console.log(this.vehicle.tokens)
             let data = this.vehicle.tokens
             let result = Object.values(data.reduce((r, { balance,lockLength,logo,name,source,start,ticker,tokenId,txID}) => {
                     r[tokenId] ??= { tokenId, count: 0, tokens: 0};
@@ -313,6 +314,8 @@ export default {
                 return r;
             }, {}));
             // let data = [...new Map(this.vehicle.tokens.map(item => [item['tokenId'] , item])).values()]
+            console.log(result)
+            console.log("************")
             return result;
         },
         getVehicle(id){
