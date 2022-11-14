@@ -100,7 +100,7 @@
                                     </div>
                                 </div>
                                 <vehicle-info v-if="activeTab === 'Info'" :vehicle="vehicle" :contractId="contractId" :isMember="allowEdits"></vehicle-info>
-                                <vehicle-settings v-else-if="activeTab === 'Names'" :vehicle="vehicle" :isMember="allowEdits"></vehicle-settings>
+                                <vehicle-names v-else-if="activeTab === 'Names'" :vehicle="vehicle" :isMember="allowEdits"></vehicle-names>
                                 <vehicle-settings v-else-if="activeTab === 'Custom Settings'" :vehicle="vehicle" :isMember="allowEdits"></vehicle-settings>
                                 <vehicle-members v-else-if="activeTab === 'Members'" :vehicle="vehicle" :isMember="allowEdits"></vehicle-members>
                                 <vehicle-tokens v-else-if="activeTab === 'Tokens'" :vehicle="vehicle" :isMember="allowEdits"></vehicle-tokens>
@@ -138,12 +138,13 @@ import VehicleContractTest from './contract-tests/VehicleContractTest.vue';
 import VehicleActivity from './vehicle/VehicleActivity.vue';
 import VehiclePlaceholder from './vehicle/VehiclePlaceholder.vue';
 import VehicleSettings from './vehicle/VehicleSettings.vue';
+import VehicleNames from './vehicle/VehicleNames.vue';
 import VehicleEvolve from "./vehicle/VehicleEvolve.vue";
 import { mapGetters } from "vuex";
 import { isVehicleMember } from './utils/shared.js';
 
 export default {
-    components: { VehicleInfo, VehicleMembers, VehicleTokens, VehicleVotes, VehicleState, VehicleActivity, VehiclePlaceholder,VehicleSettings, VehicleContractTest, VehicleEvolve },
+    components: { VehicleInfo, VehicleMembers, VehicleTokens, VehicleVotes, VehicleState, VehicleActivity, VehiclePlaceholder,VehicleSettings, VehicleContractTest, VehicleEvolve, VehicleNames },
     props: ['vehicleId'],
     data() {
         return {
