@@ -26,6 +26,7 @@
     "number-abbreviate": "^2.0.0",
     "numeral": "^2.0.6",
     "smartweave": "^0.4.46",
+    "tw-elements": "^1.0.0-alpha12",
     "verto-cache-interface": "^1.2.5",
     "vue": "^3.2.33",
     "vue-json-pretty": "^2.0.6",

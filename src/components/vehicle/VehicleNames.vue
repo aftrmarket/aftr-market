@@ -42,10 +42,13 @@
                 <tbody class="bg-white divide-y divide-gray-200">
                     <tr v-for="val in settingArray" :key="val" class="text-xs text-gray-500 hover:bg-gray-50">
                         <td class="text-left px-4 py-2 font-mono tracking-wider">
-                            {{ val[0] }}
+                            {{ val[1]["name"] }}
                         </td>
                         <td class="text-right px-4 py-2">
-                            {{ val[1] }}
+                            {{ val[1]["value"] }}
+                        </td>
+                        <td class="text-right px-4 py-2">
+                            {{ val[1]["priority"] }}
                         </td>
                         <td v-if="uiEditMode" class="text-right px-4 py-2">
                             <textarea v-model="memberUpdates[val, val[0]]" @blur="onDirty" class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
@@ -62,11 +65,14 @@
                         <td class="text-left px-2 py-2">
                             <input type="text" v-model="newSettingKey" class="mt-1 mb-1 w-full text-xs focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md">
                         </td>
-                        <td class="text-right px-4 py-2">
+                        <!-- <td class="text-right px-4 py-2">
                             0
-                        </td>
+                        </td> -->
                         <td class="text-right px-4 py-2">
                             <textarea v-model="newSettingValue" @blur="onDirty" class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
+                        </td>
+                        <td class="text-right px-4 py-2">
+                            <textarea v-model="newSettingPriority" @blur="onDirty" class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
                         </td>
                         <td class="text-center px-4 py-2">
                             <button @click.prevent="addSetting" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none">
@@ -188,6 +194,7 @@ export default {
             uiEditMode: false,
             newSettingKey: '',
             newSettingValue: null,
+            newSettingPriority: null,
             addRow: false,
             allowEdits: false,
             isDirty: false,
@@ -329,7 +336,7 @@ export default {
             if (type === 'removeSetting') {
                 input.type = 'set',
                 input.key = 'settings.'+settingKey,
-                input.value = "-"
+                input.value = {name : "-", value : "-", priority :"-"}
             } else if (type === 'addSetting') {
                 input.type = 'set',
                 input.key = 'settings.'+settingKey,
@@ -356,11 +363,12 @@ export default {
             if (count === 1) {
                 if (this.settingRemoves.length === 1) {
                     settingKey = this.settingRemoves[0][0];
-                    settingValue = this.settingRemoves[0][1];
+                    settingValue = "";
                     input = this.buildInput(settingKey, settingValue, 'removeSetting');
                 } else if (this.settingAdds.length === 1) {
-                    settingKey = this.settingAdds[0][0];
-                    settingValue = this.settingAdds[0][1];
+                    // settingKey = this.settingAdds[0][0];
+                    settingKey = "names"
+                    settingValue = {name : this.settingAdds[0][0], value : this.settingAdds[0][1], priority : this.settingAdds[0][2]};
                     input = this.buildInput(settingKey, settingValue, 'addSetting');
                 } else if (Object.keys(this.memberUpdates).length === 1) {
                     settingKey = this.updatedValue[0][0];
@@ -443,13 +451,15 @@ export default {
             this.addRow = !this.addRow;
         },
         addSetting() {
-            if (this.newSettingKey.length > 0 && this.newSettingValue) {
+            if (this.newSettingKey.length > 0 && this.newSettingValue && this.newSettingPriority) {
                 this.settingAdds.push(
-                    [this.newSettingKey , this.newSettingValue]
+                    [this.newSettingKey , this.newSettingValue , this.newSettingPriority]
                 );
+                console.log( this.settingAdds)
                 this.addRow = false;
                 this.newSettingKey = '';
-                this.newSettingValue = ''
+                this.newSettingValue = '';
+                this.newSettingPriority = '';
             }
         },
     },

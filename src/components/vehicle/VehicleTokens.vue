@@ -105,7 +105,7 @@
                                             </div> -->
                                             <div class="ml-4">
                                                 <!-- <div class="font-medium text-gray-900"> {{ pst.name + " (" + pst.ticker + ")" }} </div> -->
-                                                <div class="text-gray-500 font-mono" @click.prevent="showWalletAddress(pst.txID)"> {{ idSubstr(pst.txID) }}</div>
+                                                <div class="text-gray-500 font-mono" @click.prevent="showWalletAddress(pst.txID)"> {{index + 1}}. {{ idSubstr(pst.txID) }}</div>
                                             </div>
                                         </div>
                                     </td>
@@ -115,7 +115,7 @@
                                     <td v-if="allowTransfer" class="pt-1">
                                         <input type="number" v-model="transferAmounts[index]" :class="transferAmtInput" />
                                     </td>
-                                    <td v-if="allowTransfer" class="pt-4 flex items-center space-x-2">
+                                    <td v-if="allowTransfer" class="pt-1 flex items-center space-x-2">
                                         <input type="text" v-model="transferAddrs[index]" :class="transferAddrInput" />
                                         <button v-if="index == 0" @click.prevent="onFillDownClick" type="button" class="p-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
