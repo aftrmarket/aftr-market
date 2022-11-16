@@ -1,12 +1,11 @@
 async function handle (state, action) {
     const balances = state.balances;
-    const canEvolve = state.canEvolve;
     const input = action.input;
     const caller = action.caller;
+    let canEvolve = true;   // Assume true
   
-    if (!canEvolve) {
-        // Assume true
-        canEvolve = true;
+    if (state.canEvolve) {
+        canEvolve = state.canEvolve;
     }
     if (input.function === 'transfer') {
       const target = input.target;
