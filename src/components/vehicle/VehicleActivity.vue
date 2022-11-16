@@ -45,7 +45,7 @@
         </div>
         <div v-if="commentsToShow < activities.length || activities.length > commentsToShow">
             <button @click="commentsToShow += 10" class="mt-4 px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                show more activities
+                Show More Activities
             </button>
         </div>
     </perfect-scrollbar>
@@ -65,8 +65,7 @@ export default {
         };
     },
     mounted() {
-        this.totalComments = this.activities.length
-        console.log("Mount : ",this.activities.length)
+        this.totalComments = this.activities.length;
     },
     computed: {
         interactionResult(interaction) {
@@ -94,7 +93,7 @@ export default {
             activity.block = edge.node.block.height;
             activity.result = this.interactions[activity.id];
 
-            console.log("activity.result ", activity.result )
+            console.log("activity.result ", activity.result);
             // Parse Input tag to get the interaction specifics
             for (let tag of edge.node.tags) {
                 if (tag.name === "Input") {
@@ -207,7 +206,6 @@ export default {
         this.isLoading = true;
         
         let interactionStrings = []
-        console.log("this.interactions",this.interactions)
         for (const i in this.interactions) {
             interactionStrings.push( i )
         }
@@ -226,8 +224,7 @@ export default {
                 this.activities.push(this.parseActivity(edge));
             }
         }
-        this.activities.reverse()
-        console.log("this.activities" , this.activities)    
+        this.activities.reverse();
         this.isLoading = false;
         return
     }
