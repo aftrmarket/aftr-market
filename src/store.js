@@ -2,6 +2,35 @@ import {createStore } from 'vuex';
 import { fetchBalancesForAddress } from "verto-cache-interface";
 import { warpRead, arweaveInit } from './components/utils/warpUtils';
 
+async function getPlayTokenId(arweave ,addr) {
+    if (import.meta.env.VITE_ENV === "PROD") {
+        return import.meta.env.VITE_PLAY_CONTRACT_ID;
+    } else {
+        let queryval = { query: `
+            query($cursor: String) {
+                transactions(
+                    tags: [ 
+                        { name: "Protocol", values: ["PLAY"] },
+                ]
+                    after: $cursor
+                )
+                { pageInfo { hasNextPage }
+                    edges { cursor node { id } }
+                }
+            }`
+        };
+
+        const responseValue = await arweave.api.post("graphql", { query: queryval.query,});
+
+        if (responseValue.data.data.transactions.edges.length == 0) {
+            return "";
+        } else {
+            return responseValue.data.data.transactions.edges[0].node.id;
+            //return responseValue[0].node.id;
+        }
+    }
+};
+
 async function buildWalletPsts(aftrSourcesArray, userAddr) {
     const aftrContractSourcesString = JSON.stringify(aftrSourcesArray);
     let queryval = {
@@ -70,24 +99,27 @@ async function buildWalletPsts(aftrSourcesArray, userAddr) {
     }
 
     // Read PLAY PST
-    const playTokenId = import.meta.env.VITE_PLAY_CONTRACT_ID;
-    let playResp = await warpRead(playTokenId);
-    // Add Play token to user's wallet
-    let userTokenBal = 0;
-    if (playResp.state.balances[wallet.address]) {
-        userTokenBal = playResp.state.balances[wallet.address];
-    }
-    let playIndex = wallet.psts.findIndex(pst => pst.contractId === playTokenId);
-    if (playIndex === -1) {
-        let playPst = {
-            contractId: playTokenId,
-            balance: userTokenBal,
-            name: playResp.state.name,
-            ticker: playResp.state.ticker,
-        };
-        wallet.psts.push(playPst);
-    } else {
-        wallet.psts[playIndex].balance = userTokenBal;
+    const playTokenId = await getPlayTokenId(arweave, userAddr);
+    if (playTokenId !== "") {
+        let playResp = await warpRead(playTokenId);
+
+        // Add Play token to user's wallet
+        let userTokenBal = 0;
+        if (playResp.state.balances[wallet.address]) {
+            userTokenBal = playResp.state.balances[wallet.address];
+        }
+        let playIndex = wallet.psts.findIndex(pst => pst.contractId === playTokenId);
+        if (playIndex === -1) {
+            let playPst = {
+                contractId: playTokenId,
+                balance: userTokenBal,
+                name: playResp.state.name,
+                ticker: playResp.state.ticker,
+            };
+            wallet.psts.push(playPst);
+        } else {
+            wallet.psts[playIndex].balance = userTokenBal;
+        }
     }
 
     return wallet;
