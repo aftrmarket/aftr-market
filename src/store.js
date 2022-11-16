@@ -68,6 +68,28 @@ async function buildWalletPsts(aftrSourcesArray, userAddr) {
             console.log("ERROR reading contract for " + edge.node.id + ": " + e);
         }
     }
+
+    // Read PLAY PST
+    const playTokenId = import.meta.env.VITE_PLAY_CONTRACT_ID;
+    let playResp = await warpRead(playTokenId);
+    // Add Play token to user's wallet
+    let userTokenBal = 0;
+    if (playResp.state.balances[wallet.address]) {
+        userTokenBal = playResp.state.balances[wallet.address];
+    }
+    let playIndex = wallet.psts.findIndex(pst => pst.contractId === playTokenId);
+    if (playIndex === -1) {
+        let playPst = {
+            contractId: playTokenId,
+            balance: userTokenBal,
+            name: playResp.state.name,
+            ticker: playResp.state.ticker,
+        };
+        wallet.psts.push(playPst);
+    } else {
+        wallet.psts[playIndex].balance = userTokenBal;
+    }
+
     return wallet;
 };
 
@@ -282,7 +304,7 @@ const store = createStore({
                 const response = await fetch(
                     import.meta.env.VITE_VERTO_CACHE_URL + "balance/" + wallet.address
                 );
-                wallet.psts = await response.json();
+                const cachePsts = await response.json();
                 /**** RESPONSE RETURNS AS AN ARRAY OF KEY/VALUE PAIRS ****
                  * [ {
                  *  id: '',
@@ -292,12 +314,19 @@ const store = createStore({
                  *  logo: ''
                  * } ]
                  ****/
-
+                for (let pst of cachePsts) {
+                    wallet.psts.push({
+                        contractId: pst.id,
+                        balance: pst.balance,
+                        name: pst.name,
+                        ticker: pst.ticker
+                    });
+                }
 
                 // Query Verto to get AR prices for each token
-    /*** THIS CODE SHOULD ONLY RUN IN PROD AS WELL.
-     * IN DEV AND TEST, WE WON'T HAVE ACCESS TO PRICES, SO WE SHOULD HARD-CODE THESE FOR TESTING.
-     */
+                /*** THIS CODE SHOULD ONLY RUN IN PROD AS WELL.
+                 * IN DEV AND TEST, WE WON'T HAVE ACCESS TO PRICES, SO WE SHOULD HARD-CODE THESE FOR TESTING.
+                 */
                 for (let pst of wallet.psts) {
                     try {
                         const response = await fetch(
@@ -315,7 +344,10 @@ const store = createStore({
                         context.commit("arConnect", wallet);
                     }
                 }
-    /*** END ONLY RUNS IN PROD */
+
+                /*** DO WE WANT TO RUN buildWalletPsts in PROD?? */
+
+            /*** END ONLY RUNS IN PROD */
             } else {
                 if (context.state.aftrContractSources.length !== 0) {
                     wallet = await buildWalletPsts(context.state.aftrContractSources, wallet.address);
