@@ -39,28 +39,31 @@
                         </th>
                     </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    <tr v-for="val in settingArray" :key="val" class="text-xs text-gray-500 hover:bg-gray-50">
+                <tbody class="bg-white divide-y divide-gray-200" v-for="val in settingArray" :key="val" >
+                    <tr v-for="v in val[1]" :key="v" class="text-xs text-gray-500 hover:bg-gray-50">
                         <td class="text-left px-4 py-2 font-mono tracking-wider">
-                            {{ val[1]["name"] }}
+                            {{ v.name }}
                         </td>
                         <td class="text-right px-4 py-2">
-                            {{ val[1]["value"] }}
+                            {{ v.value}}
                         </td>
                         <td class="text-right px-4 py-2">
-                            {{ val[1]["priority"] }}
+                            {{ v.priority}}
                         </td>
                         <td v-if="uiEditMode" class="text-right px-4 py-2">
                             <textarea v-model="memberUpdates[val, val[0]]" @blur="onDirty" class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
                         </td>
                         <td v-if="uiEditMode" class="text-center px-4 py-2">
-                            <button @click.prevent="removeSetting(val)" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none">
+                            test
+                            <button @click.prevent="removeSetting(val, v)" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
                                 </svg>
                             </button>
                         </td>
                     </tr>
+                 </tbody>
+                 <tbody class="bg-white divide-y divide-gray-200">
                     <tr v-show="addRow" class="text-xs text-gray-500 hover:bg-gray-50">
                         <td class="text-left px-2 py-2">
                             <input type="text" v-model="newSettingKey" class="mt-1 mb-1 w-full text-xs focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md">
@@ -82,7 +85,7 @@
                             </button>
                         </td>
                     </tr>
-                </tbody>
+                 </tbody>
             </table>
         </div>
 
@@ -267,10 +270,10 @@ export default {
                 return "<span style='color:#FF6C8C'><b>Remove key </b></span> <b>" + settingKey[0];
             }
         },
-        removeSetting(settingVal) {
+        removeSetting(settingVal,val) {
             if (!this.settingRemoves.includes(settingVal)) {
                 if(!(settingVal[0] == 'quorum' || settingVal[0] == 'support' || settingVal[0] == 'voteLength' || settingVal[0] == 'communityDescription' || settingVal[0] == 'communityLogo')){
-                    this.settingRemoves.push(settingVal);
+                    this.settingRemoves.push(val);
                     this.onDirty();
                 } else {
                     this.$swal({
@@ -336,7 +339,7 @@ export default {
             if (type === 'removeSetting') {
                 input.type = 'set',
                 input.key = 'settings.'+settingKey,
-                input.value = {name : "-", value : "-", priority :"-"}
+                input.value = settingValue
             } else if (type === 'addSetting') {
                 input.type = 'set',
                 input.key = 'settings.'+settingKey,
@@ -357,19 +360,51 @@ export default {
             const count = this.settingRemoves.length + this.settingAdds.length + Object.keys(this.memberUpdates).length;
             let settingKey = '';
             let settingValue = 0;
+            let settingValue1 = 0 ;
             
             let input = {};
 
             if (count === 1) {
                 if (this.settingRemoves.length === 1) {
-                    settingKey = this.settingRemoves[0][0];
-                    settingValue = "";
-                    input = this.buildInput(settingKey, settingValue, 'removeSetting');
+                    settingValue = []
+                    console.log(this.settingRemoves[0])
+                    this.vehicle.settings.map(item => {
+                        if(item[0] == "names") {
+                            
+                            let indexOfObject = item[1].findIndex(x => {
+                               return x.name == this.settingRemoves[0].name
+                            })
+                            item[1].splice(indexOfObject, 1);
+                            return
+                        }
+                    });
+                    settingKey = "names";
+                    this.vehicle.settings.map((item, index) => {
+                        if(item[0] == "names") {
+                            settingValue.push(item[1])
+                        }
+                        return
+                    })
+                    console.log("settingValue", settingValue)
+                    // "";
+                    input = this.buildInput(settingKey, settingValue[0], 'removeSetting');
                 } else if (this.settingAdds.length === 1) {
-                    // settingKey = this.settingAdds[0][0];
+                    let values = [];
+                    let isTrue = false;
                     settingKey = "names"
                     settingValue = {name : this.settingAdds[0][0], value : this.settingAdds[0][1], priority : this.settingAdds[0][2]};
-                    input = this.buildInput(settingKey, settingValue, 'addSetting');
+                    this.vehicle.settings.map((value,index) => {
+                        if(value[0] == "names") {
+                            value[1].push(settingValue)
+                            isTrue = true
+                            value[1].map(x => {
+                                values.push(x)
+                            })
+                        }
+                        return
+                    })
+                    settingValue1 = isTrue ? values : [settingValue]
+                    input = this.buildInput(settingKey, settingValue1, 'addSetting');
                 } else if (Object.keys(this.memberUpdates).length === 1) {
                     settingKey = this.updatedValue[0][0];
                     settingValue = this.updatedValue[0][1];
@@ -395,17 +430,33 @@ export default {
                     })
                 }
                 if (this.settingAdds.length > 0) {
-                    this.settingAdds.forEach(setting => {
-                        let multiAction = {
+                    let values = [];
+                    let isTrue = false;
+                    console.log("settingAdds", this.settingAdds.length)
+                    let multiAction = {
                             input: {}
                         };
+                    this.settingAdds.forEach(setting => {
                         
-                        settingKey = setting[0];
-                        settingValue = setting[1];
-
-                        multiAction.input = this.buildInput(settingKey, settingValue, 'addSetting');
-                        input.actions.push(multiAction);
+                        settingKey = "names";
+                        settingValue = {name : setting[0], value : setting[1], priority : setting[2]};
+                        values.push(settingValue)
                     });
+                    // let arr = []
+                    // this.vehicle.settings.map((value,index) => {
+                    //     if(value[0] == "names") {
+                    //         values.push(value[1])
+                    //         // value[1].push(values)
+                    //         // // isTrue = true
+                    //         // value[1].map(x => {
+                    //         //     arr.push(x)
+                    //         // })
+                    //     }
+                    //     return
+                    // })
+                    
+                    multiAction.input = this.buildInput(settingKey, values, 'addSetting');
+                    input.actions.push(multiAction);
                 }
                 if (Object.keys(this.memberUpdates).length > 0) {
                     for(let member in this.memberUpdates) {
@@ -448,6 +499,7 @@ export default {
             this.$router.push("/vehicles");
         },
         addSettingRow() {
+            console.log(!this.addRow)
             this.addRow = !this.addRow;
         },
         addSetting() {
@@ -455,7 +507,6 @@ export default {
                 this.settingAdds.push(
                     [this.newSettingKey , this.newSettingValue , this.newSettingPriority]
                 );
-                console.log( this.settingAdds)
                 this.addRow = false;
                 this.newSettingKey = '';
                 this.newSettingValue = '';
