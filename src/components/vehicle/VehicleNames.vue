@@ -19,7 +19,7 @@
                 <thead class="bg-gray-50">
                     <tr>
                         <th scope="col" class="flex space-x-3 px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            <span class="py-2">Key ({{ Object.keys(settingArray).length }})</span>
+                            <span class="py-2">Key ({{ settingArray[0] ? settingArray[0][1].length : 0 }})</span>
                             <button v-if="uiEditMode" @click.prevent="addSettingRow" type="button" class="px-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
@@ -54,7 +54,6 @@
                             <textarea v-model="memberUpdates[val, val[0]]" @blur="onDirty" class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
                         </td>
                         <td v-if="uiEditMode" class="text-center px-4 py-2">
-                            test
                             <button @click.prevent="removeSetting(val, v)" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
@@ -142,7 +141,7 @@
                             {{ Object.keys(memberUpdates).length + settingAdds.length + index + 1 }}
                         </td>
                         <td class="px-4 py-2">
-                            <span v-html="proposedText(value, value, 'remove')"></span>
+                            <span v-html="proposedText(value, value.name, 'remove')"></span>
                         </td>
                         <td class="px-4 py-2 text-center">
                             <button @click.prevent="removeProposal(value[0], 'remove')" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none">
@@ -267,7 +266,7 @@ export default {
             } else if (type === 'add') {
                 return "<span style='color:green'><b>Add key </b></span> <b>" + settingKey[0] + "</b> and <span style='color:green'><b>Value </b></span> <b>" + settingValue[1] +"</b>";
             } else if (type === 'remove') {
-                return "<span style='color:#FF6C8C'><b>Remove key </b></span> <b>" + settingKey[0];
+                return "<span style='color:#FF6C8C'><b>Remove Name </b></span> <b>" + settingValue;
             }
         },
         removeSetting(settingVal,val) {
@@ -303,23 +302,25 @@ export default {
         },
         onDirty() {
             // Clean up update object, remove any blank inputs
+            console.log("onDirty",JSON.stringify(this.memberUpdates))
             for(let member in this.memberUpdates) {
-                if (this.memberUpdates[member] === '') {
-                    delete this.memberUpdates[member];
-                } else {
-                    this.updatedValue.filter((e1,index) => {
-                        if(e1[0] == member){
-                            delete this.updatedValue[index];
-                        }
-                    });
-                    this.updatedValue.push(
-                        [member ,this.memberUpdates[member]]
-                    );
-                }
-                // Deselect any rows with checkboxes
-                if (this.settingRemoves.includes(member)) {
-                    this.settingRemoves = this.settingRemoves.filter((el) => el !== member);
-                }
+                console.log(JSON.stringify(member))
+                // if (this.memberUpdates[member] === '') {
+                //     delete this.memberUpdates[member];
+                // } else {
+                //     this.updatedValue.filter((e1,index) => {
+                //         if(e1[0] == member){
+                //             delete this.updatedValue[index];
+                //         }
+                //     });
+                //     this.updatedValue.push(
+                //         [member ,this.memberUpdates[member]]
+                //     );
+                // }
+                // // Deselect any rows with checkboxes
+                // if (this.settingRemoves.includes(member)) {
+                //     this.settingRemoves = this.settingRemoves.filter((el) => el !== member);
+                // }
             }
 
             if (this.settingRemoves.length + this.settingAdds.length + Object.keys(this.memberUpdates).length > 0) {
@@ -367,7 +368,6 @@ export default {
             if (count === 1) {
                 if (this.settingRemoves.length === 1) {
                     settingValue = []
-                    console.log(this.settingRemoves[0])
                     this.vehicle.settings.map(item => {
                         if(item[0] == "names") {
                             
@@ -385,8 +385,6 @@ export default {
                         }
                         return
                     })
-                    console.log("settingValue", settingValue)
-                    // "";
                     input = this.buildInput(settingKey, settingValue[0], 'removeSetting');
                 } else if (this.settingAdds.length === 1) {
                     let values = [];
@@ -417,21 +415,34 @@ export default {
                 input.actions = [];
 
                 if (this.settingRemoves.length > 0) {
-                    this.settingRemoves.forEach(setting => {
-                        let multiAction = {
+                    let multiAction = {
                             input: {}
                         };
-                        
-                        settingKey = setting[0];
-                        settingValue = setting[1];
-                    
-                        multiAction.input = this.buildInput(settingKey, settingValue, 'removeSetting');
-                        input.actions.push(multiAction);
+                    this.settingRemoves.forEach(setting => {
+                        settingKey = "names";
+                        settingValue = []
+                        this.vehicle.settings.map(item => {
+                            if(item[0] == "names") {
+                                let indexOfObject = item[1].findIndex(x => {
+                                return x.name == setting.name
+                                })
+                                item[1].splice(indexOfObject, 1);
+                                return
+                            }
+                        });
+                        settingKey = "names";
+                        this.vehicle.settings.map((item, index) => {
+                            if(item[0] == "names") {
+                                settingValue.push(item[1])
+                            }
+                            return
+                        })
                     })
+                    multiAction.input = this.buildInput(settingKey, settingValue[0], 'removeSetting');
+                    input.actions.push(multiAction);
                 }
                 if (this.settingAdds.length > 0) {
                     let values = [];
-                    let isTrue = false;
                     console.log("settingAdds", this.settingAdds.length)
                     let multiAction = {
                             input: {}
@@ -442,18 +453,14 @@ export default {
                         settingValue = {name : setting[0], value : setting[1], priority : setting[2]};
                         values.push(settingValue)
                     });
-                    // let arr = []
-                    // this.vehicle.settings.map((value,index) => {
-                    //     if(value[0] == "names") {
-                    //         values.push(value[1])
-                    //         // value[1].push(values)
-                    //         // // isTrue = true
-                    //         // value[1].map(x => {
-                    //         //     arr.push(x)
-                    //         // })
-                    //     }
-                    //     return
-                    // })
+                    this.vehicle.settings.map((value,index) => {
+                        if(value[0] == "names") {
+                            value[1].map(x => {
+                                values.push(x)
+                            })
+                        }
+                        return
+                    })
                     
                     multiAction.input = this.buildInput(settingKey, values, 'addSetting');
                     input.actions.push(multiAction);
