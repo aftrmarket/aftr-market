@@ -171,7 +171,7 @@ import { mapGetters } from 'vuex';
 import { Switch, SwitchGroup, SwitchLabel } from '@headlessui/vue';
 import { warpWrite } from '../utils/warpUtils.js';
 
-const excludeSettings = [ "quorum", "support", "voteLength", "communityDescription", "communityLogo" ];
+const excludeSettings = [ "quorum", "support", "voteLength", "communityDescription" ];
 
 export default {
     props: ['vehicle', 'isMember'],
@@ -259,7 +259,7 @@ export default {
         },
         removeSetting(settingVal) {
             if (!this.settingRemoves.includes(settingVal)) {
-                if(!(settingVal[0] == 'quorum' || settingVal[0] == 'support' || settingVal[0] == 'voteLength' || settingVal[0] == 'communityDescription' || settingVal[0] == 'communityLogo')){
+                if(!(settingVal[0] == 'quorum' || settingVal[0] == 'support' || settingVal[0] == 'voteLength' || settingVal[0] == 'communityDescription')){
                     this.settingRemoves.push(settingVal);
                     this.onDirty();
                 } else {
