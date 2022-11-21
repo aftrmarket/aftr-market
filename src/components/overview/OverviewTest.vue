@@ -25,13 +25,11 @@
                                             <button @click.prevent="routeUser('PROD')" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Back to MAINNET</button>
                                         </div>
                                          <div class="mt-3 sm:mt-0 sm:ml-3">
-                                            <button @click.prevent="voteSimulatorTest"  type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Voting Simulator</button>
+                                            <!---<button @click.prevent="voteSimulatorTest"  type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Voting Simulator</button>-->
+                                            <button @click.prevent="mintPlayTokens"  type="submit" class="py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Mint PLAY</button>
                                         </div>
                                     </div>
                                 </form>
-                            </div>
-                            <div>
-                                <button @click.prevent="mintPlayTokens"  type="submit" class="py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Mint PLAY</button>
                             </div>
                         </div>
                     </div>
@@ -469,7 +467,9 @@ export default {
                 
                 this.$log.info("OverviewTest : init :: ", "1. Ensure wallet has some AR to make transactions");
 
-                await this.mintAr(this.addr, this.arweave);
+                if (this.env === "DEV") {
+                    await this.mintAr(this.addr, this.arweave);
+                }
 
                 let aftrContractSrcId = "";
                 this.$swal({
