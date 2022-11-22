@@ -14,19 +14,25 @@
                     {{ walletAddressSubstr(vehicleRunningSourceId) }}
                     <span v-if="vehicleRunningSourceId === latestAftrSrcId" class="py-1 tooltip">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="green" class="w-5 h-5">
-                            <path fill-rule="evenodd" d="M9.661 2.237a.531.531 0 01.678 0 11.947 11.947 0 007.078 2.749.5.5 0 01.479.425c.069.52.104 1.05.104 1.59 0 5.162-3.26 9.563-7.834 11.256a.48.48 0 01-.332 0C5.26 16.564 2 12.163 2 7c0-.538.035-1.069.104-1.589a.5.5 0 01.48-.425 11.947 11.947 0 007.077-2.75zm4.196 5.954a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                            <path fill-rule="evenodd"
+                                d="M9.661 2.237a.531.531 0 01.678 0 11.947 11.947 0 007.078 2.749.5.5 0 01.479.425c.069.52.104 1.05.104 1.59 0 5.162-3.26 9.563-7.834 11.256a.48.48 0 01-.332 0C5.26 16.564 2 12.163 2 7c0-.538.035-1.069.104-1.589a.5.5 0 01.48-.425 11.947 11.947 0 007.077-2.75zm4.196 5.954a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                                clip-rule="evenodd" />
                         </svg>
                         <span class="tooltiptext text-sm">Running latest AFTR version</span>
                     </span>
                     <span v-else class="tooltip">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#FF6C8C" class="w-5 h-5">
-                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                            <path fill-rule="evenodd"
+                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z"
+                                clip-rule="evenodd" />
                         </svg>
                         <span class="tooltiptext text-sm">Newer AFTR version available</span>
                     </span>
                 </label>
                 <label class="block text-lg text-gray-900">Latest AFTR Source:</label>
-                <label class="block text-aftrBlue text-lg font-mono tracking-wider">{{ walletAddressSubstr(latestAftrSrcId) }}</label>
+                <label class="block text-aftrBlue text-lg font-mono tracking-wider" @click="viewLatestAftrSource">{{
+                        walletAddressSubstr(latestAftrSrcId)
+                }}</label>
             </div>
         </div>
         <div v-if="vehicle.desc !== '' && vehicle.desc !== undefined" class="px-4 py-4 sm:px-6">
@@ -41,8 +47,10 @@
                             Members
                         </dt>
                         <dd class="mt-1 text-3xl font-semibold text-aftrBlue">
-                            {{ formatNumber(counts.members.total) }} 
-                            <span class="ml-2 text-sm font-medium text-gray-500"> with {{ formatNumber(counts.members.sumOfLocked) }} locked tokens</span>
+                            {{ formatNumber(counts.members.total) }}
+                            <span class="ml-2 text-sm font-medium text-gray-500"> with {{
+                                    formatNumber(counts.members.sumOfLocked)
+                            }} locked tokens</span>
                         </dd>
                     </div>
                 </dl>
@@ -52,8 +60,10 @@
                             Tokens
                         </dt>
                         <dd class="mt-1 text-3xl font-semibold text-aftrBlue">
-                            {{ formatNumber(counts.assets.sumOfTokens) }} 
-                            <span class="ml-2 text-sm font-medium text-gray-500"> from {{ formatNumber(counts.assets.total) }} assets</span>
+                            {{ formatNumber(counts.assets.sumOfTokens) }}
+                            <span class="ml-2 text-sm font-medium text-gray-500"> from {{
+                                    formatNumber(counts.assets.total)
+                            }} assets</span>
                         </dd>
                     </div>
                 </dl>
@@ -63,8 +73,10 @@
                             Active Votes
                         </dt>
                         <dd class="mt-1 text-3xl font-semibold text-aftrBlue">
-                            {{ formatNumber(counts.votes.active) }} 
-                            <span class="ml-2 text-sm font-medium text-gray-500"> from {{ formatNumber(counts.votes.total) }} votes</span>
+                            {{ formatNumber(counts.votes.active) }}
+                            <span class="ml-2 text-sm font-medium text-gray-500"> from {{
+                                    formatNumber(counts.votes.total)
+                            }} votes</span>
                         </dd>
                     </div>
                 </dl>
@@ -97,11 +109,12 @@
             </div>
             <div v-if="allowVoteSimulator">
                 <div class="px-4 sm:px-6 max-w-2xl text-sm text-gray-500">
-                    Use the <button style="color:#6C8CFF" @click.prevent="voteSimulatorTest" type="submit" :vehicle="vehicle"> Vote Simulator </button> to validate your vote system settings.
+                    Use the <button style="color:#6C8CFF" @click.prevent="voteSimulatorTest" type="submit"
+                        :vehicle="vehicle"> Vote Simulator </button> to validate your vote system settings.
                 </div>
             </div>
         </div>
-        <div class="pt-4 grid grid-cols-4">    
+        <div class="pt-4 grid grid-cols-4">
             <div>
                 <div class="px-4 sm:px-6 max-w-2xl text-sm text-gray-500">Voting System</div>
                 <div class="flex items-center justify-between pb-4">
@@ -145,7 +158,7 @@ import { mapGetters } from 'vuex';
 
 export default {
     props: ['vehicle'],
-    components: {VoteSimulator},
+    components: { VoteSimulator },
     data() {
         return {
             currentVehicleSettings: null,
@@ -203,14 +216,14 @@ export default {
         },
         vehicleRunningSrcClass() {
             if (this.vehicleRunningSourceId !== this.latestAftrSrcId) {
-                return "block text-aftrRed text-lg font-mono tracking-wider flex flex-nowrap";    
+                return "block text-aftrRed text-lg font-mono tracking-wider flex flex-nowrap";
             }
             return "block text-aftrBlue text-lg font-mono tracking-wider flex flex-nowrap";
         },
         ...mapGetters(['getActiveAddress', 'getAftrContractSources']),
     },
     methods: {
-        voteSimulatorTest(){
+        voteSimulatorTest() {
             //  console.log("vehicle", this.vehicle)
             this.showVoteSimulator = true;
         },
@@ -227,7 +240,7 @@ export default {
         },
         walletAddressSubstr(addr, chars = 10) {
             if (typeof addr === 'string') {
-                let len = parseInt(chars/2);
+                let len = parseInt(chars / 2);
                 return addr.substring(0, len) + '...' + addr.substring(addr.length - len);
             } else {
                 return '';
@@ -235,7 +248,7 @@ export default {
         },
         aggregateInfo() {
             this.$log.info("VehicleInfoRead : aggregateInfo :: ", JSON.stringify(this.vehicle));
-            
+
             if (!this.vehicle.votingSystem || this.vehicle.votingSystem === '' || this.vehicle.votingSystem === 'undefined') {
                 this.vehicle.votingSystem = 'equal';
             }
@@ -248,7 +261,7 @@ export default {
             }
             if (typeof this.vehicle.vault !== 'undefined') {
                 for (const addr in this.vehicle.vault) {
-                    this.vehicle.vault[addr].forEach( vault => {
+                    this.vehicle.vault[addr].forEach(vault => {
                         this.counts.members.sumOfLocked += vault.balance;
                     });
                 }
@@ -267,13 +280,16 @@ export default {
                 this.counts.votes.active = activeVotes.length;
                 this.counts.votes.finalized = this.counts.votes.total - this.counts.votes.active;
             }
-            
+
             // Only allow Vote Simulator if user is member of Vehicle
             if (this.getActiveAddress in this.vehicle.balances) {
                 this.allowVoteSimulator = true;
             } else {
                 this.allowVoteSimulator = false;
             }
+        },
+        viewLatestAftrSource() {
+            this.$router.push("../latest-contract-source");
         }
     },
     created() {
@@ -314,13 +330,14 @@ export default {
 }
 
 .tooltip .tooltiptext::after {
-  content: " ";
-  position: absolute;
-  top: 100%; /* At the bottom of the tooltip */
-  left: 50%;
-  margin-left: -5px;
-  border-width: 5px;
-  border-style: solid;
-  border-color: #555555 transparent transparent transparent;
+    content: " ";
+    position: absolute;
+    top: 100%;
+    /* At the bottom of the tooltip */
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555555 transparent transparent transparent;
 }
 </style>

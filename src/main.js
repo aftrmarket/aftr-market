@@ -14,6 +14,7 @@ import UiTest from './components/UiTest.vue';
 import ContractRead from './components/ContractRead.vue';
 import Overview from './components/Overview.vue';
 import MyPortfolio from './components/MyPortfolio.vue';
+import AftrContractSource from './components/AftrContractSource.vue'
 import Chat from './components/utils/Chat.vue';
 import VueSweetalert2 from 'vue-sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
@@ -33,10 +34,10 @@ if (import.meta.env.VITE_ENV === 'PROD') {
 }
 const options = {
     isEnabled: true,
-    logLevel : logLevel,
-    stringifyArguments : false,
-    showLogLevel : true,
-    showMethodName : true,
+    logLevel: logLevel,
+    stringifyArguments: false,
+    showLogLevel: true,
+    showMethodName: true,
     separator: '|',
     showConsoleColors: true,
 };
@@ -45,14 +46,15 @@ const router = createRouter({
     history: createWebHistory(),
     routes: [
         { name: 'vehicles', path: '/vehicles', component: VehicleList },
-        { name: 'myPortfolio', path: '/MyPortfolio', component: MyPortfolio},
+        { name: 'myPortfolio', path: '/MyPortfolio', component: MyPortfolio },
         { name: 'vehicle', path: '/vehicles/:vehicleId', component: Vehicle, props: true },
         { name: 'create', path: '/create', component: CreateVehicle },
         { name: 'ui-test', path: '/ui-test', component: UiTest },
         { name: 'read', path: '/read/:contractId', component: ContractRead, props: true },
         { name: 'overview', path: '/overview', component: Overview, props: true, alias: '/' },
-        { 
-            path: '/latest-contract-source',
+        { name: 'latest-contract-source', path: '/latest-contract-source', component: AftrContractSource },
+        {
+            path: '/latest-contract-src',
             beforeEnter(to, from, next) {
                 window.location.href = 'https://github.com/aftrmarket/aftr-contracts/blob/main/contract/vehicle/contract.ts'
             }
