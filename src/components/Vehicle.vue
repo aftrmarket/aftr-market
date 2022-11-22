@@ -103,7 +103,7 @@
                                 <vehicle-names v-else-if="activeTab === 'Names'" :vehicle="vehicle" :isMember="allowEdits"></vehicle-names>
                                 <vehicle-settings v-else-if="activeTab === 'Custom Settings'" :vehicle="vehicle" :isMember="allowEdits"></vehicle-settings>
                                 <vehicle-members v-else-if="activeTab === 'Members'" :vehicle="vehicle" :isMember="allowEdits"></vehicle-members>
-                                <vehicle-tokens v-else-if="activeTab === 'Tokens'" :vehicle="vehicle" :isMember="allowEdits"></vehicle-tokens>
+                                <vehicle-tokens v-else-if="activeTab === 'Assets'" :vehicle="vehicle" :isMember="allowEdits"></vehicle-tokens>
                                 <!--<vehicle-profits v-else-if="activeTab === 'Profits'"></vehicle-profits>-->
                                 <!--<vehicle-leases v-else-if="activeTab === 'Leases'" :leases="vehicles.leases"></vehicle-leases>-->
                                 <!--<vehicle-leases v-else-if="activeTab === 'Leases'"></vehicle-leases>-->
@@ -153,7 +153,7 @@ export default {
                 { name: 'Names', href: '#', current: false },
                 { name: 'Custom Settings', href: '#', current: false },
                 { name: 'Members', href: '#', current: false },
-                { name: 'Tokens', href: '#', current: false },
+                { name: 'Assets', href: '#', current: false },
                 //{ name: 'Profits', href: '#', current: false },
                 //{ name: 'Fractions', href: '#', current: false },
                 //{ name: 'Leases', href: '#', current: false },

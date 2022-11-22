@@ -108,7 +108,7 @@
                             <!--<input type="number" name="vehicleTokens" placeholder="# of Vehicle Tokens" v-model="vehicleTokens" @input="onTokenChange" :class="inputBox(vehicleTokensValid)" />-->
                             <div class="">
                                 <input type="radio" v-model="ownership" id="single" value="single" class="form-radio text-aftrBlue" /><label class="px-2 text-sm text-gray-700">Single Owner</label>
-                                <input type="radio" v-model="ownership" id="dao" value="dao" class="form-radio text-aftrBlue" /><label class="px-2 text-sm text-gray-700">DAO Owned</label>
+                                <input type="radio" v-model="ownership" id="dao" value="dao" class="form-radio text-aftrBlue" /><label class="px-2 text-sm text-gray-700">Multiple Owners</label>
                             </div>
                             <div class="">
                                 <input type="radio" v-model="votingSystem" id="weighted" value="weighted" class="form-radio text-aftrBlue" /><label class="px-2 text-sm text-gray-700">Weighted</label>
@@ -240,25 +240,25 @@
                         </div>
                     </div>
 -->
-                    <!-- DAO -->
+                    <!-- Members -->
                     <h3 class="mt-4 border-t border-gray-200 pt-4 text-xl font-light leading-6">
-                        DAO Members
+                        Members
                     </h3>
-                    <!-- DAO Members -->
+                    <!-- Members -->
                     <div class="bg-white sm:p-4">
                         <div class="flex items-stretch">
                             <div class="mt-6 flow-root">
                                 <input type="text" v-model="memberWallet" placeholder="Wallet Address" @input="onTokenChange" :class="inputBox(memberWalletValid)" class="w-96" />
                             </div>
                             <div class="mt-6 pl-4 flex flex-col inline-flex">
-                                <input type="number" placeholder="Tokens" v-model="memberAmount" @input="onTokenChange" :class="inputBox(memberAmountValid)" />
+                                <input type="number" placeholder="Voting Power" v-model="memberAmount" @input="onTokenChange" :class="inputBox(memberAmountValid)" />
                             </div>
                             <div class="mt-6 pl-4 flex flex-col inline-flex">
                                 <div v-if="!memberAmountValid">
                                     <label class="pl-4 flex flex-col inline-flex block text-sm text-aftrRed">
-                                        The Owner is assumed be a DAO member.
+                                        The Owner is assumed be a member.
                                         <br />
-                                        Be Sure to update token balance below.
+                                        Be Sure to update voting power balance below.
                                     </label>
                                 </div>
                                 <button v-if="memberWalletValid && memberAmountValid" @click.prevent="addDaoMember" type="button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
@@ -282,10 +282,10 @@
                                                         Members ({{ daoMembers.length }})
                                                     </th>
                                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                        Current Tokens
+                                                        Current Voting Power
                                                     </th>
                                                     <th scope="col" class="py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                        Update Tokens
+                                                        Update Voting Power
                                                     </th>
                                                     <th scope="col" class="px-6 py-3"></th>
                                                 </tr>
@@ -308,7 +308,7 @@
                                                         </button>
                                                         <div v-if="daoBalance == 0">
                                                             <label class="pl-4 pt-3 flex flex-col inline-flex block text-sm text-aftrRed">
-                                                                You need to mint at least 1 token when creating a vehicle.
+                                                                You need to assign a voting power of at least 1 when creating a vehicle.
                                                             </label>
                                                         </div>
                                                     </td>
@@ -330,7 +330,7 @@
                     <div class="pl-6 pb-4 text-right">
                         <div class="text-right">
                             <span v-if="daoBalance" class="px-6 py-3">
-                                DAO Balance:
+                                Voting Power Balance:
                                 <span class="px-2 inline-flex text-lg leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                     {{ formatNumber(daoBalance, false) }}
                                     {{ printTokens(daoBalance) }}
@@ -561,9 +561,9 @@ export default {
         },
         printTokens(value) {
             if (Number(value) > 1) {
-                return "Tokens";
+                return "";
             } else {
-                return "Token";
+                return "";
             }
         },
         inputBox(valid) {

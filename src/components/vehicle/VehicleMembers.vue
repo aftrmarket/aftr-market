@@ -27,7 +27,7 @@
                             </button>
                         </th>
                         <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Tokens
+                            Voting Power
                         </th>
                         <th v-if="uiEditMode" scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                             New Allocation
@@ -269,16 +269,16 @@ export default {
             if (type === 'update') {
                 const currentQty = this.vehicle.balances[recipient];
                 if (currentQty > +qty) {
-                    return "<span style='color:#FF6C8C'><b>Burn</b></span> " + this.formatNumber(String(currentQty - +qty)) + " tokens for <b> " + recipient + "</b>";
+                    return "<span style='color:#FF6C8C'><b>Decrease</b></span> voting power to " + this.formatNumber(String(currentQty - +qty)) + " for <b> " + recipient + "</b>";
                 } else if (currentQty < +qty) {
-                    return "<span style='color:green'><b>Mint</b></span> " + this.formatNumber(String(+qty - currentQty)) + " tokens for <b>" + recipient + "</b>";
+                    return "<span style='color:green'><b>Increase</b></span> voting power to " + this.formatNumber(String(+qty - currentQty)) + " for <b>" + recipient + "</b>";
                 } else if (currentQty === +qty) {
                     return "No change for " + recipient;
                 }
             } else if (type === 'add') {
-                return "<span style='color:green'><b>Add</b></span> <b>" + recipient + "</b>, minting " + this.formatNumber(qty) + " tokens";
+                return "<span style='color:green'><b>Add</b></span> <b>" + recipient + "</b>";
             } else if (type === 'remove') {
-                return "<span style='color:#FF6C8C'><b>Remove</b></span> <b>" + recipient + "</b>, burning " + this.formatNumber(qty) + " tokens";
+                return "<span style='color:#FF6C8C'><b>Remove</b></span> <b>" + recipient + "</b>";
             }
         },
         removeMember(member) {
