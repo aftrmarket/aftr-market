@@ -60,7 +60,7 @@
                                     </th>-->
                                     <th scope="col" class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Arweave Assets ({{ vehicle.tokens.length }})</th>
                                     <th scope="col" class="px-1 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Contributor</th>
-                                    <th scope="col" class="px-1 py-3 text-right font-medium text-gray-500 uppercase tracking-wider">Tokens</th>
+                                    <th scope="col" class="px-1 py-3 text-right font-medium text-gray-500 uppercase tracking-wider">Balance</th>
                                     <th scope="col" class="px-6 py-3 text-right font-medium text-gray-500 uppercase tracking-wider">Value (AR)</th>
                                     <th v-if="allowTransfer" scope="col" class="py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Transfer Amount</th>
                                     <th v-if="allowTransfer" scope="col" class="px-4 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Transfer To Address</th>
@@ -146,7 +146,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
                 </svg>
-                <span class="pl-2">ADD TOKENS</span>
+                <span class="pl-2">ADD ASSETS</span>
             </button>
             <div v-else class="pt-6 flex justify-start items-center">
                 <button @click="arConnect" type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-aftrBlue hover:bg-aftrBlue-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
@@ -219,7 +219,8 @@ import numeral from "numeral";
 import { mapGetters } from 'vuex';
 import VehicleTokensAdd from './VehicleTokensAdd.vue';
 import { warpRead, warpWrite, arweaveInit } from './../utils/warpUtils.js';
-import SlideUpDown from 'vue3-slide-up-down'
+import SlideUpDown from 'vue3-slide-up-down';
+import Transaction from 'arweave/node/lib/transaction';
 
 
 export default {
@@ -227,6 +228,12 @@ export default {
     components: { VehicleTokensAdd ,SlideUpDown},
     data() {
         return {
+            env: import.meta.env.VITE_ENV,
+            aftrContractSrcs: import.meta.env.VITE_AFTR_CONTRACT_SOURCES,
+            routeHost: import.meta.env.VITE_ARWEAVE_HOST,
+            routePort: import.meta.env.VITE_ARWEAVE_PORT,
+            routeProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
+            txGateway: import.meta.env.VITE_TX_GATEWAY,
             allowAdd: false,
             allowTransfer: false,
             showAddTokens: false,
@@ -432,34 +439,76 @@ export default {
                 return '';
             }
         },
+        interactionTagsParser(txId) {
+            const tx = new Transaction(txId);
+            // let tags = [];
+            // contractTx.get('tags').forEach((tag) => {
+            //     let key = tag.get('name', { decode: true, string: true });
+            //     let value = tag.get('value', { decode: true, string: true });
+            //     tags.push({ key, value });
+            // });
 
+
+
+            let txType = "";
+            let smartweaveContract = false;
+            let aftrVehicle = false;
+            for (let tag of tx.tags) {
+                let key = tag.get("name", {decode: true, string: true});
+                let value = tag.get('value', {decode: true, string: true});
+                if (key === "App-Name" && value === "SmartWeaveContract") {
+                    smartweaveContract = true;
+                }
+                if (key === "Protocol" && value === import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL) {
+                    aftrVehicle = true;
+                }
+            }
+
+            if (aftrVehicle) {
+                txType = "AFTR Vehicle";
+            } else if (smartweaveContract) {
+                txType = "SmartWeave Contract";
+            } else {
+                txType = "UNSURE";
+            }
+
+            return txType;
+        },
         async findIdType(id) {
             const arweave = arweaveInit();
             let txType = "";
-            try {
-                let smartweaveContract = false;
-                let aftrVehicle = false;
-                const tx = await arweave.transactions.get(id);
-                for (let tag of tx.tags) {
-                    let key = tag.get("name", {decode: true, string: true});
-                    let value = tag.get('value', {decode: true, string: true});
-                    if (key === "App-Name" && value === "SmartWeaveContract") {
-                        smartweaveContract = true;
-                    }
-                    if (key === "Protocol" && value === import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL) {
-                        aftrVehicle = true;
-                    }
-                }
-                if (aftrVehicle) {
-                    txType = "AFTR Vehicle";
-                } else if (smartweaveContract) {
-                    txType = "SmartWeave Contract";
-                } else {
+            let smartweaveContract = false;
+            let aftrVehicle = false;
+            if (this.env === "DEV") {
+                try {
+                    const route = this.routeProtocol + "://" + this.routeHost + ":" + this.routePort + "/tx/" + id;
+                    let response = await fetch(route).then(res=> res.json());
+                    txType = this.interactionTagsParser(response);
+                } catch(e) {
+                    this.$log.info("VehicleTokens : findIdType :: ", "ERROR when getting the tx. " + e);
                     txType = "UNSURE";
                 }
-            } catch(e) {
-                this.$log.info("VehicleTokens : findIdType :: ", "ERROR when getting the tx. " + e);
-                txType = "UNSURE";
+            } else {
+                const route = `${this.txGateway}?txId=${txID}${this.network === "TEST" ? "&testnet=true" : ""}`;
+                let response = await fetch(route);
+                if (!response.ok) {
+                    txType = "UNSURE";
+                } else {
+                    const data = await response.json();
+                    if (data.contractTx == null || data.contractTx.tags == null) {
+                        // Can't see tags b/c tx wasn't uploaded using bundlr, now check srcTxId to see if AFTR
+                        if (data.srcTxId && data.srcTxId != "" && data.srcTxId != null && data.srcTxId != undefined) {
+                            if (this.aftrContractSrcs.includes(data.srcTxId)) {
+                                aftrVehicle = true;
+                                txType = "AFTR Vehicle";
+                                return txType;
+                            }
+                        }
+                        txType = "UNSURE";
+                    } else {
+                        txType = await interactionTagsParser(data.contractTx);
+                    }
+                }
             }
 
             if (txType !== "UNSURE") {

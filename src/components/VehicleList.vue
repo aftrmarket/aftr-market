@@ -123,7 +123,7 @@ export default {
             arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
             arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
             arweaveProtocol: import.meta.env.VITE_ARWEAVE_PROTOCOL,
-            gatewayUrl: import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/",
+            env: import.meta.env.VITE_ENV,
             initTags: [
                 {
                     name: "Protocol",
@@ -268,19 +268,30 @@ export default {
             this.$router.push({ name: "vehicle", params: { vehicle: "joe" } });
         },
         async returnContractSrc(contractId) {
-            let tx = await this.arweave.transactions.get(contractId);
-            let contractSrcId = "";
+            if (this.env === "DEV") {
+                let tx = await this.arweave.transactions.get(contractId);
+                let contractSrcId = "";
 
-            tx.get('tags').every(tag => {
-                let key = tag.get('name', {decode: true, string: true});
-                let value = tag.get('value', {decode: true, string: true});
-                if (key === "Contract-Src") {
-                    contractSrcId = value;
-                    return false;
+                tx.get('tags').every(tag => {
+                    let key = tag.get('name', {decode: true, string: true});
+                    let value = tag.get('value', {decode: true, string: true});
+                    if (key === "Contract-Src") {
+                        contractSrcId = value;
+                        return false;
+                    }
+                    return true;
+                });
+                return contractSrcId;
+            } else {
+                const route = import.meta.env.VITE_TX_GATEWAY + "?txID=" + contractId + this.env === "TEST" ? "&testnet=true" : "";
+                const response = await fetch(route);
+                if (!response.ok) {
+                    this.$log.error("Vehicle : returnContractSrc :: ", "ERROR fetching transaction from gateway.");
+                    return;
                 }
-                return true;
-            });
-            return contractSrcId;
+                const data = await response.json();
+                return data.srcTxId;
+            }
         },
         async filterChange() {
             this.isLoading = true;

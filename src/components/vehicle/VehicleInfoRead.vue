@@ -42,7 +42,7 @@
                         </dt>
                         <dd class="mt-1 text-3xl font-semibold text-aftrBlue">
                             {{ formatNumber(counts.members.total) }} 
-                            <span class="ml-2 text-sm font-medium text-gray-500"> with {{ formatNumber(counts.members.sumOfLocked) }} locked tokens</span>
+                            <span class="ml-2 text-sm font-medium text-gray-500"> with {{ formatNumber(counts.members.sumOfLocked) }} locked in the vault</span>
                         </dd>
                     </div>
                 </dl>

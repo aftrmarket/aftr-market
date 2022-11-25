@@ -653,23 +653,32 @@ export default {
         },
         /*** BEGIN SCRIPT FUNCTIONS */
         async getContractSourceId(txID) {
-            //let tx = await arweave.transactions.get(txID);
+            if (this.env === "DEV") {
+                const route = this.gatewayUrl + "tx/" + txID;
+                const response = await fetch(route).then(res=> res.json());
+                const tx = new Transaction((await response));
 
-            const route = this.gatewayUrl + "tx/" + txID;
-            const response = await fetch(route).then(res=> res.json());
-            const tx = new Transaction((await response));
-
-            let allTags = [];
-            tx.get("tags").forEach((tag) => {
-                let key = tag.get("name", { decode: true, string: true });
-                let value = tag.get("value", { decode: true, string: true });
-                allTags.push({ key, value });
-            });
-            for (let i = 0; i < allTags.length; i++) {
-                this.$log.info("OverviewTest : getContractSourceId :: ", "allTags[i].key === 'Contract-Src'", allTags[i].key === "Contract-Src");
-                if (allTags[i].key === "Contract-Src") {
-                    return allTags[i].value;
+                let allTags = [];
+                tx.get("tags").forEach((tag) => {
+                    let key = tag.get("name", { decode: true, string: true });
+                    let value = tag.get("value", { decode: true, string: true });
+                    allTags.push({ key, value });
+                });
+                for (let i = 0; i < allTags.length; i++) {
+                    this.$log.info("OverviewTest : getContractSourceId :: ", "allTags[i].key === 'Contract-Src'", allTags[i].key === "Contract-Src");
+                    if (allTags[i].key === "Contract-Src") {
+                        return allTags[i].value;
+                    }
                 }
+            } else {
+                const route = import.meta.env.VITE_TX_GATEWAY + "?txID=" + contractId + this.env === "TEST" ? "&testnet=true" : "";
+                const response = await fetch(route);
+                if (!response.ok) {
+                    this.$log.error("OverviewTest : getContractSourceId :: ", "ERROR fetching transaction from gateway.");
+                    return;
+                }
+                const data = await response.json();
+                return data.srcTxId;
             }
         },
         async createSampleAftrVehicle(arweave, wallet, aftrSourceId, type = "aftr", name, ticker, logoUrl, initStatePath, vintContractId = "", arhdContractId = "") {

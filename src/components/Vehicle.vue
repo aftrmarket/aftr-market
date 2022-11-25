@@ -255,19 +255,30 @@ export default {
             this.activeTab = this.tabs[activeTabIndex].name;
         },
         async returnContractSrc(arweave, contractId) {
-            let tx = await arweave.transactions.get(contractId);
-            let contractSrcId = "";
+            if (this.env === "DEV") {
+                let tx = await arweave.transactions.get(contractId);
+                let contractSrcId = "";
 
-            tx.get('tags').every(tag => {
-                let key = tag.get('name', {decode: true, string: true});
-                let value = tag.get('value', {decode: true, string: true});
-                if (key === "Contract-Src") {
-                    contractSrcId = value;
-                    return false;
+                tx.get('tags').every(tag => {
+                    let key = tag.get('name', {decode: true, string: true});
+                    let value = tag.get('value', {decode: true, string: true});
+                    if (key === "Contract-Src") {
+                        contractSrcId = value;
+                        return false;
+                    }
+                    return true;
+                });
+                return contractSrcId;
+            } else {
+                const route = import.meta.env.VITE_TX_GATEWAY + "?txID=" + contractId + this.env === "TEST" ? "&testnet=true" : "";
+                const response = await fetch(route);
+                if (!response.ok) {
+                    this.$log.error("Vehicle : returnContractSrc :: ", "ERROR fetching transaction from gateway.");
+                    return;
                 }
-                return true;
-            });
-            return contractSrcId;
+                const data = await response.json();
+                return data.srcTxId;
+            }
         },
         async loadVehicle() {
             // Add contractId to vehicle object
