@@ -67,14 +67,14 @@
                         <td class="text-left px-2 py-2">
                             <input type="text" v-model="newSettingKey" class="mt-1 mb-1 w-full text-xs focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md">
                         </td>
-                        <!-- <td class="text-right px-4 py-2">
-                            0
-                        </td> -->
                         <td class="text-right px-4 py-2">
                             <textarea v-model="newSettingValue" @blur="onDirty" class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
                         </td>
                         <td class="text-right px-4 py-2">
                             <textarea v-model="newSettingPriority" @blur="onDirty" class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
+                        </td>
+                        <td  class="text-right px-4 py-2">
+                            <!-- <textarea v-model="memberUpdates[v.value, v.name]" @blur="onDirty" class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" /> -->
                         </td>
                         <td class="text-center px-4 py-2">
                             <button @click.prevent="addSetting" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none">
@@ -144,7 +144,7 @@
                             <span v-html="proposedText(value, value.name, 'remove')"></span>
                         </td>
                         <td class="px-4 py-2 text-center">
-                            <button @click.prevent="removeProposal(value[0], 'remove')" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none">
+                            <button @click.prevent="removeProposal(value, 'remove')" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
                                 </svg>
@@ -262,11 +262,11 @@ export default {
         proposedText(settingKey, settingValue, type) {
             this.showMessage = false;
             if (type === 'update') {
-                return "<span style='color:#FF6C8C'><b>Change  </b></span> " + settingKey+ " to " +settingValue;
+                return "<span style='color:#FF6C8C'><b>Change value of key </b></span> <b>" + settingKey+ "</b> to <b>" +settingValue + "</b>";
             } else if (type === 'add') {
-                return "<span style='color:green'><b>Add key </b></span> <b>" + settingKey[0] + "</b> and <span style='color:green'><b>Value </b></span> <b>" + settingValue[1] +"</b>";
+                return "<span style='color:green'><b>Add key </b></span> <b>" + settingKey[0] + "</b>, <span style='color:green'><b>Value </b></span> <b>" + settingValue[1] + "</b>, <span style='color:green'><b>and Priority </b></span> <b>" + settingValue[2] +"</b>";
             } else if (type === 'remove') {
-                return "<span style='color:#FF6C8C'><b>Remove Name </b></span> <b>" + settingValue;
+                return "<span style='color:#FF6C8C'><b>Remove Key </b></span> <b>" +  settingKey.name + "<span style='color:#FF6C8C'><b> Value </b></span> <b>" + settingKey.value + "<span style='color:#FF6C8C'><b> Priority </b></span> <b>" + settingKey.priority;
             }
         },
         removeSetting(settingVal,val) {
@@ -285,12 +285,13 @@ export default {
             }
         },
         removeProposal(value, type) {
+            console.log(value, type,this.settingRemoves)
             if (type === 'update') {
                 delete this.memberUpdates[value];
             } else if (type === 'add') {
                 this.settingAdds = this.settingAdds.filter((el) => el[0] !== value);
             } else if (type === 'remove') {
-                this.settingRemoves = this.settingRemoves.filter((el) => el[0] !== value);
+                this.settingRemoves = this.settingRemoves.filter((el) => el.name !== value.name);
             }
         },
         checkEditStatus() {
@@ -370,7 +371,7 @@ export default {
                         if(item[0] == "names") {
                             
                             let indexOfObject = item[1].findIndex(x => {
-                               return x.name == this.settingRemoves[0].name
+                               return x.name == this.settingRemoves[0].name && x.value == this.settingRemoves[0].value
                             })
                             item[1].splice(indexOfObject, 1);
                             return
@@ -523,6 +524,22 @@ export default {
         },
         addSetting() {
             if (this.newSettingKey.length > 0 && this.newSettingValue && this.newSettingPriority) {
+                this.vehicle.settings.map((value,index) => {
+                        if(value[0] == "names") {
+                            value[1].map(x => {
+                                if(x.name == this.newSettingKey){
+                                    this.$swal({
+                                        icon: "error",
+                                        html: "Key already exists",
+                                        showConfirmButton: true,
+                                        allowOutsideClick: false
+                                    });
+                                    this.$router.push("../vehicles");
+                                    return;
+                                }
+                            })
+                        }
+                })
                 this.settingAdds.push(
                     [this.newSettingKey , this.newSettingValue , this.newSettingPriority]
                 );
