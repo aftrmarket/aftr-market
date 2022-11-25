@@ -19,18 +19,18 @@
                 </div>
                 <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                   <DialogTitle as="h3" class="text-lg leading-6 font-medium text-gray-900">
-                    Add Tokens to Vehicle
+                    Add Assets to Vehicle
                   </DialogTitle>
                     <div v-if="arConnected" class="pt-6">
                         <select v-model="selectedPstId" @change="pstChange" id="selectedPstId" name="selectedPstId" class="mt-1 block w-3/4 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                             <option value="" disabled selected>
-                                Select Token
+                                Select Asset
                             </option>
                             <option v-for="pst in walletPsts" :key="pst.contractId" :value="pst.contractId">
                                 {{ pst.name }} ({{ pst.contractId }})
                             </option>
                             <option value="NOT-FOUND">
-                                --Token Not In List--
+                                --Asset Not In List--
                             </option>
                         </select>
                     </div>
@@ -42,7 +42,7 @@
                             <input type="text" placeholder="Asset ID (i.e. Contract ID)" v-model="nfTokenId" @input="readAssetContract" :class="inputBox(nfTokenId.length === 43)" />
                             <div v-if="nfTokenValid" class="flex flex-col">
                                 <label class="block text-sm font-medium text-gray-700 pt-2 pb-2">
-                                    You have <span class="font-bold text-aftrBlue">{{ formatNumber(pstBalance - pstInputTokens) }} {{ pstTicker }}</span><span> available to use in your vehicle.</span>
+                                    You have a balance of <span class="font-bold text-aftrBlue">{{ formatNumber(pstBalance - pstInputTokens) }} {{ pstTicker }}</span><span> available to use in your vehicle.</span>
                                 </label>
                                 <input type="number" placeholder="Amount" v-model="pstInputTokens" @input="calcPstPrice" :class="inputBox(pstInputValid)" />
                             </div>
@@ -361,7 +361,7 @@ export default {
                 bal = currentPst.balance;
             }
             this.updatePstInputValid(bal);
-            this.msg = "WARNING: Are you sure you want to transfer these tokens from your wallet to the vehicle? This action cannot be undone."
+            this.msg = "WARNING: Are you sure you want to transfer these assets from your wallet to the vehicle? This action cannot be undone."
         },
         updatePstInputValid(balance) {
             if (Number(this.pstInputTokens) <= balance && Number(this.pstInputTokens > 0)) {

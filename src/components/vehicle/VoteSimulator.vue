@@ -37,7 +37,7 @@
                                     </svg>
                                 </button>
                                 </th>
-                                <th scope="col" class="px-6 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">Tokens</th>
+                                <th scope="col" class="px-6 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">Balance</th>
                                 <th scope="col" class="px-4 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">Vote Cast</th>
                                 <th scope="col" class="pr-6 py-3 text-right font-medium text-gray-500 uppercase tracking-wider">Voting Power</th>
                             </tr>
