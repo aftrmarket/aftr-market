@@ -61,7 +61,7 @@
                                     <th scope="col" class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Arweave Assets ({{ vehicle.tokens.length }})</th>
                                     <th scope="col" class="px-1 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Contributor</th>
                                     <th scope="col" class="px-1 py-3 text-right font-medium text-gray-500 uppercase tracking-wider">Balance</th>
-                                    <th scope="col" class="px-6 py-3 text-right font-medium text-gray-500 uppercase tracking-wider">Value (AR)</th>
+                                    <th scope="col" class="px-6 py-3 text-right font-medium text-gray-500 uppercase tracking-wider"></th>
                                     <th v-if="allowTransfer" scope="col" class="py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Transfer Amount</th>
                                     <th v-if="allowTransfer" scope="col" class="px-4 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Transfer To Address</th>
                                     <th v-if="allowTransfer" scope="col" class="py-3 text-left font-medium text-gray-500 uppercase tracking-wider"> W/D</th>
@@ -111,7 +111,7 @@
                                     </td>
                                     <td class="px-1 py-3 text-gray-500 font-mono cursor-pointer" @click.prevent="showWalletAddress(pst.source)">{{ idSubstr(pst.source) }}</td>
                                     <td class="text-right px-1 py-3 text-gray-500">{{ formatNumber(pst.balance) }}</td>
-                                    <td class="text-right px-6 py-3 text-gray-500">{{ formatNumber(pst.total, true) }}</td>
+                                    <td class="text-right px-6 py-3 text-gray-500"></td>
                                     <td v-if="allowTransfer" class="pt-1">
                                         <input type="number" v-model="transferAmounts[index]" :class="transferAmtInput" />
                                     </td>
