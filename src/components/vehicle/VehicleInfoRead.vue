@@ -91,7 +91,7 @@
                 <div class="px-4 sm:px-6 max-w-2xl text-sm text-gray-500">Owner</div>
                 <div class="flex items-center justify-between pb-4">
                     <div class="px-4 sm:px-6 text-left text-sm font-mono tracking-wider">
-                        {{ walletAddressSubstr(vehicle.owner) }}
+                        {{ ownerText }}
                     </div>
                 </div>
             </div>
@@ -184,7 +184,7 @@ export default {
             if (this.vehicle.ownership === 'single') {
                 return 'Single';
             } else {
-                return 'DAO Owned'
+                return 'Multiple';
             }
         },
         getVotingSystem() {
@@ -192,6 +192,13 @@ export default {
                 return 'Distributed Evenly';
             } else {
                 return 'Weighted';
+            }
+        },
+        ownerText() {
+            if (this.vehicle.ownership === 'single') {
+                return this.walletAddressSubstr(this.vehicle.owner);
+            } else {
+                return 'Members';
             }
         },
         vehicleRunningSourceId() {

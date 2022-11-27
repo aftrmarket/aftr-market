@@ -26,7 +26,7 @@ this.contractSourceId = "BTxbGwMEyVv94ak2CDeuCAXLWnAhwLb_hK4qw8_a-JU";  // Contr
   "minLease": 2,
   "maxLease": 24,
   "logo": "9CYPS85KChE_zQxNLi2y5r2FLG-YE6HiphYYTlgtrtg",
-  "ownership": "dao",
+  "ownership": "multi",
   "status": "stopped",
   "balances": {
     "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8": 12300,

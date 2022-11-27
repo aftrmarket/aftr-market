@@ -191,7 +191,7 @@ export default {
                 { id: "name", desc: "Name" },
                 { id: "ticker", desc: "Ticker" },
                 { id: "owner", desc: "Owner" },
-                { id: "ownership", desc: "Ownership", valid: ['single', 'dao'] },
+                { id: "ownership", desc: "Ownership", valid: ['single', 'multi'] },
                 { id: "settings.quorum", desc: "Quorum", type: 'number' },
                 { id: "settings.voteLength", desc: "Vote Length", type: 'number' },
                 { id: "settings.lockMinLength", desc: "Minimum Lock Length", type: 'number' },

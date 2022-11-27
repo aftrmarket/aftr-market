@@ -241,7 +241,7 @@ export default {
             if (this.getActiveAddress === this.ownerAddress && this.vehicle.ownership === 'single') {
                 return "Settings changes will process immediately because you are the owner of the vehicle";
             } else {
-                return "Settings changes will be proposed as votes because this is a DAO owned vehicle";
+                return "Settings changes will be proposed as votes because this is a multiple owner vehicle";
             }
         },
         ...mapGetters(['arConnected', 'getActiveAddress', 'keyFile']),
@@ -426,7 +426,7 @@ export default {
             this.$swal.close();
 
             let msg = "Your setting changes have been submitted to the Permaweb.  Your changes will be reflected in the next block.";
-            if (this.vehicle.ownership === "dao") {
+            if (this.vehicle.ownership === "multi") {
                 msg = "Your setting changes have been proposed.  You'll be able to see the vote in the next block.";
             }
             // alert(msg);

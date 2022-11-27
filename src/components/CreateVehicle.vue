@@ -108,7 +108,7 @@
                             <!--<input type="number" name="vehicleTokens" placeholder="# of Vehicle Tokens" v-model="vehicleTokens" @input="onTokenChange" :class="inputBox(vehicleTokensValid)" />-->
                             <div class="">
                                 <input type="radio" v-model="ownership" id="single" value="single" class="form-radio text-aftrBlue" /><label class="px-2 text-sm text-gray-700">Single Owner</label>
-                                <input type="radio" v-model="ownership" id="dao" value="dao" class="form-radio text-aftrBlue" /><label class="px-2 text-sm text-gray-700">Multiple Owners</label>
+                                <input type="radio" v-model="ownership" id="multi" value="multi" class="form-radio text-aftrBlue" /><label class="px-2 text-sm text-gray-700">Multiple Owners</label>
                             </div>
                             <div class="">
                                 <input type="radio" v-model="votingSystem" id="weighted" value="weighted" class="form-radio text-aftrBlue" /><label class="px-2 text-sm text-gray-700">Weighted</label>
@@ -270,7 +270,7 @@
                                 </button>
                             </div>
                         </div>
-                        <!-- Table of DAO Members -->
+                        <!-- Table of Members -->
                         <div v-if="daoMembers.length" class="pt-1">
                             <div class="pt-2 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                                 <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
@@ -326,7 +326,7 @@
                             </div>
                         </div>
                     </div>
-                    <!-- End of DAO Table -->
+                    <!-- End of Table -->
                     <div class="pl-6 pb-4 text-right">
                         <div class="text-right">
                             <span v-if="daoBalance" class="px-6 py-3">
@@ -338,7 +338,7 @@
                             </span>
                         </div>
                     </div>
-                    <!-- End DAO -->
+                    <!-- End -->
 
                     <!-- Button Row --->
                     <div class="px-4 py-3 bg-gray-50 sm:px-6 flex items-center justify-between">
@@ -415,7 +415,7 @@ export default {
             seats: 0, // Number of seats available on vehicle
             minLease: 2, // Minimum seat lease length in months
             maxLease: 24, // Maximum seat lease length in months
-            ownership: "single", // Type of ownership for vehicle (single or dao)
+            ownership: "single", // Type of ownership for vehicle (single or multi)
             votingSystem: "weighted", // Type of voting for vehicle (equal or weighted)
             inputValid: false, // Boolean to show when any input field is invalid
             pstInputValid: false, // Boolean to show when amount goes over tokens held
@@ -428,10 +428,10 @@ export default {
             vehiclePsts: [], // Array of vehicle's PSTs
             vehicle: {}, // Created vehicle object
             psts: this.$store.getters.getActiveWallet.psts,
-            daoMembers: [], // Array of DAO member wallets (to be added to balances on vehicle creation) and number of tokens
+            daoMembers: [], // Array of members' wallets (to be added to balances on vehicle creation) and number of tokens
             daoBalance: 0,
             availableTokens: null,
-            memberWallet: "", // Wallet address of DAO member being added to vehicle
+            memberWallet: "", // Wallet address of member being added to vehicle
             memberWalletValid: false,
             memberAmount: null,
             memberAmountValid: false,
@@ -526,7 +526,7 @@ export default {
     },
     watch: {
         arConnected(value) {
-            // Update DAO Members with owner address if user is already ArConnected
+            // Update Members with owner address if user is already ArConnected
             if (value) {
                 this.daoMembers.push({
                     wallet: this.$store.getters.getActiveAddress,
@@ -990,7 +990,7 @@ export default {
             ];
             /*************** */
 
-            // Convert DAO Member array to dictionary
+            // Convert Member array to dictionary
             this.vehicle.balances = this.daoMembers.reduce( (a, x) => ({ ...a, [x.wallet]: x.balance }), {} );
 
             /**** REMOVED ADDING TOKENS FROM CREATE VEHICLE PAGE */
@@ -1007,12 +1007,12 @@ export default {
             this.vehicle.tokens = [];
             let obj = this.vehicle.balances;
 
-            if (this.vehicle.ownership == "dao") {
+            if (this.vehicle.ownership == "multi") {
                 this.$log.info("CreateVehicle : createVehicle :: ", "this.vehicle.ownership--length", Object.keys(obj).length, Object.keys(obj).length < 2);
                 if (Object.keys(obj).length < 2) {
                     this.$swal.fire({
                         icon: 'warning',
-                        html: "A DAO Owned vehicle requires that there are at least 2 members assigned to the vehicle.  Either change the vehicle ownership to a single owner or add another member.",
+                        html: "A Multi-owned vehicle requires that there are at least 2 members assigned to the vehicle.  Either change the vehicle ownership to a single owner or add another member.",
                         allowOutsideClick: false,
                     }).then((result) => { return });
                 }
@@ -1145,7 +1145,7 @@ export default {
         },
     },
     created() {
-        // Update DAO Members with owner address if user is already ArConnected
+        // Update Members with owner address if user is already ArConnected
         if (this.$store.getters.arConnected) {
             this.daoMembers.push({
                 wallet: this.$store.getters.getActiveAddress,

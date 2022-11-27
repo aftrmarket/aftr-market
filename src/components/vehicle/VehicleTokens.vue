@@ -285,7 +285,7 @@ export default {
             if (this.getActiveAddress === this.ownerAddress && this.vehicle.ownership === 'single') {
                 return "Token transfers out of the vehicle will process immediately because you are the owner of the vehicle";
             } else {
-                return "Token transfers out of the vehicle will be proposed as votes because this is a DAO owned vehicle";
+                return "Token transfers out of the vehicle will be proposed as votes because this is a multiple owner vehicle";
             }
         },
         ownerAddress() {
@@ -734,7 +734,7 @@ export default {
             };
 
             let msg = "Your token withdrawals have been submitted to the Permaweb.  Your changes will be reflected in the next block.";
-            if (this.vehicle.ownership === "dao") {
+            if (this.vehicle.ownership === "multi") {
                 msg = "Your token withdrawals have been proposed.  You'll be able to see the vote in the next block.";
             }
             this.$swal({
