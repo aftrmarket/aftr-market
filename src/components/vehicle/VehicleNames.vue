@@ -47,8 +47,11 @@
                         <td class="text-right px-4 py-2">
                             {{ v.value}}
                         </td>
-                        <td class="text-right px-4 py-2">
+                        <td class="text-right px-4 py-2" v-if="!uiEditMode">
                             {{ v.priority}}
+                        </td>
+                        <td class="text-right px-4 py-2" v-if="uiEditMode">
+                            <input type="number" v-model="memberPriorityUpdates[v.priority, v.name]" @blur="updatePriority" class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
                         </td>
                         <td v-if="uiEditMode" class="text-right px-4 py-2">
                             <textarea v-model="memberUpdates[v.value, v.name]" @blur="onDirty" class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
@@ -71,10 +74,10 @@
                             <textarea v-model="newSettingValue" @blur="onDirty" class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
                         </td>
                         <td class="text-right px-4 py-2">
-                            <textarea v-model="newSettingPriority" @blur="onDirty" class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
+                            <input type="number" v-model="newSettingPriority" @blur="onDirty" class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
                         </td>
                         <td  class="text-right px-4 py-2">
-                            <!-- <textarea v-model="memberUpdates[v.value, v.name]" @blur="onDirty" class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" /> -->
+                            
                         </td>
                         <td class="text-center px-4 py-2">
                             <button @click.prevent="addSetting" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none">
@@ -151,6 +154,21 @@
                             </button>
                         </td>
                     </tr>
+                    <tr v-for="(key, index) in Object.keys(memberPriorityUpdates)" :key="key" class="text-xs text-gray-500 hover:bg-gray-50">
+                        <td class="px-4 py-2">
+                            {{ index + 1 }}
+                        </td>
+                        <td class="px-4 py-2">
+                            <span v-html="proposedText(key, memberPriorityUpdates[key], 'updatePriority')"></span>
+                        </td>
+                        <td class="px-4 py-2 text-center">
+                            <button @click.prevent="removeProposal(key, 'updatePriority')" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -201,7 +219,8 @@ export default {
             allowEdits: false,
             isDirty: false,
             updatedValue: [],
-            showMessage: true
+            showMessage: true,
+            memberPriorityUpdates : {}
         };
     },
     mounted() {
@@ -233,7 +252,7 @@ export default {
             }
         },
         numChanges() {
-            return this.settingRemoves.length + this.settingAdds.length + Object.keys(this.memberUpdates).length;
+            return this.settingRemoves.length + this.settingAdds.length + Object.keys(this.memberUpdates).length + Object.keys(this.memberPriorityUpdates).length;
         },
         editModeClass() {
             if (this.uiEditMode) {
@@ -259,6 +278,29 @@ export default {
         ...mapGetters(['arConnected', 'getActiveAddress', 'keyFile']),
     },
     methods: {
+        updatePriority(){
+            for(let member in this.memberPriorityUpdates) {
+                 this.vehicle.settings.map(item => {
+                        if(item[0] == "names") {
+                            let indexOfObject = item[1].findIndex(x => {
+                               if(x.name == member){
+                                   console.log(this.memberPriorityUpdates[member])
+                                   x.priority = this.memberPriorityUpdates[member]
+                               } else {
+                                   x
+                               }
+                            })
+                            return
+                        }
+                 })
+            }
+            console.log(this.vehicle.settings)
+            if (this.settingRemoves.length + this.settingAdds.length + Object.keys(this.memberUpdates).length > 0 + Object.keys(this.memberPriorityUpdates).length > 0) {
+                this.isDirty = true;
+            } else {
+                this.isDirty = false;
+            }
+        },
         proposedText(settingKey, settingValue, type) {
             this.showMessage = false;
             if (type === 'update') {
@@ -267,6 +309,8 @@ export default {
                 return "<span style='color:green'><b>Add key </b></span> <b>" + settingKey[0] + "</b>, <span style='color:green'><b>Value </b></span> <b>" + settingValue[1] + "</b>, <span style='color:green'><b>and Priority </b></span> <b>" + settingValue[2] +"</b>";
             } else if (type === 'remove') {
                 return "<span style='color:#FF6C8C'><b>Remove Key </b></span> <b>" +  settingKey.name + "<span style='color:#FF6C8C'><b> Value </b></span> <b>" + settingKey.value + "<span style='color:#FF6C8C'><b> Priority </b></span> <b>" + settingKey.priority;
+            } else if (type === 'updatePriority') {
+                return "<span style='color:#FF6C8C'><b>Change Priority of key </b></span> <b>" + settingKey+ "</b> to <b>" +settingValue + "</b>";
             }
         },
         removeSetting(settingVal,val) {
@@ -292,6 +336,8 @@ export default {
                 this.settingAdds = this.settingAdds.filter((el) => el[0] !== value);
             } else if (type === 'remove') {
                 this.settingRemoves = this.settingRemoves.filter((el) => el.name !== value.name);
+            } else if (type === 'updatePriority') {
+                 delete this.memberPriorityUpdates[value];
             }
         },
         checkEditStatus() {
@@ -322,7 +368,7 @@ export default {
                     console.log("this.vehicle.settings",this.vehicle.settings)
             }
 
-            if (this.settingRemoves.length + this.settingAdds.length + Object.keys(this.memberUpdates).length > 0) {
+            if (this.settingRemoves.length + this.settingAdds.length + Object.keys(this.memberUpdates).length > 0 + Object.keys(this.memberPriorityUpdates).length > 0) {
                 this.isDirty = true;
             } else {
                 this.isDirty = false;
@@ -357,7 +403,7 @@ export default {
                 return;
             }
 
-            const count = this.settingRemoves.length + this.settingAdds.length + Object.keys(this.memberUpdates).length;
+            const count = this.settingRemoves.length + this.settingAdds.length + Object.keys(this.memberUpdates).length + Object.keys(this.memberPriorityUpdates).length;
             let settingKey = '';
             let settingValue = 0;
             let settingValue1 = 0 ;
@@ -403,6 +449,16 @@ export default {
                     settingValue1 = isTrue ? values : [settingValue]
                     input = this.buildInput(settingKey, settingValue1, 'addSetting');
                 } else if (Object.keys(this.memberUpdates).length === 1) {
+                    settingKey = "names";
+                    settingValue = []
+                    // this.updatedValue[0][1];
+                    this.vehicle.settings.map(item => {
+                         if(item[0] == "names") {
+                            settingValue.push(item[1])
+                        }
+                    })
+                    input = this.buildInput(settingKey, settingValue[0], 'update');
+                } else if (Object.keys(this.memberPriorityUpdates).length === 1) {
                     settingKey = "names";
                     settingValue = []
                     // this.updatedValue[0][1];
@@ -476,6 +532,27 @@ export default {
                             input: {}
                         };
                     // for(let member in this.memberUpdates) {
+                        
+                       this.vehicle.settings.map((value,index) => {
+                        if(value[0] == "names") {
+                            value[1].map(x => {
+                                values.push(x)
+                            })
+                        }
+                        return
+                    })
+                    // }
+                     settingKey = "names";
+                    multiAction.input = this.buildInput(settingKey, values, 'update');
+                    input.actions.push(multiAction);
+                }
+
+                if (Object.keys(this.memberPriorityUpdates).length > 0) {
+                    let values = [];
+                    let multiAction = {
+                            input: {}
+                        };
+                    // for(let member in this.memberPriorityUpdates) {
                         
                        this.vehicle.settings.map((value,index) => {
                         if(value[0] == "names") {
