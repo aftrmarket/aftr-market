@@ -59,8 +59,8 @@
                                         <input type="checkbox" v-model="selectAll" :class="checkboxClass" />
                                     </th>-->
                                     <th scope="col" class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Arweave Assets ({{ vehicle.tokens.length }})</th>
-                                    <th scope="col" class="px-1 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Contributor</th>
-                                    <th scope="col" class="px-1 py-3 text-right font-medium text-gray-500 uppercase tracking-wider">Balance</th>
+                                    <th scope="col" class="px-1 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Contributor</th>
+                                    <th scope="col" class="px-1 py-2 text-right font-medium text-gray-500 uppercase tracking-wider">Balance</th>
                                     <th scope="col" class="px-6 py-3 text-right font-medium text-gray-500 uppercase tracking-wider"></th>
                                     <th v-if="allowTransfer" scope="col" class="py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Transfer Amount</th>
                                     <th v-if="allowTransfer" scope="col" class="px-4 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Transfer To Address</th>
@@ -81,11 +81,11 @@
                                             </div>
                                          </div>
                                     </td>
-                                     <td class="px-1 py-3 text-gray-500 font-mono cursor-pointer" ></td>    
+                                     <td class="px-1 py-2 text-gray-500 font-mono cursor-pointer" ></td>    
                                     <td class="text-right px-1 py-3 text-gray-500">{{ formatNumber(pst1.tokens) }}</td>   
                                     <td class="text-right px-6 py-3 text-gray-500"></td>
-                                    <td v-if="allowTransfer" class="text-right px-6 py-3 text-gray-500"></td>
-                                    <td v-if="allowTransfer" class="text-right px-6 py-3 text-gray-500"></td>
+                                    <td v-if="allowTransfer" class="text-right px-6 py-3 text-gray-500 w-40"></td>
+                                    <td v-if="allowTransfer" class="text-right px-6 py-3 text-gray-500 w-60"></td>
                                     <td v-if="allowTransfer" class="text-right px-6 py-3 text-gray-500"></td>  
                                     <td> 
                                         <!-- <svg v-if="arrow" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -100,9 +100,6 @@
                                   
                                     <td class="px-6 py-4 whitespace-nowrap cursor-pointer">
                                         <div class="flex items-center">
-                                            <!-- <div class="flex-shrink-0 h-10 w-10" @click.prevent="showTokenState( pst.tokenId, pstLogo(pst.tokenId, pst.logo) )">
-                                                <img class="h-10 w-10 rounded-full" :src="pstLogo(pst.tokenId, pst.logo)" alt="" />
-                                            </div> -->
                                             <div class="ml-4">
                                                 <!-- <div class="font-medium text-gray-900"> {{ pst.name + " (" + pst.ticker + ")" }} </div> -->
                                                 <div class="text-gray-500 font-mono" @click.prevent="showWalletAddress(pst.txID)"> {{index + 1}}. {{ idSubstr(pst.txID) }}</div>
@@ -262,9 +259,9 @@ export default {
         },
         transferAddrInput() {
             if (this.transferAddrValid) {
-                return "mt-1 mb-1 w-80 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md";
+                return "mt-1 mb-1 w-50 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md";
             } else {
-                return "mt-1 mb-1 w-80 text-xs text-right focus:ring-aftrRed focus:border-aftrRed shadow-sm border-gray-300 rounded-md";
+                return "mt-1 mb-1 w-50 text-xs text-right focus:ring-aftrRed focus:border-aftrRed shadow-sm border-gray-300 rounded-md";
             }
         },
         transferAmtInput() {

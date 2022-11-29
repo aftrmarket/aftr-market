@@ -44,8 +44,11 @@
                         <td class="text-left px-4 py-2 font-mono tracking-wider">
                             {{ v.name }}
                         </td>
-                        <td class="text-right px-4 py-2">
+                        <td class="text-right px-4 py-2" v-if="!uiEditMode">
                             {{ v.value}}
+                        </td>
+                        <td v-if="uiEditMode" class="text-right px-4 py-2">
+                            <textarea v-model="memberUpdates[v.value, v.name]" @blur="onDirty" class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
                         </td>
                         <td class="text-right px-4 py-2" v-if="!uiEditMode">
                             {{ v.priority}}
@@ -53,9 +56,9 @@
                         <td class="text-right px-4 py-2" v-if="uiEditMode">
                             <input type="number" v-model="memberPriorityUpdates[v.priority, v.name]" @blur="updatePriority" class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
                         </td>
-                        <td v-if="uiEditMode" class="text-right px-4 py-2">
+                        <!-- <td v-if="uiEditMode" class="text-right px-4 py-2">
                             <textarea v-model="memberUpdates[v.value, v.name]" @blur="onDirty" class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
-                        </td>
+                        </td> -->
                         <td v-if="uiEditMode" class="text-center px-4 py-2">
                             <button @click.prevent="removeSetting(val, v)" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -75,9 +78,6 @@
                         </td>
                         <td class="text-right px-4 py-2">
                             <input type="number" v-model="newSettingPriority" @blur="onDirty" class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
-                        </td>
-                        <td  class="text-right px-4 py-2">
-                            
                         </td>
                         <td class="text-center px-4 py-2">
                             <button @click.prevent="addSetting" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none">
@@ -280,6 +280,16 @@ export default {
     methods: {
         updatePriority(){
             for(let member in this.memberPriorityUpdates) {
+                 if (this.memberPriorityUpdates[member] === null || this.memberPriorityUpdates[member].match(/^ *$/) !== null) {
+                    this.$swal({
+                                    icon: "error",
+                                    html: "Priority should not be null or empty.",
+                                    showConfirmButton: true,
+                                    allowOutsideClick: false
+                                });
+                    this.$router.push("../vehicles");
+                    return;
+                }
                  this.vehicle.settings.map(item => {
                         if(item[0] == "names") {
                             let indexOfObject = item[1].findIndex(x => {
@@ -351,12 +361,23 @@ export default {
             // Clean up update object, remove any blank inputs
             console.log("onDirty",JSON.stringify(this.memberUpdates))
             for(let member in this.memberUpdates) {
+                console.log()
+                if (this.memberUpdates[member] === null || this.memberUpdates[member].match(/^ *$/) !== null) {
+                    this.$swal({
+                                    icon: "error",
+                                    html: "Value should not be null or empty.",
+                                    showConfirmButton: true,
+                                    allowOutsideClick: false
+                                });
+                    this.$router.push("../vehicles");
+                    return;
+                }
                  this.vehicle.settings.map(item => {
                         if(item[0] == "names") {
                             
                             let indexOfObject = item[1].findIndex(x => {
                                if(x.name == member){
-                                   console.log(this.memberUpdates[member])
+                                   
                                    x.value = this.memberUpdates[member]
                                } else {
                                    x
@@ -617,9 +638,22 @@ export default {
                             })
                         }
                 })
+
+                
                 this.settingAdds.push(
                     [this.newSettingKey , this.newSettingValue , this.newSettingPriority]
                 );
+                const uniqueValues = new Set(this.settingAdds.map(v => v[0]));
+                if (uniqueValues.size < this.settingAdds.length) {
+                    this.$swal({
+                                icon: "error",
+                                html: "Key already exists",
+                                showConfirmButton: true,
+                                allowOutsideClick: false
+                            });
+                            this.$router.push("../vehicles");
+                            return;
+                }
                 this.addRow = false;
                 this.newSettingKey = '';
                 this.newSettingValue = '';
