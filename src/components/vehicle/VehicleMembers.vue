@@ -358,19 +358,19 @@ export default {
             if (type === 'removeMember') {
                 input.type = type;
                 input.qty = qty;
-                input.note = "Remove " + recipient + ", burning " + this.formatNumber(String(currentQty)) + " tokens";
+                input.note = "Remove " + recipient + " with a balance of " + this.formatNumber(String(currentQty));
             } else if (type === 'addMember') {
                 input.type = type;
                 input.qty = qty;
-                input.note = "Add " + recipient + ", minting " + qty + " tokens";
+                input.note = "Add " + recipient + ", adding a balance of " + qty;
             } else if (currentQty > qty) {
                 input.qty = currentQty - qty;
-                input.type = 'burn';
-                input.note = "Burn " + this.formatNumber(String(currentQty - qty)) + " for " + recipient;
+                input.type = 'subtractBalance';
+                input.note = "Subtract a balance of " + this.formatNumber(String(currentQty - qty)) + " for " + recipient;
             } else if (currentQty < qty) {
                 input.qty = qty - currentQty;
-                input.type = 'mint';
-                input.note = "Mint " + this.formatNumber(String(qty - currentQty)) + " for " + recipient;
+                input.type = 'addBalance';
+                input.note = "Add a balance of " + this.formatNumber(String(qty - currentQty)) + " for " + recipient;
             }
 
             return input;
