@@ -86,6 +86,7 @@
                                 </svg>
                             </button>
                         </td>
+                        <td></td>
                     </tr>
                  </tbody>
             </table>
@@ -639,21 +640,46 @@ export default {
                         }
                 })
 
-                
-                this.settingAdds.push(
-                    [this.newSettingKey , this.newSettingValue , this.newSettingPriority]
-                );
-                const uniqueValues = new Set(this.settingAdds.map(v => v[0]));
-                if (uniqueValues.size < this.settingAdds.length) {
-                    this.$swal({
+                if(this.settingAdds.length == 0){
+                    this.settingAdds.push(
+                        [this.newSettingKey , this.newSettingValue , this.newSettingPriority]
+                    );
+                } else {
+                    let isTrue = false
+                    this.settingAdds.map(v => {
+                        console.log(v[0] == this.newSettingKey)
+                        if(v[0] == this.newSettingKey){
+                            isTrue = true
+                        }
+                    })
+
+                    if(isTrue){
+                        this.$swal({
                                 icon: "error",
                                 html: "Key already exists",
                                 showConfirmButton: true,
                                 allowOutsideClick: false
                             });
-                            this.$router.push("../vehicles");
-                            return;
+                            return
+                    } else {
+                            this.settingAdds.push(
+                                [this.newSettingKey , this.newSettingValue , this.newSettingPriority]
+                            );
+                        }
                 }
+                
+                // const uniqueValues = new Set(this.settingAdds.map(v => v[0] ));
+                // if (uniqueValues.size < this.settingAdds.length) {
+                    // this.$swal({
+                    //             icon: "error",
+                    //             html: "Key already exists",
+                    //             showConfirmButton: true,
+                    //             allowOutsideClick: false
+                    //         });
+                            // this.$router.push("../vehicles");
+                            // return;
+                            
+                // }
                 this.addRow = false;
                 this.newSettingKey = '';
                 this.newSettingValue = '';

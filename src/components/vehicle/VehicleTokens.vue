@@ -58,19 +58,19 @@
                                     <th v-if="allowTransfer" scope="col" class="pl-3 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">
                                         <input type="checkbox" v-model="selectAll" :class="checkboxClass" />
                                     </th>-->
-                                    <th scope="col" class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Arweave Assets ({{ vehicle.tokens.length }})</th>
+                                    <th scope="col" class="px-1 py-2 text-left font-medium text-gray-500 uppercase tracking-wider pl-8">Arweave Assets ({{ vehicle.tokens.length }})</th>
                                     <th scope="col" class="px-1 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Contributor</th>
                                     <th scope="col" class="px-1 py-2 text-right font-medium text-gray-500 uppercase tracking-wider">Balance</th>
                                     <th scope="col" class="px-6 py-3 text-right font-medium text-gray-500 uppercase tracking-wider"></th>
                                     <th v-if="allowTransfer" scope="col" class="py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Transfer Amount</th>
-                                    <th v-if="allowTransfer" scope="col" class="px-4 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Transfer To Address</th>
+                                    <th v-if="allowTransfer" scope="col" class="px-4 py-3 text-left font-medium text-gray-500 uppercase tracking-wider w-65">Transfer To Address</th>
                                     <th v-if="allowTransfer" scope="col" class="py-3 text-left font-medium text-gray-500 uppercase tracking-wider"> W/D</th>
                                     <th scope="col" class="py-3 text-left font-medium text-gray-500 uppercase tracking-wider"> </th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200" v-for="(pst1) in getVehicle1()" :key="pst1.tokenId">
                                 <tr @click="toggle(pst1.tokenId)" :class="{opened: opened.includes(pst1.tokenId)}">
-                                    <td class="px-6 py-4 whitespace-nowrap cursor-pointer">
+                                    <td class="px-1 py-2 text-gray-500 font-mono cursor-pointer">
                                          <div class="flex items-center mt-3 ml-3 mb-3">
                                             <div class="flex-shrink-0 h-10 w-10" @click.prevent="showTokenState( pst1.tokenId, pstLogo(pst1.tokenId, pst1.logo) )">
                                                 <img class="h-10 w-10 rounded-full" :src="pstLogo(pst1.tokenId, pst1.logo)" alt="" />
@@ -98,7 +98,7 @@
                                 </tr>
                                <tr  v-for="(pst, index) in getVehicle(pst1.tokenId)" v-show="opened.includes(pst1.tokenId)" :key="pst.tokenId"  class="bg-gray-100" >
                                   
-                                    <td class="px-6 py-4 whitespace-nowrap cursor-pointer">
+                                    <td class="px-1 py-2 text-gray-500 font-mono cursor-pointer">
                                         <div class="flex items-center">
                                             <div class="ml-4">
                                                 <!-- <div class="font-medium text-gray-900"> {{ pst.name + " (" + pst.ticker + ")" }} </div> -->
