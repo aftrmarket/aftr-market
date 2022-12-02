@@ -340,13 +340,11 @@ async function handle(state, action) {
     if (quantity <= 0 || caller === target) {
       throw new ContractError("Invalid token transfer.");
     }
-    if (balances[caller] < quantity) {
+    if (balances[caller] < quantity || !balances[caller] || balances[caller] == undefined || balances[caller] == null || isNaN(balances[caller])) {
       throw new ContractError("Caller balance not high enough to make claimable " + quantity + " token(s).");
     }
     balances[caller] -= quantity;
-    if (balances[caller] === null || balances[caller] === void 0) {
-      balances[caller] = 0;
-    }
+
     state.claimable.push({
       from: caller,
       to: target,
