@@ -1,6 +1,6 @@
 # AFTR.Market
 
-AFTR Market is a site enabling users to create and configure AFTR vehicles. In short, AFTR vehicles are Arweave assets that encapsulate other Arweave assets. AFTR vehicles add a layer of security to your Arweave assets as management and governance are handled onchain.
+AFTR Market is a site enabling users to create and configure AFTR repos. In short, AFTR repos are Arweave assets that encapsulate other Arweave assets. AFTR repos add a layer of security to your Arweave assets as management and governance are handled onchain.
 
 ## Installation
 

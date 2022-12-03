@@ -1,94 +1,124 @@
 <template>
-  <TransitionRoot as="template" :show="open">
-    <Dialog as="div" auto-reopen="true" class="fixed z-10 inset-0 overflow-y-auto" @close="open = false">
-      <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
-          <DialogOverlay class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
-        </TransitionChild>
+    <TransitionRoot as="template" :show="open">
+        <Dialog as="div" auto-reopen="true" class="fixed z-10 inset-0 overflow-y-auto" @close="open = false">
+            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0"
+                    enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
+                    <DialogOverlay class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+                </TransitionChild>
 
-        <!-- This element is to trick the browser into centering the modal contents. -->
-        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-        <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
-          <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-            <div class="bg-white px-4 pt-5 pb-2">
-              <div class="sm:flex sm:items-start">
-                <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="green">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
-                    </svg>
-                </div>
-                <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                  <DialogTitle as="h3" class="text-lg leading-6 font-medium text-gray-900">
-                    Add Assets to Vehicle
-                  </DialogTitle>
-                    <div v-if="arConnected" class="pt-6">
-                        <select v-model="selectedPstId" @change="pstChange" id="selectedPstId" name="selectedPstId" class="mt-1 block w-3/4 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                            <option value="" disabled selected>
-                                Select Asset
-                            </option>
-                            <option v-for="pst in walletPsts" :key="pst.contractId" :value="pst.contractId">
-                                {{ pst.name }} ({{ pst.contractId }})
-                            </option>
-                            <option value="NOT-FOUND">
-                                --Asset Not In List--
-                            </option>
-                        </select>
-                    </div>
-                    <div v-if="selectedPstId === 'NOT-FOUND'">
-                        <div class="pt-6 pb-4 flex flex-col">
-                            <label class="block text-sm font-medium text-gray-700">
-                                Please paste the Contract ID of the asset that you'd like to deposit.
-                            </label>
-                            <input type="text" placeholder="Asset ID (i.e. Contract ID)" v-model="nfTokenId" @input="readAssetContract" :class="inputBox(nfTokenId.length === 43)" />
-                            <div v-if="nfTokenValid" class="flex flex-col">
-                                <label class="block text-sm font-medium text-gray-700 pt-2 pb-2">
-                                    You have a balance of <span class="font-bold text-aftrBlue">{{ formatNumber(pstBalance - pstInputTokens) }} {{ pstTicker }}</span><span> available to use in your vehicle.</span>
-                                </label>
-                                <input type="number" placeholder="Amount" v-model="pstInputTokens" @input="calcPstPrice" :class="inputBox(pstInputValid)" />
-                            </div>
-                            <div v-else>
-                                <label class="block pt-2 text-sm font-medium text-aftrRed">
-                                    {{ nfMsg }}
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    <div v-if="selectedPstId !== '' && selectedPstId !== 'NOT-FOUND'">
-                        <div class="pt-6 pb-4">
-                            <label class="block text-sm font-medium text-gray-700">
-                                You have <span class="font-bold text-aftrBlue">{{ formatNumber(pstBalance - pstInputTokens) }} {{ pstTicker }}</span><span> available to use in your vehicle.</span>
-                            </label>
-                        </div>
-                        <input type="number" placeholder="Amount" v-model="pstInputTokens" @input="calcPstPrice" :class="inputBox(pstInputValid)" />
-                        <span v-if="pstInputTokens && false" class="block text-xs pt-2 pl-4 pr-6">@ {{ formatNumber( pricePerToken, true) }} AR {{ pstInputTokens ? " = " + formatNumber(pstValue, true) + " AR" : "" }}</span>
-                    </div>
-                    <!--
+                <!-- This element is to trick the browser into centering the modal contents. -->
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                <TransitionChild as="template" enter="ease-out duration-300"
+                    enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                    enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200"
+                    leave-from="opacity-100 translate-y-0 sm:scale-100"
+                    leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+                    <div
+                        class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                        <div class="bg-white px-4 pt-5 pb-2">
+                            <div class="sm:flex sm:items-start">
+                                <div
+                                    class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                                        viewBox="0 0 24 24" stroke="green">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+                                    </svg>
+                                </div>
+                                <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                                    <DialogTitle as="h3" class="text-lg leading-6 font-medium text-gray-900">
+                                        Add Assets to Repo
+                                    </DialogTitle>
+                                    <div v-if="arConnected" class="pt-6">
+                                        <select v-model="selectedPstId" @change="pstChange" id="selectedPstId"
+                                            name="selectedPstId"
+                                            class="mt-1 block w-3/4 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                            <option value="" disabled selected>
+                                                Select Asset
+                                            </option>
+                                            <option v-for="pst in walletPsts" :key="pst.contractId"
+                                                :value="pst.contractId">
+                                                {{ pst.name }} ({{ pst.contractId }})
+                                            </option>
+                                            <option value="NOT-FOUND">
+                                                --Asset Not In List--
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div v-if="selectedPstId === 'NOT-FOUND'">
+                                        <div class="pt-6 pb-4 flex flex-col">
+                                            <label class="block text-sm font-medium text-gray-700">
+                                                Please paste the Contract ID of the asset that you'd like to deposit.
+                                            </label>
+                                            <input type="text" placeholder="Asset ID (i.e. Contract ID)"
+                                                v-model="nfTokenId" @input="readAssetContract"
+                                                :class="inputBox(nfTokenId.length === 43)" />
+                                            <div v-if="nfTokenValid" class="flex flex-col">
+                                                <label class="block text-sm font-medium text-gray-700 pt-2 pb-2">
+                                                    You have a balance of <span class="font-bold text-aftrBlue">{{
+                                                            formatNumber(pstBalance - pstInputTokens)
+                                                    }} {{ pstTicker
+}}</span><span> available to use in your repo.</span>
+                                                </label>
+                                                <input type="number" placeholder="Amount" v-model="pstInputTokens"
+                                                    @input="calcPstPrice" :class="inputBox(pstInputValid)" />
+                                            </div>
+                                            <div v-else>
+                                                <label class="block pt-2 text-sm font-medium text-aftrRed">
+                                                    {{ nfMsg }}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div v-if="selectedPstId !== '' && selectedPstId !== 'NOT-FOUND'">
+                                        <div class="pt-6 pb-4">
+                                            <label class="block text-sm font-medium text-gray-700">
+                                                You have <span class="font-bold text-aftrBlue">{{
+                                                        formatNumber(pstBalance - pstInputTokens)
+                                                }} {{ pstTicker
+}}</span><span> available to use in your repo.</span>
+                                            </label>
+                                        </div>
+                                        <input type="number" placeholder="Amount" v-model="pstInputTokens"
+                                            @input="calcPstPrice" :class="inputBox(pstInputValid)" />
+                                        <span v-if="pstInputTokens && false" class="block text-xs pt-2 pl-4 pr-6">@ {{
+                                                formatNumber(pricePerToken, true)
+                                        }} AR {{ pstInputTokens ? " = " +
+        formatNumber(pstValue, true) + " AR" : ""
+}}</span>
+                                    </div>
+                                    <!--
                   <div class="mt-2">
                     <p class="text-sm text-gray-500">
                       Are you sure you want to transfer these tokens from your
-                      wallet to the vehicle? This action cannot be undone.
+                      wallet to the repo? This action cannot be undone.
                     </p>
                   </div>
                   -->
-                </div>
-              </div>
+                                </div>
+                            </div>
+                        </div>
+                        <repo-alert v-if="pstInputValid && pstInputTokens" :repo="msg">
+                        </repo-alert>
+                        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                            <button type="button" v-if="pstInputValid && pstInputTokens"
+                                class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm"
+                                @click="transferTokens">
+                                Deposit
+                            </button>
+                            <button type="button"
+                                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-aftrRed hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                                @click="$emit('close')" ref="cancelButtonRef">
+                                Cancel
+                            </button>
+                        </div>
+
+                    </div>
+                </TransitionChild>
             </div>
-            <Vehicle-Alert v-if="pstInputValid && pstInputTokens" :vehicle="msg"></Vehicle-Alert>
-            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-              <button type="button" v-if="pstInputValid && pstInputTokens" 
-              class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm" @click="transferTokens">
-                Deposit
-              </button>
-              <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-aftrRed hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrRed sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" @click="$emit('close')" ref="cancelButtonRef">
-                Cancel
-              </button>
-            </div>
-            
-          </div>
-        </TransitionChild>
-      </div>
-    </Dialog>
-  </TransitionRoot>
+        </Dialog>
+    </TransitionRoot>
 </template>
 
 <script>
@@ -97,14 +127,14 @@ import { Dialog, DialogOverlay, DialogTitle, TransitionChild, TransitionRoot } f
 import { ExclamationIcon } from '@heroicons/vue/outline'
 import { mapGetters } from 'vuex';
 import numeral from "numeral";
-import VehicleAlert from './VehicleAlert.vue';
+import RepoAlert from './RepoAlert.vue';
 import Aftr from "aftr-market";
-import { warpRead, warpWrite } from './../utils/warpUtils.js';
+import { warpRead, warpWrite } from '../utils/warpUtils.js';
 
 const client = new Aftr();
 
 export default {
-    props : ['vehicle'],
+    props: ['repo'],
     components: {
         Dialog,
         DialogOverlay,
@@ -112,7 +142,7 @@ export default {
         TransitionChild,
         TransitionRoot,
         ExclamationIcon,
-        VehicleAlert
+        RepoAlert
     },
     data() {
         return {
@@ -121,7 +151,7 @@ export default {
             pstSelected: false,
             inputValid: false,                              // Boolean to show when any input field is invalid
             pstInputValid: false,                           // Boolean to show when amount goes over tokens held
-            nameValid: false,                               // Boolean for valid vehicle name
+            nameValid: false,                               // Boolean for valid repo name
             tickerValid: false,                             // Boolean for valid ticker name
             pricePerToken: null,                            // Selected PST's price
             pstValue: null,                                 // pricePerShare * inputShares
@@ -137,7 +167,7 @@ export default {
             nfMsg: "",
         }
     },
-    computed : {
+    computed: {
         pstBalance() {
             if (this.nfAmountValid) {
                 return this.nfTokenBal;
@@ -154,8 +184,8 @@ export default {
                 return currentPst.ticker;
             }
         },
-        vehicleTokenBox() {
-            if (this.vehicleTokensValid) {
+        repoTokenBox() {
+            if (this.repoTokensValid) {
                 return "mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md";
             } else {
                 return "mt-1 focus:ring-aftrRed focus:border-aftrRed shadow-sm sm:text-sm border-gray-300 rounded-md";
@@ -169,7 +199,7 @@ export default {
             }
         },
         isInputValid() {
-            if (this.nameValid && this.tickerValid && this.vehicleTokensValid && this.memberRowValid) {
+            if (this.nameValid && this.tickerValid && this.repoTokensValid && this.memberRowValid) {
                 return true;
             } else {
                 return false;
@@ -200,7 +230,7 @@ export default {
             }
         },
         assetIdInputBox() {
-            
+
         },
         async readAssetContract() {
             let msg = "";
@@ -225,7 +255,7 @@ export default {
             let msg = "";
 
             // Make sure user isn't trying to deposit asset of itself
-            if (this.vehicle.id === contractId) {
+            if (this.repo.id === contractId) {
                 msg = "You can't deposit an asset to itself."
                 return msg;
             }
@@ -237,17 +267,17 @@ export default {
                 msg = "This asset can't be found on the Permaweb."
                 return msg;
             }
-            
+
             /*** Changing to look for Warp's version of FCP which will require claims and claimable arrays. */
             //if (!stateInteractions.state.invocations || !stateInteractions.state.foreignCalls) {
-                if (!stateInteractions.state.claims || !stateInteractions.state.claimable) {
-                msg = "This asset doesn't support cross-contract communication so it can't be deposited into an AFTR vehicle.";
+            if (!stateInteractions.state.claims || !stateInteractions.state.claimable) {
+                msg = "This asset doesn't support cross-contract communication so it can't be deposited into an AFTR repo.";
                 return msg;
             }
 
             // Test to see if owner's balance would be 0
             if ((stateInteractions.state.ownership === "single") && (this.getActiveAddress === stateInteractions.state.owner) && (stateInteractions.state.balances[this.getActiveAddress] - Number(this.pstInputTokens) <= 0)) {
-                msg = "Can't deposit this asset because the owner's balance of a single-owner vehicle would become 0.";
+                msg = "Can't deposit this asset because the owner's balance of a single-owner repo would become 0.";
                 return msg;
             }
 
@@ -263,11 +293,11 @@ export default {
             return msg;
         },
         async transferTokens() {
-            this.msg = "Please wait for deposit into vehicle to complete..."
+            this.msg = "Please wait for deposit into repo to complete..."
 
             /*** Depositing tokens process
              * 1. Setup Claim on token being deposited.
-             * 2. Call AFTR contract to claim tokens and update the AFTR vehicle tokens object.
+             * 2. Call AFTR contract to claim tokens and update the AFTR repo tokens object.
              */
 
             const quantity = Number(this.pstInputTokens);
@@ -294,10 +324,10 @@ export default {
                 }
             }
 
-             // 1. Setup Claim
+            // 1. Setup Claim
             const inputAllow = {
                 function: "allow",
-                target: this.vehicle.id,
+                target: this.repo.id,
                 qty: quantity
             };
             const allowTxId = await warpWrite(pstId, inputAllow);
@@ -309,7 +339,7 @@ export default {
                 qty: quantity,
                 txID: allowTxId
             };
-            const allowDepId = await warpWrite(this.vehicle.id, inputDep);
+            const allowDepId = await warpWrite(this.repo.id, inputDep);
 
             this.$swal({
                 icon: "info",
@@ -341,7 +371,7 @@ export default {
             }
             await this.arConnect();
             this.$swal.close();
-            this.$router.push("../vehicles");
+            this.$router.push("../repos");
             this.$emit("close");
         },
         pstChange() {
@@ -361,7 +391,7 @@ export default {
                 bal = currentPst.balance;
             }
             this.updatePstInputValid(bal);
-            this.msg = "WARNING: Are you sure you want to transfer these assets from your wallet to the vehicle? This action cannot be undone."
+            this.msg = "WARNING: Are you sure you want to transfer these assets from your wallet to the repo? This action cannot be undone."
         },
         updatePstInputValid(balance) {
             if (Number(this.pstInputTokens) <= balance && Number(this.pstInputTokens > 0)) {
@@ -375,7 +405,7 @@ export default {
         },
     },
     created() {
-        this.walletPsts = this.$store.getters.getActiveWallet.psts.filter(pst => pst.contractId !== this.vehicle.id);
+        this.walletPsts = this.$store.getters.getActiveWallet.psts.filter(pst => pst.contractId !== this.repo.id);
     },
     setup() {
         const open = ref(true)

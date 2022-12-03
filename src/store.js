@@ -1,12 +1,13 @@
-import {createStore } from 'vuex';
+import { createStore } from 'vuex';
 import { fetchBalancesForAddress } from "verto-cache-interface";
 import { warpRead, arweaveInit } from './components/utils/warpUtils';
 
-async function getPlayTokenId(arweave ,addr) {
+async function getPlayTokenId(arweave, addr) {
     if (import.meta.env.VITE_ENV === "PROD") {
         return import.meta.env.VITE_PLAY_CONTRACT_ID;
     } else {
-        let queryval = { query: `
+        let queryval = {
+            query: `
             query($cursor: String) {
                 transactions(
                     tags: [ 
@@ -20,7 +21,7 @@ async function getPlayTokenId(arweave ,addr) {
             }`
         };
 
-        const responseValue = await arweave.api.post("graphql", { query: queryval.query,});
+        const responseValue = await arweave.api.post("graphql", { query: queryval.query, });
 
         if (responseValue.data.data.transactions.edges.length == 0) {
             return "";
@@ -39,7 +40,7 @@ async function buildWalletPsts(aftrSourcesArray, userAddr) {
                 transactions(
                     tags: [
                         { name: "App-Name", values: ["SmartWeaveContract"] },
-                        { name: "Contract-Src", values: ${ aftrContractSourcesString } }
+                        { name: "Contract-Src", values: ${aftrContractSourcesString} }
                     ]
                     first: 100
                     after: $cursor
@@ -57,7 +58,7 @@ async function buildWalletPsts(aftrSourcesArray, userAddr) {
 
     const arweave = arweaveInit();
 
-    const responseValue = await arweave.api.post("graphql", { query: queryval.query,});
+    const responseValue = await arweave.api.post("graphql", { query: queryval.query, });
     console.log(responseValue.data.data.transactions.edges);
 
     let wallet = {
@@ -73,19 +74,19 @@ async function buildWalletPsts(aftrSourcesArray, userAddr) {
         console.log(edge.node.id);
         try {
             const cachedValue = await warpRead(edge.node.id);
-            let vehicle = cachedValue.state;
-    
-            if (vehicle && Object.keys(vehicle.balances).length != 0 && vehicle.name) {
+            let repo = cachedValue.state;
+
+            if (repo && Object.keys(repo.balances).length != 0 && repo.name) {
                 let data = {
                     contractId: edge.node.id,
                     balance: 0,
-                    name: vehicle.name,
-                    ticker: vehicle.ticker
+                    name: repo.name,
+                    ticker: repo.ticker
                 };
 
-                Object.keys(vehicle.balances).some((walletId) => {
+                Object.keys(repo.balances).some((walletId) => {
                     if (walletId == wallet.address) {
-                        data.balance = vehicle.balances[wallet.address];
+                        data.balance = repo.balances[wallet.address];
                     }
                 });
 
@@ -132,7 +133,7 @@ const store = createStore({
             arConnect: false,
             testLaunchConfigCorrect: true,
             currentBlock: [],
-            keyFile : {},
+            keyFile: {},
             arConnectConfig: {},
             aftrContractSources: [],
         };
@@ -173,8 +174,8 @@ const store = createStore({
         addKeyFile(state, item) {
             state.keyFile = []
             state.keyFile.push(item);
-          },
-        setCurrentBlock (state, currentBlock) {
+        },
+        setCurrentBlock(state, currentBlock) {
             state.currentBlock = currentBlock
         },
         arConnect(state, payload) {
@@ -184,7 +185,7 @@ const store = createStore({
         arDisconnect(state) {
             state.activeWallet = {};
             state.arConnect = false;
-        }, 
+        },
         updateWalletPstBalance(state, payload) {
             /*** 
              Expect
@@ -198,7 +199,7 @@ const store = createStore({
         updateWalletArBalance(state) {
 
         },
-        setArConnectConfig (state, arConnectConfig) {
+        setArConnectConfig(state, arConnectConfig) {
             state.arConnectConfig = arConnectConfig;
         },
         setTestLaunchConfigState(state) {
@@ -226,17 +227,17 @@ const store = createStore({
         },
     },
     actions: {
-        async loadCurrentBlock ({ commit }) {
-            const url = import.meta.env.VITE_ARWEAVE_PROTOCOL+"://"+import.meta.env.VITE_ARWEAVE_HOST+":"+import.meta.env.VITE_ARWEAVE_PORT;
+        async loadCurrentBlock({ commit }) {
+            const url = import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT;
             await fetch(url)
-            .then(response => response.json())
-            .then(data => {
-              console.log('Arweave network height is: ' + data);
-              commit('setCurrentBlock', data)
-            })
-            .catch(error => {
-              console.error(error);
-            });
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Arweave network height is: ' + data);
+                    commit('setCurrentBlock', data)
+                })
+                .catch(error => {
+                    console.error(error);
+                });
         },
         setTestLaunchConfigState({ commit }) {
             commit("setTestLaunchConfigState");
@@ -251,7 +252,7 @@ const store = createStore({
             // Try to get wallet, if fails, connect so user can assign permissions
             try {
                 wallet.address = await window.arweaveWallet.getActiveAddress();
-            } catch(e) {
+            } catch (e) {
                 console.log(e);
                 const promiseResult = await window.arweaveWallet.connect([
                     "ACCESS_ADDRESS",
@@ -261,14 +262,14 @@ const store = createStore({
                 ]);
                 wallet.address = await window.arweaveWallet.getActiveAddress();
             }
-            
+
             // Set correct config
-            try {                
+            try {
                 let config = await window.arweaveWallet.getArweaveConfig();
                 if (config.host != import.meta.env.VITE_ARWEAVE_HOST || config.port != import.meta.env.VITE_ARWEAVE_PORT || config.protocol != import.meta.env.VITE_ARWEAVE_PROTOCOL) {
                     console.log("Current Config: " + JSON.stringify(config));
-                    config = { 
-                        host: import.meta.env.VITE_ARWEAVE_HOST, 
+                    config = {
+                        host: import.meta.env.VITE_ARWEAVE_HOST,
                         port: import.meta.env.VITE_ARWEAVE_PORT,
                         protocol: import.meta.env.VITE_ARWEAVE_PROTOCOL
                     };
@@ -276,7 +277,7 @@ const store = createStore({
                     context.commit("setArConnectConfig", config);
                 }
                 wallet.address = await window.arweaveWallet.getActiveAddress();
-            } catch(e) {
+            } catch (e) {
                 alert(e);
             }
 
@@ -301,8 +302,8 @@ const store = createStore({
             //         console.log("New Config: " + JSON.stringify(config));
             //         context.commit("setArConnectConfig", config);
             //     }
-                
-                
+
+
             // } catch (error) {
             //     console.log("ERROR during ArConnection: " + error);
             //     alert("Do you have the ArConnect wallet?.  AFTR Market integrates with ArConnect, so you'll need have the ArConnect plugin installed in your browser.  Go to ArConnect.io for more information.");
@@ -328,7 +329,7 @@ const store = createStore({
                     ]
                  */
 
-                
+
                 /*** DO WE HAVE THE ABILITY TO GET TOKEN PRICES IN TEST? */
 
             } else if (import.meta.env.VITE_ENV === "PROD") {
@@ -371,7 +372,7 @@ const store = createStore({
                     } catch (error) {
                         console.log("ERROR while fetching AR prices of " + pst.name + " from Verto: " + error);
                     }
-        
+
                     if (wallet.address.length === 43) {
                         context.commit("arConnect", wallet);
                     }
@@ -379,7 +380,7 @@ const store = createStore({
 
                 /*** DO WE WANT TO RUN buildWalletPsts in PROD?? */
 
-            /*** END ONLY RUNS IN PROD */
+                /*** END ONLY RUNS IN PROD */
             } else {
                 if (context.state.aftrContractSources.length !== 0) {
                     wallet = await buildWalletPsts(context.state.aftrContractSources, wallet.address);

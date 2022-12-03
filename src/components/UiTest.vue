@@ -2,7 +2,7 @@
 <template>
     <div class="grid grid-cols-2 gap-4 border">
         <div class="col-span-2">TOP</div>
-        <div >SMARTWEAVE</div>
+        <div>SMARTWEAVE</div>
         <div>3EM</div>
     </div>
 </template>
@@ -22,7 +22,7 @@ export default {
             didOpen: () => {
                 this.$swal.showLoading()
             },
-            html: "Checking balances on Blue Horizon vehicle.",
+            html: "Checking balances on Blue Horizon repo.",
             showConfirmButton: true,
             allowOutsideClick: false,
         });
