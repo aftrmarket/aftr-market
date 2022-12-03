@@ -1,35 +1,45 @@
 <template>
     <div :class="editClass">
-        <vehicle-members-add v-if="showAddModal" :vehicle="vehicle" @close="closeModal"></vehicle-members-add>
+        <repo-members-add v-if="showAddModal" :repo="repo" @close="closeModal">
+        </repo-members-add>
         <!-- Member Table -->
         <div class="col-span-3 shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th v-if="allowEdits" scope="col" class="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th v-if="allowEdits" scope="col"
+                            class="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                             <input type="checkbox" v-model="selectAll" :class="checkboxClass" />
                         </th>
-                        <th scope="col" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Member ({{ Object.keys(vehicle.balances).length }})
-                            <button v-if="allowEdits" @click.prevent="addMemberRow" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" />
+                        <th scope="col"
+                            class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Member ({{ Object.keys(repo.balances).length }})
+                            <button v-if="allowEdits" @click.prevent="addMemberRow" type="button"
+                                class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path
+                                        d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" />
                                 </svg>
                             </button>
                         </th>
-                        <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th scope="col"
+                            class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Tokens
                         </th>
-                        <th v-if="allowEdits" scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th v-if="allowEdits" scope="col"
+                            class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                             New Allocation
                         </th>
-                        <th v-if="allowEdits" scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th v-if="allowEdits" scope="col"
+                            class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Actions
                         </th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    <tr v-for="(tokens, addr) in vehicle.balances" :key="addr" class="text-xs text-gray-500 hover:bg-gray-50">
+                    <tr v-for="(tokens, addr) in repo.balances" :key="addr"
+                        class="text-xs text-gray-500 hover:bg-gray-50">
                         <td v-if="allowEdits" class="text-center px-2 py-2">
                             <input type="checkbox" :value="addr" v-model="memberRemoves" :class="checkboxClass" />
                         </td>
@@ -40,33 +50,44 @@
                             {{ formatNumber(tokens) }}
                         </td>
                         <td v-if="allowEdits" class="text-right px-4 py-2">
-                            <input type="number" v-model="memberUpdates[addr]" @blur="onDirty" class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
+                            <input type="number" v-model="memberUpdates[addr]" @blur="onDirty"
+                                class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
                         </td>
                         <td v-show="addRow" class="text-center px-4 py-2">
-                            <button @click.prevent="removeProposal(key, 'update')" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
+                            <button @click.prevent="removeProposal(key, 'update')" type="button"
+                                class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path fill-rule="evenodd"
+                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z"
+                                        clip-rule="evenodd" />
                                 </svg>
                             </button>
                         </td>
                     </tr>
                     <tr v-show="addRow" class="text-xs text-gray-500 hover:bg-gray-50">
                         <td class="text-center px-2 py-2">
-                            
+
                         </td>
                         <td class="text-left px-2 py-2">
-                            <input type="text" v-model="newMember" class="mt-1 mb-1 w-full text-xs focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md">
+                            <input type="text" v-model="newMember"
+                                class="mt-1 mb-1 w-full text-xs focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md">
                         </td>
                         <td class="text-right px-4 py-2">
                             0
                         </td>
                         <td class="text-right px-4 py-2">
-                            <input type="number" v-model="newQty" @blur="onDirty" class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
+                            <input type="number" v-model="newQty" @blur="onDirty"
+                                class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
                         </td>
                         <td class="text-center px-4 py-2">
-                            <button @click.prevent="addMember" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+                            <button @click.prevent="addMember" type="button"
+                                class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path fill-rule="evenodd"
+                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"
+                                        clip-rule="evenodd" />
                                 </svg>
                             </button>
                         </td>
@@ -81,17 +102,17 @@
             </div>
             <div v-for="addr in memberRemoves" :key="addr" class="max-w-2xl text-sm text-gray-500">{{ formatAddr(addr) }}</div>
     
-            <vehicle-status-text 
+            <repo-status-text 
                 :headerText="'Adding Members'" 
                 :item1="'Owner'" 
                 :item1Status="getActiveAddress === ownerAddress ? true : false" 
                 :item2="'Status = Not Running'" 
-                :item2Status="vehicle.status === 'stopped' || typeof vehicle.status === 'undefined' ? true : false"
+                :item2Status="repo.status === 'stopped' || typeof repo.status === 'undefined' ? true : false"
                 :item3="'Single Ownership'"
-                :item3Status="vehicle.ownership === 'single' ? true : false"
-                :footerMessage="allowVehicleAdds ? 'Members may be added or removed' : 'Votes must be passed to add/remove members'"
-                :footerStatus="allowVehicleAdds ? true : false">
-            </vehicle-status-text>
+                :item3Status="repo.ownership === 'single' ? true : false"
+                :footerMessage="allowRepoAdds ? 'Members may be added or removed' : 'Votes must be passed to add/remove members'"
+                :footerStatus="allowRepoAdds ? true : false">
+            </repo-status-text>
         </div>
         -->
 
@@ -101,18 +122,22 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th scope="col" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                
+                            <th scope="col"
+                                class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+
                             </th>
-                            <th scope="col" class="px-4 py-3 col-span-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th scope="col"
+                                class="px-4 py-3 col-span-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Proposed Updates
                             </th>
-                            <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th scope="col"
+                                class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                             </th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-for="(key, index) in Object.keys(memberUpdates)" :key="key" class="text-xs text-gray-500 hover:bg-gray-50">
+                        <tr v-for="(key, index) in Object.keys(memberUpdates)" :key="key"
+                            class="text-xs text-gray-500 hover:bg-gray-50">
                             <td class="px-4 py-2">
                                 {{ index + 1 }}
                             </td>
@@ -120,9 +145,13 @@
                                 <span v-html="proposedText(key, memberUpdates[key], 'update')"></span>
                             </td>
                             <td class="px-4 py-2 text-center">
-                                <button @click.prevent="removeProposal(key, 'update')" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
+                                <button @click.prevent="removeProposal(key, 'update')" type="button"
+                                    class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                        fill="currentColor">
+                                        <path fill-rule="evenodd"
+                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z"
+                                            clip-rule="evenodd" />
                                     </svg>
                                 </button>
                             </td>
@@ -134,18 +163,22 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th scope="col" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                
+                            <th scope="col"
+                                class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+
                             </th>
-                            <th scope="col" class="px-4 py-3 col-span-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th scope="col"
+                                class="px-4 py-3 col-span-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Proposed Adds
                             </th>
-                            <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th scope="col"
+                                class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                             </th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-for="(member, index) in memberAdds" :key="member" class="text-xs text-gray-500 hover:bg-gray-50">
+                        <tr v-for="(member, index) in memberAdds" :key="member"
+                            class="text-xs text-gray-500 hover:bg-gray-50">
                             <td class="px-4 py-2">
                                 {{ index + 1 }}
                             </td>
@@ -153,9 +186,13 @@
                                 <span v-html="proposedText(member.recipient, member.qty, 'add')"></span>
                             </td>
                             <td class="px-4 py-2 text-center">
-                                <button @click.prevent="removeProposal(member.recipient, 'add')" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
+                                <button @click.prevent="removeProposal(member.recipient, 'add')" type="button"
+                                    class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                        fill="currentColor">
+                                        <path fill-rule="evenodd"
+                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z"
+                                            clip-rule="evenodd" />
                                     </svg>
                                 </button>
                             </td>
@@ -167,28 +204,36 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th scope="col" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                
+                            <th scope="col"
+                                class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+
                             </th>
-                            <th scope="col" class="px-4 py-3 col-span-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th scope="col"
+                                class="px-4 py-3 col-span-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Proposed Removes
                             </th>
-                            <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th scope="col"
+                                class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                             </th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-for="(member, index) in memberRemoves" :key="member" class="text-xs text-gray-500 hover:bg-gray-50">
+                        <tr v-for="(member, index) in memberRemoves" :key="member"
+                            class="text-xs text-gray-500 hover:bg-gray-50">
                             <td class="px-4 py-2">
                                 {{ index + 1 }}
                             </td>
                             <td class="px-4 py-2">
-                                <span v-html="proposedText(member, vehicle.balances[member], 'remove')"></span>
+                                <span v-html="proposedText(member, repo.balances[member], 'remove')"></span>
                             </td>
                             <td class="px-4 py-2 text-center">
-                                <button @click.prevent="removeProposal(member, 'remove')" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
+                                <button @click.prevent="removeProposal(member, 'remove')" type="button"
+                                    class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                        fill="currentColor">
+                                        <path fill-rule="evenodd"
+                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z"
+                                            clip-rule="evenodd" />
                                     </svg>
                                 </button>
                             </td>
@@ -202,12 +247,12 @@
 
         <div class="col-span-3 flex flex-col inline-flex">
             <!---
-            <div v-if="false && allowVehicleAdds && !arConnected" class="pt-6 flex justify-start items-center">
+            <div v-if="false && allowRepoAdds && !arConnected" class="pt-6 flex justify-start items-center">
                 <button @click="arConnect" type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-aftrBlue hover:bg-aftrBlue-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                     Login to ArConnect
                 </button>
                 <label class="pl-4 block text-sm text-gray-700">
-                    You must provide a wallet in order to add members to a vehicle
+                    You must provide a wallet in order to add members to a repo
                 </label>
             </div>
             
@@ -221,12 +266,16 @@
             </div>
             --->
             <div v-if="numChanges > 0" class="text-right">
-                <button @click.prevent="submit" type="button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+                <button @click.prevent="submit" type="button"
+                    class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"></path>
-                        <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"></path>
+                        <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z">
+                        </path>
+                        <path fill-rule="evenodd"
+                            d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
+                            clip-rule="evenodd"></path>
                     </svg>
-                    <span class="pl-2">Update Vehicle</span>
+                    <span class="pl-2">Update Repo</span>
                 </button>
             </div>
         </div>
@@ -237,12 +286,12 @@
 <script>
 import numeral from "numeral";
 import { mapGetters } from 'vuex';
-import VehicleStatusText from './VehicleStatusText.vue';
-import VehicleMembersAdd from './VehicleMembersAdd.vue';
+import RepoStatusText from './RepoStatusText.vue';
+import RepoMembersAdd from './RepoMembersAdd.vue';
 
 export default {
-    props: ['vehicle'],
-    components: { VehicleStatusText, VehicleMembersAdd },
+    props: ['repo'],
+    components: { RepoStatusText, RepoMembersAdd },
     data() {
         return {
             memberRemoves: [],
@@ -251,8 +300,8 @@ export default {
             newMember: '',
             newQty: null,
             addRow: false,
-            // allowVehicleAdds: false,            // Allow adding members if Owner and Not Started
-            // allowVehicleRemoves: false,         // Allow removing members if Owner, Single Ownership, and Not Started
+            // allowRepoAdds: false,            // Allow adding members if Owner and Not Started
+            // allowRepoRemoves: false,         // Allow removing members if Owner, Single Ownership, and Not Started
             showAddModal: false,                 // ADD THIS FUNCTIONALITY LATER
             allowEdits: false,
             isDirty: false,
@@ -267,12 +316,12 @@ export default {
     computed: {
         selectAll: {
             get() {
-                return this.vehicle.balances ? this.memberRemoves.length == Object.keys(this.vehicle.balances).length : false;
+                return this.repo.balances ? this.memberRemoves.length == Object.keys(this.repo.balances).length : false;
             },
             set(value) {
                 let selected = [];
-                if(value) {
-                    for(let balance in this.vehicle.balances) {
+                if (value) {
+                    for (let balance in this.repo.balances) {
                         selected.push(balance);
                     }
                 }
@@ -287,16 +336,16 @@ export default {
             }
         },
         numChanges() {
-            return this.memberRemoves.length + this.memberAdds.length + Object.keys(this.memberUpdates).length;
+            return this.memberRemoves.length + this.memberAdds.length + Object.keys(this.memberUpdates).le
         },
         checkboxClass() {
             return "focus:ring-aftrBlue h-4 w-4 text-aftrBlue border-gray-300 rounded";
         },
         ownerAddress() {
-            if (typeof this.vehicle.owner === 'undefined' || this.vehicle.owner === null || this.vehicle.owner === '') {
+            if (typeof this.repo.owner === 'undefined' || this.repo.owner === null || this.repo.owner === '') {
                 return '~NO ONE~';
             } else {
-                return this.vehicle.owner;
+                return this.repo.owner;
             }
         },
         ...mapGetters(['arConnected', 'getActiveAddress']),
@@ -314,7 +363,7 @@ export default {
         },
         proposedText(recipient, qty, type) {
             if (type === 'update') {
-                const currentQty = this.vehicle.balances[recipient];
+                const currentQty = this.repo.balances[recipient];
                 if (currentQty > +qty) {
                     return "<span style='color:#FF6C8C'><b>Burn</b></span> " + this.formatNumber(String(currentQty - +qty)) + " tokens for <b> " + recipient + "</b>";
                 } else if (currentQty < +qty) {
@@ -338,18 +387,18 @@ export default {
             }
         },
         // setFlags() {
-        //     // Allow member add/remove if user is owner and (ownership is single or vehicle is not running), otherwise changes must be via vote
-        //     if (this.getActiveAddress === this.ownerAddress && (this.vehicle.ownership === 'single' || this.vehicle.status !== 'started')) {
-        //         this.allowVehicleAdds = true;
-        //         this.allowVehicleRemoves = true;
+        //     // Allow member add/remove if user is owner and (ownership is single or repo is not running), otherwise changes must be via vote
+        //     if (this.getActiveAddress === this.ownerAddress && (this.repo.ownership === 'single' || this.repo.status !== 'started')) {
+        //         this.allowRepoAdds = true;
+        //         this.allowRepoRemoves = true;
         //     } else {
-        //         this.allowVehicleAdds = false;
-        //         this.allowVehicleRemoves = false;
+        //         this.allowRepoAdds = false;
+        //         this.allowRepoRemoves = false;
         //     }
         // },
         checkEditStatus() {
             // If wallet is in balances, then user can edit
-            if (this.getActiveAddress in this.vehicle.balances) {
+            if (this.getActiveAddress in this.repo.balances) {
                 this.allowEdits = true;
             } else {
                 this.allowEdits = false;
@@ -357,7 +406,7 @@ export default {
         },
         onDirty() {
             // Clean up update object, remove any blank inputs
-            for(let member in this.memberUpdates) {
+            for (let member in this.memberUpdates) {
                 if (this.memberUpdates[member] === '') {
                     delete this.memberUpdates[member];
                 } else {
@@ -365,7 +414,7 @@ export default {
                     if (+this.memberUpdates[member] < 0) {
                         this.memberUpdates[member] = +this.memberUpdates[member] * -1;
                     }
-                    if (isNaN(+this.memberUpdates[member])){
+                    if (isNaN(+this.memberUpdates[member])) {
                         this.memberUpdates[member] = '';
                     }
                 }
@@ -389,8 +438,8 @@ export default {
         // },
         buildInput(recipient, qty, type = 'tokenChange') {
             let input = {};
-            let currentQty = +this.vehicle.balances[recipient];
-            
+            let currentQty = +this.repo.balances[recipient];
+
             input.function = 'propose';
             input.recipient = recipient;
             input.qty = qty;
@@ -423,7 +472,7 @@ export default {
             if (count === 1) {
                 if (this.memberRemoves.length === 1) {
                     recipient = this.memberRemoves[0];
-                    qty = +this.vehicle.balances[recipient];
+                    qty = +this.repo.balances[recipient];
                     action.input = this.buildInput(recipient, qty, 'removeMember');
                 } else if (this.memberAdds.length === 1) {
                     recipient = this.memberAdds[0].recipient;
@@ -441,14 +490,14 @@ export default {
                 action.input.actions = [];
 
                 if (this.memberRemoves.length > 0) {
-                    for(let member in this.memberRemoves) {
+                    for (let member in this.memberRemoves) {
                         let multiAction = {
                             input: {},
                             caller: this.getActiveAddress
                         };
                         recipient = member;
-                        qty = +this.vehicle.balances[member];
-                    
+                        qty = +this.repo.balances[member];
+
                         multiAction.input = this.buildInput(recipient, qty, 'removeMember');
                         action.input.actions.push(multiAction);
                     }
@@ -467,14 +516,14 @@ export default {
                     });
                 }
                 if (Object.keys(this.memberUpdates).length > 0) {
-                    for(let member in this.memberUpdates) {
+                    for (let member in this.memberUpdates) {
                         let multiAction = {
                             input: {},
                             caller: this.getActiveAddress
                         };
                         recipient = member;
                         qty = +this.memberUpdates[member];
-                    
+
                         multiAction.input = this.buildInput(recipient, qty);
                         action.input.actions.push(multiAction);
                     }
@@ -488,7 +537,7 @@ export default {
         },
         addMember() {
             this.memberAdds.push(
-                { recipient : this.newMember, qty: +this.newQty }
+                { recipient: this.newMember, qty: +this.newQty }
             );
             this.addRow = false;
             this.newMember = '';
@@ -505,27 +554,27 @@ export default {
 
         //     if (this.memberRemoves.length === 1) {
         //         recipient = this.memberRemoves[0];
-        //         qty = +this.vehicle.balances[recipient];
+        //         qty = +this.repo.balances[recipient];
         //         action.input = this.buildInput(recipient, qty, 'removeMember');
         //     } else if (this.memberRemoves.length > 1) {
         //         action.input.function = 'multiInteraction';
         //         action.input.key = 'multi';
         //         action.input.note = 'Multi-Interaction';
         //         action.input.actions = [];
-                
+
         //         for(let member in this.memberRemoves) {
         //             let multiAction = {
         //                 input: {},
         //                 caller: this.getActiveAddress
         //             };
         //             recipient = member;
-        //             qty = +this.vehicle.balances[member];
-                
+        //             qty = +this.repo.balances[member];
+
         //             multiAction.input = this.buildInput(recipient, qty, 'removeMember');
         //             action.input.actions.push(multiAction);
         //         }
         //     }
-            
+
         //     /*** CALL SMARTWEAVE */
         //     this.$log.info(JSON.stringify(action));
         // },
@@ -555,7 +604,7 @@ export default {
         //             };
         //             recipient = member;
         //             qty = +this.memberUpdates[member];
-                
+
         //             multiAction.input = this.buildInput(recipient, qty);
         //             action.input.actions.push(multiAction);
         //         }

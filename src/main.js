@@ -7,9 +7,9 @@ import './index.css';
 
 import App from './App.vue';
 import store from './store.js';
-import VehicleList from './components/VehicleList.vue';
-import CreateVehicle from './components/CreateVehicle.vue';
-import Vehicle from './components/Vehicle.vue';
+import RepoList from './components/RepoList.vue';
+import CreateRepo from './components/CreateRepo.vue';
+import Repo from './components/Repo.vue';
 import UiTest from './components/UiTest.vue';
 import ContractRead from './components/ContractRead.vue';
 import Overview from './components/Overview.vue';
@@ -45,10 +45,10 @@ const options = {
 const router = createRouter({
     history: createWebHistory(),
     routes: [
-        { name: 'vehicles', path: '/vehicles', component: VehicleList },
+        { name: 'repos', path: '/repos', component: RepoList },
         { name: 'myPortfolio', path: '/MyPortfolio', component: MyPortfolio },
-        { name: 'vehicle', path: '/vehicles/:vehicleId', component: Vehicle, props: true },
-        { name: 'create', path: '/create', component: CreateVehicle },
+        { name: 'repo', path: '/repos/:repoId', component: Repo, props: true },
+        { name: 'create', path: '/create', component: CreateRepo },
         { name: 'ui-test', path: '/ui-test', component: UiTest },
         { name: 'read', path: '/read/:contractId', component: ContractRead, props: true },
         { name: 'overview', path: '/overview', component: Overview, props: true, alias: '/' },

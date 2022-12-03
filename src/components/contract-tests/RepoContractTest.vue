@@ -1,7 +1,8 @@
-<template> 
+<template>
     <div class="pt-4 w-full">
         <div class="flex flex-col">
-            <select v-model="selectInput" @change="loadInput" class="w-64 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block sm:text-sm border-gray-300 rounded-md">
+            <select v-model="selectInput" @change="loadInput"
+                class="w-64 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block sm:text-sm border-gray-300 rounded-md">
                 <option value="" disabled>Select Function</option>
                 <option value="balance">Balance</option>
                 <option value="propose">Propose</option>
@@ -14,12 +15,15 @@
             </select>
 
             <label class="mt-4">Input:</label>
-            <textarea v-model="input" rows="10" class=" mt-2 w-3/4 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block sm:text-sm border-gray-300 rounded-md" />
+            <textarea v-model="input" rows="10"
+                class=" mt-2 w-3/4 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block sm:text-sm border-gray-300 rounded-md" />
             <div class="mt-2" v-if="readyToTest">
-                <button @click="testContract" type="button" class="rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-green-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
+                <button @click="testContract" type="button"
+                    class="rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-green-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
                     Test Contract (Dry Run)
                 </button>
-                <button @click="testContract('real')" type="button" class="rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-green-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
+                <button @click="testContract('real')" type="button"
+                    class="rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-green-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
                     Test Contract
                 </button>
             </div>
@@ -37,7 +41,9 @@
                 <label class="text-sm pl-1">State: </label>
                 <div class="border border-gray-200 mt-2 mb-2 w-full pt-2 pb-2">
                     <perfect-scrollbar>
-                        <vue-json-pretty :path="'res'" :data="outputState" :showDoubleQuotes="keyQuotes" :deep=depth :deepCollapseChildren="false" :showLength="true" :showSelectController="true"> </vue-json-pretty>
+                        <vue-json-pretty :path="'res'" :data="outputState" :showDoubleQuotes="keyQuotes" :deep=depth
+                            :deepCollapseChildren="false" :showLength="true" :showSelectController="true">
+                        </vue-json-pretty>
                     </perfect-scrollbar>
                 </div>
             </div>
@@ -60,10 +66,10 @@ import inputWithdrawal from "./inputs/withdrawal.json";
 import inputReadOutbox from "./inputs/readOutbox.json";
 import inputVote from "./inputs/vote.json";
 import inputMultiInteraction from "./inputs/multiInteraction.json";
-import { warpRead, warpWrite } from './../utils/warpUtils.js';
+import { warpRead, warpWrite } from '../utils/warpUtils.js';
 
 export default {
-    props: ["vehicle"],
+    props: ["repo"],
     components: { VueJsonPretty },
     data() {
         return {
@@ -95,15 +101,15 @@ export default {
         },
     },
     methods: {
-        cleanupState(){
+        cleanupState() {
             /*** 
-             * When a vehicle is created, a few keys are added to make them easier to access on the site.
+             * When a repo is created, a few keys are added to make them easier to access on the site.
              * This routine strips those keys so the UI just shows the state.
             ***/
-           this.state = JSON.parse(JSON.stringify(this.vehicle));
-           delete this.state.id;
-           delete this.state.logo;
-           delete this.state.desc;
+            this.state = JSON.parse(JSON.stringify(this.repo));
+            delete this.state.id;
+            delete this.state.logo;
+            delete this.state.desc;
         },
         loadInput() {
             this.readyToTest = true;
@@ -137,20 +143,20 @@ export default {
             } else {
                 this.input = "This function input has not been written yet."
             }
-            
+
         },
         async testContract(type = "dry") {
             let arweave = {};
 
             try {
                 arweave = await Arweave.init({
-                        host: this.arweaveHost,
-                        port: this.arweavePort,
-                        protocol: this.arweaveProtocol,
-                        timeout: 20000,
-                        logging: true,
-                        });
-            } catch(e) {
+                    host: this.arweaveHost,
+                    port: this.arweavePort,
+                    protocol: this.arweaveProtocol,
+                    timeout: 20000,
+                    logging: true,
+                });
+            } catch (e) {
                 this.$swal({
                     icon: "error",
                     html: "Failed to connect to the Arweave Gateway.",
@@ -171,7 +177,7 @@ export default {
                     this.$swal.showLoading()
                 },
             });
-            let response = await warpWrite(this.vehicle.id, inputObj);
+            let response = await warpWrite(this.repo.id, inputObj);
 
 
             // Handle the output
@@ -180,7 +186,7 @@ export default {
             this.outputResult = response.result;
             this.outputState = response.state;
             this.readyToOutput = true;
-            
+
             /***
              * type = ok or error
              * result = "message"
@@ -189,7 +195,7 @@ export default {
 
             /**** IN ORDER FOR THIS TO PROCESS, YOU NEED TO RUN http://localhost:1984/mine */
             if (type !== "dry") {
-                if(Boolean(this.arweaveMine)){
+                if (Boolean(this.arweaveMine)) {
                     const mineUrl = this.arweaveProtocol + "://" + this.arweaveHost + ":" + this.arweavePort + "/mine";
                     const response = await fetch(mineUrl);
                 }
@@ -197,7 +203,7 @@ export default {
 
             // this.$swal({
             //     icon: "info",
-            //     html: "Getting new vehicle state...",
+            //     html: "Getting new repo state...",
             //     showConfirmButton: false,
             //     allowOutsideClick: false,
             //     didOpen: () => {
@@ -206,7 +212,7 @@ export default {
             // });
 
             // try {
-            //     const stateInteractions = await executeContract(this.vehicle.id, undefined, true, {
+            //     const stateInteractions = await executeContract(this.repo.id, undefined, true, {
             //         ARWEAVE_HOST: import.meta.env.VITE_ARWEAVE_HOST,
             //         ARWEAVE_PORT: import.meta.env.VITE_ARWEAVE_PORT,
             //         ARWEAVE_PROTOCOL: import.meta.env.VITE_ARWEAVE_PROTOCOL
@@ -225,9 +231,23 @@ export default {
 }
 </script>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <style src="vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css"/>
 <style scoped>
-    .ps {
-        height: 750px;
-    }   
+.ps {
+    height: 750px;
+}
 </style>

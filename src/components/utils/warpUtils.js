@@ -3,7 +3,7 @@ import Arweave, { init } from "arweave";
 
 function warpInit() {
     let warp = {};
-    
+
     try {
         const arweave = arweaveInit();
 
@@ -17,7 +17,7 @@ function warpInit() {
         } else {
             warp = WarpFactory.forTestnet();
         }
-    } catch(e) {
+    } catch (e) {
         console.log(e);
     }
     return warp;
@@ -28,7 +28,7 @@ async function warpRead(contractId, internalWrites = true) {
 
     try {
         const contract = warp.contract(contractId)
-            .setEvaluationOptions({ 
+            .setEvaluationOptions({
                 internalWrites: internalWrites,
             });
         const result = await contract.readState();
@@ -43,14 +43,14 @@ async function warpWrite(contractId, input, internalWrites = true, bundling = tr
     const warp = warpInit();
     try {
         const contract = warp.contract(contractId)
-        .setEvaluationOptions({ 
-            internalWrites: internalWrites,
-            disableBundling: !bundling
-         })
-        .connect("use_wallet");
+            .setEvaluationOptions({
+                internalWrites: internalWrites,
+                disableBundling: !bundling
+            })
+            .connect("use_wallet");
         const { originalTxId } = await contract.writeInteraction(input);
         return originalTxId;
-    } catch(e) {
+    } catch (e) {
         console.log(e);
         return "";
     }
@@ -72,7 +72,7 @@ async function warpCreateContract(source, initState, currentTags = undefined, af
             tags
         });
         return txIds;
-    } catch(e) {
+    } catch (e) {
         console.log("ERROR deploying AFTR contract: " + e);
         return {};
     }
@@ -95,7 +95,7 @@ async function warpCreateFromTx(initState, srcId, currentTags = undefined, aftr 
             tags
         });
         return txIds;
-    } catch(e) {
+    } catch (e) {
         console.log("ERROR deploying AFTR contract: " + e);
         return {};
     }
@@ -118,9 +118,9 @@ function addTags(currentTags, aftr = false) {
         tags = currentTags;
     }
     if (aftr) {
-        tags.push( { name: "Protocol", value: import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL } );
-        tags.push( { name: "Implements", value: ["ANS-110"] });
-        tags.push( { name: "Type", value: ["token", "vehicle"] } );
+        tags.push({ name: "Protocol", value: import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL });
+        tags.push({ name: "Implements", value: ["ANS-110"] });
+        tags.push({ name: "Type", value: ["token", "repo"] });
     }
 
     return tags;
@@ -148,16 +148,16 @@ async function getAsByteArray(file) {
 async function upload(file) {
     const arweave = arweaveInit();
 
-    const tx =  await arweave.createTransaction({
+    const tx = await arweave.createTransaction({
         data: await getAsByteArray(file)
     }, "use_wallet");
     tx.addTag('Content-Type', file.type)
     await arweave.transactions.sign(tx)
     const res = await arweave.transactions.post(tx)
-        if (!res.statusText == "OK") { 
-            throw new Error('Can not upload data')
-        }
-   
+    if (!res.statusText == "OK") {
+        throw new Error('Can not upload data')
+    }
+
     return { file, assetId: tx.id }
 };
 
@@ -169,20 +169,20 @@ async function dispatch(file) {
 
 async function createAndTag(ctx) {
     const arweave = arweaveInit();
-   
-    const { assetId, name, addr, contentType, description} = ctx
+
+    const { assetId, name, addr, contentType, description } = ctx
     const tx = await arweave.createTransaction({
         data: JSON.stringify({
-        manifest: "arweave/paths",
-        version: "0.1.0",
-        index: {
-            path: "asset"
-        },
-        paths: {
-            asset: {
-            id: assetId
+            manifest: "arweave/paths",
+            version: "0.1.0",
+            index: {
+                path: "asset"
+            },
+            paths: {
+                asset: {
+                    id: assetId
+                }
             }
-        }
         })
     }, "use_wallet")
 
@@ -197,9 +197,9 @@ async function post(ctx) {
         method: 'POST',
         body: JSON.stringify({ contractTx: tx }),
         headers: {
-        'Accept-Encoding': 'gzip, deflate, br',
-        'Content-Type': 'application/json',
-        Accept: 'application/json'
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
         }
     })
     return { id: ctx.atomicId }

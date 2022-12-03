@@ -10,7 +10,7 @@
         </h3>
         <div class="mt-2 text-sm text-yellow-700">
           <p>
-            {{ this.vehicle }}
+            {{ this.repo }}
           </p>
         </div>
       </div>
@@ -22,7 +22,7 @@
 import { ExclamationIcon } from '@heroicons/vue/solid'
 
 export default {
-props: ["vehicle"],
+  props: ["repo"],
   components: {
     ExclamationIcon,
   },

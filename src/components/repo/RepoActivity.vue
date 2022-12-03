@@ -1,12 +1,13 @@
 <template>
     <perfect-scrollbar>
         <div v-if="activities.length === 0" class="pl-4 pt-4">
-            Not yet any activities to show on this vehicle.
+            Not yet any activities to show on this repo.
         </div>
-        <div v-for="(commentIndex, index) in commentsToShow" :key="activities[index]" class="pt-4 w-full"> 
+        <div v-for="(commentIndex, index) in commentsToShow" :key="activities[index]" class="pt-4 w-full">
             <div v-if="index < activities.length">
-                 <div class="">
-                    <span class="text-aftrBlue text-md font-medium uppercase tracking-wide">{{ activities.length - index }}. {{ interactionText(activities[index].input.function) }}</span>
+                <div class="">
+                    <span class="text-aftrBlue text-md font-medium uppercase tracking-wide">{{ activities.length - index
+                    }}. {{ interactionText(activities[index].input.function) }}</span>
                     <span class="font-mono text-xs text-gray-500">({{ activities[index].id }})</span>
                 </div>
                 <div class="pl-8 pb-4">
@@ -16,7 +17,8 @@
                 <div class="flex flex-row">
                     <div v-if="activities[index].result">
                         <div class="pb-1 border-solid border border-green-500 rounded ">
-                            <span class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium bg-white border-1 border-green text-green">
+                            <span
+                                class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium bg-white border-1 border-green text-green">
                                 <svg class="-ml-0.5 mr-1.5 h-2 w-2" fill="green" viewBox="0 0 8 8">
                                     <circle cx="4" cy="4" r="3" />
                                 </svg>
@@ -26,7 +28,8 @@
                     </div>
                     <div v-else>
                         <div class="pb-1 border-solid border border-red-500 rounded ">
-                            <span class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium bg-white border-1 border-red text-red">
+                            <span
+                                class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium bg-white border-1 border-red text-red">
                                 <svg class="-ml-0.5 mr-1.5 h-2 w-2" fill="red" viewBox="0 0 8 8">
                                     <circle cx="4" cy="4" r="3" />
                                 </svg>
@@ -34,17 +37,22 @@
                             </span>
                         </div>
                     </div>
-                    <div class="pl-10 pt-2 text-xs">Block <span class="font-mono text-gray-500">{{ activities[index].block }}</span></div>
+                    <div class="pl-10 pt-2 text-xs">Block <span class="font-mono text-gray-500">{{
+                            activities[index].block
+                    }}</span></div>
                     <div class="pl-10 pt-2 text-xs">
-                        Caller 
-                            <span v-if="activities[index].result" class="font-mono text-green-600">{{ activities[index].owner }}</span>
-                            <span v-else class="font-mono text-red-600">{{ activities[index].owner }}</span>
+                        Caller
+                        <span v-if="activities[index].result" class="font-mono text-green-600">{{
+                                activities[index].owner
+                        }}</span>
+                        <span v-else class="font-mono text-red-600">{{ activities[index].owner }}</span>
                     </div>
                 </div>
             </div>
         </div>
         <div v-if="commentsToShow < activities.length || activities.length > commentsToShow">
-            <button @click="commentsToShow += 10" class="mt-4 px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            <button @click="commentsToShow += 10"
+                class="mt-4 px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
                 Show More Activities
             </button>
         </div>
@@ -77,12 +85,12 @@ export default {
         },
     },
     methods: {
-        test(){
+        test() {
             this.$swal({
                 html: JSON.stringify(this.errorMessages),
                 width: 800,
                 showConfirmButton: false,
-            }) 
+            })
         },
         parseActivity(edge) {
             // Parses the query response and returns an object with the needed variables
@@ -155,10 +163,10 @@ export default {
         },
         getErrorInputs(obj) {
             let htmlText = "";
-            Object.fromEntries( Object.entries(this.errorMessages).filter(([key, value]) => {
-                if( key == obj.id){
+            Object.fromEntries(Object.entries(this.errorMessages).filter(([key, value]) => {
+                if (key == obj.id) {
                     htmlText += "Error:<br/>"
-                    htmlText += "<p class='text-sm text-red-600'>- " + value + "</p>" ;
+                    htmlText += "<p class='text-sm text-red-600'>- " + value + "</p>";
                 }
             }))
             return htmlText;
@@ -174,8 +182,8 @@ export default {
                 }
 
                 return response;
-            } catch(e) {
-                this.$log.error("VehicleActivity : runQuery :: ", errorMsg + e);
+            } catch (e) {
+                this.$log.error("RepoActivity : runQuery :: ", errorMsg + e);
             }
         },
         async readInteractions(data) {
@@ -204,17 +212,17 @@ export default {
     },
     async created() {
         this.isLoading = true;
-        
+
         let interactionStrings = []
         for (const i in this.interactions) {
-            interactionStrings.push( i )
+            interactionStrings.push(i)
         }
 
-            const numChunks = Math.ceil(interactionStrings.length / 10);
-            let data = Array.from(
-                { length: numChunks },
-                (_, i) => interactionStrings.slice(i * interactionStrings.length / numChunks, (i + 1) * interactionStrings.length / numChunks)
-            );
+        const numChunks = Math.ceil(interactionStrings.length / 10);
+        let data = Array.from(
+            { length: numChunks },
+            (_, i) => interactionStrings.slice(i * interactionStrings.length / numChunks, (i + 1) * interactionStrings.length / numChunks)
+        );
         // Read the tags for all contract interactions
 
         for (let i = 0; i < data.length; i++) {
@@ -231,9 +239,13 @@ export default {
 }
 </script>
 
+
+
+
+
 <style src="vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css"/>
 <style scoped>
-    .ps {
-        height: 750px;
-    }   
+.ps {
+    height: 750px;
+}
 </style>

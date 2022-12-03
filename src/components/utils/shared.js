@@ -1,30 +1,30 @@
 function capitalize(str) {
-    return str[0].toUpperCase() + str.substr(1, );
+    return str[0].toUpperCase() + str.substr(1,);
 };
 
-function isVehicleMember(vehicle, userAddr) {
+function isRepoMember(repo, userAddr) {
     const addr = userAddr;
     let found = false;
-    
+
     // If single ownership, check for owner
-    if (vehicle.ownership === "single" && addr === vehicle.owner) {
+    if (repo.ownership === "single" && addr === repo.owner) {
         return true;
     }
 
     // Check balances
-    if (vehicle.balances) {
-        if (addr in vehicle.balances && vehicle.balances[addr] > 0) {
+    if (repo.balances) {
+        if (addr in repo.balances && repo.balances[addr] > 0) {
             return true;
         }
     }
 
     // Check vault
-    if (vehicle.vault) {
-        for (let vaultAddr in vehicle.vault) {
+    if (repo.vault) {
+        for (let vaultAddr in repo.vault) {
             if (vaultAddr === addr) {
-                for (let bal of vehicle.vault[vaultAddr]) {
+                for (let bal of repo.vault[vaultAddr]) {
                     if (bal.balance > 0) {
-                        found = true; 
+                        found = true;
                         break;
                     }
                 }
@@ -37,4 +37,4 @@ function isVehicleMember(vehicle, userAddr) {
 
 
 
-export { capitalize, isVehicleMember };
+export { capitalize, isRepoMember };
