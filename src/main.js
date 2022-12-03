@@ -53,12 +53,12 @@ const router = createRouter({
         { name: 'read', path: '/read/:contractId', component: ContractRead, props: true },
         { name: 'overview', path: '/overview', component: Overview, props: true, alias: '/' },
         { name: 'latest-contract-source', path: '/latest-contract-source', component: AftrContractSource },
-        {
-            path: '/latest-contract-src',
-            beforeEnter(to, from, next) {
-                window.location.href = 'https://github.com/aftrmarket/aftr-contracts/blob/main/contract/vehicle/contract.ts'
-            }
-        },
+        // {
+        //     path: '/latest-contract-src',
+        //     beforeEnter(to, from, next) {
+        //         window.location.href = 'https://github.com/aftrmarket/aftr-contracts/blob/main/contract/vehicle/contract.ts'
+        //     }
+        // },
         // { 
         //     path: '/chat',
         //     component: Chat,
