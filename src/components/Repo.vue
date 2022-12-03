@@ -139,8 +139,7 @@
                                 <repo-info v-if="activeTab === 'Info'" :repo="repo" :contractId="contractId"
                                     :isMember="allowEdits">
                                 </repo-info>
-                                <repo-names v-else-if="activeTab === 'Names'" :repo="repo" :isMember="allowEdits">
-                                </repo-names>
+                                <!--<repo-names v-else-if="activeTab === 'Names'" :repo="repo" :isMember="allowEdits"></repo-names>-->
                                 <repo-settings v-else-if="activeTab === 'Custom Settings'" :repo="repo"
                                     :isMember="allowEdits">
                                 </repo-settings>
@@ -199,7 +198,7 @@ export default {
         return {
             tabs: [
                 { name: 'Info', href: '#', current: true },
-                { name: 'Names', href: '#', current: false },
+                //{ name: 'Names', href: '#', current: false },
                 { name: 'Custom Settings', href: '#', current: false },
                 { name: 'Members', href: '#', current: false },
                 { name: 'Assets', href: '#', current: false },
