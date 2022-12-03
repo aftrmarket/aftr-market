@@ -1,4 +1,4 @@
-// contract/repo/contract.ts
+// contract/vehicle/contract.ts
 var multiLimit = 1e3;
 var multiIteration = 0;
 async function handle(state, action) {
@@ -283,6 +283,39 @@ async function handle(state, action) {
     }
     vote.voted.push(caller);
   }
+  if (input.function === "transfer") {
+    const target2 = input.target;
+    const qty = input.qty;
+    const callerAddress = isArweaveAddress(caller);
+    const targetAddress = isArweaveAddress(target2);
+    if (!Number.isInteger(qty)) {
+      throw new ContractError('Invalid value for "qty". Must be an integer.');
+    }
+    if (!targetAddress) {
+      throw new ContractError("No target specified.");
+    }
+    if (qty <= 0 || callerAddress === targetAddress) {
+      throw new ContractError("Invalid token transfer.");
+    }
+    if (!balances[callerAddress] || balances[callerAddress] == void 0 || balances[callerAddress] == null || isNaN(balances[callerAddress])) {
+      throw new ContractError("Caller doesn't own a balance in the Repo.");
+    }
+    if (balances[callerAddress] < qty) {
+      throw new ContractError(`Caller balance not high enough to send ${qty} token(s)!`);
+    }
+    if (SmartWeave.contract.id === target2) {
+      throw new ContractError("A repo token cannot be transferred to itself because it would add itself the balances object of the repo, thus changing the membership of the repo without a vote.");
+    }
+    if (state.ownership === "single" && callerAddress === state.owner && balances[callerAddress] - qty <= 0) {
+      throw new ContractError("Invalid transfer because the owner's balance would be 0.");
+    }
+    balances[callerAddress] -= qty;
+    if (targetAddress in balances) {
+      balances[targetAddress] += qty;
+    } else {
+      balances[targetAddress] = qty;
+    }
+  }
   if (input.function === "deposit") {
     if (!input.txID) {
       throw new ContractError("The transaction is not valid.  Tokens were not transferred to the repo.");
@@ -335,16 +368,15 @@ async function handle(state, action) {
       throw new ContractError("No target specified.");
     }
     if (target === SmartWeave.contract.id) {
-      throw new ContractError("Can't setup claim to transfer a token to itself.");
+      throw new ContractError("Can't setup claim to transfer a balance to itself.");
     }
     if (quantity <= 0 || caller === target) {
-      throw new ContractError("Invalid token transfer.");
+      throw new ContractError("Invalid balance transfer.");
     }
-    if (balances[caller] < quantity || !balances[caller] || balances[caller] == undefined || balances[caller] == null || isNaN(balances[caller])) {
-      throw new ContractError("Caller balance not high enough to make claimable " + quantity + " token(s).");
+    if (balances[caller] < quantity || !balances[caller] || balances[caller] == void 0 || balances[caller] == null || isNaN(balances[caller])) {
+      throw new ContractError("Caller balance not high enough to make a balance of " + quantity + "claimable.");
     }
     balances[caller] -= quantity;
-
     state.claimable.push({
       from: caller,
       to: target,
@@ -387,52 +419,50 @@ async function handle(state, action) {
     state.claims.push(txID);
   }
 
-  /*** PLAYGROUND FUNCTIONS - NOT FOR PRODUCTION */
-  /*** ADDED MINT FUNCTION FOR THE TEST GATEWAY - NOT FOR PRODUCTION */
-  if (input.function === 'plygnd-mint') {
-    if (!input.qty) {
-      ThrowError("Missing qty.");
-    }
-    if (!(caller in state.balances)) {
-      balances[caller] = input.qty;
-    }
-  }
-  /*** ADDED ADDLOGO FUNCTION TO EASILY ADD LOGO ON TEST GATEWAY - NOT FOR PRODUCTION */
-  if (input.function === "plygnd-addLogo") {
-    if (!input.logo) {
-      ThrowError("Missing logo");
-    }
-
-    // Add logo
-    updateSetting(state, "communityLogo", input.logo);
-  }
-
-  /*** ADDED UPDATETOKENS FUNCTION TO UPDATE THE TOKEN OBJECT'S LOGOS ON INIT - NOT FOR PRODUCTION */
-  if (input.function === 'plygnd-updateTokens') {
-    if (!input.logoVint) {
-      ThrowError("Missing Vint logo");
-    }
-
-    if (!input.logoArhd) {
-      ThrowError("Missing arHD logo");
-    }
-
-    // Update logo in tokens[] if aftr repo
-    if (state.tokens) {
-      // Find tokens that == ticker and update their logos
-      const updatedTokens = state.tokens.filter((token) => (token.ticker === "VINT" || token.ticker === "ARHD"));
-      updatedTokens.forEach((token) => {
-        if (token.ticker === "VINT") {
-          token.logo = input.logoVint;
-        } else if (token.ticker === "ARHD") {
-          token.logo = input.logoArhd;
+/*** PLAYGROUND FUNCTIONS - NOT FOR PRODUCTION */
+    /*** ADDED MINT FUNCTION FOR THE TEST GATEWAY - NOT FOR PRODUCTION */
+    if (input.function === 'plygnd-mint') {
+        if (!input.qty) {
+            ThrowError("Missing qty.");
         }
-      });
+        if (!(caller in state.balances)) {
+            balances[caller] = input.qty;
+        }
     }
-  }
-  /*** PLAYGROUND FUNCTIONS END */
+    /*** ADDED ADDLOGO FUNCTION TO EASILY ADD LOGO ON TEST GATEWAY - NOT FOR PRODUCTION */
+    if (input.function === "plygnd-addLogo") {
+        if (!input.logo) {
+            ThrowError("Missing logo");
+        }
 
+        // Add logo
+        updateSetting(state, "communityLogo", input.logo);
+    }
 
+    /*** ADDED UPDATETOKENS FUNCTION TO UPDATE THE TOKEN OBJECT'S LOGOS ON INIT - NOT FOR PRODUCTION */
+    if (input.function === 'plygnd-updateTokens') {
+        if (!input.logoVint) {
+            ThrowError("Missing Vint logo");
+        }
+
+        if (!input.logoArhd) {
+            ThrowError("Missing arHD logo");
+        }
+
+        // Update logo in tokens[] if aftr vehicle
+        if (state.tokens) {
+            // Find tokens that == ticker and update their logos
+            const updatedTokens = state.tokens.filter( (token) => (token.ticker === "VINT" || token.ticker === "ARHD"));
+            updatedTokens.forEach((token) => {
+                if (token.ticker === "VINT") {
+                    token.logo = input.logoVint;
+                } else if (token.ticker === "ARHD") {
+                    token.logo = input.logoArhd;
+                }
+            });
+        }
+    }
+/*** PLAYGROUND FUNCTIONS END */
 
 
   if (input.function === "multiInteraction") {
