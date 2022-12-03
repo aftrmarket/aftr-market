@@ -45,11 +45,11 @@
                       <div class="mt-4 mb-4 grid grid-cols-3 gap-x-4 border-t border-gray-300">
                         <div class="ml-6 text-gray-500">TOTAL :</div>
                         <div v-if="vehicle.ownership == 'single'" class="text-gray-500">1</div>
-                        <div v-if="vehicle.ownership == 'dao'" class="text-gray-500">{{ total }}</div>
+                        <div v-if="vehicle.ownership == 'multi'" class="text-gray-500">{{ total }}</div>
                       </div> 
                     </dl>
 
-                    <div v-if="vehicle.ownership == 'dao'">
+                    <div v-if="vehicle.ownership == 'multi'">
                       <div class="mt-4 mb-4 grid grid-cols-2 gap-x-4">
                         <div class="text-gray-500">STARTING BLOCK</div>
                         <div class="text-gray-500">ENDING BLOCK</div>

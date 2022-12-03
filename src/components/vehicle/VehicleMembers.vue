@@ -27,7 +27,7 @@
                             </button>
                         </th>
                         <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Tokens
+                            Voting Power
                         </th>
                         <th v-if="uiEditMode" scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                             New Allocation
@@ -249,7 +249,7 @@ export default {
             if (this.getActiveAddress === this.ownerAddress && this.vehicle.ownership === 'single') {
                 return "Membership changes will process immediately because you are the owner of the vehicle";
             } else {
-                return "Membership changes will be proposed as votes because this is a DAO owned vehicle";
+                return "Membership changes will be proposed as votes because this is a multiple owner vehicle";
             }
         },
         ...mapGetters(['arConnected', 'getActiveAddress']),
@@ -269,16 +269,16 @@ export default {
             if (type === 'update') {
                 const currentQty = this.vehicle.balances[recipient];
                 if (currentQty > +qty) {
-                    return "<span style='color:#FF6C8C'><b>Burn</b></span> " + this.formatNumber(String(currentQty - +qty)) + " tokens for <b> " + recipient + "</b>";
+                    return "<span style='color:#FF6C8C'><b>Decrease</b></span> voting power to " + this.formatNumber(String(currentQty - +qty)) + " for <b> " + recipient + "</b>";
                 } else if (currentQty < +qty) {
-                    return "<span style='color:green'><b>Mint</b></span> " + this.formatNumber(String(+qty - currentQty)) + " tokens for <b>" + recipient + "</b>";
+                    return "<span style='color:green'><b>Increase</b></span> voting power to " + this.formatNumber(String(+qty - currentQty)) + " for <b>" + recipient + "</b>";
                 } else if (currentQty === +qty) {
                     return "No change for " + recipient;
                 }
             } else if (type === 'add') {
-                return "<span style='color:green'><b>Add</b></span> <b>" + recipient + "</b>, minting " + this.formatNumber(qty) + " tokens";
+                return "<span style='color:green'><b>Add</b></span> <b>" + recipient + "</b>";
             } else if (type === 'remove') {
-                return "<span style='color:#FF6C8C'><b>Remove</b></span> <b>" + recipient + "</b>, burning " + this.formatNumber(qty) + " tokens";
+                return "<span style='color:#FF6C8C'><b>Remove</b></span> <b>" + recipient + "</b>";
             }
         },
         removeMember(member) {
@@ -358,19 +358,19 @@ export default {
             if (type === 'removeMember') {
                 input.type = type;
                 input.qty = qty;
-                input.note = "Remove " + recipient + ", burning " + this.formatNumber(String(currentQty)) + " tokens";
+                input.note = "Remove " + recipient + " with a balance of " + this.formatNumber(String(currentQty));
             } else if (type === 'addMember') {
                 input.type = type;
                 input.qty = qty;
-                input.note = "Add " + recipient + ", minting " + qty + " tokens";
+                input.note = "Add " + recipient + ", adding a balance of " + qty;
             } else if (currentQty > qty) {
                 input.qty = currentQty - qty;
-                input.type = 'burn';
-                input.note = "Burn " + this.formatNumber(String(currentQty - qty)) + " for " + recipient;
+                input.type = 'subtractBalance';
+                input.note = "Subtract a balance of " + this.formatNumber(String(currentQty - qty)) + " for " + recipient;
             } else if (currentQty < qty) {
                 input.qty = qty - currentQty;
-                input.type = 'mint';
-                input.note = "Mint " + this.formatNumber(String(qty - currentQty)) + " for " + recipient;
+                input.type = 'addBalance';
+                input.note = "Add a balance of " + this.formatNumber(String(qty - currentQty)) + " for " + recipient;
             }
 
             return input;
@@ -467,7 +467,7 @@ export default {
             this.$swal.close();
 
             let msg = "Your membership changes have been submitted to the Permaweb.  Your changes will be reflected in the next block.";
-            if (this.vehicle.ownership === "dao") {
+            if (this.vehicle.ownership === "multi") {
                 msg = "Your membership changes have been proposed.  You'll be able to see the vote in the next block.";
             }
             // alert(msg);

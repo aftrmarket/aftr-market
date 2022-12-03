@@ -103,7 +103,7 @@
                                 <vehicle-names v-else-if="activeTab === 'Names'" :vehicle="vehicle" :isMember="allowEdits"></vehicle-names>
                                 <vehicle-settings v-else-if="activeTab === 'Custom Settings'" :vehicle="vehicle" :isMember="allowEdits"></vehicle-settings>
                                 <vehicle-members v-else-if="activeTab === 'Members'" :vehicle="vehicle" :isMember="allowEdits"></vehicle-members>
-                                <vehicle-tokens v-else-if="activeTab === 'Tokens'" :vehicle="vehicle" :isMember="allowEdits"></vehicle-tokens>
+                                <vehicle-tokens v-else-if="activeTab === 'Assets'" :vehicle="vehicle" :isMember="allowEdits"></vehicle-tokens>
                                 <!--<vehicle-profits v-else-if="activeTab === 'Profits'"></vehicle-profits>-->
                                 <!--<vehicle-leases v-else-if="activeTab === 'Leases'" :leases="vehicles.leases"></vehicle-leases>-->
                                 <!--<vehicle-leases v-else-if="activeTab === 'Leases'"></vehicle-leases>-->
@@ -153,7 +153,7 @@ export default {
                 { name: 'Names', href: '#', current: false },
                 { name: 'Custom Settings', href: '#', current: false },
                 { name: 'Members', href: '#', current: false },
-                { name: 'Tokens', href: '#', current: false },
+                { name: 'Assets', href: '#', current: false },
                 //{ name: 'Profits', href: '#', current: false },
                 //{ name: 'Fractions', href: '#', current: false },
                 //{ name: 'Leases', href: '#', current: false },
@@ -255,19 +255,30 @@ export default {
             this.activeTab = this.tabs[activeTabIndex].name;
         },
         async returnContractSrc(arweave, contractId) {
-            let tx = await arweave.transactions.get(contractId);
-            let contractSrcId = "";
+            if (this.env === "DEV") {
+                let tx = await arweave.transactions.get(contractId);
+                let contractSrcId = "";
 
-            tx.get('tags').every(tag => {
-                let key = tag.get('name', {decode: true, string: true});
-                let value = tag.get('value', {decode: true, string: true});
-                if (key === "Contract-Src") {
-                    contractSrcId = value;
-                    return false;
+                tx.get('tags').every(tag => {
+                    let key = tag.get('name', {decode: true, string: true});
+                    let value = tag.get('value', {decode: true, string: true});
+                    if (key === "Contract-Src") {
+                        contractSrcId = value;
+                        return false;
+                    }
+                    return true;
+                });
+                return contractSrcId;
+            } else {
+                const route = import.meta.env.VITE_TX_GATEWAY + "?txID=" + contractId + this.env === "TEST" ? "&testnet=true" : "";
+                const response = await fetch(route);
+                if (!response.ok) {
+                    this.$log.error("Vehicle : returnContractSrc :: ", "ERROR fetching transaction from gateway.");
+                    return;
                 }
-                return true;
-            });
-            return contractSrcId;
+                const data = await response.json();
+                return data.srcTxId;
+            }
         },
         async loadVehicle() {
             // Add contractId to vehicle object

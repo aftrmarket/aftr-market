@@ -65,7 +65,7 @@
                     </div>
                     <div>
                         <input @change="formDirty" type="radio" v-model="newOwnership" id="single" value="single" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">Single Owner</label>
-                        <input @change="formDirty" type="radio" v-model="newOwnership" id="dao" value="dao" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">DAO Owned</label>
+                        <input @change="formDirty" type="radio" v-model="newOwnership" id="multi" value="multi" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">Multiple Owner</label>
                     </div>
                     <div>
                         <input @change="formDirty" type="radio" v-model="newVotingSystem" id="equal" value="equal" class="form-radio text-aftrBlue"><label class="px-2 text-sm text-gray-700">Distributed Evenly</label>
@@ -80,7 +80,7 @@
                     <input @change="formDirty" v-model="newVoteLength" class="w-3/4" type="number" name="newVoteLength" :class="inputBox(voteLengthIsValid)" />
                     <div/>
                     <div/>
-                    <label class="pt-4 pb-2 grid col-span-2 block text-sm font-medium text-gray-700">Owner (transferring ownership not recommended!)</label>
+                    <label class="pt-4 pb-2 grid col-span-2 block text-sm font-medium text-gray-700">{{ ownerText }}</label>
                     <div/>
                     <input @change="formDirty" v-model="newOwner" class="grid col-span-2 w-3/4" type="text" name="newOwner" :class="inputBox(ownerIsValid)" />
                 </div>
@@ -205,6 +205,13 @@ export default {
                 return "If file size is less than 100kb, upload is free.  Overwise AR fees apply.";
             } else {
                 return "File size: " + this.formatNumber(this.totalSize);
+            }
+        },
+        ownerText() {
+            if (this.vehicle.ownership === "single") {
+                return "Owner (transferring ownership not recommended!)";
+            } else {
+                return "Owner (transferring ownership has no impact on a multiple owner vehicle)";
             }
         },
         ...mapGetters(['arConnected', 'getActiveAddress']),

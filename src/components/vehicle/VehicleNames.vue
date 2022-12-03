@@ -44,15 +44,21 @@
                         <td class="text-left px-4 py-2 font-mono tracking-wider">
                             {{ v.name }}
                         </td>
-                        <td class="text-right px-4 py-2">
+                        <td class="text-right px-4 py-2" v-if="!uiEditMode">
                             {{ v.value}}
                         </td>
-                        <td class="text-right px-4 py-2">
+                        <td v-if="uiEditMode" class="text-right px-4 py-2">
+                            <textarea v-model="memberUpdates[v.value, v.name]" @blur="onDirty" class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
+                        </td>
+                        <td class="text-right px-4 py-2" v-if="!uiEditMode">
                             {{ v.priority}}
                         </td>
-                        <td v-if="uiEditMode" class="text-right px-4 py-2">
-                            <textarea v-model="memberUpdates[val, val[0]]" @blur="onDirty" class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
+                        <td class="text-right px-4 py-2" v-if="uiEditMode">
+                            <input type="number" v-model="memberPriorityUpdates[v.priority, v.name]" @blur="updatePriority" class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
                         </td>
+                        <!-- <td v-if="uiEditMode" class="text-right px-4 py-2">
+                            <textarea v-model="memberUpdates[v.value, v.name]" @blur="onDirty" class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
+                        </td> -->
                         <td v-if="uiEditMode" class="text-center px-4 py-2">
                             <button @click.prevent="removeSetting(val, v)" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -67,14 +73,11 @@
                         <td class="text-left px-2 py-2">
                             <input type="text" v-model="newSettingKey" class="mt-1 mb-1 w-full text-xs focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md">
                         </td>
-                        <!-- <td class="text-right px-4 py-2">
-                            0
-                        </td> -->
                         <td class="text-right px-4 py-2">
                             <textarea v-model="newSettingValue" @blur="onDirty" class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
                         </td>
                         <td class="text-right px-4 py-2">
-                            <textarea v-model="newSettingPriority" @blur="onDirty" class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
+                            <input type="number" v-model="newSettingPriority" @blur="onDirty" class="mt-1 mb-1 mr-4 w-36 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
                         </td>
                         <td class="text-center px-4 py-2">
                             <button @click.prevent="addSetting" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none">
@@ -83,6 +86,7 @@
                                 </svg>
                             </button>
                         </td>
+                        <td></td>
                     </tr>
                  </tbody>
             </table>
@@ -144,7 +148,22 @@
                             <span v-html="proposedText(value, value.name, 'remove')"></span>
                         </td>
                         <td class="px-4 py-2 text-center">
-                            <button @click.prevent="removeProposal(value[0], 'remove')" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none">
+                            <button @click.prevent="removeProposal(value, 'remove')" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr v-for="(key, index) in Object.keys(memberPriorityUpdates)" :key="key" class="text-xs text-gray-500 hover:bg-gray-50">
+                        <td class="px-4 py-2">
+                            {{ index + 1 }}
+                        </td>
+                        <td class="px-4 py-2">
+                            <span v-html="proposedText(key, memberPriorityUpdates[key], 'updatePriority')"></span>
+                        </td>
+                        <td class="px-4 py-2 text-center">
+                            <button @click.prevent="removeProposal(key, 'updatePriority')" type="button" class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
                                 </svg>
@@ -201,7 +220,8 @@ export default {
             allowEdits: false,
             isDirty: false,
             updatedValue: [],
-            showMessage: true
+            showMessage: true,
+            memberPriorityUpdates : {}
         };
     },
     mounted() {
@@ -233,7 +253,7 @@ export default {
             }
         },
         numChanges() {
-            return this.settingRemoves.length + this.settingAdds.length + Object.keys(this.memberUpdates).length;
+            return this.settingRemoves.length + this.settingAdds.length + Object.keys(this.memberUpdates).length + Object.keys(this.memberPriorityUpdates).length;
         },
         editModeClass() {
             if (this.uiEditMode) {
@@ -253,20 +273,55 @@ export default {
             if (this.getActiveAddress === this.ownerAddress && this.vehicle.ownership === 'single') {
                 return "Settings changes will process immediately because you are the owner of the vehicle";
             } else {
-                return "Settings changes will be proposed as votes because this is a DAO owned vehicle";
+                return "Settings changes will be proposed as votes because this is a multiple owner vehicle";
             }
         },
         ...mapGetters(['arConnected', 'getActiveAddress', 'keyFile']),
     },
     methods: {
+        updatePriority(){
+            for(let member in this.memberPriorityUpdates) {
+                 if (this.memberPriorityUpdates[member] === null || this.memberPriorityUpdates[member].match(/^ *$/) !== null) {
+                    this.$swal({
+                                    icon: "error",
+                                    html: "Priority should not be null or empty.",
+                                    showConfirmButton: true,
+                                    allowOutsideClick: false
+                                });
+                    this.$router.push("../vehicles");
+                    return;
+                }
+                 this.vehicle.settings.map(item => {
+                        if(item[0] == "names") {
+                            let indexOfObject = item[1].findIndex(x => {
+                               if(x.name == member){
+                                   console.log(this.memberPriorityUpdates[member])
+                                   x.priority = this.memberPriorityUpdates[member]
+                               } else {
+                                   x
+                               }
+                            })
+                            return
+                        }
+                 })
+            }
+            console.log(this.vehicle.settings)
+            if (this.settingRemoves.length + this.settingAdds.length + Object.keys(this.memberUpdates).length > 0 + Object.keys(this.memberPriorityUpdates).length > 0) {
+                this.isDirty = true;
+            } else {
+                this.isDirty = false;
+            }
+        },
         proposedText(settingKey, settingValue, type) {
             this.showMessage = false;
             if (type === 'update') {
-                return "<span style='color:#FF6C8C'><b>Change  </b></span> " + settingKey+ " to " +settingValue;
+                return "<span style='color:#FF6C8C'><b>Change value of key </b></span> <b>" + settingKey+ "</b> to <b>" +settingValue + "</b>";
             } else if (type === 'add') {
-                return "<span style='color:green'><b>Add key </b></span> <b>" + settingKey[0] + "</b> and <span style='color:green'><b>Value </b></span> <b>" + settingValue[1] +"</b>";
+                return "<span style='color:green'><b>Add key </b></span> <b>" + settingKey[0] + "</b>, <span style='color:green'><b>Value </b></span> <b>" + settingValue[1] + "</b>, <span style='color:green'><b>and Priority </b></span> <b>" + settingValue[2] +"</b>";
             } else if (type === 'remove') {
-                return "<span style='color:#FF6C8C'><b>Remove Name </b></span> <b>" + settingValue;
+                return "<span style='color:#FF6C8C'><b>Remove Key </b></span> <b>" +  settingKey.name + "<span style='color:#FF6C8C'><b> Value </b></span> <b>" + settingKey.value + "<span style='color:#FF6C8C'><b> Priority </b></span> <b>" + settingKey.priority;
+            } else if (type === 'updatePriority') {
+                return "<span style='color:#FF6C8C'><b>Change Priority of key </b></span> <b>" + settingKey+ "</b> to <b>" +settingValue + "</b>";
             }
         },
         removeSetting(settingVal,val) {
@@ -285,12 +340,15 @@ export default {
             }
         },
         removeProposal(value, type) {
+            console.log(value, type,this.settingRemoves)
             if (type === 'update') {
                 delete this.memberUpdates[value];
             } else if (type === 'add') {
                 this.settingAdds = this.settingAdds.filter((el) => el[0] !== value);
             } else if (type === 'remove') {
-                this.settingRemoves = this.settingRemoves.filter((el) => el[0] !== value);
+                this.settingRemoves = this.settingRemoves.filter((el) => el.name !== value.name);
+            } else if (type === 'updatePriority') {
+                 delete this.memberPriorityUpdates[value];
             }
         },
         checkEditStatus() {
@@ -304,26 +362,35 @@ export default {
             // Clean up update object, remove any blank inputs
             console.log("onDirty",JSON.stringify(this.memberUpdates))
             for(let member in this.memberUpdates) {
-                console.log(JSON.stringify(member))
-                // if (this.memberUpdates[member] === '') {
-                //     delete this.memberUpdates[member];
-                // } else {
-                //     this.updatedValue.filter((e1,index) => {
-                //         if(e1[0] == member){
-                //             delete this.updatedValue[index];
-                //         }
-                //     });
-                //     this.updatedValue.push(
-                //         [member ,this.memberUpdates[member]]
-                //     );
-                // }
-                // // Deselect any rows with checkboxes
-                // if (this.settingRemoves.includes(member)) {
-                //     this.settingRemoves = this.settingRemoves.filter((el) => el !== member);
-                // }
+                console.log()
+                if (this.memberUpdates[member] === null || this.memberUpdates[member].match(/^ *$/) !== null) {
+                    this.$swal({
+                                    icon: "error",
+                                    html: "Value should not be null or empty.",
+                                    showConfirmButton: true,
+                                    allowOutsideClick: false
+                                });
+                    this.$router.push("../vehicles");
+                    return;
+                }
+                 this.vehicle.settings.map(item => {
+                        if(item[0] == "names") {
+                            
+                            let indexOfObject = item[1].findIndex(x => {
+                               if(x.name == member){
+                                   
+                                   x.value = this.memberUpdates[member]
+                               } else {
+                                   x
+                               }
+                            })
+                            return
+                        }
+                    });
+                    console.log("this.vehicle.settings",this.vehicle.settings)
             }
 
-            if (this.settingRemoves.length + this.settingAdds.length + Object.keys(this.memberUpdates).length > 0) {
+            if (this.settingRemoves.length + this.settingAdds.length + Object.keys(this.memberUpdates).length > 0 + Object.keys(this.memberPriorityUpdates).length > 0) {
                 this.isDirty = true;
             } else {
                 this.isDirty = false;
@@ -358,7 +425,7 @@ export default {
                 return;
             }
 
-            const count = this.settingRemoves.length + this.settingAdds.length + Object.keys(this.memberUpdates).length;
+            const count = this.settingRemoves.length + this.settingAdds.length + Object.keys(this.memberUpdates).length + Object.keys(this.memberPriorityUpdates).length;
             let settingKey = '';
             let settingValue = 0;
             let settingValue1 = 0 ;
@@ -372,7 +439,7 @@ export default {
                         if(item[0] == "names") {
                             
                             let indexOfObject = item[1].findIndex(x => {
-                               return x.name == this.settingRemoves[0].name
+                               return x.name == this.settingRemoves[0].name && x.value == this.settingRemoves[0].value
                             })
                             item[1].splice(indexOfObject, 1);
                             return
@@ -404,9 +471,25 @@ export default {
                     settingValue1 = isTrue ? values : [settingValue]
                     input = this.buildInput(settingKey, settingValue1, 'addSetting');
                 } else if (Object.keys(this.memberUpdates).length === 1) {
-                    settingKey = this.updatedValue[0][0];
-                    settingValue = this.updatedValue[0][1];
-                    input = this.buildInput(settingKey, settingValue, 'update');
+                    settingKey = "names";
+                    settingValue = []
+                    // this.updatedValue[0][1];
+                    this.vehicle.settings.map(item => {
+                         if(item[0] == "names") {
+                            settingValue.push(item[1])
+                        }
+                    })
+                    input = this.buildInput(settingKey, settingValue[0], 'update');
+                } else if (Object.keys(this.memberPriorityUpdates).length === 1) {
+                    settingKey = "names";
+                    settingValue = []
+                    // this.updatedValue[0][1];
+                    this.vehicle.settings.map(item => {
+                         if(item[0] == "names") {
+                            settingValue.push(item[1])
+                        }
+                    })
+                    input = this.buildInput(settingKey, settingValue[0], 'update');
                 }
             } else if (count > 1) {
                 input.function = 'multiInteraction';
@@ -466,16 +549,45 @@ export default {
                     input.actions.push(multiAction);
                 }
                 if (Object.keys(this.memberUpdates).length > 0) {
-                    for(let member in this.memberUpdates) {
-                        let multiAction = {
+                    let values = [];
+                    let multiAction = {
                             input: {}
                         };
-                        settingKey = member;
-                        settingValue = +this.memberUpdates[member];
-                    
-                        multiAction.input = this.buildInput(settingKey, settingValue);
-                        input.actions.push(multiAction);
-                    }
+                    // for(let member in this.memberUpdates) {
+                        
+                       this.vehicle.settings.map((value,index) => {
+                        if(value[0] == "names") {
+                            value[1].map(x => {
+                                values.push(x)
+                            })
+                        }
+                        return
+                    })
+                    // }
+                     settingKey = "names";
+                    multiAction.input = this.buildInput(settingKey, values, 'update');
+                    input.actions.push(multiAction);
+                }
+
+                if (Object.keys(this.memberPriorityUpdates).length > 0) {
+                    let values = [];
+                    let multiAction = {
+                            input: {}
+                        };
+                    // for(let member in this.memberPriorityUpdates) {
+                        
+                       this.vehicle.settings.map((value,index) => {
+                        if(value[0] == "names") {
+                            value[1].map(x => {
+                                values.push(x)
+                            })
+                        }
+                        return
+                    })
+                    // }
+                     settingKey = "names";
+                    multiAction.input = this.buildInput(settingKey, values, 'update');
+                    input.actions.push(multiAction);
                 }
             }
 
@@ -495,7 +607,7 @@ export default {
             this.$swal.close();
 
             let msg = "Your setting changes have been submitted to the Permaweb.  Your changes will be reflected in the next block.";
-            if (this.vehicle.ownership === "dao") {
+            if (this.vehicle.ownership === "multi") {
                 msg = "Your setting changes have been proposed.  You'll be able to see the vote in the next block.";
             }
             // alert(msg);
@@ -511,9 +623,63 @@ export default {
         },
         addSetting() {
             if (this.newSettingKey.length > 0 && this.newSettingValue && this.newSettingPriority) {
-                this.settingAdds.push(
-                    [this.newSettingKey , this.newSettingValue , this.newSettingPriority]
-                );
+                this.vehicle.settings.map((value,index) => {
+                        if(value[0] == "names") {
+                            value[1].map(x => {
+                                if(x.name == this.newSettingKey){
+                                    this.$swal({
+                                        icon: "error",
+                                        html: "Key already exists",
+                                        showConfirmButton: true,
+                                        allowOutsideClick: false
+                                    });
+                                    this.$router.push("../vehicles");
+                                    return;
+                                }
+                            })
+                        }
+                })
+
+                if(this.settingAdds.length == 0){
+                    this.settingAdds.push(
+                        [this.newSettingKey , this.newSettingValue , this.newSettingPriority]
+                    );
+                } else {
+                    let isTrue = false
+                    this.settingAdds.map(v => {
+                        console.log(v[0] == this.newSettingKey)
+                        if(v[0] == this.newSettingKey){
+                            isTrue = true
+                        }
+                    })
+
+                    if(isTrue){
+                        this.$swal({
+                                icon: "error",
+                                html: "Key already exists",
+                                showConfirmButton: true,
+                                allowOutsideClick: false
+                            });
+                            return
+                    } else {
+                            this.settingAdds.push(
+                                [this.newSettingKey , this.newSettingValue , this.newSettingPriority]
+                            );
+                        }
+                }
+                
+                // const uniqueValues = new Set(this.settingAdds.map(v => v[0] ));
+                // if (uniqueValues.size < this.settingAdds.length) {
+                    // this.$swal({
+                    //             icon: "error",
+                    //             html: "Key already exists",
+                    //             showConfirmButton: true,
+                    //             allowOutsideClick: false
+                    //         });
+                            // this.$router.push("../vehicles");
+                            // return;
+                            
+                // }
                 this.addRow = false;
                 this.newSettingKey = '';
                 this.newSettingValue = '';

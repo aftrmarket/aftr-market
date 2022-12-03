@@ -19,7 +19,7 @@
                 </div>
                 <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                   <DialogTitle as="h3" class="text-lg leading-6 font-medium text-gray-900">
-                    Add Members to Vehicle's DAO
+                    Add Members to Vehicle
                   </DialogTitle>
 
                     <div class="bg-white sm:p-4">
@@ -47,7 +47,7 @@
 
                   <div class="mt-2">
                     <p class="text-sm text-gray-500">
-                      Are you sure you want to add this DAO member to the vehicle?
+                      Are you sure you want to add this member to the vehicle?
                     </p>
                   </div>
                 </div>
