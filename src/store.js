@@ -218,11 +218,11 @@ const store = createStore({
             state.activeWallet.psts = newWalletPsts;
         },
         addAftrContractSource(state, sourceId) {
-            // Called in Test/Dev to set add the AFTR Contract Source
+            // Called in Dev to set add the AFTR Contract Source
             state.aftrContractSources.push(sourceId);
         },
         setAftrContractSources(state) {
-            // Called in Prod to load all the AFTR Contract Sources
+            // Called in Prod & Test to load all the AFTR Contract Sources
             state.aftrContractSources = JSON.parse(import.meta.env.VITE_AFTR_CONTRACT_SOURCES);
         },
     },
@@ -264,22 +264,36 @@ const store = createStore({
             }
 
             // Set correct config
+            // try {
+            //     let config = await window.arweaveWallet.getArweaveConfig();
+            //     if (config.host != import.meta.env.VITE_ARWEAVE_HOST || config.port != import.meta.env.VITE_ARWEAVE_PORT || config.protocol != import.meta.env.VITE_ARWEAVE_PROTOCOL) {
+            //         console.log("Current Config: " + JSON.stringify(config));
+            //         config = {
+            //             host: import.meta.env.VITE_ARWEAVE_HOST,
+            //             port: import.meta.env.VITE_ARWEAVE_PORT,
+            //             protocol: import.meta.env.VITE_ARWEAVE_PROTOCOL
+            //         };
+            //         console.log("New Config: " + JSON.stringify(config));
+            //         context.commit("setArConnectConfig", config);
+            //     }
+            //     wallet.address = await window.arweaveWallet.getActiveAddress();
+            // } catch (e) {
+            //     alert(e);
+            // }
+
             try {
                 let config = await window.arweaveWallet.getArweaveConfig();
-                if (config.host != import.meta.env.VITE_ARWEAVE_HOST || config.port != import.meta.env.VITE_ARWEAVE_PORT || config.protocol != import.meta.env.VITE_ARWEAVE_PROTOCOL) {
-                    console.log("Current Config: " + JSON.stringify(config));
-                    config = {
-                        host: import.meta.env.VITE_ARWEAVE_HOST,
-                        port: import.meta.env.VITE_ARWEAVE_PORT,
-                        protocol: import.meta.env.VITE_ARWEAVE_PROTOCOL
-                    };
-                    console.log("New Config: " + JSON.stringify(config));
-                    context.commit("setArConnectConfig", config);
-                }
+                config = {
+                    host: import.meta.env.VITE_ARWEAVE_HOST,
+                    port: import.meta.env.VITE_ARWEAVE_PORT,
+                    protocol: import.meta.env.VITE_ARWEAVE_PROTOCOL
+                };
+                context.commit("setArConnectConfig", config);
                 wallet.address = await window.arweaveWallet.getActiveAddress();
             } catch (e) {
                 alert(e);
             }
+
 
             // try {
             //     const promiseResult = await window.arweaveWallet.connect([

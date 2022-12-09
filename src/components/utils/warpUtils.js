@@ -5,14 +5,13 @@ function warpInit() {
     let warp = {};
 
     try {
-        const arweave = arweaveInit();
-
         // Using Warp
         if (import.meta.env.VITE_ENV === "PROD") {
             warp = WarpFactory.forMainnet();
         } else if (import.meta.env.VITE_ENV === "TEST") {
-            warp = WarpFactory.forTestnet(import.meta.env.VITE_ARWEAVE_PORT, arweave);
+            warp = WarpFactory.forTestnet();
         } else if (import.meta.env.VITE_ENV === "DEV") {
+            const arweave = arweaveInit();
             warp = WarpFactory.forLocal(import.meta.env.VITE_ARWEAVE_PORT, arweave);
         } else {
             warp = WarpFactory.forTestnet();
@@ -65,7 +64,7 @@ async function warpCreateContract(source, initState, currentTags = undefined, af
     let tags = addTags(currentTags, aftr);
     const warp = warpInit();
     try {
-        let txIds = await warp.createContract.deploy({
+        let txIds = await warp.deploy({
             wallet: "use_wallet",
             initState: initState,
             src: source,
@@ -88,7 +87,7 @@ async function warpCreateFromTx(initState, srcId, currentTags = undefined, aftr 
 
     const warp = warpInit();
     try {
-        let txIds = await warp.createContract.deployFromSourceTx({
+        let txIds = await warp.deployFromSourceTx({
             wallet: "use_wallet",
             initState: initState,
             srcTxId: srcId,
@@ -120,7 +119,7 @@ function addTags(currentTags, aftr = false) {
     if (aftr) {
         tags.push({ name: "Protocol", value: import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL });
         tags.push({ name: "Implements", value: ["ANS-110"] });
-        tags.push({ name: "Type", value: ["token", "repo"] });
+        tags.push({ name: "Type", value: ["aftr-repo"] });
     }
 
     return tags;

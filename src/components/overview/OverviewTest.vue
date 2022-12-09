@@ -22,8 +22,12 @@
                                 <form action="#" class="sm:max-w-xl sm:mx-auto lg:mx-0">
                                     <div class="sm:flex">
                                         <div class="mt-3 sm:mt-0 sm:ml-3">
-                                            <button @click.prevent="init" type="submit"
+                                            <button @click.prevent="initPlayground" type="submit"
                                                 class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Launch</button>
+                                        </div>
+                                        <div class="mt-3 sm:mt-0 sm:ml-3">
+                                            <button @click.prevent="init" type="submit"
+                                                class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Repo List</button>
                                         </div>
                                         <div class="mt-3 sm:mt-0 sm:ml-3">
                                             <button @click.prevent="routeUser('PROD')" type="submit"
@@ -356,6 +360,9 @@ export default {
         closeModal() {
             this.showVoteSimulator = false;
         },
+        route2Repos() {
+            this.$router.push("../repos");
+        },
         async mintPlayTokens() {
             await this.$store.dispatch('arConnect');
             let playTokenId = import.meta.env.VITE_PLAY_CONTRACT_ID;
@@ -451,7 +458,7 @@ export default {
             }
             this.$log.info("OverviewTest : mintAr :: ", "Balance for " + addr + ": " + balance.toString());
         },
-        async init() {
+        async initPlayground() {
             await this.$store.dispatch('arConnect');
 
             try {
@@ -695,6 +702,96 @@ export default {
                 });
             }
         },
+
+
+
+        async init() {
+            await this.$store.dispatch('arConnect');
+
+            try {
+                this.getMyRepo = true;
+                // Check to see if system is ready for for Test Launch
+                this.$store.dispatch("setTestLaunchConfigState");
+
+                if (!this.$store.getters.getTestLaunchConfigState) {
+                    this.$swal({
+                        icon: "error",
+                        html: "Please connect your Arweave wallet with ArConnect.",
+                    });
+                    return false;
+                }
+
+                // Check for correct ArConnect settings                
+                if (this.env === "DEV") {
+                    if (
+                        this.arConnectConfig.host != this.arweaveHost ||
+                        this.arConnectConfig.protocol != this.arweaveProtocol ||
+                        this.arConnectConfig.port != this.arweavePort
+                    ) {
+                        this.$swal({
+                            icon: "error",
+                            html: "Your ArConnect Gateway Config is pointing to the wrong gateway.  Please change the gateway to localhost.",
+                        });
+                        this.$store.dispatch("arDisconnect");
+                        return false;
+                    }
+                } else if (this.env === "TEST") {
+                    if (
+                        this.arConnectConfig.host != this.arweaveHost ||
+                        this.arConnectConfig.protocol != this.arweaveProtocol ||
+                        this.arConnectConfig.port != this.arweavePort
+                    ) {
+
+                        this.$swal({
+                            icon: "error",
+                            html: "Your ArConnect Gateway Config is pointing to the wrong gateway.  Please change the gateway to www.arweave.run.",
+                        });
+                        this.$store.dispatch("arDisconnect");
+                        return false;
+                    }
+                } else if (this.env === "DEV1") {
+                    // Do nothing
+                } else {
+                    // Situation should never occur :)
+                    this.$log.info("OverviewTest : init :: ", "Situation should never occur");
+                    return false;
+                }
+
+                // Initializing Arweave
+                if (this.arweave && Object.keys(this.arweave).length === 0 && Object.getPrototypeOf(this.arweave) === Object.prototype) {
+                    this.arweave = arweaveInit();
+                }
+
+                const use_wallet = "use_wallet";
+                if (this.addr === "") {
+                    this.addr = await this.arweave.wallets.jwkToAddress(use_wallet);
+                }
+
+                /***
+                 * Look at all PSTs and save the ones where the user has a balance.
+                 * This doesn't need to be done in PROD or TEST b/c the Verto Cache is used
+                 * and the wallet.psts are built during the Arconnection.
+                 */
+                if (this.env === "DEV" || import.meta.env.VITE_BUILD_PSTS) {
+                    // Get the AFTR Contract Source ID for Prod
+                    if (import.meta.env.VITE_ENV === "TEST") {
+                        this.$store.commit("setAftrContractSources");
+                    }
+                    await this.$store.dispatch("arRefresh", true);
+                }
+                this.$swal.close();
+                this.$router.push("repos");
+            } catch (error) {
+                this.$swal({
+                    icon: "error",
+                    html: error,
+                });
+            }
+        },
+
+
+
+
         async runQuery(arweave, query, errorMsg) {
             try {
                 let response = await arweave.api.post("graphql", { query: query, });

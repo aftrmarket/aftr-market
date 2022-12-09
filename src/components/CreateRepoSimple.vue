@@ -109,7 +109,6 @@ export default {
     components: { Dialog, DialogOverlay, DialogTitle, TransitionChild, TransitionRoot },
     data() {
         return {
-            contractSourceId: import.meta.env.VITE_SMARTWEAVE_CONTRACT_SOURCE_ID,
             tagProtocol: import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL,
             arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
             arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
@@ -228,7 +227,8 @@ export default {
 
             const csArray = this.getAftrContractSources;
             const latestAftrSourceId = csArray[csArray.length - 1];
-
+    console.log(JSON.stringify(this.repoTemplate));
+    return;
             const txIds = await warpCreateFromTx(JSON.stringify(this.repoTemplate), latestAftrSourceId, tags, true);
             this.repoTemplate["id"] = txIds.contractTxId;
 

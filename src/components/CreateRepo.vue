@@ -457,7 +457,6 @@ export default {
     data() {
         return {
             /** Smartweave variables */
-            contractSourceId: import.meta.env.VITE_SMARTWEAVE_CONTRACT_SOURCE_ID,
             tagProtocol: import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL,
             arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
             arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
