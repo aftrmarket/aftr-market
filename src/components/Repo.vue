@@ -318,7 +318,7 @@ export default {
                 });
                 return contractSrcId;
             } else {
-                const route = import.meta.env.VITE_TX_GATEWAY + "?txID=" + contractId + this.env === "TEST" ? "&testnet=true" : "";
+                const route = import.meta.env.VITE_TX_GATEWAY + "?txId=" + contractId + (this.env === "TEST" ? "&testnet=true" : "");
                 const response = await fetch(route);
                 if (!response.ok) {
                     this.$log.error("Repo : returnContractSrc :: ", "ERROR fetching transaction from gateway.");
@@ -432,7 +432,6 @@ export default {
             this.$router.push("../overview");
             return false;
         }
-
         try {
             // Using Warp
             const cachedValue = await warpRead(this.contractId);

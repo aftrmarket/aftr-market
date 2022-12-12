@@ -136,6 +136,7 @@ const store = createStore({
             keyFile: {},
             arConnectConfig: {},
             aftrContractSources: [],
+            // aftrContractSources: import.meta.env.VITE_AFTR_CONTRACT_SOURCES,
         };
     },
     getters: {
@@ -224,6 +225,7 @@ const store = createStore({
         setAftrContractSources(state) {
             // Called in Prod & Test to load all the AFTR Contract Sources
             state.aftrContractSources = JSON.parse(import.meta.env.VITE_AFTR_CONTRACT_SOURCES);
+            console.log("sources: " + state.aftrContractSources)
         },
     },
     actions: {
