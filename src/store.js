@@ -72,13 +72,15 @@ async function buildWalletPsts(aftrSourcesArray, userAddr) {
 
     for (let edge of responseValue.data.data.transactions.edges) {
         console.log(edge.node.id);
+        let bundled = await arweave.api.get(edge.node.id)
+        let txId = bundled.data.id
         try {
-            const cachedValue = await warpRead(edge.node.id);
+            const cachedValue = await warpRead(txId);
             let repo = cachedValue.state;
 
             if (repo && Object.keys(repo.balances).length != 0 && repo.name) {
                 let data = {
-                    contractId: edge.node.id,
+                    contractId: txId,
                     balance: 0,
                     name: repo.name,
                     ticker: repo.ticker
@@ -95,7 +97,7 @@ async function buildWalletPsts(aftrSourcesArray, userAddr) {
                 }
             }
         } catch (e) {
-            console.log("ERROR reading contract for " + edge.node.id + ": " + e);
+            console.log("ERROR reading contract for " + txId + ": " + e);
         }
     }
 
@@ -136,6 +138,7 @@ const store = createStore({
             keyFile: {},
             arConnectConfig: {},
             aftrContractSources: [],
+            // aftrContractSources: import.meta.env.VITE_AFTR_CONTRACT_SOURCES,
         };
     },
     getters: {
@@ -224,6 +227,7 @@ const store = createStore({
         setAftrContractSources(state) {
             // Called in Prod & Test to load all the AFTR Contract Sources
             state.aftrContractSources = JSON.parse(import.meta.env.VITE_AFTR_CONTRACT_SOURCES);
+            console.log("sources: " + state.aftrContractSources)
         },
     },
     actions: {

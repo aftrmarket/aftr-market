@@ -304,7 +304,6 @@ export default {
             if (this.env === "DEV") {
                 let tx = await this.arweave.transactions.get(contractId);
                 let contractSrcId = "";
-
                 tx.get('tags').every(tag => {
                     let key = tag.get('name', { decode: true, string: true });
                     let value = tag.get('value', { decode: true, string: true });
@@ -316,7 +315,8 @@ export default {
                 });
                 return contractSrcId;
             } else {
-                const route = import.meta.env.VITE_TX_GATEWAY + "?txID=" + contractId + this.env === "TEST" ? "&testnet=true" : "";
+                const route = import.meta.env.VITE_TX_GATEWAY + "?txId=" + contractId + (this.env === "TEST" ? "&testnet=true" : "");
+                console.log("route:" + route)
                 const response = await fetch(route);
                 if (!response.ok) {
                     this.$log.error("Repo : returnContractSrc :: ", "ERROR fetching transaction from gateway.");
@@ -344,14 +344,15 @@ export default {
 
         async loadAllRepos(contractId) {
             try {
+                console.log("ID: " + contractId)
                 // Added this b/c of the mount call to loadAllRepos.  Not sure why that was added.
                 if (!contractId) {
                     return;
                 }
-
                 /*** Using Warp */
                 const cachedValue = await warpRead(contractId);
                 let repo = cachedValue.state;
+                console.log(repo)
 
                 /*** COMMENTING OUT CHECKING FOR CONTRACT SOURCE.
                  * WITH THE ADDITION OF EXECUTION MACHINE FUNCTIONS, WE MAY NOT NEED TO CHECK THE CONTRACT SOURCE.
@@ -360,20 +361,19 @@ export default {
                 // Check to make sure contract source matches AFTR Contract Source
                 let isAftrRepo = true;
                 const contractSrc = await this.returnContractSrc(contractId);
-
+                console.log("SOURCE: " + contractSrc)
                 const csArray = this.getAftrContractSources;
+                console.log(csArray)
                 if (!csArray.find(id => id === contractSrc)) {
                     this.$log.error("RepoList : loadAllRepos :: ", "Invalid AFTR Repo found - Contract ID: " + contractId);
                     isAftrRepo = false;
                 }
-
                 const latestContractSourceId = csArray[csArray.length - 1];
 
                 /*** END OF COMMENTING OUT */
 
                 // Is user member of this repo?
                 const isMember = isRepoMember(repo, this.getActiveAddress);
-
                 if (isAftrRepo) {
                     repo.id = contractId;
                     if (!repo.tokens) {
@@ -459,7 +459,6 @@ export default {
                     //         }
                     //     }
                     // }
-
                     this.repos.push(repo);
                 }
             } catch (error) {
@@ -468,15 +467,17 @@ export default {
         },
         async load() {
             // Get the AFTR Contract Source ID for Prod
-            if (import.meta.env.VITE_ENV === "PROD") {
+            if (import.meta.env.VITE_ENV === "PROD" || import.meta.env.VITE_ENV === "TEST") {
                 this.$store.commit("setAftrContractSources");
             }
 
             // Get all aftr repo contracts, then load all repos
             let txs = await this.getAftrRepos();
-
             for (let edge of txs.edges) {
-                await this.loadAllRepos(edge.node.id);
+                let bundled = await this.arweave.api.get(edge.node.id)
+                let txId = bundled.data.id
+                await this.loadAllRepos(txId);
+                // await this.loadAllRepos(edge.node.id);
             }
 
             this.numRepos = this.repos.length;
@@ -531,18 +532,16 @@ export default {
                         query($cursor: String) {
                             transactions(
                                 tags: [ 
-                                    { name: "Protocol", values: ["${import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL}"] },
-                                    { name: "Contract-Src", values: ${aftrContractSourcesString} }
+                                    { name: "Contract-Src", values: ${import.meta.env.VITE_AFTR_CONTRACT_SOURCES} }
                                 ]
-                                first: 9
                                 after: $cursor
-                            ) {
-                                pageInfo {
-                                    hasNextPage
-                                }
-                                edges {
-                                    cursor
-                                    node { id } 
+                        ) { 
+                            pageInfo { 
+                                hasNextPage
+                            }
+                                edges { 
+                                    cursor 
+                                    node { id }
                                 }
                             }
                         }`;
@@ -601,6 +600,96 @@ export default {
 
 };
 </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
