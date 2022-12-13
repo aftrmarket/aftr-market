@@ -26,6 +26,10 @@ async function handle (state, action) {
       if (balances[caller] < qty) {
         throw new ContractError(`Caller balance not high enough to send ${qty} token(s)!`);
       }
+
+      if (!balances[caller] || balances[caller] == void 0 || balances[caller] == null || isNaN(balances[caller])) {
+        throw new ContractError("Caller doesn't own a balance in the contract.");
+      }
   
       // Lower the token balance of the caller
       balances[caller] -= qty;
