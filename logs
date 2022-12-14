@@ -1,0 +1,4 @@
+[12/14/2022, 3:11:28 AM] GET /tx/EFCxR6ukQII64_-7gIfRdI4UgQBnXrsDpBHV-b7C_ps 404 39ms 
+[12/14/2022, 3:11:30 AM] GET /wallet//balance 404 5ms 
+[12/14/2022, 3:11:30 AM] GET /wallet/EFCxR6ukQII64_-7gIfRdI4UgQBnXrsDpBHV-b7C_ps/balance 200 9ms 
+[12/14/2022, 3:11:42 AM] GET /wallet/EFCxR6ukQII64_-7gIfRdI4UgQBnXrsDpBHV-b7C_ps/balance 200 4ms 

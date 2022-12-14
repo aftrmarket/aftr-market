@@ -111,7 +111,7 @@
                                     <label class="pl-4 block text-sm text-gray-700">
                                         Months (~<span class="text-lg text-aftrBlue">{{ monthsInBlocks(minLease)
                                         }}</span> to <span class="text-lg text-aftrBlue">{{ monthsInBlocks(maxLease)
-                                            }}</span> Blocks)
+}}</span> Blocks)
                                     </label>
                                 </div>
                             </div>
@@ -1008,7 +1008,7 @@ export default {
 
             let initTags = [{ name: "Protocol", value: this.tagProtocol }];
             if (import.meta.env.VITE_ENV !== "PROD") {
-                initTags.push({ name: "Aftr-Playground", value: this.repo.ticker });
+                // initTags.push({ name: "Aftr-Playground", value: this.repo.ticker });
             }
             this.repo.owner = this.$store.getters.getActiveAddress;
             //this.repo.seats = this.seats;  /*** NO LONGER USED */
@@ -1107,7 +1107,7 @@ export default {
             const latestAftrSourceId = csArray[csArray.length - 1];
             const txIds = await warpCreateFromTx(JSON.stringify(this.repo), latestAftrSourceId, tags, true);
             this.repo["id"] = txIds.contractTxId;
-
+            console.log(txIds)
             try {
                 this.$log.info("CreateRepo : createRepo :: ", "repo: " + JSON.stringify(this.repo));
 

@@ -3,7 +3,7 @@ import { fetchBalancesForAddress } from "verto-cache-interface";
 import { warpRead, arweaveInit } from './components/utils/warpUtils';
 
 async function getPlayTokenId(arweave, addr) {
-    if (import.meta.env.VITE_ENV === "PROD") {
+    if (import.meta.env.VITE_ENV === "PROD" || import.meta.env.VITE_ENV == 'TEST') {
         return import.meta.env.VITE_PLAY_CONTRACT_ID;
     } else {
         let queryval = {
@@ -38,22 +38,20 @@ async function buildWalletPsts(aftrSourcesArray, userAddr) {
         query: `
             query($cursor: String) {
                 transactions(
-                    tags: [
-                        { name: "App-Name", values: ["SmartWeaveContract"] },
-                        { name: "Contract-Src", values: ${aftrContractSourcesString} }
+                    tags: [ 
+                        { name: "Contract-Src", values: ${import.meta.env.VITE_AFTR_CONTRACT_SOURCES} }
                     ]
-                    first: 100
                     after: $cursor
-                ) {
-                    pageInfo {
-                        hasNextPage
-                    }
-                    edges {
-                        cursor
-                        node { id } 
+            ) { 
+                pageInfo { 
+                    hasNextPage
+                }
+                    edges { 
+                        cursor 
+                        node { id }
                     }
                 }
-            }`,
+            }`
     };
 
     const arweave = arweaveInit();
@@ -71,7 +69,6 @@ async function buildWalletPsts(aftrSourcesArray, userAddr) {
     wallet.ar = balInWinstons / 1000000000000;
 
     for (let edge of responseValue.data.data.transactions.edges) {
-        console.log(edge.node.id);
         let bundled = await arweave.api.get(edge.node.id)
         let txId = bundled.data.id
         try {
@@ -104,6 +101,9 @@ async function buildWalletPsts(aftrSourcesArray, userAddr) {
     // Read PLAY PST
     const playTokenId = await getPlayTokenId(arweave, userAddr);
     if (playTokenId !== "") {
+        // let bundled = await arweave.api.get(playTokenId)
+        // let playTokenId = bundled.data.id
+        console.log("PLAY ID: " + playTokenId)
         let playResp = await warpRead(playTokenId);
 
         // Add Play token to user's wallet
