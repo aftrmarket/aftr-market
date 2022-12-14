@@ -1107,7 +1107,7 @@ export default {
             const latestAftrSourceId = csArray[csArray.length - 1];
             const txIds = await warpCreateFromTx(JSON.stringify(this.repo), latestAftrSourceId, tags, true);
             this.repo["id"] = txIds.contractTxId;
-
+            console.log(txIds)
             try {
                 this.$log.info("CreateRepo : createRepo :: ", "repo: " + JSON.stringify(this.repo));
 

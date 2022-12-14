@@ -27,7 +27,8 @@
                                         </div>
                                         <div class="mt-3 sm:mt-0 sm:ml-3">
                                             <button @click.prevent="init" type="submit"
-                                                class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Repo List</button>
+                                                class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Repo
+                                                List</button>
                                         </div>
                                         <div class="mt-3 sm:mt-0 sm:ml-3">
                                             <button @click.prevent="routeUser('PROD')" type="submit"
@@ -365,10 +366,12 @@ export default {
         },
         async mintPlayTokens() {
             await this.$store.dispatch('arConnect');
+
+            // Not using bundled 
             let playTokenId = import.meta.env.VITE_PLAY_CONTRACT_ID;
 
-            // Get contract ID
-            if (this.env !== "PROD") {
+            // Get contract ID if in dev
+            if (this.env === "DEV") {
 
                 const query = `query($cursor: String) {
                         transactions(
@@ -399,6 +402,7 @@ export default {
                 } else {
                     playTokenId = res[0].node.id;
                 }
+                alert(playTokenId)
             }
             /*** FAUCET  */
             let input = {
@@ -430,6 +434,11 @@ export default {
                 this.$store.commit("removeWalletPst", playTokenId);
             }
             this.$store.commit("addWalletPst", playPst);
+            // swal for loading?
+            this.$swal({
+                icon: "success",
+                html: walletAddr + "<br /><br />Successfully minted 1000 PLAY"
+            });
         },
         routeUser(site) {
             if (site === "PROD") {
