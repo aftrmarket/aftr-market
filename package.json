@@ -8,23 +8,23 @@
   },
   "dependencies": {
     "@headlessui/vue": "^1.6.5",
-    "@heroicons/vue": "^1.0.1",
+    "@heroicons/vue": "^2.0.13",
     "@highlightjs/vue-plugin": "^2.1.0",
     "@ocrv/vue-tailwind-pagination": "^0.0.4",
     "@soerenmartius/vue3-clipboard": "^0.1.2",
-    "@tailwindcss/forms": "^0.2.1",
-    "@tailwindcss/line-clamp": "^0.3.1",
-    "@three-em/js": "^0.2.13",
+    "@tailwindcss/forms": "^0.5.3",
+    "@tailwindcss/line-clamp": "^0.4.2",
+    "@three-em/js": "^0.3.0",
     "@verto/js": "^1.0.0-beta-22",
     "aftr-market": "^1.1.67",
-    "ar-gql": "^0.0.6",
+    "ar-gql": "^0.0.11",
     "arweave": "^1.10.18",
     "dotenv": "^16.0.0",
     "highlight.js": "^11.6.0",
     "install": "^0.13.0",
     "lodash": "^4.17.21",
     "material-design-icons": "^3.0.1",
-    "node": "^16.17.1",
+    "node": "^19.2.0",
     "number-abbreviate": "^2.0.0",
     "numeral": "^2.0.6",
     "smartweave": "^0.4.46",
@@ -34,7 +34,7 @@
     "vue-json-pretty": "^2.0.6",
     "vue-router": "^4.0.5",
     "vue-sweetalert2": "^5.0.2",
-    "vue-uuid": "^2.0.2",
+    "vue-uuid": "^3.0.0",
     "vue3-perfect-scrollbar": "^1.6.0",
     "vue3-slide-up-down": "^1.2.5",
     "vuejs3-logger": "1.0.0",
@@ -42,10 +42,10 @@
     "warp-contracts": "^1.2.35"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^3.1.0",
+    "@vitejs/plugin-vue": "^4.0.0",
     "autoprefixer": "^10.2.5",
     "postcss": "^8.2.8",
-    "tailwindcss": "^2.0.4",
-    "vite": "^3.1.0"
+    "tailwindcss": "^3.2.4",
+    "vite": "^4.0.1"
   }
 }

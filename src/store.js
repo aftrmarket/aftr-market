@@ -33,68 +33,114 @@ async function getPlayTokenId(arweave, addr) {
 };
 
 async function buildWalletPsts(aftrSourcesArray, userAddr) {
-    const aftrContractSourcesString = JSON.stringify(aftrSourcesArray);
-    let queryval = {
-        query: `
-            query($cursor: String) {
-                transactions(
-                    tags: [ 
-                        { name: "Contract-Src", values: ${import.meta.env.VITE_AFTR_CONTRACT_SOURCES} }
-                    ]
-                    after: $cursor
-            ) { 
-                pageInfo { 
-                    hasNextPage
-                }
-                    edges { 
-                        cursor 
-                        node { id }
-                    }
-                }
-            }`
-    };
 
     const arweave = arweaveInit();
-
-    const responseValue = await arweave.api.post("graphql", { query: queryval.query, });
-    console.log(responseValue.data.data.transactions.edges);
-
     let wallet = {
         address: userAddr,
         ar: 0,
         psts: [],
+        repos: []
     };
-
     const balInWinstons = await arweave.wallets.getBalance(userAddr);
     wallet.ar = balInWinstons / 1000000000000;
 
-    for (let edge of responseValue.data.data.transactions.edges) {
-        let bundled = await arweave.api.get(edge.node.id)
-        let txId = bundled.data.id
-        try {
-            const cachedValue = await warpRead(txId);
-            let repo = cachedValue.state;
-
-            if (repo && Object.keys(repo.balances).length != 0 && repo.name) {
-                let data = {
-                    contractId: txId,
-                    balance: 0,
-                    name: repo.name,
-                    ticker: repo.ticker
-                };
-
-                Object.keys(repo.balances).some((walletId) => {
-                    if (walletId == wallet.address) {
-                        data.balance = repo.balances[wallet.address];
+    if (import.meta.env.VITE_ENV === 'DEV') {
+        const aftrContractSourcesString = JSON.stringify(aftrSourcesArray);
+        let queryval = {
+            query: `
+            query($cursor: String) {
+                transactions(
+                    tags: [
+                        { name: "Contract-Src", values: ${import.meta.env.VITE_AFTR_CONTRACT_SOURCES} }
+                    ]
+                    after: $cursor
+                    ) {
+                        pageInfo {
+                            hasNextPage
+                        }
+                        edges {
+                            cursor
+                            node { id }
+                        }
                     }
-                });
+                }`
+        };
 
-                if (data.balance > 0) {
-                    wallet.psts.push(data);
+        const responseValue = await arweave.api.post("graphql", { query: queryval.query, });
+        console.log(responseValue.data.data.transactions.edges);
+
+        for (let edge of responseValue.data.data.transactions.edges) {
+            let bundled = await arweave.api.get(edge.node.id)
+            let txId = bundled.data.id
+            try {
+                const cachedValue = await warpRead(txId);
+                let repo = cachedValue.state;
+
+                if (repo && Object.keys(repo.balances).length != 0 && repo.name) {
+                    let data = {
+                        contractId: txId,
+                        balance: 0,
+                        name: repo.name,
+                        ticker: repo.ticker
+                    };
+
+                    Object.keys(repo.balances).some((walletId) => {
+                        if (walletId == wallet.address) {
+                            data.balance = repo.balances[wallet.address];
+                        }
+                    });
+
+                    if (data.balance > 0) {
+                        wallet.psts.push(data);
+                        wallet.repos.push(data);
+                    }
                 }
+            } catch (e) {
+                console.log("ERROR reading contract for " + txId + ": " + e);
             }
-        } catch (e) {
-            console.log("ERROR reading contract for " + txId + ": " + e);
+        }
+
+    } else {
+        // LATEST contract source: does not handle multiple contract sources in array
+        const contractSrc = aftrSourcesArray[aftrSourcesArray.length - 1];
+
+        let limit = 9
+        let page = 1
+
+        let route = import.meta.env.VITE_CONTRACTS_BY_SOURCE_ENDPOINT;
+        let response = await fetch(route + contractSrc +
+            (limit ? '&limit=' + limit : '') +
+            (page ? '&page=' + page : '')
+        )
+        let object = await response.json()
+        for (let contract of object.contracts) {
+            let txId = contract.contractId;
+            try {
+                const cachedValue = await warpRead(txId);
+                let repo = cachedValue.state;
+
+                if (repo && Object.keys(repo.balances).length != 0 && repo.name) {
+                    let data = {
+                        contractId: txId,
+                        balance: 0,
+                        name: repo.name,
+                        ticker: repo.ticker
+                    };
+
+                    Object.keys(repo.balances).some((walletId) => {
+                        if (walletId == wallet.address) {
+                            data.balance = repo.balances[wallet.address];
+                        }
+                    });
+
+                    if (data.balance > 0) {
+                        wallet.psts.push(data);
+                        wallet.repos.push(data);
+                    }
+                }
+            } catch (e) {
+                console.log("ERROR reading contract for " + txId + ": " + e);
+            }
         }
     }
 
@@ -138,7 +184,6 @@ const store = createStore({
             keyFile: {},
             arConnectConfig: {},
             aftrContractSources: [],
-            // aftrContractSources: import.meta.env.VITE_AFTR_CONTRACT_SOURCES,
         };
     },
     getters: {
@@ -227,7 +272,7 @@ const store = createStore({
         setAftrContractSources(state) {
             // Called in Prod & Test to load all the AFTR Contract Sources
             state.aftrContractSources = JSON.parse(import.meta.env.VITE_AFTR_CONTRACT_SOURCES);
-            console.log("sources: " + state.aftrContractSources)
+            // console.log("sources: " + state.aftrContractSources)
         },
     },
     actions: {
@@ -251,6 +296,7 @@ const store = createStore({
                 address: "",
                 ar: 0,
                 psts: [],
+                repos: []
             };
 
             // Try to get wallet, if fails, connect so user can assign permissions
@@ -405,6 +451,7 @@ const store = createStore({
                     if (wallet !== {}) {
                         context.commit("arConnect", wallet);
                     }
+                    console.log(wallet)
                 }
             }
         },

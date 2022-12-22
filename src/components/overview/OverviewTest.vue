@@ -160,7 +160,7 @@
                         <div>
                             <div>
                                 <span class="h-12 w-12 rounded-md flex items-center justify-center bg-aftrBlue">
-                                    <PencilAltIcon class="h-6 w-6 text-white" aria-hidden="true" />
+                                    <PencilSquareIcon class="h-6 w-6 text-white" aria-hidden="true" />
                                 </span>
                             </div>
                             <div class="mt-6">
@@ -267,11 +267,11 @@
 <script>
 import {
     ChartPieIcon,
-    ClipboardCheckIcon,
-    CashIcon,
+    ClipboardDocumentCheckIcon,
+    BanknotesIcon,
     TruckIcon,
-    PencilAltIcon,
-} from "@heroicons/vue/outline";
+    PencilSquareIcon,
+} from "@heroicons/vue/24/outline";
 
 import vertoInitState from "./../../testnet/contracts/vertoInitState.json";
 //import * as vertoSource from "./../../testnet/contracts/vertoSource.js?raw";
@@ -294,14 +294,14 @@ const initProcess = [
         id: 1,
         name: "Validate",
         description: "Ensure the test node is ready for playing.",
-        icon: ClipboardCheckIcon,
+        icon: ClipboardDocumentCheckIcon,
     },
     {
         id: 2,
         name: "Give You Assets",
         description:
             "In order to add tokens to AFTR Repos, you'll need some tokens in the Playground.",
-        icon: CashIcon,
+        icon: BanknotesIcon,
     },
     {
         id: 3,
@@ -319,7 +319,7 @@ const initProcess = [
 ];
 
 export default {
-    components: { PencilAltIcon, TruckIcon, VoteSimulator },
+    components: { PencilSquareIcon, TruckIcon, VoteSimulator },
     data() {
         return {
             /** Smartweave variables */

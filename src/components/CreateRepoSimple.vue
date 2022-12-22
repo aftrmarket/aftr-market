@@ -227,8 +227,8 @@ export default {
 
             const csArray = this.getAftrContractSources;
             const latestAftrSourceId = csArray[csArray.length - 1];
-    console.log(JSON.stringify(this.repoTemplate));
-    return;
+            console.log(JSON.stringify(this.repoTemplate));
+
             const txIds = await warpCreateFromTx(JSON.stringify(this.repoTemplate), latestAftrSourceId, tags, true);
             this.repoTemplate["id"] = txIds.contractTxId;
 

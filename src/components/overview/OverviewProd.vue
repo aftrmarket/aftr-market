@@ -25,7 +25,9 @@
                                 <form action="#" class="sm:max-w-xl sm:mx-auto lg:mx-0">
                                     <div class="sm:flex">
                                         <div class="mt-3 sm:mt-0 sm:ml-3">
-                                            <button @click.prevent="routeUser('PROD')" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Get Started</button>
+                                            <button @click.prevent="routeUser('PROD')" type="submit"
+                                                class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Get
+                                                Started</button>
                                         </div>
                                         <div class="mt-3 sm:mt-0 sm:ml-3">
                                             <button @click.prevent="routeUser('TEST')" type="submit"
@@ -110,15 +112,15 @@
 import {
     ChartPieIcon,
     LockClosedIcon,
-    SpeakerphoneIcon,
+    MegaphoneIcon,
     ChartBarIcon,
     ReceiptRefundIcon,
     UserGroupIcon,
-    ClipboardListIcon,
+    ClipboardDocumentListIcon,
     CurrencyDollarIcon,
-    TrendingUpIcon,
+    ArrowTrendingUpIcon,
     GlobeAltIcon,
-} from "@heroicons/vue/outline";
+} from "@heroicons/vue/24/outline";
 
 const tmFeatures = [
     {
@@ -139,14 +141,14 @@ const tmFeatures = [
         name: "Built-in Governance",
         description:
             "Make changes to your repo and let AFTR Market determine if votes need to be cast.",
-        icon: ClipboardListIcon,
+        icon: ClipboardDocumentListIcon,
     },
     {
         id: 4,
         name: "Governance Notifications (COMING SOON)",
         description:
             "Automatically notify members of proposed changes to your repo through the ArConnect wallet.",
-        icon: SpeakerphoneIcon,
+        icon: MegaphoneIcon,
     },
 ];
 

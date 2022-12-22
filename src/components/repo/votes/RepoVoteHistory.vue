@@ -112,7 +112,7 @@ import {
   TransitionChild,
   TransitionRoot,
 } from "@headlessui/vue";
-import { ExclamationIcon } from "@heroicons/vue/outline";
+import { ExclamationCircleIcon } from "@heroicons/vue/24/outline";
 import numeral from "numeral";
 
 export default {
@@ -124,7 +124,7 @@ export default {
     DialogTitle,
     TransitionChild,
     TransitionRoot,
-    ExclamationIcon,
+    ExclamationCircleIcon,
   },
   data() {
     return {
@@ -166,6 +166,14 @@ export default {
   },
 };
 </script>
+
+
+
+
+
+
+
+
 
 
 
