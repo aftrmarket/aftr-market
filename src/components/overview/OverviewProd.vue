@@ -120,6 +120,7 @@ import {
 } from "@heroicons/vue/24/outline";
 
 import { mapGetters } from "vuex";
+import { warpRead, warpWrite, arweaveInit, warpCreateContract } from './../utils/warpUtils.js';
 
 const tmFeatures = [
     {
@@ -161,93 +162,18 @@ export default {
         ...mapGetters(["getActiveWallet"]),
     },
     methods: {
-        routeUser() {
+        async routeUser() {
+            await this.init();
             this.$router.push("../repos");
         },
 
-
-
         async init() {
-            await this.$store.dispatch('arConnect');
-
-            try {
-                this.getMyRepo = true;
-                // Check to see if system is ready for for Test Launch
-                this.$store.dispatch("setTestLaunchConfigState");
-
-                if (!this.$store.getters.getTestLaunchConfigState) {
-                    this.$swal({
-                        icon: "error",
-                        html: "Please connect your Arweave wallet with ArConnect.",
-                    });
-                    return false;
-                }
-
-                // Check for correct ArConnect settings                
-                if (this.env === "DEV") {
-                    if (
-                        this.arConnectConfig.host != this.arweaveHost ||
-                        this.arConnectConfig.protocol != this.arweaveProtocol ||
-                        this.arConnectConfig.port != this.arweavePort
-                    ) {
-                        this.$swal({
-                            icon: "error",
-                            html: "Your ArConnect Gateway Config is pointing to the wrong gateway.  Please change the gateway to localhost.",
-                        });
-                        this.$store.dispatch("arDisconnect");
-                        return false;
-                    }
-                } else if (this.env === "TEST") {
-                    if (
-                        this.arConnectConfig.host != this.arweaveHost ||
-                        this.arConnectConfig.protocol != this.arweaveProtocol ||
-                        this.arConnectConfig.port != this.arweavePort
-                    ) {
-
-                        this.$swal({
-                            icon: "error",
-                            html: "Your ArConnect Gateway Config is pointing to the wrong gateway.  Please change the gateway to www.arweave.run.",
-                        });
-                        this.$store.dispatch("arDisconnect");
-                        return false;
-                    }
-                } else if (this.env === "DEV1") {
-                    // Do nothing
-                } else {
-                    // Situation should never occur :)
-                    this.$log.info("OverviewProd : init :: ", "Situation should never occur");
-                    return false;
-                }
-
-                // Initializing Arweave
-                if (this.arweave && Object.keys(this.arweave).length === 0 && Object.getPrototypeOf(this.arweave) === Object.prototype) {
-                    this.arweave = arweaveInit();
-                }
-
-                const use_wallet = "use_wallet";
-                if (this.addr === "") {
-                    this.addr = await this.arweave.wallets.jwkToAddress(use_wallet);
-                }
-
-                /***
-                 * Until there's a better way to get all PSTs for a given wallet, 
-                 * we need to do it from AFTR.
-                 */
-                
-                // Get the AFTR Contract Source ID for Prod and Test
-                if (import.meta.env.VITE_ENV === "TEST" || import.meta.env.VITE_ENV === "PROD") {
-                    this.$store.commit("setAftrContractSources");
-                }
-                await this.$store.dispatch("arRefresh", true);
-                
-                this.$swal.close();
-                this.$router.push("repos");
-            } catch (error) {
-                this.$swal({
-                    icon: "error",
-                    html: error,
-                });
+            // Get the AFTR Contract Source ID for Prod and Test
+            if (import.meta.env.VITE_ENV === "TEST" || import.meta.env.VITE_ENV === "PROD") {
+                this.$store.commit("setAftrContractSources");
             }
+
+            await this.$store.dispatch('arConnect');
         },
 
         async mintPlayTokens() {
@@ -258,7 +184,6 @@ export default {
 
             // Get contract ID if in dev
             if (this.env === "DEV") {
-
                 const query = `query($cursor: String) {
                         transactions(
                             tags: [ 
@@ -271,13 +196,10 @@ export default {
                         }
                     }`;
 
-                if (this.arweave && Object.keys(this.arweave).length === 0 && Object.getPrototypeOf(this.arweave) === Object.prototype) {
-                    this.arweave = arweaveInit();
-                }
-                if (this.addr === "") {
-                    this.addr = await this.arweave.wallets.jwkToAddress("use_wallet");
-                }
-                await this.mintAr(this.addr, this.arweave);
+                const arweave = arweaveInit();
+    
+                const addr = await arweave.wallets.jwkToAddress("use_wallet");
+                await this.mintAr(addr, arweave);
                 let response = await this.runQuery(this.arweave, query, "Failed when looking for PLAY Token.");
                 let res = response.data.data.transactions.edges;
 

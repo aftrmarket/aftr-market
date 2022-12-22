@@ -26,7 +26,7 @@ export default {
     data() {
         return {
             //overviewRoute: import.meta.env.VITE_ENV,
-            overviewRoute: "TEST"
+            overviewRoute: "PROD"
         };
     },
 }
