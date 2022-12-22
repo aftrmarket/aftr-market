@@ -58,8 +58,7 @@
                                                 <label class="block text-sm font-medium text-gray-700 pt-2 pb-2">
                                                     You have a balance of <span class="font-bold text-aftrBlue">{{
                                                             formatNumber(pstBalance - pstInputTokens)
-                                                    }} {{ pstTicker
-}}</span><span> available to use in your repo.</span>
+                                                    }} {{ pstTicker }}</span><span> available to use in your repo.</span>
                                                 </label>
                                                 <input type="number" placeholder="Amount" v-model="pstInputTokens"
                                                     @input="calcPstPrice" :class="inputBox(pstInputValid)" />
@@ -76,17 +75,14 @@
                                             <label class="block text-sm font-medium text-gray-700">
                                                 You have <span class="font-bold text-aftrBlue">{{
                                                         formatNumber(pstBalance - pstInputTokens)
-                                                }} {{ pstTicker
-}}</span><span> available to use in your repo.</span>
+                                                }} {{ pstTicker}}</span><span> available to use in your repo.</span>
                                             </label>
                                         </div>
                                         <input type="number" placeholder="Amount" v-model="pstInputTokens"
                                             @input="calcPstPrice" :class="inputBox(pstInputValid)" />
                                         <span v-if="pstInputTokens && false" class="block text-xs pt-2 pl-4 pr-6">@ {{
                                                 formatNumber(pricePerToken, true)
-                                        }} AR {{ pstInputTokens ? " = " +
-        formatNumber(pstValue, true) + " AR" : ""
-}}</span>
+                                        }} AR {{ pstInputTokens ? " = " + formatNumber(pstValue, true) + " AR" : "" }}</span>
                                     </div>
                                     <!--
                   <div class="mt-2">
@@ -99,8 +95,7 @@
                                 </div>
                             </div>
                         </div>
-                        <repo-alert v-if="pstInputValid && pstInputTokens" :repo="msg">
-                        </repo-alert>
+                        <repo-alert v-if="pstInputValid && pstInputTokens" :repo="msg"></repo-alert>
                         <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                             <button type="button" v-if="pstInputValid && pstInputTokens"
                                 class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm"
@@ -130,8 +125,6 @@ import numeral from "numeral";
 import RepoAlert from './RepoAlert.vue';
 import Aftr from "aftr-market";
 import { warpRead, warpWrite } from '../utils/warpUtils.js';
-
-const client = new Aftr();
 
 export default {
     props: ['repo'],
@@ -263,7 +256,7 @@ export default {
             // Is internalWrite Supported?
             const stateInteractions = await warpRead(contractId);
 
-            if (!stateInteractions || Object.keys(stateInteractions).length === 0 || Object.getPrototypeOf(stateInteractions) === Object.prototype) {
+            if (!stateInteractions || Object.keys(stateInteractions).length === 0) {
                 msg = "This asset can't be found on the Permaweb."
                 return msg;
             }
@@ -312,14 +305,16 @@ export default {
                 pstId = currentPst.contractId;
 
                 // If the token was selected, then the contract hasn't been read yet for validation
-                const msg = await this.isDepositAllowed(pstId);
-                if (msg !== "") {
+                const resultMsg = await this.isDepositAllowed(pstId);
+                if (resultMsg !== "") {
                     this.$swal({
                         icon: "error",
-                        html: msg,
+                        html: resultMsg,
                         showConfirmButton: true,
                         allowOutsideClick: false,
                     });
+                    this.pstInputValid = false;
+                    this.msg = "";
                     return;
                 }
             }
