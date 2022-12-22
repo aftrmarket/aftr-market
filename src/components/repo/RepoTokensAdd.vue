@@ -327,6 +327,17 @@ export default {
             };
             const allowTxId = await warpWrite(pstId, inputAllow);
 
+
+            this.$swal({
+                icon: "info",
+                html: "Please wait while the allow transaction completes...",
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    this.$swal.showLoading()
+                },
+            });
+
             // 2. Claim tokens
             const inputDep = {
                 function: "deposit",
