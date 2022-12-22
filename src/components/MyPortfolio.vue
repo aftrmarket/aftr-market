@@ -52,7 +52,7 @@
 
 <script>
 //import { readContract } from 'smartweave';
-import { executeContract } from "@three-em/js";
+//import { executeContract } from "@three-em/js";
 import RepoCard from './repo/RepoCard.vue';
 import RepoCardPlaceholder from './repo/RepoCardPlaceholder.vue';
 import { run, all } from 'ar-gql';

@@ -16,7 +16,7 @@
 import VueJsonPretty from 'vue-json-pretty';
 import 'vue-json-pretty/lib/styles.css';
 import { readContract } from 'smartweave';
-import { executeContract } from "@three-em/js";
+//import { executeContract } from "@three-em/js";
 import { WarpFactory, defaultCacheOptions } from 'warp-contracts/web';
 
 export default {

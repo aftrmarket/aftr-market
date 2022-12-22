@@ -55,7 +55,7 @@
 import VueJsonPretty from 'vue-json-pretty';
 import 'vue-json-pretty/lib/styles.css';
 import { interactWrite, interactWriteDryRun } from "smartweave";
-import { executeContract } from "@three-em/js";
+//import { executeContract } from "@three-em/js";
 import { mapGetters } from 'vuex';
 
 import inputBalance from "./inputs/balance.json";
