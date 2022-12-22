@@ -17,21 +17,18 @@
                                 assets.
                             </p>
                             <p class="mt-3 text-base text-gray-300 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
-                                Our <a href="https://test.aftr.market" style="color:#FFFC79;">Testnet</a> is live!
-                                Come learn more about how to create and manage treasuries on Arweave in our test
-                                environment.
+                                Feel free to mint yourself some PLAY tokens so that you can try out the functionality when launching the app.
                             </p>
                             <div class="mt-10 sm:mt-12">
                                 <form action="#" class="sm:max-w-xl sm:mx-auto lg:mx-0">
                                     <div class="sm:flex">
                                         <div class="mt-3 sm:mt-0 sm:ml-3">
-                                            <button @click.prevent="routeUser('PROD')" type="submit"
-                                                class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Get
-                                                Started</button>
+                                            <button @click.prevent="routeUser" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Launch</button>
                                         </div>
                                         <div class="mt-3 sm:mt-0 sm:ml-3">
-                                            <button @click.prevent="routeUser('TEST')" type="submit"
-                                                class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Testnet</button>
+                                            <button @click.prevent="mintPlayTokens" type="submit"
+                                                class="py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Mint
+                                                PLAY</button>
                                         </div>
                                     </div>
                                 </form>
@@ -122,6 +119,8 @@ import {
     GlobeAltIcon,
 } from "@heroicons/vue/24/outline";
 
+import { mapGetters } from "vuex";
+
 const tmFeatures = [
     {
         id: 1,
@@ -153,14 +152,180 @@ const tmFeatures = [
 ];
 
 export default {
+    data() {
+        return {
+            env: import.meta.env.VITE_ENV,
+        };
+    },
+    computed: {
+        ...mapGetters(["getActiveWallet"]),
+    },
     methods: {
-        routeUser(site) {
-            if (site === 'TEST') {
-                window.location.href = import.meta.env.VITE_AFTR_TEST;
-            } else {
-                this.$router.push("../repos");
+        routeUser() {
+            this.$router.push("../repos");
+        },
+
+
+
+        async init() {
+            await this.$store.dispatch('arConnect');
+
+            try {
+                this.getMyRepo = true;
+                // Check to see if system is ready for for Test Launch
+                this.$store.dispatch("setTestLaunchConfigState");
+
+                if (!this.$store.getters.getTestLaunchConfigState) {
+                    this.$swal({
+                        icon: "error",
+                        html: "Please connect your Arweave wallet with ArConnect.",
+                    });
+                    return false;
+                }
+
+                // Check for correct ArConnect settings                
+                if (this.env === "DEV") {
+                    if (
+                        this.arConnectConfig.host != this.arweaveHost ||
+                        this.arConnectConfig.protocol != this.arweaveProtocol ||
+                        this.arConnectConfig.port != this.arweavePort
+                    ) {
+                        this.$swal({
+                            icon: "error",
+                            html: "Your ArConnect Gateway Config is pointing to the wrong gateway.  Please change the gateway to localhost.",
+                        });
+                        this.$store.dispatch("arDisconnect");
+                        return false;
+                    }
+                } else if (this.env === "TEST") {
+                    if (
+                        this.arConnectConfig.host != this.arweaveHost ||
+                        this.arConnectConfig.protocol != this.arweaveProtocol ||
+                        this.arConnectConfig.port != this.arweavePort
+                    ) {
+
+                        this.$swal({
+                            icon: "error",
+                            html: "Your ArConnect Gateway Config is pointing to the wrong gateway.  Please change the gateway to www.arweave.run.",
+                        });
+                        this.$store.dispatch("arDisconnect");
+                        return false;
+                    }
+                } else if (this.env === "DEV1") {
+                    // Do nothing
+                } else {
+                    // Situation should never occur :)
+                    this.$log.info("OverviewProd : init :: ", "Situation should never occur");
+                    return false;
+                }
+
+                // Initializing Arweave
+                if (this.arweave && Object.keys(this.arweave).length === 0 && Object.getPrototypeOf(this.arweave) === Object.prototype) {
+                    this.arweave = arweaveInit();
+                }
+
+                const use_wallet = "use_wallet";
+                if (this.addr === "") {
+                    this.addr = await this.arweave.wallets.jwkToAddress(use_wallet);
+                }
+
+                /***
+                 * Until there's a better way to get all PSTs for a given wallet, 
+                 * we need to do it from AFTR.
+                 */
+                
+                // Get the AFTR Contract Source ID for Prod and Test
+                if (import.meta.env.VITE_ENV === "TEST" || import.meta.env.VITE_ENV === "PROD") {
+                    this.$store.commit("setAftrContractSources");
+                }
+                await this.$store.dispatch("arRefresh", true);
+                
+                this.$swal.close();
+                this.$router.push("repos");
+            } catch (error) {
+                this.$swal({
+                    icon: "error",
+                    html: error,
+                });
             }
-        }
+        },
+
+        async mintPlayTokens() {
+            await this.$store.dispatch('arConnect');
+
+            // Not using bundled 
+            let playTokenId = import.meta.env.VITE_PLAY_CONTRACT_ID;
+
+            // Get contract ID if in dev
+            if (this.env === "DEV") {
+
+                const query = `query($cursor: String) {
+                        transactions(
+                            tags: [ 
+                                { name: "Protocol", values: ["PLAY"] },
+                        ]
+                            after: $cursor
+                        )
+                        { pageInfo { hasNextPage }
+                            edges { cursor node { id } }
+                        }
+                    }`;
+
+                if (this.arweave && Object.keys(this.arweave).length === 0 && Object.getPrototypeOf(this.arweave) === Object.prototype) {
+                    this.arweave = arweaveInit();
+                }
+                if (this.addr === "") {
+                    this.addr = await this.arweave.wallets.jwkToAddress("use_wallet");
+                }
+                await this.mintAr(this.addr, this.arweave);
+                let response = await this.runQuery(this.arweave, query, "Failed when looking for PLAY Token.");
+                let res = response.data.data.transactions.edges;
+
+                if (res.length == 0) {
+                    // Create PLAY
+                    let txIds = await warpCreateContract(playTokenSrc, playTokenInitState, [{ name: "Protocol", value: "PLAY" }], false);
+                    playTokenId = txIds.contractTxId;
+                } else {
+                    playTokenId = res[0].node.id;
+                }
+                alert(playTokenId)
+            }
+            /*** FAUCET  */
+            let input = {
+                function: "mint",
+                qty: 1000
+            };
+            let tx = await warpWrite(playTokenId, input, true);
+
+            let activeWallet = this.getActiveWallet;
+            let walletAddr = activeWallet.address;
+
+            // Read Play contract
+            let response = await warpRead(playTokenId);
+
+            // Add or update Play token in user's wallet
+            let userTokenBal = response.state.balances[walletAddr];
+
+            if (response.state.balances[walletAddr]) {
+                userTokenBal = response.state.balances[walletAddr];
+            }
+            let playIndex = activeWallet.psts.findIndex(pst => pst.contractId === playTokenId);
+            let playPst = {
+                contractId: playTokenId,
+                balance: userTokenBal,
+                name: response.state.name,
+                ticker: response.state.ticker,
+            };
+            if (playIndex !== -1) {
+                this.$store.commit("removeWalletPst", playTokenId);
+            }
+            this.$store.commit("addWalletPst", playPst);
+            // swal for loading?
+            this.$swal({
+                icon: "success",
+                html: walletAddr + "<br /><br />Successfully minted 1000 PLAY"
+            });
+        },
     },
     setup() {
         return {
