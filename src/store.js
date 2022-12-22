@@ -1,5 +1,4 @@
 import { createStore } from 'vuex';
-import { fetchBalancesForAddress } from "verto-cache-interface";
 import { warpRead, arweaveInit } from './components/utils/warpUtils';
 
 async function getPlayTokenId(arweave, addr) {
@@ -377,82 +376,13 @@ const store = createStore({
                 context.commit("setTestLaunchConfigState");
             }
 
-            if (import.meta.env.VITE_ENV === "TEST" && !import.meta.env.VITE_BUILD_PSTS) {
 
-                const tokens = await fetchBalancesForAddress(wallet.address);
-                /*** Returns an array of objects
-                 *  [
-                        {
-                            "name": "<TOKEN>",
-                            "ticker": "<TICKER>",
-                            "balance": <BALANCE>,
-                            "contractId": "<CONTRACT-ID OF TOKEN>",
-                            "userAddress": "<WALLET ADDRESS>",
-                            "type": "<TYPE OF TOKEN>"
-                        }
-                    ]
-                 */
-
-
-                /*** DO WE HAVE THE ABILITY TO GET TOKEN PRICES IN TEST? */
-
-            } else if (import.meta.env.VITE_ENV === "PROD") {
-                // Now query Verto to get all PSTs contained in Wallet
-                const response = await fetch(
-                    import.meta.env.VITE_VERTO_CACHE_URL + "balance/" + wallet.address
-                );
-                const cachePsts = await response.json();
-                /**** RESPONSE RETURNS AS AN ARRAY OF KEY/VALUE PAIRS ****
-                 * [ {
-                 *  id: '',
-                 *  balance: '',
-                 *  name: '',
-                 *  ticker: '',
-                 *  logo: ''
-                 * } ]
-                 ****/
-                for (let pst of cachePsts) {
-                    wallet.psts.push({
-                        contractId: pst.id,
-                        balance: pst.balance,
-                        name: pst.name,
-                        ticker: pst.ticker
-                    });
+            if (context.state.aftrContractSources.length !== 0) {
+                wallet = await buildWalletPsts(context.state.aftrContractSources, wallet.address);
+                if (wallet !== {}) {
+                    context.commit("arConnect", wallet);
                 }
-
-                // Query Verto to get AR prices for each token
-                /*** THIS CODE SHOULD ONLY RUN IN PROD AS WELL.
-                 * IN DEV AND TEST, WE WON'T HAVE ACCESS TO PRICES, SO WE SHOULD HARD-CODE THESE FOR TESTING.
-                 */
-                for (let pst of wallet.psts) {
-                    try {
-                        const response = await fetch(
-                            import.meta.env.VITE_VERTO_CACHE_URL + "token/" + pst.id + "/price"
-                        );
-                        const jsonRes = await response.json();
-                        const i = wallet.psts.findIndex((item) => item.id === pst.id);
-                        wallet.psts[i]["price"] = jsonRes.price;
-                        wallet.psts[i]["total"] = jsonRes.price * wallet.psts[i]["balance"];
-                    } catch (error) {
-                        console.log("ERROR while fetching AR prices of " + pst.name + " from Verto: " + error);
-                    }
-
-                    if (wallet.address.length === 43) {
-                        context.commit("arConnect", wallet);
-                    }
-                }
-
-                /*** DO WE WANT TO RUN buildWalletPsts in PROD?? */
-
-                /*** END ONLY RUNS IN PROD */
-            } else {
-                if (context.state.aftrContractSources.length !== 0) {
-                    wallet = await buildWalletPsts(context.state.aftrContractSources, wallet.address);
-                    if (wallet !== {}) {
-                        context.commit("arConnect", wallet);
-                    }
-                    console.log(wallet)
-                }
+                //console.log(wallet)
             }
         },
         async arDisconnect(context) {
