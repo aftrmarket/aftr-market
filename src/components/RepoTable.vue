@@ -68,7 +68,9 @@
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ repo.tokens.length }}</td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ Object.keys(repo.balances).length
                   }}</td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ repo.votes.length }}</td>
+                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ repo.votes ? repo.votes.length : 0
+                  }}
+                  </td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                     <span v-if="getActiveAddress in repo.balances">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"

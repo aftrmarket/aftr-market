@@ -212,7 +212,7 @@ import {
   TransitionChild,
   TransitionRoot,
 } from "@headlessui/vue";
-import { ExclamationIcon } from "@heroicons/vue/outline";
+import { ExclamationCircleIcon } from '@heroicons/vue/24/outline';
 
 export default {
   props: ["repo"],
@@ -223,7 +223,7 @@ export default {
     TransitionChild,
     TransitionRoot,
     DialogPanel,
-    ExclamationIcon,
+    ExclamationCircleIcon,
   },
   data() {
     return {
@@ -557,6 +557,14 @@ export default {
   },
 };
 </script>
+
+
+
+
+
+
+
+
 
 
 

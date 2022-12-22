@@ -124,7 +124,7 @@
 <script>
 import { ref } from 'vue'
 import { Dialog, DialogOverlay, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import { ExclamationIcon } from '@heroicons/vue/outline'
+import { ExclamationCircleIcon } from '@heroicons/vue/24/outline'
 import { mapGetters } from 'vuex';
 import numeral from "numeral";
 import RepoAlert from './RepoAlert.vue';
@@ -141,7 +141,7 @@ export default {
         DialogTitle,
         TransitionChild,
         TransitionRoot,
-        ExclamationIcon,
+        ExclamationCircleIcon,
         RepoAlert
     },
     data() {

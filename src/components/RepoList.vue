@@ -15,20 +15,16 @@
                             <option value="my">My Repos</option>
                         </select>
                         <button type="button" @click.prevent="toggleLayout" class="mr-2">
-                            <svg v-if="!layoutGrid" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-                                viewBox="0 0 24 24" stroke="#FFFC79" stroke-width="2">
+                            <svg v-if="!layoutGrid" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="#FFFC79" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                             </svg>
-                            <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-                                viewBox="0 0 24 24" stroke="#FFFC79" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                            <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="#FFFC79" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                             </svg>
                         </button>
                         <button type="button" @click.prevent="toggleFilter">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="#FFFC79" class="w-6 h-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#FFFC79" class="w-6 h-6">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
                             </svg>
@@ -42,25 +38,19 @@
                             <option value="Asset ID">Asset ID</option>
                             <option value="Needs Attention">Needs Attention</option>
                         </select>
-                        <input v-if="filtersOn && searchType !== 'Needs Attention'" type="text"
-                            :placeholder="searchTypeText" v-model="searchInput"
+                        <input v-if="filtersOn && searchType !== 'Needs Attention'" type="text" :placeholder="searchTypeText" v-model="searchInput"
                             class="ml-2 mt-1 pl-2 py-2 w-96 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" />
-                        <button v-if="filtersOn" title="Clear search box" class="visible pl-1" @click="clearData"
-                            type="button">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="#FFFC79" class="w-6 h-6">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <button v-if="filtersOn" title="Clear search box" class="visible pl-1" @click="clearData" type="button">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#FFFC79" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </button>
                     </div>
                     <div>
                         <button type="button" @click.prevent="createRepo()"
                             class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z">
                                 </path>
                                 <path
                                     d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z">
@@ -70,10 +60,8 @@
                         </button>
                         <button type="button" @click.prevent="openModal"
                             class="ml-2  inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20"
-                                fill="currentColor">
-                                <path fill-rule="evenodd"
-                                    d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"
                                     clip-rule="evenodd" />
                             </svg>
                             <span class="pl-2">Quick Add</span>
@@ -93,11 +81,9 @@
                         </div>
                     </div>
                     <perfect-scrollbar>
-                        <ul v-if="layoutGrid && !isLoading && repos.length > 0"
-                            class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        <ul v-if="layoutGrid && !isLoading && repos.length > 0" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                             <!-- <li v-for="repo in repos" :key="repo.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200"> -->
-                            <li v-for="repo in filteredList()" :key="repo.id"
-                                class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
+                            <li v-for="repo in filteredList()" :key="repo.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
                                 <router-link :to="{ name: 'repo', params: { repoId: repo.id } }">
                                     <repo-card :repo="repo">
                                     </repo-card>
@@ -105,15 +91,13 @@
                             </li>
                             <div v-if="showMessage">No repos found...</div>
                         </ul>
-                        <repo-table v-else-if="!layoutGrid && !isLoading && repos.length > 0" :repos="repos"
-                            :searchType="searchType" :searchInput="searchInput">
+                        <repo-table v-else-if="!layoutGrid && !isLoading && repos.length > 0" :repos="repos" :searchType="searchType" :searchInput="searchInput">
                         </repo-table>
                         <ul v-else-if="!isLoading && repos.length == 0" class="">
                             No repos found...
                         </ul>
                         <ul v-else class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                            <li v-for="index in 12" :key="index"
-                                class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
+                            <li v-for="index in 12" :key="index" class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
                                 <repo-card-placeholder :key="index">
                                 </repo-card-placeholder>
                             </li>
@@ -165,6 +149,7 @@ export default {
             ],
             /** */
             myPsts: [],
+            myRepos: [],
             isLoading: true,
             repoId: null,
             all_repo: "all_repo",
@@ -316,7 +301,6 @@ export default {
                 return contractSrcId;
             } else {
                 const route = import.meta.env.VITE_TX_GATEWAY + "?txId=" + contractId + (this.env === "TEST" ? "&testnet=true" : "");
-                console.log("route:" + route)
                 const response = await fetch(route);
                 if (!response.ok) {
                     this.$log.error("Repo : returnContractSrc :: ", "ERROR fetching transaction from gateway.");
@@ -342,17 +326,17 @@ export default {
             }
         },
 
+        // Loads a repo (warpRead using its contractId) from the permaweb and pushes its data to this.repos for Vue to display
         async loadAllRepos(contractId) {
             try {
-                console.log("ID: " + contractId)
                 // Added this b/c of the mount call to loadAllRepos.  Not sure why that was added.
                 if (!contractId) {
                     return;
                 }
                 /*** Using Warp */
+                // READ REPO CONTRACT
                 const cachedValue = await warpRead(contractId);
                 let repo = cachedValue.state;
-                console.log(repo)
 
                 /*** COMMENTING OUT CHECKING FOR CONTRACT SOURCE.
                  * WITH THE ADDITION OF EXECUTION MACHINE FUNCTIONS, WE MAY NOT NEED TO CHECK THE CONTRACT SOURCE.
@@ -361,9 +345,7 @@ export default {
                 // Check to make sure contract source matches AFTR Contract Source
                 let isAftrRepo = true;
                 const contractSrc = await this.returnContractSrc(contractId);
-                console.log("SOURCE: " + contractSrc)
                 const csArray = this.getAftrContractSources;
-                console.log(csArray)
                 if (!csArray.find(id => id === contractSrc)) {
                     this.$log.error("RepoList : loadAllRepos :: ", "Invalid AFTR Repo found - Contract ID: " + contractId);
                     isAftrRepo = false;
@@ -472,109 +454,75 @@ export default {
             }
 
             // Get all aftr repo contracts, then load all repos
-            let txs = await this.getAftrRepos();
-            for (let edge of txs.edges) {
-                let bundled = await this.arweave.api.get(edge.node.id)
-                let txId = bundled.data.id
-                await this.loadAllRepos(txId);
-                // await this.loadAllRepos(edge.node.id);
+            let aftrContractIds = await this.getAftrRepos();
+            for (let repoId of aftrContractIds) {
+                await this.loadAllRepos(repoId)
             }
+
+            // for (let edge of txs.edges) {
+            //     let bundled = await this.arweave.api.get(edge.node.id)
+            //     let txId = bundled.data.id
+            //     await this.loadAllRepos(txId);
+            //     // await this.loadAllRepos(edge.node.id);
+            // }
 
             this.numRepos = this.repos.length;
         },
         async getAftrRepos() {
-            let response = {};
-            // try {
-            //     response = await axios.get('http://localhost:3001/repos/read');
-            //     return response.data.state;
-            // } catch(e) {
-            //     return {};
-            // }
-
-            /*** TEMPORARILY QUERY ARWEAVE TO GET REPOS UNTIL EXECUTION MACHINE FUNCTIONS ARE WORKING PROPERLY */
+            let repoContractIds = [];
+            if (this.filter === 'my') {
+                repoContractIds = this.myRepos
+                return repoContractIds
+            }
             try {
-                this.arweave = await Arweave.init({
-                    host: this.arweaveHost,
-                    port: this.arweavePort,
-                    protocol: this.arweaveProtocol,
-                    timeout: 20000,
-                    logging: true,
-                });
-                let query = "";
+                let contractsArr = this.getAftrContractSources
+                let route = import.meta.env.VITE_CONTRACTS_BY_SOURCE_ENDPOINT
 
-                // Turn array into string so it can be put into the query string
-                const aftrContractSourcesString = JSON.stringify(this.getAftrContractSources);
+                // handle contractsArr
+                for (let contractSrc of contractsArr) {
+                    let limit = 9
+                    let page = 1
 
-                if (this.filter === "my") {
-                    query = `
-                        query($cursor: String) {
-                            transactions(
-                                tags: [ 
-                                    { name: "Protocol", values: ["${import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL}"] },
-                                    { name: "Contract-Src", values: ${aftrContractSourcesString} }
+                    let response = await fetch(route + contractSrc +
+                        (limit ? '&limit=' + limit : '') +
+                        (page ? '&page=' + page : '')
+                    )
+                    if (response.status !== 200) {
+                        throw response.status + " - " + response.statusText;
+                    }
 
-                                ]
-                                ids: ${JSON.stringify(this.myPsts)}
-                                first: 9
-                                after: $cursor
-                            ) {
-                                pageInfo {
-                                    hasNextPage
-                                }
-                                edges {
-                                    cursor
-                                    node { id } 
-                                }
-                            }
-                        }`;
-                } else {
-                    query = `
-                        query($cursor: String) {
-                            transactions(
-                                tags: [ 
-                                    { name: "Contract-Src", values: ${import.meta.env.VITE_AFTR_CONTRACT_SOURCES} }
-                                ]
-                                after: $cursor
-                        ) { 
-                            pageInfo { 
-                                hasNextPage
-                            }
-                                edges { 
-                                    cursor 
-                                    node { id }
-                                }
-                            }
-                        }`;
+                    let data = await response.json()
+                    for (let repo of data.contracts) {
+                        repoContractIds.push(repo.contractId)
+                    }
                 }
-
-                response = await this.arweave.api.post("graphql", {
-                    query: query,
-                    variables: { "cursor": this.cursor }
-                });
-
-                if (response.status !== 200) {
-                    throw response.status + " - " + response.statusText;
-                }
-            } catch (error) {
+            }
+            catch (error) {
                 this.$log.error("RepoList : getAftrRepos :: ", "ERROR while fetching from gateway: " + error);
                 return {};
             }
             //this.isLoading = false;
-            if (response.data.data.transactions.pageInfo.hasNextPage) {
-                this.hasNextPage = true;
-                const [lastNumber] = response.data.data.transactions.edges.slice(-1);
-                this.cursor = lastNumber.cursor;
-            } else {
-                this.hasNextPage = false;
-            }
-
-            return response.data.data.transactions;
+            // if (response.data.data.transactions.pageInfo.hasNextPage) {
+            //     this.hasNextPage = true;
+            //     const [lastNumber] = response.data.data.transactions.edges.slice(-1);
+            //     this.cursor = lastNumber.cursor;
+            // } else {
+            //     this.hasNextPage = false;
+            // }
+            // return response.data.data.transactions;
             /*** */
+            return repoContractIds
         },
         getUserPsts() {
             // Loads all of user's PSTs to be used as a filter on the My Repos query
             for (const pst of this.$store.getters.getActiveWallet.psts) {
                 this.myPsts.push(pst.contractId);
+            }
+        },
+        getUserRepos() {
+            // Loads all of user's Repos to be used as a filter on the My Repos query
+            for (const repo of this.$store.getters.getActiveWallet.repos) {
+                this.myRepos.push(repo.contractId);
             }
         },
         openModal() {
@@ -588,6 +536,10 @@ export default {
     async created() {
         this.isLoading = true;
         this.getUserPsts();
+        this.getUserRepos();
+
+        // check if user has psts
+
         await this.load();
 
         if (this.filter === "my" && this.repos.length == 0) {
@@ -595,7 +547,6 @@ export default {
             await this.filterChange();
         }
         this.isLoading = false;
-        console.log(this.getAftrContractSources);
     },
 
 };
@@ -603,422 +554,7 @@ export default {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<style src="vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css"/>
-<style scoped>
+<style src="vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css" scoped>
 .ps {
     height: 750px;
 }

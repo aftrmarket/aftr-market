@@ -131,7 +131,7 @@ export default {
             allowAdd: false,
             voteId: 0,
             voteData: {},
-            votes: this.repo.votes,
+            votes: this.repo.votes ? this.repo.votes : [],
             selectedVoteCategory: "Active",
             showVoteSimulator: false,
 
@@ -336,7 +336,6 @@ export default {
             if (!('votes' in this.repo)) {
                 this.repo.votes = [];
             }
-
         }
     },
     created() {
