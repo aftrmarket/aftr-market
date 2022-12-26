@@ -88,79 +88,6 @@
                         </pattern>
                     </defs>
                 </svg>
-
-                <div class="relative mt-12 sm:mt-16 lg:mt-24">
-                    <div class="lg:grid lg:grid-flow-row-dense lg:grid-cols-2 lg:gap-8 lg:items-center">
-                        <div class="lg:col-start-2">
-                            <h3 class="text-2xl font-extrabold text-gray-900 tracking-tight sm:text-3xl">Direct Profit Streams</h3>
-                            <p class="mt-3 text-lg text-gray-500">
-                                Use an AFTR Vehicle to encapsulate your Arweave assets to direct your profit streams.
-                            </p>
-
-                            <dl class="mt-10 space-y-10">
-                                <div v-for="item in groupingFeatures" :key="item.id" class="relative">
-                                    <dt>
-                                        <div class="absolute flex items-center justify-center h-12 w-12 rounded-md bg-aftrBlue text-white">
-                                            <component :is="item.icon" class="h-6 w-6" aria-hidden="true" />
-                                        </div>
-                                        <p class="ml-16 text-lg leading-6 font-medium text-gray-900">{{ item.name }}</p>
-                                    </dt>
-                                    <dd class="mt-2 ml-16 text-base text-gray-500">
-                                        {{ item.description }}
-                                    </dd>
-                                </div>
-                            </dl>
-                        </div>
-
-                        <div class="mt-10 -mx-4 relative lg:mt-0 lg:col-start-1">
-                            <svg class="absolute left-1/2 transform -translate-x-1/2 translate-y-16 lg:hidden" width="784" height="404" fill="none" viewBox="0 0 784 404" aria-hidden="true">
-                                <defs>
-                                    <pattern id="e80155a9-dfde-425a-b5ea-1f6fadd20131" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-                                        <rect x="0" y="0" width="4" height="4" class="text-gray-200" fill="currentColor" />
-                                    </pattern>
-                                </defs>
-                                <rect width="784" height="404" fill="url(#e80155a9-dfde-425a-b5ea-1f6fadd20131)" />
-                            </svg>
-                            <img class="relative mx-auto" width="490" src="../../assets/overview_profit.svg" alt="" />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="relative mt-12 lg:mt-24 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-center">
-                    <div class="relative">
-                        <h3 class="text-2xl font-extrabold text-gray-900 tracking-tight sm:text-3xl">Arweave Founders</h3>
-                        <p class="mt-3 text-lg text-gray-500">
-                            Create your decentratlized communities on AFTR Market.
-                        </p>
-
-                        <dl class="mt-10 space-y-10">
-                            <div v-for="item in founderFeatures" :key="item.id" class="relative">
-                                <dt>
-                                    <div class="absolute flex items-center justify-center h-12 w-12 rounded-md bg-aftrBlue text-white">
-                                        <component :is="item.icon" class="h-6 w-6" aria-hidden="true" />
-                                    </div>
-                                    <p class="ml-16 text-lg leading-6 font-medium text-gray-900">{{ item.name }}</p>
-                                </dt>
-                                <dd class="mt-2 ml-16 text-base text-gray-500">
-                                    {{ item.description }}
-                                </dd>
-                            </div>
-                        </dl>
-                    </div>
-
-                    <div class="mt-10 -mx-4 relative lg:mt-0" aria-hidden="true">
-                        <svg class="absolute left-1/2 transform -translate-x-1/2 translate-y-16 lg:hidden" width="784" height="404" fill="none" viewBox="0 0 784 404">
-                            <defs>
-                                <pattern id="ca9667ae-9f92-4be7-abcb-9e3d727f2941" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-                                    <rect x="0" y="0" width="4" height="4" class="text-gray-200" fill="currentColor" />
-                                </pattern>
-                            </defs>
-                            <rect width="784" height="404" fill="url(#ca9667ae-9f92-4be7-abcb-9e3d727f2941)" />
-                        </svg>
-                        <img class="relative mx-auto" width="490" src="../../assets/overview-create.svg" alt="" />
-                    </div>
-                </div>
-
             </div>
         </div>
 
@@ -192,67 +119,22 @@ const tmFeatures = [
         id: 2,
         name: "Multi-signature",
         description:
-            "Create DAO or individually owned vehicles to manage your Arweave assets.",
+            "Create multiple or individually owned repos to manage your Arweave assets.",
         icon: UserGroupIcon,
     },
     {
         id: 3,
         name: "Built-in Governance",
         description:
-            "Make changes to your vehicle and let AFTR Market determine if votes need to be cast.",
+            "Make changes to your repos and let AFTR Market determine if votes need to be cast.",
         icon: ClipboardListIcon,
     },
     {
         id: 4,
         name: "Governance Notifications (COMING SOON)",
         description:
-            "Automatically notify DAO members of proposed changes to your vehicle through the ArConnect wallet.",
+            "Automatically notify repo members of proposed changes to your vehicle through the ArConnect wallet.",
         icon: SpeakerphoneIcon,
-    },
-];
-const groupingFeatures = [
-    {
-        id: 1,
-        name: "Token Fractionalization",
-        description:
-            "Add members to your AFTR Vehicle to fractionalize the profit streams of your tokens.",
-        icon: ChartPieIcon,
-    },
-    {
-        id: 2,
-        name: "Indexing",
-        description:
-            "Group tokens together to form indexes of your Arweave assets.",
-        icon: ChartBarIcon,
-    },
-    {
-        id: 3,
-        name: "Loaning Assets (COMING SOON)",
-        description: "Temporarily loan assets to an AFTR Vehicle.",
-        icon: ReceiptRefundIcon,
-    },
-];
-const founderFeatures = [
-    {
-        id: 1,
-        name: "Create Your PSTs",
-        description:
-            "Mint your PSTs to be securely saved until you're ready to deploy your treasuries.",
-        icon: CurrencyDollarIcon,
-    },
-    {
-        id: 3,
-        name: "Evolve",
-        description:
-            "The Evolve protocol is supported to allow your PSTs to adapt to changes in the ecosystem.",
-        icon: GlobeAltIcon,
-    },
-    {
-        id: 2,
-        name: "Earn AFTR Tokens (COMING SOON)",
-        description:
-            "Earn additional profit streams by utilizing AFTR. 10% of AFTR's token supply is dedicated to its Partner Program.  An AFTR library is on the roadmap to incentivize adoption.",
-        icon: TrendingUpIcon,
     },
 ];
 
@@ -262,15 +144,13 @@ export default {
             if (site === 'TEST') {
                 window.location.href = import.meta.env.VITE_AFTR_TEST;
             } else {
-                this.$router.push("../vehicles");
+                this.$router.push("../repos");
             }
         }
     },
     setup() {
         return {
-            tmFeatures,
-            groupingFeatures,
-            founderFeatures,
+            tmFeatures
         };
     },
 };
