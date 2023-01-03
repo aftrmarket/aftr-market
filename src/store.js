@@ -101,44 +101,48 @@ async function buildWalletPsts(aftrSourcesArray, userAddr) {
 
     } else {
         // LATEST contract source: does not handle multiple contract sources in array
-        const contractSrc = aftrSourcesArray[aftrSourcesArray.length - 1];
+        // getAftrContractSources not working?
+        let contractsArr = aftrSourcesArray
 
-        let limit = 9
-        let page = 1
+        for (let contractSrc of contractsArr) {
 
-        let route = import.meta.env.VITE_CONTRACTS_BY_SOURCE_ENDPOINT;
-        let response = await fetch(route + contractSrc +
-            (limit ? '&limit=' + limit : '') +
-            (page ? '&page=' + page : '')
-        )
-        let object = await response.json()
-        for (let contract of object.contracts) {
-            let txId = contract.contractId;
-            try {
-                const cachedValue = await warpRead(txId);
-                let repo = cachedValue.state;
+            let limit = 9
+            let page = 1
 
-                if (repo && Object.keys(repo.balances).length != 0 && repo.name) {
-                    let data = {
-                        contractId: txId,
-                        balance: 0,
-                        name: repo.name,
-                        ticker: repo.ticker
-                    };
+            let route = import.meta.env.VITE_CONTRACTS_BY_SOURCE_ENDPOINT;
+            let response = await fetch(route + contractSrc +
+                (limit ? '&limit=' + limit : '') +
+                (page ? '&page=' + page : '')
+            )
+            let data = await response.json()
+            for (let contract of data.contracts) {
+                let txId = contract.contractId;
+                try {
+                    const cachedValue = await warpRead(txId);
+                    let repo = cachedValue.state;
 
-                    Object.keys(repo.balances).some((walletId) => {
-                        if (walletId == wallet.address) {
-                            data.balance = repo.balances[wallet.address];
+                    if (repo && Object.keys(repo.balances).length != 0 && repo.name) {
+                        let data = {
+                            contractId: txId,
+                            balance: 0,
+                            name: repo.name,
+                            ticker: repo.ticker
+                        };
+
+                        Object.keys(repo.balances).some((walletId) => {
+                            if (walletId == wallet.address) {
+                                data.balance = repo.balances[wallet.address];
+                            }
+                        });
+
+                        if (data.balance > 0) {
+                            wallet.psts.push(data);
+                            wallet.repos.push(data);
                         }
-                    });
-
-                    if (data.balance > 0) {
-                        wallet.psts.push(data);
-                        wallet.repos.push(data);
                     }
+                } catch (e) {
+                    console.log("ERROR reading contract for " + txId + ": " + e);
                 }
-            } catch (e) {
-                console.log("ERROR reading contract for " + txId + ": " + e);
             }
         }
     }
