@@ -7,7 +7,7 @@
             <div v-if="index < activities.length">
                 <div class="">
                     <span class="text-aftrBlue text-md font-medium uppercase tracking-wide">{{ activities.length - index
-                    }}. {{ interactionText(activities[index].input.function) }}</span>
+}}. {{ interactionText(activities[index].input.function) }}</span>
                     <span class="font-mono text-xs text-gray-500">({{ activities[index].id }})</span>
                 </div>
                 <div class="pl-8 pb-4">
@@ -17,8 +17,7 @@
                 <div class="flex flex-row">
                     <div v-if="activities[index].result">
                         <div class="pb-1 border-solid border border-green-500 rounded ">
-                            <span
-                                class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium bg-white border-1 border-green text-green">
+                            <span class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium bg-white border-1 border-green text-green">
                                 <svg class="-ml-0.5 mr-1.5 h-2 w-2" fill="green" viewBox="0 0 8 8">
                                     <circle cx="4" cy="4" r="3" />
                                 </svg>
@@ -28,8 +27,7 @@
                     </div>
                     <div v-else>
                         <div class="pb-1 border-solid border border-red-500 rounded ">
-                            <span
-                                class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium bg-white border-1 border-red text-red">
+                            <span class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium bg-white border-1 border-red text-red">
                                 <svg class="-ml-0.5 mr-1.5 h-2 w-2" fill="red" viewBox="0 0 8 8">
                                     <circle cx="4" cy="4" r="3" />
                                 </svg>
@@ -38,21 +36,20 @@
                         </div>
                     </div>
                     <div class="pl-10 pt-2 text-xs">Block <span class="font-mono text-gray-500">{{
-                            activities[index].block
-                    }}</span></div>
+        activities[index].block
+}}</span></div>
                     <div class="pl-10 pt-2 text-xs">
                         Caller
                         <span v-if="activities[index].result" class="font-mono text-green-600">{{
-                                activities[index].owner
-                        }}</span>
+        activities[index].owner
+}}</span>
                         <span v-else class="font-mono text-red-600">{{ activities[index].owner }}</span>
                     </div>
                 </div>
             </div>
         </div>
         <div v-if="commentsToShow < activities.length || activities.length > commentsToShow">
-            <button @click="commentsToShow += 10"
-                class="mt-4 px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            <button @click="commentsToShow += 10" class="mt-4 px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
                 Show More Activities
             </button>
         </div>
@@ -60,8 +57,9 @@
 </template>
 
 <script>
+
 export default {
-    props: ["arweave", "interactions", "errorMessages"],
+    props: ["arweave", "repoId", "interactions", "errorMessages"],
     data() {
         return {
             isLoading: true,
@@ -92,18 +90,19 @@ export default {
                 showConfirmButton: false,
             })
         },
-        parseActivity(edge) {
+        parseActivity(data) {
+            console.log(data)
             // Parses the query response and returns an object with the needed variables
             let activity = {};
-            activity.id = edge.node.id;
-            activity.owner = edge.node.owner.address;
-            activity.timestamp = edge.node.block.timestamp;
-            activity.block = edge.node.block.height;
+            activity.id = data.id;
+            activity.owner = data.owner.address;
+            activity.timestamp = data.block.timestamp;
+            activity.block = data.block.height;
             activity.result = this.interactions[activity.id];
 
             console.log("activity.result ", activity.result);
             // Parse Input tag to get the interaction specifics
-            for (let tag of edge.node.tags) {
+            for (let tag of data.tags) {
                 if (tag.name === "Input") {
                     activity.input = JSON.parse(tag.value);
                 }
@@ -209,35 +208,111 @@ export default {
             const responseData = await this.runQuery(query, "Error querying interactions. ");
             this.edges = responseData.data.data.transactions.edges;
         },
+        async getInteractions(contractId) {
+            console.log(contractId);
+            let route = 'https://gateway.redstone.finance/gateway/interactions?contractId=' + contractId + (this.network === 'TEST' ? '&testnet=true' : '');
+            let response = await fetch(route)
+            let data = await response.json()
+            return data.interactions
+        }
     },
     async created() {
         this.isLoading = true;
-
-        let interactionStrings = []
-        for (const i in this.interactions) {
-            interactionStrings.push(i)
+        let interactions = await this.getInteractions(this.repoId)
+        for (const i of interactions) {
+            let parsed = this.parseActivity(i.interaction)
+            this.activities.push(parsed)
         }
 
-        const numChunks = Math.ceil(interactionStrings.length / 10);
-        let data = Array.from(
-            { length: numChunks },
-            (_, i) => interactionStrings.slice(i * interactionStrings.length / numChunks, (i + 1) * interactionStrings.length / numChunks)
-        );
-        // Read the tags for all contract interactions
+        // let txIds = Object.keys(JSON.parse(JSON.stringify(this.interactions)))
+        // for (const interaction of txIds) {
+        //     await this.readInteraction(interaction)
+        // }
 
-        for (let i = 0; i < data.length; i++) {
-            await this.readInteractions(data[i]);
 
-            for (let edge of this.edges) {
-                this.activities.push(this.parseActivity(edge));
-            }
-        }
+        // let interactionStrings = []
+        // for (const i in this.interactions) {
+        //     interactionStrings.push(i)
+        // }
+
+        // const numChunks = Math.ceil(interactionStrings.length / 10);
+        // let data = Array.from(
+        //     { length: numChunks },
+        //     (_, i) => interactionStrings.slice(i * interactionStrings.length / numChunks, (i + 1) * interactionStrings.length / numChunks)
+        // );
+        // // Read the tags for all contract interactions
+
+        // for (let i = 0; i < data.length; i++) {
+        //     await this.readInteractions(data[i]);
+
+        //     for (let edge of this.edges) {
+        //         this.activities.push(this.parseActivity(edge));
+        //     }
+        // }
         this.activities.reverse();
         this.isLoading = false;
         return
     }
 }
 </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
