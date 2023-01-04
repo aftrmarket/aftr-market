@@ -1,6 +1,6 @@
 module.exports = {
-  purge: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
-  darkMode: false, // or 'media' or 'class'
+  content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
+  darkMode: "media", // or 'media' or 'class'
   theme: {
     extend: {
       colors: {
@@ -9,9 +9,9 @@ module.exports = {
           DEFAULT: '#FFFC79'
         },
         aftrDarkGrey: {
-        //   light: '#707070',
-        //   DEFAULT: '#3F3F3F',
-        //   dark: '#202020'
+          //   light: '#707070',
+          //   DEFAULT: '#3F3F3F',
+          //   dark: '#202020'
           light: '#8D98A3',
           DEFAULT: '#484F55',
           //DEFAULT: '#323B3D',
@@ -25,15 +25,15 @@ module.exports = {
           DEFAULT: '#FF6C8C'
         },
         aftrGo: {
-            light: 'rgba(0, 0, 0, 0.4)',
-            DEFAULT: '#00F900',
-            dark: 'rgba(0, 0, 0, 0.6)'
+          light: 'rgba(0, 0, 0, 0.4)',
+          DEFAULT: '#00F900',
+          dark: 'rgba(0, 0, 0, 0.6)'
         },
         aftrDarkGreen: {
-            DEFAULT: '#065F46'
+          DEFAULT: '#065F46'
         },
         smoke: {
-            DEFAULT: 'rgba(0, 0, 0, 0.5)'
+          DEFAULT: 'rgba(0, 0, 0, 0.5)'
         }
       }
     },

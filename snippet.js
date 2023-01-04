@@ -16,17 +16,17 @@ try {
 const tags = [{ name: "Protocol", value: this.tagProtocol }];
 this.contractSourceId = "BTxbGwMEyVv94ak2CDeuCAXLWnAhwLb_hK4qw8_a-JU";  // Contract for testing
 /****
- this.vehicle = 
+ this.repo = 
  {
-  "name": "Test Vehicle",
+  "name": "Test Repo",
   "ticker": "AFTR-Test-1",
-  "creator": "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
+  "owner": "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8",
   "seats": 0,
   "lockPeriod": 0,
   "minLease": 2,
   "maxLease": 24,
   "logo": "9CYPS85KChE_zQxNLi2y5r2FLG-YE6HiphYYTlgtrtg",
-  "ownership": "dao",
+  "ownership": "multi",
   "status": "stopped",
   "balances": {
     "abd7DMW1A8-XiGUVn5qxHLseNhkJ5C1Cxjjbj6XC3M8": 12300,
@@ -38,9 +38,9 @@ this.contractSourceId = "BTxbGwMEyVv94ak2CDeuCAXLWnAhwLb_hK4qw8_a-JU";  // Contr
 
 // Create SmartWeave contract
 try {
-    console.log("vehicle: " + JSON.stringify(this.vehicle));
-    this.vehicle['id'] = await createContractFromTx(arweave, "use-wallet", this.contractSourceId, JSON.stringify(this.vehicle), tags);
-} catch(error) {
+    console.log("repo: " + JSON.stringify(this.repo));
+    this.repo['id'] = await createContractFromTx(arweave, "use-wallet", this.contractSourceId, JSON.stringify(this.repo), tags);
+} catch (error) {
     console.log("ERROR creating SmartWeave contract: " + error);
     return false;
 }

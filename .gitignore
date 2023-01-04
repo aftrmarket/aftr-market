@@ -5,4 +5,5 @@ dist-ssr
 *.local
 keyfile.json
 .vercel
-code-workspace
+.code-workspace
+aftr.code-workspace
