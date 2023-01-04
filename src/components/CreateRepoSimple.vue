@@ -139,7 +139,7 @@ export default {
                 "evolve": "",
                 "settings": [
                     ["quorum", 0.5],
-                    ["support", 0.5],
+                    ["support", 0.51],
                     ["voteLength", 2160],
                     ["communityLogo", ""]
                 ]
