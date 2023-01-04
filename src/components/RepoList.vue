@@ -452,7 +452,7 @@ export default {
             if (import.meta.env.VITE_ENV === "PROD" || import.meta.env.VITE_ENV === "TEST") {
                 this.$store.commit("setAftrContractSources");
             }
-            
+
             // Get all aftr repo contracts, then load all repos
             let aftrContractIds = await this.getAftrRepos();
             for (let repoId of aftrContractIds) {
@@ -477,8 +477,6 @@ export default {
             try {
                 let contractsArr = this.getAftrContractSources
                 let route = import.meta.env.VITE_CONTRACTS_BY_SOURCE_ENDPOINT
-
-                // handle contractsArr
                 for (let contractSrc of contractsArr) {
                     let limit = 9
                     let page = 1

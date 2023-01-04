@@ -12,7 +12,7 @@
                                 <span class="block text-aftrYellow">Arweave assets</span>
                             </h1>
                             <p class="mt-3 text-base text-gray-300 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
-                                AFTR Market provides treasury management and governance on-chain for <a
+                                AFTR Market provides asset management and governance on-chain for <a
                                     href="https://arweave.org" target="_blank" style="color:#FFFC79;">Arweave</a>
                                 assets.
                             </p>
@@ -48,13 +48,14 @@
             </div>
         </div>
 
+
         <div class="py-4 bg-gray-50 overflow-hidden lg:py-4">
             <div class="relative max-w-xl mx-auto px-4 sm:px-6 lg:px-8 lg:max-w-7xl">
 
                 <div class="relative mt- lg:mt-2 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-center">
                     <div class="relative">
-                        <h3 class="text-2xl font-extrabold text-gray-900 tracking-tight sm:text-3xl">Treasury Management
-                        </h3>
+                        <h2 class="text-base text-aftrBlue font-semibold tracking-wide uppercase">Introducing</h2>
+                        <h3 class="text-2xl font-extrabold text-gray-900 tracking-tight sm:text-3xl">Arweave Asset Management</h3>
                         <p class="mt-3 text-lg text-gray-500">
                             Securely manage your Arweave assets on-chain.
                         </p>
@@ -75,7 +76,7 @@
                         </dl>
                     </div>
 
-                    <div class="mt-10 -mx-4 relative lg:mt-0" aria-hidden="true">
+                    <div class="mt-10 -mx-4 pb-20 relative lg:mt-0" aria-hidden="true">
                         <svg class="absolute left-1/2 transform -translate-x-1/2 translate-y-16 lg:hidden" width="784"
                             height="404" fill="none" viewBox="0 0 784 404">
                             <defs>
@@ -86,7 +87,7 @@
                             </defs>
                             <rect width="784" height="404" fill="url(#ca9667ae-9f92-4be7-abcb-9e3d727f2941)" />
                         </svg>
-                        <img class="relative mx-auto" width="490" src="../../assets/overview-mgmt.svg" alt="" />
+                        <img class="relative mx-auto" src="../../assets/overview-repo.svg" alt="" width="1184" height="1376" />
                     </div>
                 </div>
 
@@ -101,7 +102,6 @@
                 </svg>
             </div>
         </div>
-
     </main>
 </template>
 
@@ -117,6 +117,7 @@ import {
     CurrencyDollarIcon,
     ArrowTrendingUpIcon,
     GlobeAltIcon,
+    PencilSquareIcon,
 } from "@heroicons/vue/24/outline";
 
 import { mapGetters } from "vuex";
@@ -125,22 +126,23 @@ import { warpRead, warpWrite, arweaveInit, warpCreateContract } from './../utils
 const tmFeatures = [
     {
         id: 1,
-        name: "Security",
-        description: "Stores assets on-chain.",
-        icon: LockClosedIcon,
+        name: "Multi-signature",
+        description:
+            "Securely store your Arweave assets on-chain using AFTR's multi-signature capabilities. Create multiple or individually owned repos to protect your assets.",
+        icon: UserGroupIcon,
     },
     {
         id: 2,
-        name: "Multi-signature",
+        name: "Composable",
         description:
-            "Create multiple or individually owned repos to manage your Arweave assets.",
-        icon: UserGroupIcon,
-    },
+            "Build repos to meet your needs, define voting systems, set parameters such as quorum and support, add new settings, set member voting power, and more!",
+        icon: PencilSquareIcon,
+    },    
     {
         id: 3,
         name: "Built-in Governance",
         description:
-            "Make changes to your repo and let AFTR Market determine if votes need to be cast.",
+            "Make changes to your repo and let the smart contract determine if votes need to be cast.",
         icon: ClipboardDocumentListIcon,
     },
     {

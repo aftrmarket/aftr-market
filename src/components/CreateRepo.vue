@@ -517,7 +517,7 @@ export default {
             quorumIsValid: true,
             supportIsValid: true,
             newQuorum: 0.5,
-            newSupport: 0.5,
+            newSupport: 0.51,
             fileUpload: false,
             showVoteSimulator: false,
         };

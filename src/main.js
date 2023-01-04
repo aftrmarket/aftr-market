@@ -14,7 +14,7 @@ import UiTest from './components/UiTest.vue';
 import ContractRead from './components/ContractRead.vue';
 import Overview from './components/Overview.vue';
 import MyPortfolio from './components/MyPortfolio.vue';
-import AftrContractSource from './components/AftrContractSource.vue'
+import ContractSource from './components/ContractSource.vue'
 import Chat from './components/utils/Chat.vue';
 import VueSweetalert2 from 'vue-sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
@@ -52,7 +52,7 @@ const router = createRouter({
         { name: 'ui-test', path: '/ui-test', component: UiTest },
         { name: 'read', path: '/read/:contractId', component: ContractRead, props: true },
         { name: 'overview', path: '/overview', component: Overview, props: true, alias: '/' },
-        { name: 'latest-contract-source', path: '/latest-contract-source', component: AftrContractSource },
+        { name: 'contract-source', path: '/contract-source/:contractId', component: ContractSource, props: true },
         // {
         //     path: '/latest-contract-src',
         //     beforeEnter(to, from, next) {

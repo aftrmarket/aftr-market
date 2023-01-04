@@ -10,8 +10,10 @@
             </div>
             <div class="px-4 py-6 sm:px-6 grid grid-cols-2 gap-x-4">
                 <label class="block text-lg text-gray-900">Repo's Running Source:</label>
-                <label :class="repoRunningSrcClass">
-                    {{ walletAddressSubstr(repoRunningSourceId) }}
+                <router-link :to="{ name: 'contract-source', params: { contractId: repoRunningSourceId } }" :class="repoRunningSrcClass">
+                    <p class="hover:underline">
+                        {{ walletAddressSubstr(repoRunningSourceId) }}
+                    </p>
                     <span v-if="repoRunningSourceId === latestAftrSrcId" class="py-1 tooltip">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="green" class="w-5 h-5">
                             <path fill-rule="evenodd"
@@ -28,11 +30,12 @@
                         </svg>
                         <span class="tooltiptext text-sm">Newer AFTR version available</span>
                     </span>
-                </label>
+                </router-link>
                 <label class="block text-lg text-gray-900">Latest AFTR Source:</label>
-                <label class="block text-aftrBlue text-lg font-mono tracking-wider" @click="viewLatestAftrSource">{{
-                        walletAddressSubstr(latestAftrSrcId)
-                }}</label>
+                <router-link :to="{ name: 'contract-source', params: { contractId: latestAftrSrcId } }"
+                    class="block text-aftrBlue text-lg font-mono tracking-wider hover:underline">
+                    {{ walletAddressSubstr(latestAftrSrcId) }}
+                </router-link>
             </div>
         </div>
         <div v-if="repo.desc !== '' && repo.desc !== undefined" class="px-4 py-4 sm:px-6">
@@ -48,9 +51,7 @@
                         </dt>
                         <dd class="mt-1 text-3xl font-semibold text-aftrBlue">
                             {{ formatNumber(counts.members.total) }}
-                            <span class="ml-2 text-sm font-medium text-gray-500"> with {{
-                                    formatNumber(counts.members.sumOfLocked)
-                            }} locked in the vault</span>
+                            <span class="ml-2 text-sm font-medium text-gray-500"> with {{ formatNumber(counts.members.sumOfLocked) }} locked in the vault</span>
                         </dd>
                     </div>
                 </dl>
@@ -61,9 +62,7 @@
                         </dt>
                         <dd class="mt-1 text-3xl font-semibold text-aftrBlue">
                             {{ formatNumber(counts.assets.sumOfTokens) }}
-                            <span class="ml-2 text-sm font-medium text-gray-500"> from {{
-                                    formatNumber(counts.assets.total)
-                            }} assets</span>
+                            <span class="ml-2 text-sm font-medium text-gray-500"> from {{ formatNumber(counts.assets.total) }} assets</span>
                         </dd>
                     </div>
                 </dl>
@@ -74,9 +73,7 @@
                         </dt>
                         <dd class="mt-1 text-3xl font-semibold text-aftrBlue">
                             {{ formatNumber(counts.votes.active) }}
-                            <span class="ml-2 text-sm font-medium text-gray-500"> from {{
-                                    formatNumber(counts.votes.total)
-                            }} votes</span>
+                            <span class="ml-2 text-sm font-medium text-gray-500"> from {{ formatNumber(counts.votes.total) }} votes</span>
                         </dd>
                     </div>
                 </dl>
@@ -254,7 +251,7 @@ export default {
             }
         },
         aggregateInfo() {
-            this.$log.info("RepoInfoRead : aggregateInfo :: ", JSON.stringify(this.repo));
+            // this.$log.info("RepoInfoRead : aggregateInfo :: ", JSON.stringify(this.repo));
 
             if (!this.repo.votingSystem || this.repo.votingSystem === '' || this.repo.votingSystem === 'undefined') {
                 this.repo.votingSystem = 'equal';
@@ -296,7 +293,7 @@ export default {
             }
         },
         viewLatestAftrSource() {
-            this.$router.push("../latest-contract-source");
+            this.$router.push({ name: 'contract-source', params: { contractId: this.latestAftrSrcId } });
         }
     },
     created() {
