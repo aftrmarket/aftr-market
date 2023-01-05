@@ -10,8 +10,7 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th colspan="2" scope="col"
-                                class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th colspan="2" scope="col" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Approved Withdrawals
                             </th>
                         </tr>
@@ -36,10 +35,8 @@
             <div>
                 <button @click.prevent="processWithdrawalClick" type="button"
                     class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrDarkGreen bg-white hover:bg-aftrDarkGreen hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrDarkGreen">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                     </svg>
                     <span class="pl-2">FINALIZE</span>
                 </button>
@@ -63,50 +60,38 @@
                                     <th v-if="allowTransfer" scope="col" class="pl-3 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">
                                         <input type="checkbox" v-model="selectAll" :class="checkboxClass" />
                                     </th>-->
-                                    <th scope="col"
-                                        class="px-1 py-2 text-left font-medium text-gray-500 uppercase tracking-wider pl-8">
+                                    <th scope="col" class="px-1 py-2 text-left font-medium text-gray-500 uppercase tracking-wider pl-8">
                                         Arweave Assets ({{ repo.tokens.length }})</th>
-                                    <th scope="col"
-                                        class="px-1 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">
+                                    <th scope="col" class="px-1 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">
                                         Contributor</th>
-                                    <th scope="col"
-                                        class="px-1 py-2 text-right font-medium text-gray-500 uppercase tracking-wider">
+                                    <th scope="col" class="px-1 py-2 text-right font-medium text-gray-500 uppercase tracking-wider">
                                         Balance</th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-right font-medium text-gray-500 uppercase tracking-wider">
+                                    <th scope="col" class="px-6 py-3 text-right font-medium text-gray-500 uppercase tracking-wider">
                                     </th>
-                                    <th v-if="allowTransfer" scope="col"
-                                        class="py-3 text-left font-medium text-gray-500 uppercase tracking-wider">
+                                    <th v-if="allowTransfer" scope="col" class="py-3 text-left font-medium text-gray-500 uppercase tracking-wider">
                                         Transfer Amount</th>
-                                    <th v-if="allowTransfer" scope="col"
-                                        class="px-4 py-3 text-left font-medium text-gray-500 uppercase tracking-wider w-65">
+                                    <th v-if="allowTransfer" scope="col" class="px-4 py-3 text-left font-medium text-gray-500 uppercase tracking-wider w-65">
                                         Transfer To Address</th>
-                                    <th v-if="allowTransfer" scope="col"
-                                        class="py-3 text-left font-medium text-gray-500 uppercase tracking-wider">
+                                    <th v-if="allowTransfer" scope="col" class="py-3 text-left font-medium text-gray-500 uppercase tracking-wider">
                                         W/D</th>
-                                    <th scope="col"
-                                        class="py-3 text-left font-medium text-gray-500 uppercase tracking-wider">
+                                    <th scope="col" class="py-3 text-left font-medium text-gray-500 uppercase tracking-wider">
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-gray-200" v-for="(pst1) in getRepo1()"
-                                :key="pst1.tokenId">
+                            <tbody class="bg-white divide-y divide-gray-200" v-for="(pst1) in getRepo1()" :key="pst1.tokenId">
                                 <tr @click="toggle(pst1.tokenId)" :class="{ opened: opened.includes(pst1.tokenId) }">
                                     <td class="px-1 py-2 text-gray-500 font-mono cursor-pointer">
                                         <div class="flex items-center mt-3 ml-3 mb-3">
-                                            <div class="flex-shrink-0 h-10 w-10"
-                                                @click.prevent="showTokenState(pst1.tokenId, pstLogo(pst1.tokenId, pst1.logo))">
-                                                <img class="h-10 w-10 rounded-full"
-                                                    :src="pstLogo(pst1.tokenId, pst1.logo)" alt="" />
+                                            <div class="flex-shrink-0 h-10 w-10" @click.prevent="showTokenState(pst1.tokenId, pstLogo(pst1.tokenId, pst1.logo))">
+                                                <img class="h-10 w-10 rounded-full" :src="pstLogo(pst1.tokenId, pst1.logo)" alt="" />
                                             </div>
                                             <div class="ml-4">
                                                 <div class="font-medium text-gray-900"> {{ pst1.name + " (" +
-                                                        pst1.ticker + ")"
-                                                }} ({{ pst1.count }})</div>
-                                                <div class="text-gray-500 font-mono"
-                                                    @click.prevent="showWalletAddress(pst1.tokenId)"> {{
-                                                            idSubstr(pst1.tokenId)
-                                                    }}</div>
+        pst1.ticker + ")"
+}} ({{ pst1.count }})</div>
+                                                <div class="text-gray-500 font-mono" @click.prevent="showWalletAddress(pst1.tokenId)"> {{
+        idSubstr(pst1.tokenId)
+}}</div>
                                             </div>
                                         </div>
                                     </td>
@@ -126,37 +111,32 @@
                                         </svg>  -->
                                     </td>
                                 </tr>
-                                <tr v-for="(pst, index) in getRepo(pst1.tokenId)" v-show="opened.includes(pst1.tokenId)"
-                                    :key="pst.tokenId" class="bg-gray-100">
+                                <tr v-for="(pst, index) in getRepo(pst1.tokenId)" v-show="opened.includes(pst1.tokenId)" :key="pst.tokenId" class="bg-gray-100">
 
                                     <td class="px-1 py-2 text-gray-500 font-mono cursor-pointer">
                                         <div class="flex items-center">
                                             <div class="ml-4">
                                                 <!-- <div class="font-medium text-gray-900"> {{ pst.name + " (" + pst.ticker + ")" }} </div> -->
-                                                <div class="text-gray-500 font-mono"
-                                                    @click.prevent="showWalletAddress(pst.txID)"> {{ index + 1 }}.
+                                                <div class="text-gray-500 font-mono" @click.prevent="showWalletAddress(pst.txID)"> {{ index + 1 }}.
                                                     {{
-                                                            idSubstr(pst.txID)
-                                                    }}</div>
+        idSubstr(pst.txID)
+}}</div>
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="px-1 py-3 text-gray-500 font-mono cursor-pointer"
-                                        @click.prevent="showWalletAddress(pst.source)">{{ idSubstr(pst.source) }}
+                                    <td class="px-1 py-3 text-gray-500 font-mono cursor-pointer" @click.prevent="showWalletAddress(pst.source)">{{ idSubstr(pst.source) }}
                                     </td>
                                     <td class="text-right px-1 py-3 text-gray-500">{{ formatNumber(pst.balance) }}
                                     </td>
                                     <td class="text-right px-6 py-3 text-gray-500"></td>
                                     <td v-if="allowTransfer" class="pt-1">
-                                        <input type="number" v-model="transferAmounts[index]"
-                                            :class="transferAmtInput" />
+                                        <input type="number" v-model="transferAmounts[index]" :class="transferAmtInput" />
                                     </td>
                                     <td v-if="allowTransfer" class="pt-1 flex items-center space-x-2">
                                         <input type="text" v-model="transferAddrs[index]" :class="transferAddrInput" />
                                         <button v-if="index == 0" @click.prevent="onFillDownClick" type="button"
                                             class="p-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
-                                                fill="currentColor">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                                 <path fill-rule="evenodd"
                                                     d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
                                                     clip-rule="evenodd" />
@@ -164,11 +144,9 @@
                                         </button>
                                     </td>
                                     <td v-if="allowTransfer" class="pt-1">
-                                        <button @click.prevent="onTransferPstClick(pst.txID, index, pst.tokenId)"
-                                            type="button"
+                                        <button @click.prevent="onTransferPstClick(pst.txID, index, pst.tokenId)" type="button"
                                             class="p-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
-                                                fill="currentColor">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                                 <path fill-rule="evenodd"
                                                     d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V8z"
                                                     clip-rule="evenodd" />
@@ -190,9 +168,7 @@
             <button v-if="allowAdd" @click.prevent="addPst" type="button"
                 class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"
-                        clip-rule="evenodd" />
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
                 </svg>
                 <span class="pl-2">ADD ASSETS</span>
             </button>
@@ -214,19 +190,16 @@
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th colspan="2" scope="col"
-                            class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th colspan="2" scope="col" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Proposed Changes ({{ numChanges }})
                         </th>
-                        <th scope="col"
-                            class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th scope="col" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Cancel
                         </th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    <tr v-for="(wd, index) in proposedChanges" :key="wd.txID"
-                        class="text-xs text-gray-500 hover:bg-gray-50">
+                    <tr v-for="(wd, index) in proposedChanges" :key="wd.txID" class="text-xs text-gray-500 hover:bg-gray-50">
                         <td class="px-4 py-2">
                             {{ index + 1 }}
                         </td>
@@ -236,8 +209,7 @@
                         <td class="px-4 py-2 text-center">
                             <button @click.prevent="onRemoveProposalClick(index)" type="button"
                                 class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
-                                    fill="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd"
                                         d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
                                         clip-rule="evenodd" />
@@ -262,9 +234,7 @@
                     class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                         <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"></path>
-                        <path fill-rule="evenodd"
-                            d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
-                            clip-rule="evenodd"></path>
+                        <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"></path>
                     </svg>
                     <span class="pl-2">Update Repo</span>
                 </button>
@@ -548,7 +518,7 @@ export default {
                     txType = "UNSURE";
                 }
             } else {
-                const route = `${this.txGateway}?txId=${txID}${this.network === "TEST" ? "&testnet=true" : ""}`;
+                const route = `${this.txGateway}?txId=${id}${this.network === "TEST" ? "&testnet=true" : ""}`;
                 let response = await fetch(route);
                 if (!response.ok) {
                     txType = "UNSURE";
@@ -850,6 +820,12 @@ export default {
     },
 };
 </script>
+
+
+
+
+
+
 
 
 
