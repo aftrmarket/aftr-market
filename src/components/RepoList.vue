@@ -77,37 +77,39 @@
                         </div>
                         <div></div>
                         <div class="text-right text-sm">
-                            {{ numRepos }} Repos Shown
+                            {{ this.repos.length }} Repos Shown
                         </div>
                     </div>
-                    <perfect-scrollbar>
-                        <ul v-if="layoutGrid && !isLoading && repos.length > 0" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                            <!-- <li v-for="repo in repos" :key="repo.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200"> -->
-                            <li v-for="repo in filteredList()" :key="repo.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
-                                <router-link :to="{ name: 'repo', params: { repoId: repo.id } }">
-                                    <repo-card :repo="repo">
-                                    </repo-card>
-                                </router-link>
-                            </li>
-                            <div v-if="showMessage">No repos found...</div>
-                        </ul>
-                        <repo-table v-else-if="!layoutGrid && !isLoading && repos.length > 0" :repos="repos" :searchType="searchType" :searchInput="searchInput">
-                        </repo-table>
-                        <ul v-else-if="!isLoading && repos.length == 0" class="">
-                            No repos found...
-                        </ul>
-                        <ul v-else class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                            <li v-for="index in 12" :key="index" class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
-                                <repo-card-placeholder :key="index">
-                                </repo-card-placeholder>
-                            </li>
-                        </ul>
-                        <div class="text-center">
-                            <button v-if="!isLoading && hasNextPage" @click.prevent="load" type="submit"
-                                class="mt-4 px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Load
-                                More</button>
-                        </div>
-                    </perfect-scrollbar>
+                    <!-- <perfect-scrollbar> -->
+                    <!-- <ul v-if="layoutGrid && !isLoading && repos.length > 0" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"> -->
+                    <ul v-if="layoutGrid && repos.length > 0" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        <!-- <li v-for="repo in repos" :key="repo.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200"> -->
+                        <li v-for="repo in filteredList()" :key="repo.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
+                            <router-link :to="{ name: 'repo', params: { repoId: repo.id } }">
+                                <repo-card :repo="repo">
+                                </repo-card>
+                            </router-link>
+                        </li>
+                        <div v-if="showMessage">No repos found...</div>
+                    </ul>
+                    <!-- <repo-table v-else-if="!layoutGrid && !isLoading && repos.length > 0" :repos="repos" :searchType="searchType" :searchInput="searchInput"> -->
+                    <repo-table v-else-if="!layoutGrid && repos.length > 0" :repos="repos" :searchType="searchType" :searchInput="searchInput">
+                    </repo-table>
+                    <ul v-else-if="!isLoading && repos.length == 0" class="">
+                        No repos found...
+                    </ul>
+                    <ul v-else class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        <li v-for="index in 12" :key="index" class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
+                            <repo-card-placeholder :key="index">
+                            </repo-card-placeholder>
+                        </li>
+                    </ul>
+                    <div class="text-center">
+                        <button v-if="!isLoading && hasNextPage" @click.prevent="load" type="submit"
+                            class="mt-4 px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Load
+                            More</button>
+                    </div>
+                    <!-- </perfect-scrollbar> -->
                 </div>
 
                 <!-- <div v-if="!isLoading && noResult" class="">
@@ -455,9 +457,9 @@ export default {
 
             // Get all aftr repo contracts, then load all repos
             let aftrContractIds = await this.getAftrRepos();
-            for (let repoId of aftrContractIds) {
-                await this.loadAllRepos(repoId)
-            }
+            // for (let repoId of aftrContractIds) {
+            //     await this.loadAllRepos(repoId)
+            // }
 
             // for (let edge of txs.edges) {
             //     let bundled = await this.arweave.api.get(edge.node.id)
@@ -469,35 +471,37 @@ export default {
             this.numRepos = this.repos.length;
         },
         async getAftrRepos() {
-            let repoContractIds = [];
             if (this.filter === 'my') {
-                repoContractIds = this.myRepos
-                return repoContractIds
-            }
-            try {
-                let contractsArr = this.getAftrContractSources
-                let route = import.meta.env.VITE_CONTRACTS_BY_SOURCE_ENDPOINT
-                for (let contractSrc of contractsArr) {
-                    let limit = 9
-                    let page = 1
-
-                    let response = await fetch(route + contractSrc +
-                        (limit ? '&limit=' + limit : '') +
-                        (page ? '&page=' + page : '')
-                    )
-                    if (response.status !== 200) {
-                        throw response.status + " - " + response.statusText;
-                    }
-
-                    let data = await response.json()
-                    for (let repo of data.contracts) {
-                        repoContractIds.push(repo.contractId)
-                    }
+                for (let repoId of this.myRepos) {
+                    await this.loadAllRepos(repoId)
                 }
             }
-            catch (error) {
-                this.$log.error("RepoList : getAftrRepos :: ", "ERROR while fetching from gateway: " + error);
-                return {};
+            else {
+                try {
+                    let contractsArr = this.getAftrContractSources
+                    let route = import.meta.env.VITE_CONTRACTS_BY_SOURCE_ENDPOINT
+                    for (let contractSrc of contractsArr) {
+                        let limit = 9
+                        let page = 1
+
+                        let response = await fetch(route + contractSrc
+                            // + (limit ? '&limit=' + limit : '')
+                            // + (page ? '&page=' + page : '')
+                        )
+                        if (response.status !== 200) {
+                            throw response.status + " - " + response.statusText;
+                        }
+
+                        let data = await response.json()
+                        for (let repo of data.contracts) {
+                            await this.loadAllRepos(repo.contractId)
+                        }
+                    }
+                }
+                catch (error) {
+                    this.$log.error("RepoList : getAftrRepos :: ", "ERROR while fetching from gateway: " + error);
+                    return {};
+                }
             }
             //this.isLoading = false;
             // if (response.data.data.transactions.pageInfo.hasNextPage) {
@@ -509,7 +513,6 @@ export default {
             // }
             // return response.data.data.transactions;
             /*** */
-            return repoContractIds
         },
         getUserPsts() {
             // Loads all of user's PSTs to be used as a filter on the My Repos query
