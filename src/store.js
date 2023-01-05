@@ -106,14 +106,11 @@ async function buildWalletPsts(aftrSourcesArray, userAddr) {
 
         for (let contractSrc of contractsArr) {
 
-            let limit = 9
-            let page = 1
+            // let limit = 9
+            // let page = 1
 
             let route = import.meta.env.VITE_CONTRACTS_BY_SOURCE_ENDPOINT;
-            let response = await fetch(route + contractSrc +
-                (limit ? '&limit=' + limit : '') +
-                (page ? '&page=' + page : '')
-            )
+            let response = await fetch(route + contractSrc)
             let data = await response.json()
             for (let contract of data.contracts) {
                 let txId = contract.contractId;

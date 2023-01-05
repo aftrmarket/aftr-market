@@ -249,12 +249,14 @@ export default {
         //         this.activities.push(this.parseActivity(edge));
         //     }
         // }
-        this.activities.reverse();
+        // this.activities.reverse();
         this.isLoading = false;
         return
     }
 }
 </script>
+
+
 
 
 
