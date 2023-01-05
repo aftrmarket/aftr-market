@@ -450,6 +450,8 @@ export default {
             }
         },
         async load() {
+            this.getUserPsts();
+            this.getUserRepos();
             // Get the AFTR Contract Source ID for Prod
             if (import.meta.env.VITE_ENV === "PROD" || import.meta.env.VITE_ENV === "TEST") {
                 this.$store.commit("setAftrContractSources");
@@ -536,8 +538,6 @@ export default {
     },
     async created() {
         this.isLoading = true;
-        this.getUserPsts();
-        this.getUserRepos();
 
         // check if user has psts
 

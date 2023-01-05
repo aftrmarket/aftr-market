@@ -167,7 +167,7 @@ export default {
         allowOutsideClick: false
       })
       this.$log.info("RepoVotesCast : recordVote :: ", txID);
-      // this.$router.push("../repos");
+      this.$router.push("../repos" + this.contractId);
       // this.$emit("close");
       return
     },
