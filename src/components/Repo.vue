@@ -103,9 +103,9 @@
                                 <div class="sm:hidden">
                                     <label for="tabs" class="sr-only">Select a tab</label>
                                     <select id="tabs" name="tabs" class="block w-full focus:ring-aftrBlue focus:border-aftrBlue border-gray-300 rounded-md">
-                                        <option v-for="tab in tabs" :key="tab.name" :selected="tab.current">{{
-        tab.name
-}}</option>
+                                        <option v-for="tab in tabs" :key="tab.name" :selected="tab.current">
+                                            {{ tab.name }}
+                                        </option>
                                     </select>
                                 </div>
                                 <div class="hidden sm:block">
@@ -114,6 +114,8 @@
                                             <a v-for="tab in tabs" :key="tab.name" :href="tab.href" @click="tabClick(tab.name)" :class="tabText(tab)"
                                                 :aria-current="tab.current ? 'page' : undefined">
                                                 {{ tab.name }}
+                                                <span class="inline-flex items-center justify-center w-4 h-4 ml-2 text-xs font-semibold text-white bg-aftrBlue rounded-full"
+                                                    v-if="tab.name === 'Votes'">{{ this.repo.votes.filter((vote) => vote.status === "active").length }}</span>
                                             </a>
                                         </nav>
                                     </div>
