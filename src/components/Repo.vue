@@ -314,7 +314,7 @@ export default {
             // Evolve
             const csArray = this.getAftrContractSources;
             const latestContractSourceId = csArray[csArray.length - 1];
-            if (this.repo.contractSrc !== latestContractSourceId && this.repo.evolve !== latestContractSourceId) {
+            if (this.repo.contractSrc !== latestContractSourceId && this.repo.evolve !== latestContractSourceId && (this.repo.ownership === "single" && this.repo.owner === this.getActiveAddress)) {
                 // Contract needs to be evolved
                 this.repo.evolveNeeded = true;
 

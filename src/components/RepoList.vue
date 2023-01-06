@@ -368,7 +368,7 @@ export default {
                     */
 
                     if (isMember) {
-                        if (latestContractSourceId !== contractSrc) {
+                        if (latestContractSourceId !== contractSrc && latestContractSourceId !== repo.evolve) {
                             repo.evolveNeeded = true;
                         }
                         if (repo.evolve !== "") {
