@@ -1121,7 +1121,9 @@ export default {
                         //logo: this.communityLogoValue,
                         //fcp: true
                     };
+                    // Update store
                     this.$store.commit("addWalletPst", pst);
+                    this.$store.commit("addWalletRepo", pst);
                 }
 
                 this.$log.info("CreateRepo : createRepo :: ", "ID = " + this.repo["id"]);
