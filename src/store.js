@@ -66,7 +66,7 @@ async function buildWalletPsts(aftrSourcesArray, userAddr) {
         };
 
         const responseValue = await arweave.api.post("graphql", { query: queryval.query, });
-        console.log(responseValue.data.data.transactions.edges);
+        //console.log(responseValue.data.data.transactions.edges);
 
         for (let edge of responseValue.data.data.transactions.edges) {
             let bundled = await arweave.api.get(edge.node.id)
@@ -106,14 +106,11 @@ async function buildWalletPsts(aftrSourcesArray, userAddr) {
 
         for (let contractSrc of contractsArr) {
 
-            let limit = 9
-            let page = 1
+            // let limit = 9
+            // let page = 1
 
             let route = import.meta.env.VITE_CONTRACTS_BY_SOURCE_ENDPOINT;
-            let response = await fetch(route + contractSrc +
-                (limit ? '&limit=' + limit : '') +
-                (page ? '&page=' + page : '')
-            )
+            let response = await fetch(route + contractSrc)
             let data = await response.json()
             for (let contract of data.contracts) {
                 let txId = contract.contractId;
@@ -152,7 +149,7 @@ async function buildWalletPsts(aftrSourcesArray, userAddr) {
     if (playTokenId !== "") {
         // let bundled = await arweave.api.get(playTokenId)
         // let playTokenId = bundled.data.id
-        console.log("PLAY ID: " + playTokenId)
+        //console.log("PLAY ID: " + playTokenId)
         let playResp = await warpRead(playTokenId);
 
         // Add Play token to user's wallet
@@ -268,6 +265,13 @@ const store = createStore({
             let newWalletPsts = state.activeWallet.psts.filter(pst => pst.contractId !== pstId);
             state.activeWallet.psts = newWalletPsts;
         },
+        addWalletRepo(state, repo) {
+            state.activeWallet.repos.push(repo);
+        },
+        removeWalletRepo(state, repoId) {
+            let newWalletRepo = state.activeWallet.repos.filter(repo => repo.contractId !== repoId);
+            state.activeWallet.repos = newWalletRepos;
+        },        
         addAftrContractSource(state, sourceId) {
             // Called in Dev to set add the AFTR Contract Source
             state.aftrContractSources.push(sourceId);

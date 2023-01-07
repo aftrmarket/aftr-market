@@ -517,7 +517,7 @@ export default {
             quorumIsValid: true,
             supportIsValid: true,
             newQuorum: 0.5,
-            newSupport: 0.5,
+            newSupport: 0.51,
             fileUpload: false,
             showVoteSimulator: false,
         };
@@ -1121,7 +1121,9 @@ export default {
                         //logo: this.communityLogoValue,
                         //fcp: true
                     };
+                    // Update store
                     this.$store.commit("addWalletPst", pst);
+                    this.$store.commit("addWalletRepo", pst);
                 }
 
                 this.$log.info("CreateRepo : createRepo :: ", "ID = " + this.repo["id"]);

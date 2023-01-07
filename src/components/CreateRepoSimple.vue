@@ -71,7 +71,7 @@
                                                         walletAddressSubstr(getActiveAddress)
                                                 }}</span></label>
                                         <label>Quorum: &nbsp; <span class="font-mono font-medium">50%</span></label>
-                                        <label>Support: &nbsp; <span class="font-mono font-medium">50%</span></label>
+                                        <label>Support: &nbsp; <span class="font-mono font-medium">51%</span></label>
 
                                     </div>
                                     <div class="flex flex-col text-sm text-aftrRed mt-4">
@@ -139,7 +139,7 @@ export default {
                 "evolve": "",
                 "settings": [
                     ["quorum", 0.5],
-                    ["support", 0.5],
+                    ["support", 0.51],
                     ["voteLength", 2160],
                     ["communityLogo", ""]
                 ]
@@ -227,7 +227,6 @@ export default {
 
             const csArray = this.getAftrContractSources;
             const latestAftrSourceId = csArray[csArray.length - 1];
-            console.log(JSON.stringify(this.repoTemplate));
 
             const txIds = await warpCreateFromTx(JSON.stringify(this.repoTemplate), latestAftrSourceId, tags, true);
             this.repoTemplate["id"] = txIds.contractTxId;
@@ -243,7 +242,9 @@ export default {
                         //logo: this.communityLogoValue,
                         //fcp: true
                     };
+                    // Update the store for what the user has in wallet
                     this.$store.commit("addWalletPst", pst);
+                    this.$store.commit("addWalletRepo", pst);
                 }
 
                 // if(Boolean(this.arweaveMine)){

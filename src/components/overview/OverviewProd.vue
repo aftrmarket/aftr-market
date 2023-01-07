@@ -165,8 +165,18 @@ export default {
     },
     methods: {
         async routeUser() {
+            this.$swal({
+                icon: "info",
+                html: "Finding AFTR Repos...",
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    this.$swal.showLoading()
+                },
+            });
             await this.init();
             this.$router.push("../repos");
+            this.$swal.close();
         },
 
         async init() {

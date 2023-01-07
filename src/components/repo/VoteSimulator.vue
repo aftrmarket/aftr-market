@@ -300,7 +300,14 @@ export default {
 
     this.changeVoteCategory();
   },
-
+  watch: {
+    selectedQuorumValue() {
+        this.determineMessage();
+    },
+    selectedSupportValue() {
+        this.determineMessage();
+    }
+  },
   methods: {
     resetInput(value, index) {
       this.memberData.map((val, i) => {
