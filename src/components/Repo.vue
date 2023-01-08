@@ -103,9 +103,7 @@
                                 <div class="sm:hidden">
                                     <label for="tabs" class="sr-only">Select a tab</label>
                                     <select id="tabs" name="tabs" class="block w-full focus:ring-aftrBlue focus:border-aftrBlue border-gray-300 rounded-md">
-                                        <option v-for="tab in tabs" :key="tab.name" :selected="tab.current">{{
-        tab.name
-}}</option>
+                                        <option v-for="tab in tabs" :key="tab.name" :selected="tab.current">{{ tab.name }}</option>
                                     </select>
                                 </div>
                                 <div class="hidden sm:block">
@@ -225,7 +223,7 @@ export default {
                 return logoUrl;
             }
         },
-        ...mapGetters(["getActiveAddress", "currentBlock", "getAftrContractSources"]),
+        ...mapGetters(["getActiveAddress", "currentBlock", "getAftrContractSources", "arConnected"]),
     },
     methods: {
         showPopup() {
@@ -380,18 +378,17 @@ export default {
             }
         },
     },
-    beforeRouteEnter(to, from, next) {
-        // Check to make sure valid Repo ID
-        if (to.params["repoId"] !== "") {
-            next();
-        } else {
-            this.pageStatus = "error";
-            next("repos");
-        }
-    },
     async created() {
         this.pageStatus = "in-progress";
         this.showEvolveModal = false;
+
+        // Get parameter in case user browses directly to page
+        this.contractId = this.$route.params.repoId;
+
+        // Set contract sources in case they got erased somehow
+        if (import.meta.env.VITE_ENV === "TEST" || import.meta.env.VITE_ENV === "PROD") {
+            this.$store.commit("setAftrContractSources");
+        }
 
         try {
             this.arweave = await Arweave.init({
@@ -408,7 +405,7 @@ export default {
                 logo: "error",
                 html: "ERROR to load repo. Please click the Launch button again",
             })
-            this.$router.push("../overview");
+            this.$router.push("/");
             return false;
         }
         try {
@@ -433,7 +430,7 @@ export default {
                 logo: "error",
                 html: "ERROR to load repo. Please click the Launch button again",
             })
-            this.$router.push("../overview");
+            this.$router.push("/");
             return false;
         }
 

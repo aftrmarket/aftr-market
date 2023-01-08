@@ -1,7 +1,6 @@
 <template>
     <div class="pt-4 w-full">
-        <create-repo-simple v-if="showCreateSimple" @close="closeModal">
-        </create-repo-simple>
+        <create-repo-simple v-if="showCreateSimple" @close="closeModal"></create-repo-simple>
     </div>
     <div>
         <main class="-mt-32">
@@ -46,7 +45,7 @@
                             </svg>
                         </button>
                     </div>
-                    <div>
+                    <div v-if="arConnected">
                         <button type="button" @click.prevent="createRepo()"
                             class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
                             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -131,7 +130,6 @@ import { mapGetters } from "vuex";
 import CreateRepoSimple from "./CreateRepoSimple.vue";
 import RepoTable from './RepoTable.vue';
 import { isRepoMember } from './utils/shared.js';
-import Transaction from 'arweave/node/lib/transaction';
 
 export default {
     components: { RepoCard, RepoCardPlaceholder, CreateRepoSimple, RepoTable },
@@ -181,7 +179,7 @@ export default {
         searchTypeText() {
             return "Enter " + this.searchType;
         },
-        ...mapGetters(["currentBlock", "getActiveAddress", "getAftrContractSources"]),
+        ...mapGetters(["currentBlock", "getActiveAddress", "getAftrContractSources", "arConnected", "getActiveWallet"]),
     },
     methods: {
         clearData() {
@@ -531,25 +529,29 @@ export default {
         },
         closeModal() {
             this.showCreateSimple = false;
-
         },
     },
-    async created() {
+    async mounted() {
         this.isLoading = true;
-        this.getUserPsts();
-        this.getUserRepos();
-
-        // check if user has psts
-
-        await this.load();
-
-        if (this.filter === "my" && this.repos.length == 0) {
+        // If not ArConnected, just browse all repos
+        if (!this.arConnected) {            
             this.filter = "all"
             await this.filterChange();
-        }
-        this.isLoading = false;
-    },
+        } else {
+            this.getUserPsts();
+            this.getUserRepos();
 
+            // check if user has psts
+
+            await this.load();
+
+            if (this.filter === "my" && this.repos.length == 0) {
+                this.filter = "all"
+                await this.filterChange();
+            }
+        this.isLoading = false;
+        }
+    }
 };
 </script>
 
