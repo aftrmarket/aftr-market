@@ -1,12 +1,12 @@
 import VueLogger from 'vuejs3-logger';
 import { createApp } from 'vue';
 import { createRouter, createWebHistory } from 'vue-router';
-//import { uuid } from 'vue-uuid';
-import numeral from 'numeral';
 import './index.css';
+
 
 import App from './App.vue';
 import store from './store.js';
+
 import RepoList from './components/RepoList.vue';
 import CreateRepo from './components/CreateRepo.vue';
 import Repo from './components/Repo.vue';
@@ -14,8 +14,9 @@ import UiTest from './components/UiTest.vue';
 import ContractRead from './components/ContractRead.vue';
 import Overview from './components/Overview.vue';
 import MyPortfolio from './components/MyPortfolio.vue';
-import ContractSource from './components/ContractSource.vue'
+import ContractSource from './components/ContractSource.vue';
 import Chat from './components/utils/Chat.vue';
+
 import VueSweetalert2 from 'vue-sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
 //import { readContract } from 'smartweave';
@@ -76,8 +77,7 @@ app.use(store);
 app.use(router);
 app.use(VueLogger, options);
 app.use(VueSweetalert2);
-app.use(PerfectScrollbar)
-app.use(VueClipboard)
-//app.use(uuid);
+app.use(PerfectScrollbar);
+app.use(VueClipboard);
 
 app.mount('#app');
