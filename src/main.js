@@ -67,7 +67,7 @@ const router = createRouter({
         //         window.location.href = 'https://discord.gg/YEy8VpuNXR'
         //     }
         // },
-        { path: '/:notFound(.*)', redirect: '/' }
+        { path: '/:pathMatch(.*)*', redirect: '/' }
     ],
     linkActiveClass: 'active'
 });
