@@ -66,7 +66,7 @@ async function buildWalletPsts(aftrSourcesArray, userAddr) {
         };
 
         const responseValue = await arweave.api.post("graphql", { query: queryval.query, });
-        console.log(responseValue.data.data.transactions.edges);
+        //console.log(responseValue.data.data.transactions.edges);
 
         for (let edge of responseValue.data.data.transactions.edges) {
             let bundled = await arweave.api.get(edge.node.id)
@@ -149,7 +149,7 @@ async function buildWalletPsts(aftrSourcesArray, userAddr) {
     if (playTokenId !== "") {
         // let bundled = await arweave.api.get(playTokenId)
         // let playTokenId = bundled.data.id
-        console.log("PLAY ID: " + playTokenId)
+        //console.log("PLAY ID: " + playTokenId)
         let playResp = await warpRead(playTokenId);
 
         // Add Play token to user's wallet
@@ -265,6 +265,13 @@ const store = createStore({
             let newWalletPsts = state.activeWallet.psts.filter(pst => pst.contractId !== pstId);
             state.activeWallet.psts = newWalletPsts;
         },
+        addWalletRepo(state, repo) {
+            state.activeWallet.repos.push(repo);
+        },
+        removeWalletRepo(state, repoId) {
+            let newWalletRepo = state.activeWallet.repos.filter(repo => repo.contractId !== repoId);
+            state.activeWallet.repos = newWalletRepos;
+        },        
         addAftrContractSource(state, sourceId) {
             // Called in Dev to set add the AFTR Contract Source
             state.aftrContractSources.push(sourceId);
@@ -303,7 +310,9 @@ const store = createStore({
             try {
                 wallet.address = await window.arweaveWallet.getActiveAddress();
             } catch (e) {
-                console.log(e);
+                console.log("getActiveAddress failed: " + e);
+            }
+            try {
                 const promiseResult = await window.arweaveWallet.connect([
                     "ACCESS_ADDRESS",
                     "ACCESS_ALL_ADDRESSES",
@@ -311,7 +320,11 @@ const store = createStore({
                     "ACCESS_ARWEAVE_CONFIG",
                 ]);
                 wallet.address = await window.arweaveWallet.getActiveAddress();
+            } catch(e) {
+                alert("It appears that you do not have the ArConnect wallet.  You'll need ArConnect to run AFTR.Market.  Please see arconnect.io for more information.");
+                return;
             }
+            
 
             // Set correct config
             // try {
@@ -377,14 +390,17 @@ const store = createStore({
                 context.commit("setTestLaunchConfigState");
             }
 
-
-            if (context.state.aftrContractSources.length !== 0) {
-                wallet = await buildWalletPsts(context.state.aftrContractSources, wallet.address);
-                if (wallet !== {}) {
-                    context.commit("arConnect", wallet);
+            if (context.state.aftrContractSources.length === 0) {
+                if (import.meta.env.VITE_ENV === "TEST" || import.meta.env.VITE_ENV === "PROD") {
+                    context.commit("setAftrContractSources");
                 }
-                //console.log(wallet)
             }
+
+            wallet = await buildWalletPsts(context.state.aftrContractSources, wallet.address);
+            if (wallet !== {}) {
+                context.commit("arConnect", wallet);
+            }
+            
         },
         async arDisconnect(context) {
             try {
@@ -396,11 +412,14 @@ const store = createStore({
         },
         async arRefresh(context, buildWallet = false) {
             if (buildWallet) {
-                if (context.state.aftrContractSources.length !== 0) {
-                    const wallet = await buildWalletPsts(context.state.aftrContractSources, context.state.activeWallet.address);
-                    if (wallet !== {}) {
-                        context.commit("arConnect", wallet);
+                if (context.state.aftrContractSources.length === 0) {
+                    if (import.meta.env.VITE_ENV === "TEST" || import.meta.env.VITE_ENV === "PROD") {
+                        context.commit("setAftrContractSources");
                     }
+                }
+                const wallet = await buildWalletPsts(context.state.aftrContractSources, context.state.activeWallet.address);
+                if (wallet !== {}) {
+                    context.commit("arConnect", wallet);
                 }
             } else {
                 const arweave = arweaveInit();

@@ -114,8 +114,10 @@
                                             <a v-for="tab in tabs" :key="tab.name" :href="tab.href" @click="tabClick(tab.name)" :class="tabText(tab)"
                                                 :aria-current="tab.current ? 'page' : undefined">
                                                 {{ tab.name }}
-                                                <span class="inline-flex items-center justify-center w-4 h-4 ml-2 text-xs font-semibold text-white bg-aftrBlue rounded-full"
-                                                    v-if="tab.name === 'Votes'">{{ this.repo.votes.filter((vote) => vote.status === "active").length }}</span>
+                                                <span v-if="tab.name === 'Votes' && (this.repo.votes.filter((vote) => vote.status === 'active').length) > 0"
+                                                    class="inline-flex items-center justify-center w-4 h-4 ml-2 text-xs font-semibold text-white bg-aftrBlue rounded-full">
+                                                    {{ this.repo.votes.filter((vote) => vote.status === 'active').length }}
+                                                </span>
                                             </a>
                                         </nav>
                                     </div>
