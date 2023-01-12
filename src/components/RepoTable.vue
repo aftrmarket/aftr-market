@@ -11,12 +11,12 @@
                   <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
                     Name
                     <button type="button" @click.prevent="sortRepo">
-                      <svg v-if="sortDirection == 'DESC'" xmlns="http://www.w3.org/2000/svg" class="ml-2 h-3 w-3"
-                        fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <svg v-if="sortDirection == 'DESC'" xmlns="http://www.w3.org/2000/svg" class="ml-2 h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                        stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                       </svg>
-                      <svg v-if="sortDirection == 'ASC'" xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="ml-2 h-3 w-3">
+                      <svg v-if="sortDirection == 'ASC'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                        class="ml-2 h-3 w-3">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
                       </svg>
                     </button>
@@ -44,37 +44,33 @@
                       </div>
                     </td>
                   </router-link>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    <div class="text-gray-900">{{ repo.desc }}</div>
+                  <td class="max-w-sm whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    <div class="text-gray-900 truncate">{{ repo.desc }}</div>
                   </td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    <span v-if="repo.ownership == 'single'"
-                      class="inline-flex rounded-full px-2 text-xs font-semibold leading-5">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    <span v-if="repo.ownership == 'single'" class="inline-flex rounded-full px-2 text-xs font-semibold leading-5">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
                     </span>
-                    <span v-if="repo.ownership == 'multi'"
-                      class="inline-flex rounded-full px-2 text-xs font-semibold leading-5">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor" stroke-width="2">
+                    <span v-if="repo.ownership == 'multi'" class="inline-flex rounded-full px-2 text-xs font-semibold leading-5">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round"
                           d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                       </svg>
                     </span>
                   </td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ repo.tokens.length }}</td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ Object.keys(repo.balances).length
+                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{
+                    Object.keys(repo.balances).length
                   }}</td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ repo.votes ? repo.votes.length : 0
+                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{
+                    repo.votes ? repo.votes.length : 0
                   }}
                   </td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                     <span v-if="getActiveAddress in repo.balances">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor" stroke-width="2">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                       </svg>
                     </span>

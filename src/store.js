@@ -271,7 +271,7 @@ const store = createStore({
         removeWalletRepo(state, repoId) {
             let newWalletRepo = state.activeWallet.repos.filter(repo => repo.contractId !== repoId);
             state.activeWallet.repos = newWalletRepos;
-        },        
+        },
         addAftrContractSource(state, sourceId) {
             // Called in Dev to set add the AFTR Contract Source
             state.aftrContractSources.push(sourceId);
@@ -320,11 +320,11 @@ const store = createStore({
                     "ACCESS_ARWEAVE_CONFIG",
                 ]);
                 wallet.address = await window.arweaveWallet.getActiveAddress();
-            } catch(e) {
+            } catch (e) {
                 alert("It appears that you do not have the ArConnect wallet.  You'll need ArConnect to run AFTR.Market.  Please see arconnect.io for more information.");
                 return;
             }
-            
+
 
             // Set correct config
             // try {
@@ -400,7 +400,7 @@ const store = createStore({
             if (wallet !== {}) {
                 context.commit("arConnect", wallet);
             }
-            
+
         },
         async arDisconnect(context) {
             try {
