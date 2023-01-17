@@ -122,7 +122,7 @@
                                         </nav>
                                     </div>
                                 </div>
-                                <repo-info v-if="activeTab === 'Info'" :repo="repo" :contractId="contractId" :isMember="allowEdits">
+                                <repo-info v-if="activeTab === 'Info'" :repo="repo" :contractId="repoId" :isMember="allowEdits">
                                 </repo-info>
                                 <!--<repo-names v-else-if="activeTab === 'Names'" :repo="repo" :isMember="allowEdits"></repo-names>-->
                                 <repo-settings v-else-if="activeTab === 'Custom Settings'" :repo="repo" :isMember="allowEdits">
@@ -135,11 +135,11 @@
                                 <!--<repo-leases v-else-if="activeTab === 'Leases'" :leases="repo.leases"></repo-leases>-->
                                 <!--<repo-leases v-else-if="activeTab === 'Leases'"></repo-leases>-->
                                 <!--<repo-fractions v-else-if="activeTab === 'Fractions'"></repo-fractions>-->
-                                <repo-votes v-else-if="activeTab === 'Votes'" :repo="repo" :contractId="contractId" :isMember="allowEdits">
+                                <repo-votes v-else-if="activeTab === 'Votes'" :repo="repo" :contractId="repoId" :isMember="allowEdits">
                                 </repo-votes>
                                 <repo-state v-else-if="activeTab === 'State'" :repo="repo">
                                 </repo-state>
-                                <repo-activity v-else-if="activeTab === 'Activity'" :arweave="arweave" :repoId="this.repoId" :interactions="interactions"
+                                <repo-activity v-else-if="activeTab === 'Activity'" :arweave="arweave" :repoId="repoId" :interactions="interactions"
                                     :errorMessages="interactionErrorMsgs">
                                 </repo-activity>
 
@@ -395,6 +395,10 @@ export default {
     },
     async created() {
         this.pageStatus = "in-progress";
+
+        // Ensure this contract sources are up to date
+        this.$store.commit("setAftrContractSources");
+        
         this.showEvolveModal = false;
 
         try {
@@ -425,9 +429,6 @@ export default {
             // Ensure AFTR Repo
             const contractSrc = await this.returnContractSrc(this.arweave, this.contractId);
             this.repo.contractSrc = contractSrc;
-            // if (contractSrc !== this.getAftrContractSrcId) {
-            //     throw "Not valid AFTR Repo";
-            // }
 
             await this.loadRepo();
         } catch (error) {
