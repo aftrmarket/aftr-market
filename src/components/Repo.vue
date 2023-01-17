@@ -103,7 +103,9 @@
                                 <div class="sm:hidden">
                                     <label for="tabs" class="sr-only">Select a tab</label>
                                     <select id="tabs" name="tabs" class="block w-full focus:ring-aftrBlue focus:border-aftrBlue border-gray-300 rounded-md">
-                                        <option v-for="tab in tabs" :key="tab.name" :selected="tab.current">{{ tab.name }}</option>
+                                        <option v-for="tab in tabs" :key="tab.name" :selected="tab.current">
+                                            {{ tab.name }}
+                                        </option>
                                     </select>
                                 </div>
                                 <div class="hidden sm:block">
@@ -112,11 +114,15 @@
                                             <a v-for="tab in tabs" :key="tab.name" :href="tab.href" @click="tabClick(tab.name)" :class="tabText(tab)"
                                                 :aria-current="tab.current ? 'page' : undefined">
                                                 {{ tab.name }}
+                                                <span v-if="tab.name === 'Votes' && (this.repo.votes.filter((vote) => vote.status === 'active').length) > 0"
+                                                    class="inline-flex items-center justify-center w-4 h-4 ml-2 text-xs font-semibold text-white bg-aftrBlue rounded-full">
+                                                    {{ this.repo.votes.filter((vote) => vote.status === 'active').length }}
+                                                </span>
                                             </a>
                                         </nav>
                                     </div>
                                 </div>
-                                <repo-info v-if="activeTab === 'Info'" :repo="repo" :contractId="contractId" :isMember="allowEdits">
+                                <repo-info v-if="activeTab === 'Info'" :repo="repo" :contractId="repoId" :isMember="allowEdits">
                                 </repo-info>
                                 <!--<repo-names v-else-if="activeTab === 'Names'" :repo="repo" :isMember="allowEdits"></repo-names>-->
                                 <repo-settings v-else-if="activeTab === 'Custom Settings'" :repo="repo" :isMember="allowEdits">
@@ -129,11 +135,11 @@
                                 <!--<repo-leases v-else-if="activeTab === 'Leases'" :leases="repo.leases"></repo-leases>-->
                                 <!--<repo-leases v-else-if="activeTab === 'Leases'"></repo-leases>-->
                                 <!--<repo-fractions v-else-if="activeTab === 'Fractions'"></repo-fractions>-->
-                                <repo-votes v-else-if="activeTab === 'Votes'" :repo="repo" :contractId="contractId" :isMember="allowEdits">
+                                <repo-votes v-else-if="activeTab === 'Votes'" :repo="repo" :contractId="repoId" :isMember="allowEdits">
                                 </repo-votes>
                                 <repo-state v-else-if="activeTab === 'State'" :repo="repo">
                                 </repo-state>
-                                <repo-activity v-else-if="activeTab === 'Activity'" :arweave="arweave" :repoId="this.repoId" :interactions="interactions"
+                                <repo-activity v-else-if="activeTab === 'Activity'" :arweave="arweave" :repoId="repoId" :interactions="interactions"
                                     :errorMessages="interactionErrorMsgs">
                                 </repo-activity>
 
@@ -223,7 +229,7 @@ export default {
                 return logoUrl;
             }
         },
-        ...mapGetters(["getActiveAddress", "currentBlock", "getAftrContractSources", "arConnected"]),
+        ...mapGetters(["getActiveAddress", "currentBlock", "getAftrContractSources"]),
     },
     methods: {
         showPopup() {
@@ -312,7 +318,7 @@ export default {
             // Evolve
             const csArray = this.getAftrContractSources;
             const latestContractSourceId = csArray[csArray.length - 1];
-            if (this.repo.contractSrc !== latestContractSourceId && this.repo.evolve !== latestContractSourceId && (this.repo.ownership === "single" && this.repo.owner === this.getActiveAddress)) {
+            if (this.repo.contractSrc !== latestContractSourceId && this.repo.evolve !== latestContractSourceId) {
                 // Contract needs to be evolved
                 this.repo.evolveNeeded = true;
 
@@ -378,17 +384,22 @@ export default {
             }
         },
     },
+    beforeRouteEnter(to, from, next) {
+        // Check to make sure valid Repo ID
+        if (to.params["repoId"] !== "") {
+            next();
+        } else {
+            this.pageStatus = "error";
+            next("repos");
+        }
+    },
     async created() {
         this.pageStatus = "in-progress";
+
+        // Ensure this contract sources are up to date
+        this.$store.commit("setAftrContractSources");
+        
         this.showEvolveModal = false;
-
-        // Get parameter in case user browses directly to page
-        this.contractId = this.$route.params.repoId;
-
-        // Set contract sources in case they got erased somehow
-        if (import.meta.env.VITE_ENV === "TEST" || import.meta.env.VITE_ENV === "PROD") {
-            this.$store.commit("setAftrContractSources");
-        }
 
         try {
             this.arweave = await Arweave.init({
@@ -405,7 +416,7 @@ export default {
                 logo: "error",
                 html: "ERROR to load repo. Please click the Launch button again",
             })
-            this.$router.push("/");
+            this.$router.push("../overview");
             return false;
         }
         try {
@@ -418,9 +429,6 @@ export default {
             // Ensure AFTR Repo
             const contractSrc = await this.returnContractSrc(this.arweave, this.contractId);
             this.repo.contractSrc = contractSrc;
-            // if (contractSrc !== this.getAftrContractSrcId) {
-            //     throw "Not valid AFTR Repo";
-            // }
 
             await this.loadRepo();
         } catch (error) {
@@ -430,7 +438,7 @@ export default {
                 logo: "error",
                 html: "ERROR to load repo. Please click the Launch button again",
             })
-            this.$router.push("/");
+            this.$router.push("../overview");
             return false;
         }
 
