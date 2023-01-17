@@ -65,7 +65,7 @@
                     Object.keys(repo.balances).length
                   }}</td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{
-                    repo.votes ? repo.votes.length : 0
+                    activeVotes(repo)
                   }}
                   </td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
@@ -201,6 +201,14 @@ export default {
       }.bind(this));
 
       this.sortDirection == 'ASC' ? this.sortDirection = 'DESC' : this.sortDirection = 'ASC'
+    },
+    activeVotes(repo) {
+      let activeVoteCount = 0;
+      if (typeof repo.votes !== "undefined" && repo.votes.length !== 0) {
+        const activeVotes = repo.votes.filter((vote) => vote.status === "active");
+        activeVoteCount = activeVotes.length;
+      }
+      return activeVoteCount;
     }
   }
 }
