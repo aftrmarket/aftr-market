@@ -42,12 +42,15 @@
                     </svg>
                     <span class="tooltiptext">{{ evolveText }}</span>
                 </div>
+                <div v-if="concludeVote" class="tooltip">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="#FF6C8C" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                    </svg>
+                    <span class="tooltiptext">{{ concludeVoteText }}</span>
+                </div>
             </div>
             <div class="pr-3 justify-self-end">
-                <span
-                    class="capitalize px-2 sm:px-4 py-3 inline-flex leading-3 text-xs font-medium rounded-full bg-blue-100 text-blue-800">{{
-        repo.ticker
-                    }}</span>
+                <span class="capitalize px-2 sm:px-4 py-3 inline-flex leading-3 text-xs font-medium rounded-full bg-blue-100 text-blue-800">{{ repo.ticker }}</span>
             </div>
             <!---
             <div class="-ml-px w-0 flex-1 flex justify-end pr-3">
@@ -73,11 +76,12 @@ export default {
     data() {
         return {
             evolveNeeded: false,
+            concludeVote: false,
         };
     },
     computed: {
         actionRequiredClass() {
-            if (this.evolveNeeded) {
+            if (this.evolveNeeded || this.concludeVote) {
                 return "text-aftrRed text-xl font-normal line-clamp-1 break-all";
             } else {
                 return "text-gray-900 text-xl font-normal line-clamp-1 break-all";
@@ -85,6 +89,9 @@ export default {
         },
         evolveText() {
             return "Contract Update Needed";
+        },
+        concludeVoteText() {
+            return "Vote Confirmation Needed";
         },
         repoStatusAlert() {
             if (typeof this.repo.status === 'undefined' || this.repo.status === 'stopped' || this.repo.status === '') {
@@ -133,6 +140,9 @@ export default {
         // Does repo contract need to be evolved? Only show to members of the repo
         if (this.repo.evolveNeeded && (this.repo.owner === this.getActiveAddress || this.getActiveAddress in this.repo.balances)) {
             this.evolveNeeded = true;
+        }
+        if (this.repo.concludeVoteNeeded) {
+            this.concludeVote = true;
         }
     }
 };

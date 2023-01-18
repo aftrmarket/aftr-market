@@ -156,7 +156,7 @@
 </template>
 
 <script>
-import { warpRead } from './utils/warpUtils.js';
+import { warpRead, warpWrite } from './utils/warpUtils.js';
 import RepoInfo from './repo/RepoInfo.vue';
 import RepoMembers from './repo/RepoMembers.vue';
 import RepoTokens from './repo/RepoTokens.vue';
@@ -202,6 +202,8 @@ export default {
             interactionErrorMsgs: {},
             anyWithdrawals: false,
             concludeVoteNeeded: false,
+            currentBlockInt: 0,
+            concludedVoteIds: [],
 
             arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
             arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
@@ -370,15 +372,16 @@ export default {
             // this.repo.treasury = treasuryTotal;
 
             // Votes
-            if (this.repo.votes) {
+            if (this.allowEdits && this.repo.votes) {
                 this.$store.dispatch('loadCurrentBlock');
-                let currentBlock = +this.currentBlock.height;
+                this.currentBlockInt = +this.currentBlock.height;
                 let activeVotes = this.repo.votes.filter((vote) => vote.status === "active");
                 activeVotes.forEach((vote) => {
                     let start = +vote.start;
                     let voteLength = +vote.voteLength;
-                    if (start + voteLength < currentBlock) {
+                    if (start + voteLength < this.currentBlockInt) {
                         this.concludeVoteNeeded = true;
+                        this.concludedVoteIds.push(vote.id);
                     }
                 });
             }
@@ -440,6 +443,29 @@ export default {
             })
             this.$router.push("../overview");
             return false;
+        }
+
+        if (this.allowEdits && this.concludeVoteNeeded) {
+            const input = { function: "finalize" };
+            const tx = await warpWrite(this.repo.id, input, true, undefined);
+
+            // Reread contract to get latest with vote finalizations
+            const cachedValue = await warpRead(this.contractId);
+            this.repo = cachedValue.state;
+            this.interactions = cachedValue.validity;
+            this.interactionErrorMsgs = cachedValue.errorMessages;
+
+            let msg = "The following votes just became finalized: <br>";
+            for (let id of this.concludedVoteIds) {
+                msg += id.substring(0, 5) + '...' + id.substring(id.length - 5) + "<br>";
+            }
+            this.$swal({
+                icon: "info",
+                html: msg,
+                showConfirmButton: true,
+                allowOutsideClick: false,
+            });
+            this.concludeVoteNeeded = false;
         }
 
         this.pageStatus = "";

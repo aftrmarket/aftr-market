@@ -277,7 +277,7 @@ export default {
             }
 
             if (this.searchType == "Needs Attention") {
-                const repo = this.renderedRepos.filter((repo) => { repo.evolveNeeded == true });
+                const repo = this.renderedRepos.filter((repo) => { repo.evolveNeeded == true || repo.concludeVoteNeeded == true });
                 this.numRepos = repo.length;
                 return repo;
             }
@@ -428,18 +428,18 @@ export default {
 
                         /*** The concludedVoteNeeded proporty was added before using Warp.  Since switching to Warp, we don't need to check this anymore b/c contract functions run during a read of the contract. */
                         // Show repo notices to members
-                        // if (isMember) {
-                        //     // Look for votes that need to be concluded
-                        //     this.$store.dispatch('loadCurrentBlock');
-                        //     let currentBlock = +this.currentBlock.height;
-                        //     activeVotes.forEach((vote) => {
-                        //         let start = +vote.start;
-                        //         let voteLength = +vote.voteLength;
-                        //         if (start + voteLength < currentBlock) {
-                        //             repo.concludeVoteNeeded = true;
-                        //         }
-                        //     });
-                        // }
+                        if (isMember) {
+                            // Look for votes that need to be concluded
+                            this.$store.dispatch('loadCurrentBlock');
+                            let currentBlock = +this.currentBlock.height;
+                            activeVotes.forEach((vote) => {
+                                let start = +vote.start;
+                                let voteLength = +vote.voteLength;
+                                if (start + voteLength < currentBlock) {
+                                    repo.concludeVoteNeeded = true;
+                                }
+                            });
+                        }
                     } else {
                         repo.totalActiveVotes = 0;
                     }
