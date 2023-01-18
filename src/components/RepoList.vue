@@ -100,7 +100,7 @@
                         </div>
                     </div>
                     <!-- </perfect-scrollbar> -->
-                    <div v-if="repos.length != renderedRepos.length || true" class="text-center pt-6">
+                    <div v-if="repos.length != renderedRepos.length" class="text-center pt-6">
                         <button v-show="!isLoading" @click.prevent="loadMore" type="button"
                             class="inline-flex items-center px-4 py-2 border border-gray-200 shadow-md text-lg font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
                             Load More
