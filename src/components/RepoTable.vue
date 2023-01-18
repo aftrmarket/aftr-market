@@ -36,7 +36,7 @@
                     <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
                       <div class="flex items-center">
                         <div class="h-10 w-10 flex-shrink-0">
-                          <img class="w-10 h-10 bg-gray-300 rounded-full" :src="repoLogo(repo)" alt="">
+                          <img class="w-10 h-10 bg-gray-300 rounded-full" :src="getRepoLogo(repo)" alt="">
                         </div>
                         <div class="ml-4">
                           <div class="font-medium text-gray-900">{{ repo.name }}</div>
@@ -61,12 +61,8 @@
                     </span>
                   </td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ repo.tokens.length }}</td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{
-                    Object.keys(repo.balances).length
-                  }}</td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{
-                    activeVotes(repo)
-                  }}
+                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ Object.keys(repo.balances).length }}</td>
+                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ activeVotes(repo) }}
                   </td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                     <span v-if="getActiveAddress in repo.balances">
@@ -96,7 +92,8 @@ export default {
       logoUrl: "",
       allowEdits: false,
       sortDirection: "ASC",
-      showMessage: false
+      showMessage: false,
+      repoLogo: "",
     }
   },
   computed: {
@@ -174,20 +171,20 @@ export default {
         return repo
       }
     },
-    repoLogo(repo) {
-      let logoUrl = "";
-      if (!repo.logo || repo.logo === '') {
-        logoUrl = "https://avatars.dicebear.com/api/pixel-art-neutral/:" + repo.id + ".svg";
-      } else {
-        // logoUrl = "https://arweave.net/" + this.repo.logo;
-        if (import.meta.env.VITE_ARWEAVE_PORT) {
-          logoUrl = `${import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/" + repo.logo}`;
+    getRepoLogo(repo) {
+        let logoUrl = "";
+        if (!repo.logo || repo.logo === '') {
+            logoUrl = "https://avatars.dicebear.com/api/pixel-art-neutral/:" + repo.id + ".svg";
         } else {
-          logoUrl = `${import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + "/" + repo.logo}`;
+            // logoUrl = "https://arweave.net/" + this.repo.logo;
+            if (import.meta.env.VITE_ARWEAVE_PORT) {
+                logoUrl = `${import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/" + repo.logo}`;
+            } else {
+                logoUrl = `${import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + "/" + repo.logo}`;
+            }
         }
-      }
-
-      return logoUrl;
+        this.repoLogo = logoUrl;
+        return logoUrl;
     },
     sortRepo() {
       this.repos.sort(function (a, b) {
@@ -210,6 +207,6 @@ export default {
       }
       return activeVoteCount;
     }
-  }
+  },
 }
 </script>

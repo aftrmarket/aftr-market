@@ -77,6 +77,7 @@ export default {
         return {
             evolveNeeded: false,
             concludeVote: false,
+            repoLogo: "",
         };
     },
     computed: {
@@ -109,7 +110,17 @@ export default {
                 return this.repo.status;
             }
         },
-        repoLogo() {
+        ...mapGetters(["getActiveAddress"]),
+    },
+    methods: {
+        formatNumber(num, dec = false) {
+            if (dec) {
+                return numeral(num).format("0,0.0000");
+            } else {
+                return numeral(num).format("0,0");
+            }
+        },
+        getRepoLogo() {
             let logoUrl = "";
 
             if (!this.repo.logo || this.repo.logo === '') {
@@ -122,18 +133,7 @@ export default {
                     logoUrl = `${import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + "/" + this.repo.logo}`;
                 }
             }
-
-            return logoUrl;
-        },
-        ...mapGetters(["getActiveAddress"]),
-    },
-    methods: {
-        formatNumber(num, dec = false) {
-            if (dec) {
-                return numeral(num).format("0,0.0000");
-            } else {
-                return numeral(num).format("0,0");
-            }
+            this.repoLogo = logoUrl;
         },
     },
     created() {
@@ -143,6 +143,19 @@ export default {
         }
         if (this.repo.concludeVoteNeeded) {
             this.concludeVote = true;
+        }
+        this.getRepoLogo();
+    },
+    async mounted() {
+        const url = this.repoLogo;
+        if (url.substring(0, 15) !== "https://avatars") {
+            // Check to see if logo is invalid
+            await fetch(url)
+                .then(response => {
+                    if (response.status != 200) {
+                        this.repoLogo = "https://avatars.dicebear.com/api/pixel-art-neutral/:" + this.repo.id + ".svg";
+                    }
+                });
         }
     }
 };

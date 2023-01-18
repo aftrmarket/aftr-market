@@ -204,6 +204,7 @@ export default {
             concludeVoteNeeded: false,
             currentBlockInt: 0,
             concludedVoteIds: [],
+            repoLogo: "",
 
             arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
             arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
@@ -217,7 +218,10 @@ export default {
         };
     },
     computed: {
-        repoLogo() {
+        ...mapGetters(["getActiveAddress", "currentBlock", "getAftrContractSources"]),
+    },
+    methods: {
+        async getRepoLogo() {
             let logoUrl = ""
             if (this.repo.logo) {
                 if (import.meta.env.VITE_ARWEAVE_PORT) {
@@ -225,15 +229,11 @@ export default {
                 } else {
                     logoUrl = `${import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + "/" + this.repo.logo}`;
                 }
-                return logoUrl;
             } else {
                 logoUrl = "https://avatars.dicebear.com/api/pixel-art-neutral/:" + this.repo.id + ".svg";
-                return logoUrl;
             }
+            this.repoLogo = logoUrl;
         },
-        ...mapGetters(["getActiveAddress", "currentBlock", "getAftrContractSources"]),
-    },
-    methods: {
         showPopup() {
             this.show = true;
 
@@ -385,6 +385,7 @@ export default {
                     }
                 });
             }
+            await this.getRepoLogo();
         },
     },
     beforeRouteEnter(to, from, next) {
@@ -470,5 +471,17 @@ export default {
 
         this.pageStatus = "";
     },
+    async updated() {
+        let logoUrl = this.repoLogo;
+        if (logoUrl.substring(0, 15) !== "https://avatars") {
+            // Check to see if logo is invalid
+            await fetch(logoUrl)
+                .then(response => {
+                    if (response.status != 200) {
+                        this.repoLogo = "https://avatars.dicebear.com/api/pixel-art-neutral/:" + this.repo.id + ".svg";
+                    }
+                });
+        }
+    }
 };
 </script>
