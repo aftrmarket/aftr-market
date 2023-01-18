@@ -100,12 +100,12 @@
                         </div>
                     </div>
                     <!-- </perfect-scrollbar> -->
-                    <div v-if="repos.length != renderedRepos.length" class="text-center pt-6">
+                    <div v-if="repos.length != renderedRepos.length || true" class="text-center pt-6">
                         <button v-show="!isLoading" @click.prevent="loadMore" type="button"
                             class="inline-flex items-center px-4 py-2 border border-gray-200 shadow-md text-lg font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
                             Load More
                         </button>
-                        <div v-show="isLoading" class="inline-flex items-center">
+                        <div v-show="isLoading" class="inline-flex items-center p-6">
                             <svg aria-hidden="true" class="w-8 h-8 animate-spin text-aftrDarkGrey-light fill-aftrBlue" viewBox="0 0 100 101" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path
