@@ -69,7 +69,7 @@
                 </div>
                 <!-- List -->
 
-                <div class="bg-white rounded-lg shadow-[0_-20px_15px_0px_rgba(0,0,0,0.2)] px-5 py-6">
+                <div class="bg-white rounded-lg shadow-md px-5 py-6">
                     <div class="grid grid-cols-3">
                         <div>
                             <span v-show="filterText">SHOW FILTERS HERE</span>
@@ -106,12 +106,12 @@
                         No repos found...
                     </ul>
                     <!-- </perfect-scrollbar> -->
-                </div>
-                <div class="text-center p-2">
-                    <button v-if="!isLoading && repos.length != renderedRepos.length" @click.prevent="loadMore" type="button"
-                        class="inline-flex items-center px-4 py-2 border border-gray-200 shadow-lg text-lg font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
-                        Load More
-                    </button>
+                    <div class="text-center pt-6">
+                        <button v-if="!isLoading && repos.length != renderedRepos.length" @click.prevent="loadMore" type="button"
+                            class="inline-flex items-center px-4 py-2 border border-gray-200 shadow-md text-lg font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+                            Load More
+                        </button>
+                    </div>
                 </div>
 
                 <!-- <div v-if="!isLoading && noResult" class="">
