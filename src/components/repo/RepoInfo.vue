@@ -14,8 +14,7 @@
         </div>
     </div>
     <div v-if="!uiEditMode" class="pt-2">
-        <repo-info-read :repo="repo">
-        </repo-info-read>
+        <repo-info-read :repo="repo"></repo-info-read>
     </div>
     <!-- EDIT MODE -->
     <div v-else>
@@ -231,7 +230,8 @@ export default {
             if (this.fileInvalid) {
                 return "Not a valid image. Please try again."
             } else if (this.totalSize === 0) {
-                return "If file size is less than 100kb, upload is free.  Overwise AR fees apply.";
+                //return "If file size is less than 100kb, upload is free.  Overwise AR fees apply.";
+                return "AR upload fees apply."
             } else {
                 return "File size: " + this.formatNumber(this.totalSize);
             }
@@ -400,6 +400,7 @@ export default {
                     await this.deployFile(this.files, arweave, "use_wallet");
                 }
             }
+            return;
 
             this.$log.info("RepoInfo : updateRepo :: ", "this.newLogo ", this.newLogo)
 
