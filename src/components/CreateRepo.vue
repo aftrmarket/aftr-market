@@ -562,7 +562,8 @@ export default {
             if (this.fileInvalid) {
                 return "Not a valid image. Please try again."
             } else if (this.totalSize === 0) {
-                return "If file size is less than 100kb, upload is free.  Overwise AR fees apply.";
+                //return "If file size is less than 100kb, upload is free.  Overwise AR fees apply.";
+                return "AR upload fees apply."
             } else {
                 return "File size: " + this.formatNumber(this.totalSize);
             }
