@@ -36,7 +36,7 @@
     "vue3-slide-up-down": "^1.2.5",
     "vuejs3-logger": "1.0.0",
     "vuex": "^4.0.2",
-    "warp-contracts": "^1.2.46"
+    "warp-contracts": "^1.2.47"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.0.0",
