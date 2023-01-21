@@ -231,7 +231,7 @@ export default {
                 return "Not a valid image. Please try again."
             } else if (this.totalSize === 0) {
                 //return "If file size is less than 100kb, upload is free.  Overwise AR fees apply.";
-                return "AR upload fees apply."
+                return "Image must be less than 120kb."
             } else {
                 return "File size: " + this.formatNumber(this.totalSize);
             }
@@ -400,7 +400,6 @@ export default {
                     await this.deployFile(this.files, arweave, "use_wallet");
                 }
             }
-            return;
 
             this.$log.info("RepoInfo : updateRepo :: ", "this.newLogo ", this.newLogo)
 
@@ -557,17 +556,22 @@ export default {
                 URL.revokeObjectURL(this.repoLogo);
             }
             this.repoLogo = URL.createObjectURL(file);
-            this.fileInfo = file.size + ", " + file.name + ", " + file.type;
-            const filename = file.name.replace(/ /g, "") + file.lastModified;
 
             // Total size should be < ? so that it's a free transaction
             this.totalSize = file.size;
             this.isFormValid = true
             this.$log.info("RepoInfo : onFileChange :: ", "totalSize", this.totalSize, this.balance);
 
-            /**** SHOULD THIS BE > 0? */
-            if (this.totalSize != 0) {
-
+            if (this.totalSize > 120000) {
+                this.$swal({
+                    icon: "error",
+                    html: "The image file size is too big.",
+                    showConfirmButton: true,
+                    allowOutsideClick: false
+                });
+                URL.revokeObjectURL(this.repoLogo);
+                this.fileInvalid = true;
+                this.isFormValid = false;
             }
         },
         readFile(file) {

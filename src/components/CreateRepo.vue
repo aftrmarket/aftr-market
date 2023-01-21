@@ -498,7 +498,6 @@ export default {
             memberAmountValid: false,
             memberRowValid: false,
             daoRowBalance: [],
-            fileInfo: "",
             fileInvalid: false,
             communityLogoValue: "",
             totalSize: 0,
@@ -563,7 +562,7 @@ export default {
                 return "Not a valid image. Please try again."
             } else if (this.totalSize === 0) {
                 //return "If file size is less than 100kb, upload is free.  Overwise AR fees apply.";
-                return "AR upload fees apply."
+                return "Image must be less than 120kb."
             } else {
                 return "File size: " + this.formatNumber(this.totalSize);
             }
@@ -668,52 +667,23 @@ export default {
                 URL.revokeObjectURL(this.repoLogo);
             }
             this.repoLogo = URL.createObjectURL(file);
-            this.fileInfo = file.size + ", " + file.name + ", " + file.type;
-            const filename = file.name.replace(/ /g, "") + file.lastModified;
-
-            // const { data: winston } = await arweave.api.get(
-            //     `price/${file.size}`
-            // );
-            // const ar = arweave.ar.winstonToAr(winston, {
-            //     formatted: true,
-            //     decimals: 5,
-            //     trim: true,
-            // });
-            // if (import.meta.env.VITE_ENV === "DEV") {
-            //     this.address = await arweave.wallets.jwkToAddress(wallet);
-            // } else {
-            //     this.address = await arweave.wallets.jwkToAddress("use_wallet");
-            // }
-            // const bal = await arweave.wallets.getBalance(this.address);
-            // this.balance = arweave.ar.winstonToAr(bal);
 
             // Total size should be < ? so that it's a free transaction
             this.totalSize = file.size;
             this.$log.info("CreateRepo : onFileChange :: ", "totalSize", this.totalSize, this.balance);
-
-            /**** SHOULD THIS BE > 0? */
-            if (this.totalSize != 0) {
-                // const { data: winston } = await arweave.api.get(
-                //     `price/${this.totalSize}`
-                // );
-                // this.fee = +winston * 0.1;
-                // const ar = arweave.ar.winstonToAr(winston);
-                // const arFee = arweave.ar.winstonToAr(this.fee.toString());
-                // const total = arweave.ar.winstonToAr(
-                //     (+winston + this.fee).toString()
-                // );
-                // this.$log.info("total", total);
-                // this.totalCost = total;
-                // if (total > this.balance) {
-                //     return alert("You don't have enough AR to upload this file!");
-                // }
-
-                //if (import.meta.env.VITE_ENV === "DEV") {
-                //    await this.deployFile(this.files, arweave, wallet);
-                //} else {
-                //    await this.deployFile(this.files, arweave, "use_wallet");
-                //}
+            if (this.totalSize > 120000) {
+                this.$swal({
+                    icon: "error",
+                    html: "The image file size is too big.",
+                    showConfirmButton: true,
+                    allowOutsideClick: false
+                });
+                URL.revokeObjectURL(this.repoLogo);
+                this.fileInvalid = true;
+            } else {
+                this.fileInvalid = false;
             }
+            
         },
         nameValidate() {
             if (this.repo.name === "") {

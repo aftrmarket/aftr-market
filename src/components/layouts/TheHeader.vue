@@ -112,6 +112,7 @@
 
 import ArConnectWindow from './ArConnectWindow.vue';
 import { arweaveInit } from './../utils/warpUtils.js';
+import { mapGetters } from "vuex";
 
 export default {
   components: { ArConnectWindow },
@@ -168,13 +169,14 @@ export default {
         return "";
       }
     },
+    ...mapGetters(["arConnected"]),
   },
   methods: {
     goHome() {
       this.$router.push("../repos");
     },
     goMyPortfolio() {
-      if (!this.$store.getters.arConnected) {
+      if (!this.arConnected) {
         // alert("Please login to Aftr-Market")
         this.$swal({
           icon: 'error',
@@ -217,6 +219,11 @@ export default {
   },
   mounted() {
     this.arweave = arweaveInit();
+    window.addEventListener("arweaveWalletLoaded", async () => {
+        if (!this.arConnected && this.$route.name !== "overview") {
+            await this.$store.dispatch('arConnect');
+        }
+    });
   }
 };
 </script>

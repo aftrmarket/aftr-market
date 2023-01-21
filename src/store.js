@@ -318,6 +318,7 @@ const store = createStore({
                     "ACCESS_ALL_ADDRESSES",
                     "SIGN_TRANSACTION",
                     "ACCESS_ARWEAVE_CONFIG",
+                    "DISPATCH"
                 ]);
                 wallet.address = await window.arweaveWallet.getActiveAddress();
             } catch (e) {
