@@ -446,7 +446,7 @@ export default {
                         // Show repo notices to members
                         if (isMember) {
                             // Look for votes that need to be concluded
-                            this.$store.dispatch('loadCurrentBlock');
+                            await this.$store.dispatch('loadCurrentBlock');
                             let currentBlock = +this.currentBlock.height;
                             activeVotes.forEach((vote) => {
                                 let start = +vote.start;

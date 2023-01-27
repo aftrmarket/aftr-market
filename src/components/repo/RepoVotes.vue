@@ -147,8 +147,8 @@ export default {
             }
         },
     },
-    mounted() {
-        this.$store.dispatch('loadCurrentBlock');
+    async mounted() {
+        await this.$store.dispatch('loadCurrentBlock');
     },
     watch: {
         arConnected(value) {
