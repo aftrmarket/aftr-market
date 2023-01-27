@@ -90,7 +90,7 @@
                         d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
                         clip-rule="evenodd" />
                     </svg>
-                    <span class="pt-1.5 text-red-500 font-bold text-xl">{{ voteData.statusNote }}</span>
+                    <span :class="statusMsgClass(voteData.status)">{{ voteData.statusNote }}</span>
                   </div>
                 </div>
               </div>
@@ -155,7 +155,14 @@ export default {
       this.total = Object.values(this.repo.balances).reduce((accumulator, object) => {
         return accumulator + object;
       }, 0)
-    }
+    },
+    statusMsgClass(status) {
+        if (status === "passed") {
+            return "pt-1.5 text-green-700 font-bold text-xl";
+        } else {
+            return "pt-1.5 text-red-500 font-bold text-xl";
+        }
+    },
   },
   setup() {
     const open = ref(true);
