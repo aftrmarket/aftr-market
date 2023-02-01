@@ -91,7 +91,6 @@ export default {
             })
         },
         parseActivity(data) {
-            console.log(data)
             // Parses the query response and returns an object with the needed variables
             let activity = {};
             activity.id = data.id;
@@ -100,7 +99,6 @@ export default {
             activity.block = data.block.height;
             activity.result = this.interactions[activity.id];
 
-            console.log("activity.result ", activity.result);
             // Parse Input tag to get the interaction specifics
             for (let tag of data.tags) {
                 if (tag.name === "Input") {
@@ -209,7 +207,6 @@ export default {
             this.edges = responseData.data.data.transactions.edges;
         },
         async getInteractions(contractId) {
-            console.log(contractId);
             let route = 'https://gateway.redstone.finance/gateway/interactions?contractId=' + contractId + (this.network === 'TEST' ? '&testnet=true' : '');
             let response = await fetch(route)
             let data = await response.json()
