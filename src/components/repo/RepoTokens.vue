@@ -86,12 +86,8 @@
                                                 <img class="h-10 w-10 rounded-full" :src="pstLogo(pst1.tokenId, pst1.logo)" alt="" />
                                             </div>
                                             <div class="ml-4">
-                                                <div class="font-medium text-gray-900"> {{ pst1.name + " (" +
-        pst1.ticker + ")"
-}} ({{ pst1.count }})</div>
-                                                <div class="text-gray-500 font-mono" @click.prevent="showWalletAddress(pst1.tokenId)"> {{
-        idSubstr(pst1.tokenId)
-}}</div>
+                                                <div class="font-medium text-gray-900"> {{ pst1.name + " (" + pst1.ticker + ")" }} ({{ pst1.count }})</div>
+                                                <div class="text-gray-500 font-mono" @click.prevent="showWalletAddress(pst1.tokenId)"> {{ idSubstr(pst1.tokenId) }}</div>
                                             </div>
                                         </div>
                                     </td>
@@ -118,9 +114,7 @@
                                             <div class="ml-4">
                                                 <!-- <div class="font-medium text-gray-900"> {{ pst.name + " (" + pst.ticker + ")" }} </div> -->
                                                 <div class="text-gray-500 font-mono" @click.prevent="showWalletAddress(pst.txID)"> {{ index + 1 }}.
-                                                    {{
-        idSubstr(pst.txID)
-}}</div>
+                                                    {{ idSubstr(pst.txID) }}</div>
                                             </div>
                                         </div>
                                     </td>
@@ -333,8 +327,8 @@ export default {
     },
     methods: {
         getRepo1() {
-            console.log("************")
-            console.log(this.repo.tokens)
+            // console.log("************")
+            // console.log(this.repo.tokens)
             let data = this.repo.tokens
             let result = Object.values(data.reduce((r, { balance, lockLength, logo, name, source, start, ticker, tokenId, txID }) => {
                 r[tokenId] ??= { tokenId, count: 0, tokens: 0 };
@@ -350,8 +344,8 @@ export default {
                 return r;
             }, {}));
             // let data = [...new Map(this.repo.tokens.map(item => [item['tokenId'] , item])).values()]
-            console.log(result)
-            console.log("************")
+            // console.log(result)
+            // console.log("************")
             return result;
         },
         getRepo(id) {
@@ -390,8 +384,43 @@ export default {
                 title: '<span style="vertical-align:middle" >' + title.replace(/^"(.*)"$/, '$1') + '</span><hr size="8">',
                 html: "<pre style= 'text-align:left'> <code>" + "<p style='color:green'> Balances : </p>" + JSON.stringify(state.balances, null, 3) + "</code> </pre>",
                 width: 800,
-                customClass: 'swal-height'
+                customClass: 'swal-height',
+                confirmButtonColor: "#6C8CFF"
             });
+
+            /*** Sync is potential future enhancement */
+            // Check for balance discrepency
+            // const repoBal = state.balances[this.repo.id];
+            // const tokens = this.repo.tokens.filter(token => token.tokenId === id);
+            // let totalBal = 0;
+            // for (let token of tokens) {
+            //     totalBal += token.balance;
+            // }
+            // if (totalBal !== repoBal) {
+            //     this.$swal.fire({
+            //         title: "Balance Discrepancy Found",
+            //         html: "A discrepency was found between repo and the asset's balance. Would like to synchronize the repo?",
+            //         icon: "warning",
+            //         showCancelButton: true,
+            //         confirmButtonText: "Yes",
+            //         cancelButtonText: "No",
+            //         confirmButtonColor: "#6C8CFF",
+            //         cancelButtonColor: "#FF6C8C",
+            //         allowOutsideClick: false
+            //     }).then(async (result) => {
+            //         if (result.isConfirmed) {
+            //             let txid = await warpWrite(this.repo.id, { function: "sync", target: id });
+            //             this.$swal.fire({
+            //                 title: "Sync completed",
+            //                 icon: "success",
+            //                 allowOutsideClick: false,
+            //                 showConfirmButton: true,
+            //                 confirmButtonColor: "#6C8CFF"
+            //             });
+            //         }
+            //     });
+            // }
+            /*** */
         },
         setFlags() {
             if (this.arConnected) {
