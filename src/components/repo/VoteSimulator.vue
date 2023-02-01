@@ -260,9 +260,7 @@ export default {
 
       const objEntries = Object.entries(myRepo);
       let test = Object.fromEntries(objEntries);
-
-      let voteValue = test.votingSystem
-
+      let voteValue = test.votingSystem;
       this.selectedVoteCategory = voteValue.charAt(0).toUpperCase() + voteValue.slice(1);
 
       let val = Object.entries(test.settings).map((item) => {
@@ -273,15 +271,24 @@ export default {
         if (item[1][0] == "support") {
           this.selectedSupportValue = item[1][1] * 100
         }
-      })
-      Object.entries(this.vote.votingPower).map((item) =>
-        this.memberData.push({
-          member: this.idSubstr(item[0]),
-          token: item[1],
-          voteCast: "",
-        })
-      )
-
+      });
+      if (this.vote == undefined || this.vote == null) {
+        for (const [key, value] of Object.entries(this.repo.balances)) {
+            this.memberData.push({
+                member: this.idSubstr(key),
+                token: value,
+                voteCast: ""
+            });
+        }
+      } else {
+        Object.entries(this.vote.votingPower).map((item) =>
+            this.memberData.push({
+                member: this.idSubstr(item[0]),
+                token: item[1],
+                voteCast: "",
+            })
+        );
+      }
     }
 
     this.changeVoteCategory();

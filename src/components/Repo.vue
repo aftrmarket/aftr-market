@@ -373,7 +373,7 @@ export default {
 
             // Votes
             if (this.allowEdits && this.repo.votes) {
-                this.$store.dispatch('loadCurrentBlock');
+                await this.$store.dispatch('loadCurrentBlock');
                 this.currentBlockInt = +this.currentBlock.height;
                 let activeVotes = this.repo.votes.filter((vote) => vote.status === "active");
                 activeVotes.forEach((vote) => {
@@ -429,7 +429,7 @@ export default {
             this.repo = cachedValue.state;
             this.interactions = cachedValue.validity;
             this.interactionErrorMsgs = cachedValue.errorMessages;
-
+console.log(JSON.stringify(this.repo));
             // Ensure AFTR Repo
             const contractSrc = await this.returnContractSrc(this.arweave, this.contractId);
             this.repo.contractSrc = contractSrc;
