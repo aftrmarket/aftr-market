@@ -15,8 +15,7 @@
             <div class="mt-2 pb-3 text-sm text-gray-700">Current Block: {{ currentBlock.height }}</div>
             <div>
                 <input type="radio" v-model="selectedVoteCategory" value="Active" class="form-radio text-aftrBlue" /><label class="px-2 text-sm text-gray-700">Active Votes</label>
-                <input type="radio" v-model="selectedVoteCategory" value="Concluded" class="form-radio text-aftrBlue" /><label class="px-2 text-sm text-gray-700">Concluded
-                    Votes</label>
+                <input type="radio" v-model="selectedVoteCategory" value="Concluded" class="form-radio text-aftrBlue" /><label class="px-2 text-sm text-gray-700">Concluded Votes</label>
             </div>
 
             <div v-if="false">
@@ -209,7 +208,11 @@ export default {
             } else if (vote.type === '???') {
                 return "???";
             } else {
-                return capitalize(vote.note);
+                if (vote.note) {
+                    return capitalize(vote.note);
+                } else {
+                    return vote.type;
+                }
             }
         },
         calculateStatus(vote) {
