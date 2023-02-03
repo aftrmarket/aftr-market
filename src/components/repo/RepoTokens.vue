@@ -2,7 +2,8 @@
     <div class="pt-4 w-full">
         <repo-tokens-add v-if="showAddTokens" :repo="repo" @close="closeModal">
         </repo-tokens-add>
-
+        <repo-asset-directives v-if="showDirectives" :repo="repo" @close="showDirectives = false">
+        </repo-asset-directives>
 
         <!--- Finalize Withdrawals Start --->
         <div v-if="allowTransfer && wds.length > 0" class="pt-4 w-full grid grid-cols-4 gap-4">
@@ -78,12 +79,12 @@
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-gray-200" v-for="(pst1) in getRepo1()" :key="pst1.tokenId">
-                                <tr @click="toggle(pst1.tokenId)" :class="{ opened: opened.includes(pst1.tokenId) }">
+                            <tbody class="bg-white divide-y divide-gray-200" v-for="(pst) in getRepo1()" :key="pst.tokenId">
+                                <tr @click="toggle(pst.tokenId)" :class="{ opened: opened.includes(pst.tokenId) }">
                                     <td class="px-1 py-2 text-gray-500 font-mono cursor-pointer">
                                         <div class="flex items-center mt-3 ml-3 mb-3">
-                                            <div class="flex-shrink-0 h-10 w-10" @click.prevent="showTokenState(pst1.tokenId, pstLogo(pst1.tokenId, pst1.logo))">
-                                                <img class="h-10 w-10 rounded-full" :src="pstLogo(pst1.tokenId, pst1.logo)" alt="" />
+                                            <div class="flex-shrink-0 h-10 w-10" @click.prevent="showTokenState(pst.tokenId, pstLogo(pst.tokenId, pst.logo))">
+                                                <img class="h-10 w-10 rounded-full" :src="pstLogo(pst.tokenId, pst.logo)" alt="" />
                                             </div>
                                             <div class="ml-4">
                                                 <div class="font-medium text-gray-900"> {{ pst1.name + " (" + pst1.ticker + ")" }} ({{ pst1.count }})</div>
@@ -92,7 +93,7 @@
                                         </div>
                                     </td>
                                     <td class="px-1 py-2 text-gray-500 font-mono cursor-pointer"></td>
-                                    <td class="text-right px-1 py-3 text-gray-500">{{ formatNumber(pst1.tokens) }}
+                                    <td class="text-right px-1 py-3 text-gray-500">{{ formatNumber(pst.tokens) }}
                                     </td>
                                     <td class="text-right px-6 py-3 text-gray-500"></td>
                                     <td v-if="allowTransfer" class="text-right px-6 py-3 text-gray-500 w-40"></td>
@@ -102,12 +103,12 @@
                                         <!-- <svg v-if="arrow" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                                         </svg>
-                                        <svg v-if="!arrow && opened == pst1.tokenId" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-3 w-3" >
+                                        <svg v-if="!arrow && opened == pst.tokenId" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-3 w-3" >
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
                                         </svg>  -->
                                     </td>
                                 </tr>
-                                <tr v-for="(pst, index) in getRepo(pst1.tokenId)" v-show="opened.includes(pst1.tokenId)" :key="pst.tokenId" class="bg-gray-100">
+                                <tr v-for="(pst, index) in getRepo(pst.tokenId)" v-show="opened.includes(pst.tokenId)" :key="pst.tokenId" class="bg-gray-100">
 
                                     <td class="px-1 py-2 text-gray-500 font-mono cursor-pointer">
                                         <div class="flex items-center">
@@ -158,14 +159,26 @@
         <div v-else>
             <h3 class="text-xl font-light leading-6">No current tokens in repo</h3>
         </div>
-        <div class="mt-6 flex flex-col inline-flex">
-            <button v-if="allowAdd" @click.prevent="addPst" type="button"
-                class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
-                </svg>
-                <span class="pl-2">ADD ASSETS</span>
-            </button>
+        <div class="mt-6 flex flex-col">
+            <div v-if="allowAdd" class="flex justify-between">
+                <button @click.prevent="addPst" type="button"
+                    class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <span class="pl-2">ADD ASSETS</span>
+                </button>
+                <button v-if="this.isMember" @click.prevent="viewDirectives" type="button"
+                    class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                        <path fill-rule="evenodd"
+                            d="M2 10a8 8 0 1116 0 8 8 0 01-16 0zm6.39-2.908a.75.75 0 01.766.027l3.5 2.25a.75.75 0 010 1.262l-3.5 2.25A.75.75 0 018 12.25v-4.5a.75.75 0 01.39-.658z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <span class="pl-2">VIEW DIRECTIVES</span>
+                </button>
+            </div>
             <div v-else class="pt-6 flex justify-start items-center">
                 <button @click="arConnect" type="button"
                     class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-aftrBlue hover:bg-aftrBlue-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
@@ -241,6 +254,7 @@
 import numeral from "numeral";
 import { mapGetters } from 'vuex';
 import RepoTokensAdd from './RepoTokensAdd.vue';
+import RepoAssetDirectives from './RepoAssetDirectives.vue'
 import { warpRead, warpWrite, arweaveInit } from '../utils/warpUtils.js';
 import SlideUpDown from 'vue3-slide-up-down';
 import Transaction from 'arweave/node/lib/transaction';
@@ -248,7 +262,7 @@ import Transaction from 'arweave/node/lib/transaction';
 
 export default {
     props: ['repo', 'isMember'],
-    components: { RepoTokensAdd, SlideUpDown },
+    components: { RepoTokensAdd, RepoAssetDirectives, SlideUpDown },
     data() {
         return {
             env: import.meta.env.VITE_ENV,
@@ -260,6 +274,7 @@ export default {
             allowAdd: false,
             allowTransfer: false,
             showAddTokens: false,
+            showDirectives: false,
             wds: [],
             //tokenSelected: [],
             transferAddrs: [],
@@ -371,7 +386,7 @@ export default {
         async showWalletAddress(walletAddress) {
             this.$swal({
                 html: walletAddress,
-                showConfirmButton: false,
+                showConfirmButton: false
             })
         },
         async showTokenState(id, logo) {
@@ -665,6 +680,9 @@ export default {
                 this.proposedChanges[foundIndex].target = this.transferAddrs[index];
             }
         },
+        viewDirectives() {
+            this.showDirectives = true;
+        },
         onRemoveProposalClick(index) {
             this.proposedChanges.splice(index, 1);
         },
@@ -849,6 +867,48 @@ export default {
     },
 };
 </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

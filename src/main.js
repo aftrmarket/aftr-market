@@ -24,6 +24,9 @@ import PerfectScrollbar from 'vue3-perfect-scrollbar'
 import 'vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css'
 import { VueClipboard } from '@soerenmartius/vue3-clipboard'
 
+import VueDiff from 'vue-diff'
+import 'vue-diff/dist/index.css';
+
 
 let logLevel = "";
 if (import.meta.env.VITE_ENV === 'PROD') {
@@ -79,5 +82,8 @@ app.use(VueLogger, options);
 app.use(VueSweetalert2);
 app.use(PerfectScrollbar);
 app.use(VueClipboard);
+app.use(VueDiff, {
+    componentName: 'VueDiff'
+})
 
 app.mount('#app');
