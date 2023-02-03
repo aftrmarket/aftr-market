@@ -1,10 +1,8 @@
 <template>
     <vote-simulator v-if="showVoteSimulator" :repo="repo" :vote="simulatedVote" @close="closeSimulatorModal"></vote-simulator>
     <div class="pt-4 w-full">
-        <repo-vote-history v-if="showVoteHistory" :repo="repo" :voteData="voteData" @close="closeVoteHostory">
-        </repo-vote-history>
-        <repo-votes-add v-if="showAddVotes" :repo="repo" @close="closeModal('add')">
-        </repo-votes-add>
+        <repo-vote-history v-if="showVoteHistory" :repo="repo" :voteData="voteData" @close="closeVoteHostory"></repo-vote-history>
+        <repo-votes-add v-if="showAddVotes" :repo="repo" @close="closeModal('add')"></repo-votes-add>
         <repo-votes-cast v-if="showCastVotes" :repo="repo" :voteId="voteId" :voteData="voteData" :contractId="contractId" :currentBlock="currentBlock.height"
             @close="closeModal('cast')">
         </repo-votes-cast>
