@@ -47,6 +47,7 @@ async function warpWrite(contractId, input, internalWrites = true, bundling = tr
                 disableBundling: !bundling
             })
             .connect("use_wallet");
+        console.log(contract)
         const { originalTxId } = await contract.writeInteraction(input);
         return originalTxId;
     } catch (e) {

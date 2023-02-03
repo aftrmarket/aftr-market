@@ -23,8 +23,12 @@
             </div>
         </div>
         <div class="py-6 bg-gray-50 overflow-hidden">
-            <div class="max-w-7xl mx-auto px-4 space-y-8 sm:px-6 lg:px-8 text-sm">
-                <highlightjs v-if="contractSrc != '' && contractSrc != undefined" language="js" :code="contractSrc" />
+            <div class="mx-auto px-4 space-y-8 sm:px-6 lg:px-8 text-sm">
+
+                <VueDiff v-if="contractSrc != ''" :mode="diffMode" theme="dark" language="js" :prev="contractSrc" :current="currentAftrSrc" :input-delay="0" :virtual-scroll="false"
+                    style="font-size: 0.875rem" />
+
+                <!-- <highlightjs v-if="contractSrc != '' && contractSrc != undefined" language="js" :code="contractSrc" /> -->
                 <p v-if="contractSrc == undefined" class="text-red-500">Contract source missing - no contracts exist with source ID {{ contractId }}</p>
             </div>
         </div>
@@ -72,7 +76,6 @@ import 'highlight.js/styles/stackoverflow-light.css'
 import hljs from 'highlight.js/lib/core';
 import javascript from 'highlight.js/lib/languages/javascript';
 import hljsVuePlugin from "@highlightjs/vue-plugin";
-import { arweaveInit } from "./utils/warpUtils";
 hljs.registerLanguage('javascript', javascript);
 
 export default {
@@ -86,14 +89,16 @@ export default {
             routePort: "1984",
             logo: '../src/assets/aftr-market-logo.png',
             contractSrc: '',
-            show: false
+            currentAftrSrc: '',
+            diffMode: '',
+            show: false,
         }
     },
     components: {
         highlightjs: hljsVuePlugin.component
     },
     methods: {
-        async getSource() {
+        async getSourceDev() {
             let protocol = import.meta.env.VITE_ARWEAVE_PROTOCOL
             let host = import.meta.env.VITE_ARWEAVE_HOST
             let port = import.meta.env.VITE_ARWEAVE_PORT
@@ -171,34 +176,38 @@ export default {
                 }
             }, 1000)
         },
+        async getSource(contractId) {
+            if (import.meta.env.VITE_ENV === "PROD" || import.meta.env.VITE_ENV === "TEST") {
+                this.$store.commit("setAftrContractSources");
+
+                let route = 'https://gateway.warp.cc/gateway/contract-source?id=' + contractId + (this.network === 'TEST' ? '&testnet=true' : '');
+                let response = await fetch(route)
+                console.log(route)
+                let data = await response.json()
+                return data.src
+            } else {
+                // Check to see if any contract sources exist (getAftrContractSources variable)
+                const csArray = this.getAftrContractSources
+                if (csArray.length > 0) {
+                    this.aftrContractSourceId = csArray[csArray.length - 1]
+                    this.getSourceDev()
+                } else {
+                    // If they don't, add a message stating that the contract source can't be shown until after the user enters the Playground
+                    /*** I know, this is clunky, but's it's just for dev/test, so realistically, no one will ever see it */
+                    alert("contract source can't be shown until after the user enters the playground!")
+                }
+            }
+        }
     },
     computed: {
         ...mapGetters(["getAftrContractSources"])
     },
     async created() {
-        if (import.meta.env.VITE_ENV === "PROD" || import.meta.env.VITE_ENV === "TEST") {
-            this.$store.commit("setAftrContractSources");
-            const csArray = this.getAftrContractSources
-            let aftrContractSourceId = this.contractId
-            // get a contract that uses this source
-            let route = 'https://gateway.redstone.finance/gateway/contract-source?id=' + aftrContractSourceId + (this.network === 'TEST' ? '&testnet=true' : '');
-            let response = await fetch(route)
-            let data = await response.json()
-
-            this.contractSrc = data.src
-        } else {
-            // Check to see if any contract sources exist (getAftrContractSources variable)
-            const csArray = this.getAftrContractSources
-            if (csArray.length > 0) {
-                this.aftrContractSourceId = csArray[csArray.length - 1]
-                this.getSource()
-            } else {
-                // If they don't, add a message stating that the contract source can't be shown until after the user enters the Playground
-                /*** I know, this is clunky, but's it's just for dev/test, so realistically, no one will ever see it */
-                alert("contract source can't be shown until after the user enters the playground!")
-            }
-        }
-
+        const csArray = this.getAftrContractSources
+        let latestAftrContract = csArray[csArray.length - 1]
+        this.diffMode = latestAftrContract == this.contractId ? 'unified' : 'split'
+        this.contractSrc = await this.getSource(this.contractId)
+        this.currentAftrSrc = latestAftrContract == this.contractId ? this.contractSrc : await this.getSource(latestAftrContract)
         // const srcId = this.getContractSourceId()
     }
 };
