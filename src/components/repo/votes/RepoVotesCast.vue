@@ -167,10 +167,11 @@ export default {
         allowOutsideClick: false
       })
       this.$log.info("RepoVotesCast : recordVote :: ", txID);
-      this.$router.push("../repos" + this.contractId);
-      // this.$emit("close");
+      //this.$router.go(0); -> We're losing the Arconnection when we try to go back to the repo page
+      this.$router.push("/repos");
+    //   this.$emit("close");
       return
-    },
+    }
   },
   setup() {
     const open = ref(true);

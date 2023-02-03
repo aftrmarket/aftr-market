@@ -46,15 +46,11 @@
                         </button>
                     </div>
                     <div v-if="arConnected">
-                        <button type="button" @click.prevent="createRepo()"
-                            class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z">
-                                </path>
-                                <path
-                                    d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z">
-                                </path>
+                        <button type="button" @click.prevent="createRepo()" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                                <path d="M5.566 4.657A4.505 4.505 0 016.75 4.5h10.5c.41 0 .806.055 1.183.157A3 3 0 0015.75 3h-7.5a3 3 0 00-2.684 1.657zM2.25 12a3 3 0 013-3h13.5a3 3 0 013 3v6a3 3 0 01-3 3H5.25a3 3 0 01-3-3v-6zM5.25 7.5c-.41 0-.806.055-1.184.157A3 3 0 016.75 6h10.5a3 3 0 012.683 1.657A4.505 4.505 0 0018.75 7.5H5.25z" />
                             </svg>
+
                             <span class="pl-2">Create</span>
                         </button>
                         <button type="button" @click.prevent="openModal"
@@ -297,7 +293,7 @@ export default {
             }
 
             if (this.searchType == "Needs Attention") {
-                const repo = this.renderedRepos.filter((repo) => { repo.evolveNeeded == true });
+                const repo = this.renderedRepos.filter((repo) => { repo.evolveNeeded == true || repo.concludeVoteNeeded == true });
                 this.numRepos = repo.length;
                 return repo;
             }
@@ -448,18 +444,18 @@ export default {
 
                         /*** The concludedVoteNeeded proporty was added before using Warp.  Since switching to Warp, we don't need to check this anymore b/c contract functions run during a read of the contract. */
                         // Show repo notices to members
-                        // if (isMember) {
-                        //     // Look for votes that need to be concluded
-                        //     this.$store.dispatch('loadCurrentBlock');
-                        //     let currentBlock = +this.currentBlock.height;
-                        //     activeVotes.forEach((vote) => {
-                        //         let start = +vote.start;
-                        //         let voteLength = +vote.voteLength;
-                        //         if (start + voteLength < currentBlock) {
-                        //             repo.concludeVoteNeeded = true;
-                        //         }
-                        //     });
-                        // }
+                        if (isMember) {
+                            // Look for votes that need to be concluded
+                            await this.$store.dispatch('loadCurrentBlock');
+                            let currentBlock = +this.currentBlock.height;
+                            activeVotes.forEach((vote) => {
+                                let start = +vote.start;
+                                let voteLength = +vote.voteLength;
+                                if (start + voteLength < currentBlock) {
+                                    repo.concludeVoteNeeded = true;
+                                }
+                            });
+                        }
                     } else {
                         repo.totalActiveVotes = 0;
                     }

@@ -122,7 +122,7 @@
                                         </nav>
                                     </div>
                                 </div>
-                                <repo-info v-if="activeTab === 'Info'" :repo="repo" :contractId="contractId" :isMember="allowEdits">
+                                <repo-info v-if="activeTab === 'Info'" :repo="repo" :contractId="repoId" :isMember="allowEdits">
                                 </repo-info>
                                 <!--<repo-names v-else-if="activeTab === 'Names'" :repo="repo" :isMember="allowEdits"></repo-names>-->
                                 <repo-settings v-else-if="activeTab === 'Custom Settings'" :repo="repo" :isMember="allowEdits">
@@ -135,11 +135,11 @@
                                 <!--<repo-leases v-else-if="activeTab === 'Leases'" :leases="repo.leases"></repo-leases>-->
                                 <!--<repo-leases v-else-if="activeTab === 'Leases'"></repo-leases>-->
                                 <!--<repo-fractions v-else-if="activeTab === 'Fractions'"></repo-fractions>-->
-                                <repo-votes v-else-if="activeTab === 'Votes'" :repo="repo" :contractId="contractId" :isMember="allowEdits">
+                                <repo-votes v-else-if="activeTab === 'Votes'" :repo="repo" :contractId="repoId" :isMember="allowEdits">
                                 </repo-votes>
                                 <repo-state v-else-if="activeTab === 'State'" :repo="repo">
                                 </repo-state>
-                                <repo-activity v-else-if="activeTab === 'Activity'" :arweave="arweave" :repoId="this.repoId" :interactions="interactions"
+                                <repo-activity v-else-if="activeTab === 'Activity'" :arweave="arweave" :repoId="repoId" :interactions="interactions"
                                     :errorMessages="interactionErrorMsgs">
                                 </repo-activity>
 
@@ -156,7 +156,7 @@
 </template>
 
 <script>
-import { warpRead } from './utils/warpUtils.js';
+import { warpRead, warpWrite } from './utils/warpUtils.js';
 import RepoInfo from './repo/RepoInfo.vue';
 import RepoMembers from './repo/RepoMembers.vue';
 import RepoTokens from './repo/RepoTokens.vue';
@@ -202,6 +202,9 @@ export default {
             interactionErrorMsgs: {},
             anyWithdrawals: false,
             concludeVoteNeeded: false,
+            currentBlockInt: 0,
+            concludedVoteIds: [],
+            repoLogo: "",
 
             arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
             arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
@@ -215,7 +218,10 @@ export default {
         };
     },
     computed: {
-        repoLogo() {
+        ...mapGetters(["getActiveAddress", "currentBlock", "getAftrContractSources"]),
+    },
+    methods: {
+        async getRepoLogo() {
             let logoUrl = ""
             if (this.repo.logo) {
                 if (import.meta.env.VITE_ARWEAVE_PORT) {
@@ -223,15 +229,11 @@ export default {
                 } else {
                     logoUrl = `${import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + "/" + this.repo.logo}`;
                 }
-                return logoUrl;
             } else {
                 logoUrl = "https://avatars.dicebear.com/api/pixel-art-neutral/:" + this.repo.id + ".svg";
-                return logoUrl;
             }
+            this.repoLogo = logoUrl;
         },
-        ...mapGetters(["getActiveAddress", "currentBlock", "getAftrContractSources"]),
-    },
-    methods: {
         showPopup() {
             this.show = true;
 
@@ -370,18 +372,20 @@ export default {
             // this.repo.treasury = treasuryTotal;
 
             // Votes
-            if (this.repo.votes) {
-                this.$store.dispatch('loadCurrentBlock');
-                let currentBlock = +this.currentBlock.height;
+            if (this.allowEdits && this.repo.votes) {
+                await this.$store.dispatch('loadCurrentBlock');
+                this.currentBlockInt = +this.currentBlock.height;
                 let activeVotes = this.repo.votes.filter((vote) => vote.status === "active");
                 activeVotes.forEach((vote) => {
                     let start = +vote.start;
                     let voteLength = +vote.voteLength;
-                    if (start + voteLength < currentBlock) {
+                    if (start + voteLength < this.currentBlockInt) {
                         this.concludeVoteNeeded = true;
+                        this.concludedVoteIds.push(vote.id);
                     }
                 });
             }
+            await this.getRepoLogo();
         },
     },
     beforeRouteEnter(to, from, next) {
@@ -395,6 +399,10 @@ export default {
     },
     async created() {
         this.pageStatus = "in-progress";
+
+        // Ensure this contract sources are up to date
+        this.$store.commit("setAftrContractSources");
+        
         this.showEvolveModal = false;
 
         try {
@@ -421,13 +429,10 @@ export default {
             this.repo = cachedValue.state;
             this.interactions = cachedValue.validity;
             this.interactionErrorMsgs = cachedValue.errorMessages;
-
+console.log(JSON.stringify(this.repo));
             // Ensure AFTR Repo
             const contractSrc = await this.returnContractSrc(this.arweave, this.contractId);
             this.repo.contractSrc = contractSrc;
-            // if (contractSrc !== this.getAftrContractSrcId) {
-            //     throw "Not valid AFTR Repo";
-            // }
 
             await this.loadRepo();
         } catch (error) {
@@ -441,7 +446,42 @@ export default {
             return false;
         }
 
+        if (this.allowEdits && this.concludeVoteNeeded) {
+            const input = { function: "finalize" };
+            const tx = await warpWrite(this.repo.id, input, true, undefined);
+
+            // Reread contract to get latest with vote finalizations
+            const cachedValue = await warpRead(this.contractId);
+            this.repo = cachedValue.state;
+            this.interactions = cachedValue.validity;
+            this.interactionErrorMsgs = cachedValue.errorMessages;
+
+            let msg = "The following votes just became finalized: <br>";
+            for (let id of this.concludedVoteIds) {
+                msg += id.substring(0, 5) + '...' + id.substring(id.length - 5) + "<br>";
+            }
+            this.$swal({
+                icon: "info",
+                html: msg,
+                showConfirmButton: true,
+                allowOutsideClick: false,
+            });
+            this.concludeVoteNeeded = false;
+        }
+
         this.pageStatus = "";
     },
+    async updated() {
+        let logoUrl = this.repoLogo;
+        if (logoUrl.substring(0, 15) !== "https://avatars") {
+            // Check to see if logo is invalid
+            await fetch(logoUrl)
+                .then(response => {
+                    if (response.status != 200) {
+                        this.repoLogo = "https://avatars.dicebear.com/api/pixel-art-neutral/:" + this.repo.id + ".svg";
+                    }
+                });
+        }
+    }
 };
 </script>
