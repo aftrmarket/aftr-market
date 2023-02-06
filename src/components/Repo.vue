@@ -404,6 +404,7 @@ export default {
         this.$store.commit("setAftrContractSources");
         
         this.showEvolveModal = false;
+        let contractSrc = "";
 
         try {
             this.arweave = await Arweave.init({
@@ -429,9 +430,9 @@ export default {
             this.repo = cachedValue.state;
             this.interactions = cachedValue.validity;
             this.interactionErrorMsgs = cachedValue.errorMessages;
-console.log(JSON.stringify(this.repo));
+
             // Ensure AFTR Repo
-            const contractSrc = await this.returnContractSrc(this.arweave, this.contractId);
+            contractSrc = await this.returnContractSrc(this.arweave, this.contractId);
             this.repo.contractSrc = contractSrc;
 
             await this.loadRepo();
@@ -449,12 +450,15 @@ console.log(JSON.stringify(this.repo));
         if (this.allowEdits && this.concludeVoteNeeded) {
             const input = { function: "finalize" };
             const tx = await warpWrite(this.repo.id, input, true, undefined);
+            const contractId = this.repo.id;
 
             // Reread contract to get latest with vote finalizations
-            const cachedValue = await warpRead(this.contractId);
+            const cachedValue = await warpRead(contractId);
             this.repo = cachedValue.state;
             this.interactions = cachedValue.validity;
             this.interactionErrorMsgs = cachedValue.errorMessages;
+            this.repo.id = contractId;
+            this.repo.contractSrc = contractSrc;
 
             let msg = "The following votes just became finalized: <br>";
             for (let id of this.concludedVoteIds) {
