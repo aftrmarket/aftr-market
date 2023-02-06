@@ -166,7 +166,11 @@ export default {
                 return this.nfTokenBal;
             } else {
                 const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.contractId === this.selectedPstId);
-                return currentPst.balance;
+                if (currentPst.balance !== undefined) {
+                    return currentPst.balance;
+                } else {
+                    return 0;
+                }
             }
         },
         pstTicker() {
@@ -174,7 +178,11 @@ export default {
                 return this.nfTokenTicker;
             } else {
                 const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.contractId === this.selectedPstId);
-                return currentPst.ticker;
+                if (currentPst.ticker !== undefined) {
+                    return currentPst.ticker;
+                } else {
+                    return "";
+                }
             }
         },
         repoTokenBox() {
@@ -275,8 +283,13 @@ export default {
             }
 
             // Test to see if user has enough balance on the contract
-            if (stateInteractions.state.balances[this.getActiveAddress] - Number(this.pstInputTokens) <= 0 || !stateInteractions.state.balances[this.getActiveAddress]) {
+            if (!stateInteractions.state.balances[this.getActiveAddress]) {
                 msg = "Can't deposit this asset because you don't appear to have a balance on this contract.";
+                return msg;
+            }
+
+            if (stateInteractions.state.balances[this.getActiveAddress] - Number(this.pstInputTokens) < 0) {
+                msg = "Can't deposit this asset because your balance is too low on the other contract.";
                 return msg;
             }
 
