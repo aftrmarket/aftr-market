@@ -12,7 +12,7 @@
                 <img class="w-10" src="../../assets/aftr-market-logo.png" alt="Logo">
                 <span
                   class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-aftrDarkGrey-light text-aftrYellow">
-                  alpha
+                  beta
                 </span>
               </div>
               <div class="hidden md:block">

@@ -203,6 +203,7 @@ async function post(ctx) {
         }
     })
     return { id: ctx.atomicId }
-}
+};
+
 
 export { warpInit, warpRead, warpWrite, warpCreateContract, warpCreateFromTx, arweaveInit, upload, getAsByteArray, readFile, dispatch, post };
