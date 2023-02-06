@@ -47,6 +47,7 @@ async function warpWrite(contractId, input, internalWrites = true, bundling = tr
                 disableBundling: !bundling
             })
             .connect("use_wallet");
+        console.log(contract)
         const { originalTxId } = await contract.writeInteraction(input);
         return originalTxId;
     } catch (e) {
@@ -202,6 +203,7 @@ async function post(ctx) {
         }
     })
     return { id: ctx.atomicId }
-}
+};
+
 
 export { warpInit, warpRead, warpWrite, warpCreateContract, warpCreateFromTx, arweaveInit, upload, getAsByteArray, readFile, dispatch, post };

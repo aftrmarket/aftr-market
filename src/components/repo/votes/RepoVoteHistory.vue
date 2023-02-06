@@ -2,9 +2,9 @@
   <TransitionRoot as="template" :show="open">
     <Dialog as="div" auto-reopen="true" class="relative z-50" @close="open = false">
       <div
-        class="fixed inset-0 overflow-y-auto flex items-center justify-center p-4 rounded-md shadow border-b border-gray-200">
-        <DialogPanel class="w-full max-w-4xl shadow border-b border-gray-200">
-          <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+        class="fixed inset-0 overflow-y-auto flex items-center justify-center p-4">
+        <DialogPanel class="w-full max-w-4xl">
+          <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 rounded-lg shadow-2xl border border-gray-200">
             <div class="sm:flex sm:items-start">
               <div
                 class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
@@ -151,7 +151,6 @@ export default {
       }
     },
     totalBalance() {
-      console.log("voteData", this.repo, this.voteData, this.repo.settings[0][1])
       this.total = Object.values(this.repo.balances).reduce((accumulator, object) => {
         return accumulator + object;
       }, 0)
