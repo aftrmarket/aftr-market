@@ -1,10 +1,16 @@
 <template>
-    <div class="grid grid-cols-2 gap-4 p-4 border">
+    <!--<div class="grid grid-cols-2 gap-4 p-4 border">
         <div class="col-span-2">Contract Comparison</div>
         <div class="pt-4 w-full">
             <p class="font-sans font-lg text-aftrBlue">3EM</p><br/>
             <vue-json-pretty :path="'res'" :data="contract" :showDoubleQuotes="keyQuotes" :deep=depth :deepCollapseChildren="false" :showLength="true" :showSelectController="true"> </vue-json-pretty>
         </div>
+        <div class="pt-4 w-full">
+            <p class="font-sans font-lg text-aftrBlue">Warp</p><br/>
+            <vue-json-pretty :path="'res'" :data="contract3" :showDoubleQuotes="keyQuotes" :deep=depth :deepCollapseChildren="false" :showLength="true" :showSelectController="true"> </vue-json-pretty>
+        </div>
+    </div>-->
+    <div class="grid grid-cols-1 gap-4 p-4 border">
         <div class="pt-4 w-full">
             <p class="font-sans font-lg text-aftrBlue">Warp</p><br/>
             <vue-json-pretty :path="'res'" :data="contract3" :showDoubleQuotes="keyQuotes" :deep=depth :deepCollapseChildren="false" :showLength="true" :showSelectController="true"> </vue-json-pretty>
@@ -15,9 +21,10 @@
 <script>
 import VueJsonPretty from 'vue-json-pretty';
 import 'vue-json-pretty/lib/styles.css';
-import { readContract } from 'smartweave';
+// import { readContract } from 'smartweave';
 //import { executeContract } from "@three-em/js";
-import { WarpFactory, defaultCacheOptions } from 'warp-contracts/web';
+// import { WarpFactory, defaultCacheOptions } from 'warp-contracts/web';
+import { warpRead } from "./utils/warpUtils.js";
 
 export default {
     props: ["contractId"],
@@ -44,8 +51,21 @@ export default {
         
     },
     methods: {
-        async readContracts() {
-            let contractId = "9UN_SQ3RZkA0etf8mlZUN2qbcigOLZKARFM7MMbLTZ0";
+        async readContract() {
+            //let contractId = "Tb9kKmUqvNw_HnWgroWkRQK8Fa8frxl7CKA3zSsrETc";
+            let contractId = this.contractId;
+            // if (this.contractId === "") {
+            //     return;
+            // }
+            const result = await warpRead(contractId);
+            console.log(JSON.stringify(result.state));
+            this.contract3 = result;
+            this.contractState = result;
+            this.contractSrcId = await this.getContractSourceId(contractId);
+            this.findIdType(contractId);
+        },
+        async readContracts1() {
+            let contractId = "Tb9kKmUqvNw_HnWgroWkRQK8Fa8frxl7CKA3zSsrETc";
             // try{
             //     // Using 3EM
             //     const { state, validity } = await executeContract(contractId, undefined, true, {
@@ -127,7 +147,8 @@ export default {
             console.log(error);
             return false;
         }
-        await this.readContracts();
+        //await this.readContracts();
+        await this.readContract();
     }
 }
 </script>
