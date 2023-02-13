@@ -72,9 +72,8 @@
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {{ vote.yays }} - {{ vote.nays }}
                     </td>
-                    <td v-if="allowAdd && selectedVoteCategory === 'Active'"
-                        class="lg:flex lg:flex-row px-6 py-4 whitespace-nowrap text-sm font-medium lg:space-x-4 justify-center items-center table-cell">
-                        <div v-if="canVote(vote) && vote.status === 'active'" class="text-center">
+                    <td v-if="allowAdd && selectedVoteCategory === 'Active'" class="lg:flex lg:flex-row px-6 py-7 whitespace-nowrap text-sm font-medium lg:space-x-4 justify-center items-center table-cell">
+                        <div v-if="canVote(vote) && vote.status === 'active'">
                             <button @click.prevent="openModal('cast', vote.id, vote)" type="button" class="text-aftrBlue hover:text-indigo-900">
                                 Cast
                             </button>
