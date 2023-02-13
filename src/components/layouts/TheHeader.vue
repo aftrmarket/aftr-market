@@ -79,7 +79,7 @@
                 </button>
               </div>
               <div v-else class="flex items-center">
-                <div class="text-aftrGo text-sm font-light mr-20">
+                <div v-if="siteMode!=='PROD'" class="text-aftrGo text-sm font-light mr-20">
                   {{ currentArBalance }}
                 </div>
                 <div class="text-aftrGo text-sm font-light">
