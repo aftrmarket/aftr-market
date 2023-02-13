@@ -32,6 +32,10 @@
                                 <label class="text-gray-700 text-sm">Gateway: </label>
                                 <label class="text-gray-700 text-xs font-mono">{{ arConnectConfig.host }}</label>
                             </div>
+                            <div class="flex flex-row items-center gap-2">
+                                <label class="text-gray-700 text-sm">AR: </label>
+                                <label class="text-gray-700 text-xs font-mono">{{ getActiveWallet.ar }}</label>
+                            </div>
                             <div v-if="arConnected" class="mt-3 border-t border-gray-200">
                                 <label class="text-gray-700 text-sm">Arweave Assets</label>
                                 <perfect-scrollbar>

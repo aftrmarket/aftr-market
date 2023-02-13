@@ -1,6 +1,6 @@
 # AFTR.Market
 
-AFTR Market is a site enabling users to create and configure AFTR vehicles. In short, AFTR vehicles are Arweave assets that encapsulate other Arweave assets. AFTR vehicles add a layer of security to your Arweave assets as management and governance are handled onchain.
+AFTR Market is a site enabling users to create and configure AFTR repos. In short, AFTR repos are Arweave assets that encapsulate other Arweave assets. AFTR repos add a layer of security to your Arweave assets as management and governance are handled onchain.
 
 ## Installation
 
@@ -15,7 +15,8 @@ VITE_ARWEAVE_PORT=1984
 VITE_ARWEAVE_PROTOCOL=http
 
 ###### SMARTWEAVE VARIABLES - The contractSourceId changes when a new AFTR contract source is uploaded to Arweave
-VITE_SMARTWEAVE_CONTRACT_SOURCE_ID=64l71KmgluNSX6rgHqmD0c2iyA2FTnfqkIgbg2MoI3c
+# Make sure to save the source IDs in an array because repos may be on different versions of the AFTR Protocol
+VITE_SMARTWEAVE_CONTRACT_SOURCE_ID=["64l71KmgluNSX6rgHqmD0c2iyA2FTnfqkIgbg2MoI3c"]
 #############
 ```
 
