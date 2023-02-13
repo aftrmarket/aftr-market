@@ -6,8 +6,7 @@
         <div v-for="(commentIndex, index) in commentsToShow" :key="activities[index]" class="pt-4 w-full">
             <div v-if="index < activities.length">
                 <div class="">
-                    <span class="text-aftrBlue text-md font-medium uppercase tracking-wide">{{ activities.length - index
-}}. {{ interactionText(activities[index].input.function) }}</span>
+                    <span class="text-aftrBlue text-md font-medium uppercase tracking-wide">{{ activities.length - index }}. {{ interactionText(activities[index].input.function) }}</span>
                     <span class="font-mono text-xs text-gray-500">({{ activities[index].id }})</span>
                 </div>
                 <div class="pl-8 pb-4">
@@ -35,14 +34,10 @@
                             </span>
                         </div>
                     </div>
-                    <div class="pl-10 pt-2 text-xs">Block <span class="font-mono text-gray-500">{{
-        activities[index].block
-}}</span></div>
+                    <div class="pl-10 pt-2 text-xs">Block <span class="font-mono text-gray-500">{{ activities[index].block }}</span></div>
                     <div class="pl-10 pt-2 text-xs">
                         Caller
-                        <span v-if="activities[index].result" class="font-mono text-green-600">{{
-        activities[index].owner
-}}</span>
+                        <span v-if="activities[index].result" class="font-mono text-green-600">{{ activities[index].owner }}</span>
                         <span v-else class="font-mono text-red-600">{{ activities[index].owner }}</span>
                     </div>
                 </div>
@@ -155,6 +150,9 @@ export default {
                         htmlText += "<p class='pl-4 text-sm'>- " + keys[i] + ": <span class='font-mono text-sm text-gray-600'>" + value + "</span></p>";
                     }
                 }
+            }
+            if (htmlText === "Inputs:<br/>") {
+                htmlText = "";
             }
             return htmlText;
         },
