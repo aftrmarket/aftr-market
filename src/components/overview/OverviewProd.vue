@@ -128,7 +128,7 @@ const tmFeatures = [
         id: 1,
         name: "Multi-signature",
         description:
-            "Securely store your Arweave assets on-chain using AFTR's multi-signature capabilities. Create multiple or individually owned repos to protect your assets.",
+            "Store your Arweave assets on-chain using AFTR's multi-signature capabilities. Create multiple or individually owned repos to protect your assets.",
         icon: UserGroupIcon,
     },
     {

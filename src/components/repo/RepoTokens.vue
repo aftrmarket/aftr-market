@@ -169,7 +169,7 @@
                     </svg>
                     <span class="pl-2">ADD ASSETS</span>
                 </button>
-                <button v-if="this.isMember" @click.prevent="viewDirectives" type="button"
+                <button v-if="isMember && env !== 'PROD' && false" @click.prevent="viewDirectives" type="button"
                     class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
                         <path fill-rule="evenodd"
@@ -512,8 +512,8 @@ export default {
                 return '';
             }
         },
-        interactionTagsParser(txId) {
-            const tx = new Transaction(txId);
+        interactionTagsParser(transaction) {
+            const tx = new Transaction(transaction);
             // let tags = [];
             // contractTx.get('tags').forEach((tag) => {
             //     let key = tag.get('name', { decode: true, string: true });
@@ -579,7 +579,8 @@ export default {
                         }
                         txType = "UNSURE";
                     } else {
-                        txType = await interactionTagsParser(data.contractTx);
+                        console.log("DATA: " + JSON.stringify(data));
+                        txType = this.interactionTagsParser(data.contractTx);
                     }
                 }
             }
@@ -867,189 +868,6 @@ export default {
     },
 };
 </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 <style src="vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css"/>
 

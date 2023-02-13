@@ -2,7 +2,7 @@
   <Dialog :open="isOpen" class="relative z-50">
     <div class="fixed inset-0 overflow-y-auto flex items-center justify-center p-4 rounded-md shadow border-b border-gray-200">
       <DialogPanel class="w-full max-w-4xl shadow border-b border-gray-200">
-        <div class="bg-white px-1 pt-5 pb-8 col-lg-12 rounded-md shadow border-b border-gray-200">
+        <div class="bg-white px-1 pt-5 pb-8 col-lg-12 rounded-lg shadow-2xl border border-gray-200">
           <div class="mt-3 text-center sm:mt-0 sm:ml-2 sm:text-left">
             <DialogTitle as="h3" class="text-lg leading-6 font-medium text-gray-900 break-all">Voting Simulator
             </DialogTitle>
