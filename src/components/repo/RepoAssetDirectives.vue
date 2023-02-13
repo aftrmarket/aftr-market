@@ -39,7 +39,7 @@
                                             </option>
                                         </select>
                                     </div>
-                                    <div v-if="selectedPstId !== ''">
+                                    <!-- <div v-if="selectedPstId !== ''">
                                         <div class="pt-6 pb-4">
                                             <label class="block text-sm font-medium text-gray-700">
                                                 <span>Select an interaction to run:</span>
@@ -54,8 +54,8 @@
                                                 {{ action.name }}
                                             </option>
                                         </select>
-                                    </div>
-                                    <textarea :value="inputStr" @input="inputStr = $event.target.value" class="p-2 w-3/4 mt-4" rows="10"></textarea>
+                                    </div> -->
+                                    <textarea v-model="inputStr" class="p-2 w-3/4 mt-4" rows="10"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -156,12 +156,9 @@ export default {
         async fetchContract() {
             // assuming on test or prod
             let route = 'https://gateway.warp.cc/gateway/contract?txId=' + this.selectedPstId + (this.network === 'TEST' ? '&testnet=true' : '')
-            console.log(route)
             let response = await fetch(route)
             let data = await response.json()
-            console.log(response)
             let source = data.src
-            console.log(source)
         },
         async runInput() {
             let interaction = {
@@ -170,7 +167,6 @@ export default {
                 "target": this.selectedPstId,  // Token ID that you're calling the interaction on
                 "value": this.inputStr.replace(/\s+/g, '')  // Input that you want to run on the token.  Note, that the double quotes must be delimited.
             }
-            console.log(interaction)
             let tx = await warpWrite(this.repo.id, interaction);  // This is from my warpUtils in my test app.  I think the network property is different in our regular warpUtils
             console.log(tx);
         },
