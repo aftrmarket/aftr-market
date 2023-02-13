@@ -87,8 +87,8 @@
                                                 <img class="h-10 w-10 rounded-full" :src="pstLogo(pst.tokenId, pst.logo)" alt="" />
                                             </div>
                                             <div class="ml-4">
-                                                <div class="font-medium text-gray-900"> {{ pst1.name + " (" + pst1.ticker + ")" }} ({{ pst1.count }})</div>
-                                                <div class="text-gray-500 font-mono" @click.prevent="showWalletAddress(pst1.tokenId)"> {{ idSubstr(pst1.tokenId) }}</div>
+                                                <div class="font-medium text-gray-900"> {{ pst.name + " (" + pst.ticker + ")" }} ({{ pst.count }})</div>
+                                                <div class="text-gray-500 font-mono" @click.prevent="showWalletAddress(pst.tokenId)"> {{ idSubstr(pst.tokenId) }}</div>
                                             </div>
                                         </div>
                                     </td>

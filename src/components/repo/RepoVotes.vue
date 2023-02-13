@@ -15,7 +15,8 @@
             <div class="mt-2 pb-3 text-sm text-gray-700">Current Block: {{ currentBlock.height }}</div>
             <div>
                 <input type="radio" v-model="selectedVoteCategory" value="Active" class="form-radio text-aftrBlue" /><label class="px-2 text-sm text-gray-700">Active Votes</label>
-                <input type="radio" v-model="selectedVoteCategory" value="Concluded" class="form-radio text-aftrBlue" /><label class="px-2 text-sm text-gray-700">Concluded Votes</label>
+                <input type="radio" v-model="selectedVoteCategory" value="Concluded" class="form-radio text-aftrBlue" /><label class="px-2 text-sm text-gray-700">Concluded
+                    Votes</label>
             </div>
 
             <div v-if="false">
@@ -73,8 +74,9 @@
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {{ vote.yays }} - {{ vote.nays }}
                     </td>
-                    <td v-if="allowAdd && selectedVoteCategory === 'Active'" class="py-4 whitespace-nowrap text-sm font-medium grid grid-cols-2">
-                        <div v-if="canVote(vote) && vote.status === 'active'" class="text-right">
+                    <td v-if="allowAdd && selectedVoteCategory === 'Active'"
+                        class="lg:flex lg:flex-row px-6 py-4 whitespace-nowrap text-sm font-medium lg:space-x-4 justify-center items-center table-cell">
+                        <div v-if="canVote(vote) && vote.status === 'active'" class="text-center">
                             <button @click.prevent="openModal('cast', vote.id, vote)" type="button" class="text-aftrBlue hover:text-indigo-900">
                                 Cast
                             </button>
@@ -86,7 +88,7 @@
                                     clip-rule="evenodd" />
                             </svg> Voted
                         </div>
-                        <div v-if="vote.status === 'active'" class="pl-2">
+                        <div v-if="vote.status === 'active'" class="text-center">
                             <button @click.prevent="voteSimulatorTest(vote)" :repo="repo" type="submit" class="text-aftrBlue hover:text-indigo-900">Simulate</button>
                         </div>
                     </td>
