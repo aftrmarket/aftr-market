@@ -19,19 +19,20 @@
                             <p class="mt-3 text-base text-gray-300 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
                                 Feel free to mint yourself some PLAY tokens so that you can try out the functionality when launching the app.
                             </p>
-                            <div class="mt-10 sm:mt-12">
-                                <form action="#" class="sm:max-w-xl sm:mx-auto lg:mx-0">
-                                    <div class="sm:flex">
-                                        <div class="mt-3 sm:mt-0 sm:ml-3">
-                                            <button @click.prevent="routeUser" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Launch</button>
-                                        </div>
-                                        <div class="mt-3 sm:mt-0 sm:ml-3">
-                                            <button @click.prevent="mintPlayTokens" type="submit"
-                                                class="py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Mint
-                                                PLAY</button>
-                                        </div>
+                            <p class="mt-3 pl-4 text-sm text-aftrRed">
+                                * PLAY tokens have not value and are for testing purposes only.
+                            </p>
+                            <div class="mt-10">
+                                <div class="sm:flex">
+                                    <div class="mt-3 sm:mt-0 sm:ml-3">
+                                        <button @click.prevent="routeUser" type="submit" class="block w-full py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">Launch</button>
                                     </div>
-                                </form>
+                                    <div class="mt-3 sm:mt-0 sm:ml-3">
+                                        <button @click.prevent="mintPlayTokens" type="submit" class="py-3 px-4 rounded-md shadow bg-indigo-300 text-white font-medium hover:bg-aftrBlue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 focus:ring-offset-gray-900">
+                                            Mint PLAY
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -128,7 +129,7 @@ const tmFeatures = [
         id: 1,
         name: "Multi-signature",
         description:
-            "Securely store your Arweave assets on-chain using AFTR's multi-signature capabilities. Create multiple or individually owned repos to protect your assets.",
+            "Store your Arweave assets on-chain using AFTR's multi-signature capabilities. Create multiple or individually owned repos to protect your assets.",
         icon: UserGroupIcon,
     },
     {

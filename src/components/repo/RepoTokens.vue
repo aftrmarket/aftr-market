@@ -87,7 +87,7 @@
                                                 <img class="h-10 w-10 rounded-full" :src="pstLogo(pst.tokenId, pst.logo)" alt="" />
                                             </div>
                                             <div class="ml-4">
-                                                <div class="font-medium text-gray-900"> {{ pst.name + " (" + pst.ticker + ")" }} ({{ pst.count }})</div>
+                                                <div class="font-medium text-gray-900"> {{ pst.name + " (" + pst.ticker + ")" }} ({{ pst.count }} TXs)</div>
                                                 <div class="text-gray-500 font-mono" @click.prevent="showWalletAddress(pst.tokenId)"> {{ idSubstr(pst.tokenId) }}</div>
                                             </div>
                                         </div>
@@ -98,14 +98,13 @@
                                     <td class="text-right px-6 py-3 text-gray-500"></td>
                                     <td v-if="allowTransfer" class="text-right px-6 py-3 text-gray-500 w-40"></td>
                                     <td v-if="allowTransfer" class="text-right px-6 py-3 text-gray-500 w-60"></td>
-                                    <td v-if="allowTransfer" class="text-right px-6 py-3 text-gray-500"></td>
-                                    <td>
-                                        <!-- <svg v-if="arrow" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                    <td class="text-right text-gray-500">
+                                        <svg v-if="!drawerOpened.get(pst.tokenId)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                                            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
                                         </svg>
-                                        <svg v-if="!arrow && opened == pst.tokenId" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-3 w-3" >
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
-                                        </svg>  -->
+                                        <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                                            <path fill-rule="evenodd" d="M14.77 12.79a.75.75 0 01-1.06-.02L10 8.832 6.29 12.77a.75.75 0 11-1.08-1.04l4.25-4.5a.75.75 0 011.08 0l4.25 4.5a.75.75 0 01-.02 1.06z" clip-rule="evenodd" />
+                                        </svg>
                                     </td>
                                 </tr>
                                 <tr v-for="(pst, index) in getRepo(pst.tokenId)" v-show="opened.includes(pst.tokenId)" :key="pst.tokenId" class="bg-gray-100">
@@ -285,7 +284,8 @@ export default {
             active: false,
             opened: [],
             repoToken: [],
-            arrow: true
+            arrow: true,
+            drawerOpened: [],
 
             /*** TODO: HANDLE TOKENS THAT ARE LOCKED! */
             /**************************************** */
@@ -341,6 +341,10 @@ export default {
         }
     },
     methods: {
+        toggleDrawer(tokenId) {
+            let status = this.drawerOpened.get(tokenId);
+            this.drawerOpened.set(tokenId, !status);
+        },
         getRepo1() {
             // console.log("************")
             // console.log(this.repo.tokens)
@@ -382,6 +386,7 @@ export default {
             } else {
                 this.opened.push(id)
             }
+            this.toggleDrawer(id);
         },
         async showWalletAddress(walletAddress) {
             this.$swal({
@@ -450,6 +455,7 @@ export default {
                 this.allowTransfer = false;
             }
             // Are there any withdrawals waiting to be processed?
+            let drawerTracker = new Map();
             if (this.repo.tokens) {
                 this.repo.tokens.forEach(token => {
                     if (token.withdrawals) {
@@ -460,7 +466,10 @@ export default {
                             }
                         });
                     }
+                    // Load drawer array
+                    drawerTracker.set(token.tokenId, false);
                 });
+                this.drawerOpened = drawerTracker;
             } else {
                 this.repo.tokens = [];
             }

@@ -38,7 +38,7 @@
                 </router-link>
             </div>
         </div>
-        <div v-if="repo.desc !== '' && repo.desc !== undefined" class="px-4 py-4 sm:px-6">
+        <div v-if="repo.desc" class="px-4 py-4 sm:px-6">
             <div class="block text-lg text-gray-900">Description</div>
             <div class="block text-lg text-gray-500 font-medium">{{ repo.desc }}</div>
         </div>
