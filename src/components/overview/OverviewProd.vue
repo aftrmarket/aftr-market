@@ -20,7 +20,7 @@
                                 Feel free to mint yourself some PLAY tokens so that you can try out the functionality when launching the app.
                             </p>
                             <p class="mt-3 pl-4 text-sm text-aftrRed">
-                                * PLAY tokens have not value and are for testing purposes only.
+                                * PLAY tokens have no value and are for testing purposes only.
                             </p>
                             <div class="mt-10">
                                 <div class="sm:flex">
