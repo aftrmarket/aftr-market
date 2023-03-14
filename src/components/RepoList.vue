@@ -46,9 +46,11 @@
                         </button>
                     </div>
                     <div v-if="arConnected">
-                        <button type="button" @click.prevent="createRepo()" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+                        <button type="button" @click.prevent="createRepo()"
+                            class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-                                <path d="M5.566 4.657A4.505 4.505 0 016.75 4.5h10.5c.41 0 .806.055 1.183.157A3 3 0 0015.75 3h-7.5a3 3 0 00-2.684 1.657zM2.25 12a3 3 0 013-3h13.5a3 3 0 013 3v6a3 3 0 01-3 3H5.25a3 3 0 01-3-3v-6zM5.25 7.5c-.41 0-.806.055-1.184.157A3 3 0 016.75 6h10.5a3 3 0 012.683 1.657A4.505 4.505 0 0018.75 7.5H5.25z" />
+                                <path
+                                    d="M5.566 4.657A4.505 4.505 0 016.75 4.5h10.5c.41 0 .806.055 1.183.157A3 3 0 0015.75 3h-7.5a3 3 0 00-2.684 1.657zM2.25 12a3 3 0 013-3h13.5a3 3 0 013 3v6a3 3 0 01-3 3H5.25a3 3 0 01-3-3v-6zM5.25 7.5c-.41 0-.806.055-1.184.157A3 3 0 016.75 6h10.5a3 3 0 012.683 1.657A4.505 4.505 0 0018.75 7.5H5.25z" />
                             </svg>
 
                             <span class="pl-2">Create</span>
@@ -77,7 +79,7 @@
                     </div>
                     <!-- <perfect-scrollbar> -->
                     <div v-if="renderedRepos.length > 0">
-                        <div v-if="layoutGrid">
+                        <div v-if="layoutGrid" key="grid">
                             <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                                 <!-- <ul v-if="layoutGrid && repos.length > 0" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"> -->
                                 <!-- <li v-for="repo in repos" :key="repo.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200"> -->
@@ -89,7 +91,7 @@
                                 </li>
                             </ul>
                         </div>
-                        <div v-else-if="!layoutGrid && renderedRepos.length > 0">
+                        <div v-else-if="!layoutGrid && renderedRepos.length > 0" key="table">
                             <repo-table :repos="renderedRepos" :searchType="searchType" :searchInput="searchInput">
                                 <!-- <repo-table v-else-if="!layoutGrid && repos.length > 0" :repos="repos" :searchType="searchType" :searchInput="searchInput"> -->
                             </repo-table>
@@ -131,14 +133,14 @@
                 </div>
 
                 <!-- <div v-if="!isLoading && noResult" class="">
-                    <p>
-                        No more data...
-                    </p>
-                </div> -->
+                        <p>
+                            No more data...
+                        </p>
+                    </div> -->
                 <!-- /End replace -->
             </div>
         </main>
-    </div>
+</div>
 </template>
 
 <script>

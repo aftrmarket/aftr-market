@@ -19,7 +19,7 @@
                         <div>
                             <h1 class="text-2xl font-bold text-white">{{ repo.name }}</h1>
                             <p class="text-sm font-medium font-mono text-aftrYellow">
-                                {{ contractId }}
+                                {{ walletAddressSubstr(contractId) }}
                                 <button v-clipboard="contractId" @click="showPopup">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-6 h-6">
                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -29,7 +29,7 @@
 
 
                                 <!-- </div>
-                            </div> -->
+                                                                            </div> -->
 
 
                             </p>
@@ -58,8 +58,7 @@
                                                 <button type="button" @click="show = false"
                                                     class="inline-flex rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                                                     <span class="sr-only">Close</span>
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                                                        class="w-6 h-6">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                                                     </svg>
                                                 </button>
@@ -72,6 +71,13 @@
                     </div>
                     <div
                         class="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-white">{{ repo.stampCount }}</span>
+                            <button @click.prevent="stampRepo" class="tooltip">
+                                <Stamp size="30px" class="fill-white" />
+                                <span class="tooltiptext text-sm">$STAMP</span>
+                            </button>
+                        </div>
                         <label v-if="repo.evolveNeeded && allowEdits && !evolvePressedAlready" class="py-1 pr-2 text-right text-4xl animate-pulse">👉</label>
                         <button v-if="repo.evolveNeeded && allowEdits && !evolvePressedAlready" @click.prevent="evolveContract" type="submit"
                             class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
@@ -151,8 +157,7 @@
                 </div>
             </div>
         </main>
-    </div>
-
+</div>
 </template>
 
 <script>
@@ -173,9 +178,10 @@ import RepoNames from './repo/RepoNames.vue';
 import RepoEvolve from "./repo/RepoEvolve.vue";
 import { mapGetters } from "vuex";
 import { isRepoMember } from './utils/shared.js';
+import Stamp from './Stamp.vue';
 
 export default {
-    components: { RepoInfo, RepoMembers, RepoTokens, RepoVotes, RepoState, RepoActivity, RepoPlaceholder, RepoSettings, RepoContractTest, RepoEvolve, RepoNames },
+    components: { RepoInfo, RepoMembers, RepoTokens, RepoVotes, RepoState, RepoActivity, RepoPlaceholder, RepoSettings, RepoContractTest, RepoEvolve, RepoNames, Stamp },
     props: ['repoId'],
     data() {
         return {
@@ -246,6 +252,14 @@ export default {
                     timer--
                 }
             }, 1000)
+        },
+        walletAddressSubstr(addr, chars = 10) {
+            if (typeof addr === 'string') {
+                let len = parseInt(chars / 2);
+                return addr.substring(0, len) + '...' + addr.substring(addr.length - len);
+            } else {
+                return '';
+            }
         },
         tabText(tab) {
             let cssText = "w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm ";
@@ -387,6 +401,21 @@ export default {
             }
             await this.getRepoLogo();
         },
+        stampRepo() {
+            let repo = this.repo
+
+            // stamp an Asset
+            // await stamps.stamp(TX, [qty], [tags])
+
+            repo.stampCount++
+            console.log('Stamped ' + repo.name)
+        },
+        async getStampCount() {
+            let repo = this.repo
+            // get number of stamps for a repo to display
+            // const { total } = await stamps.count(TX)
+            return repo.stampCount ? repo.stampCount : 0
+        }
     },
     beforeRouteEnter(to, from, next) {
         // Check to make sure valid Repo ID
@@ -402,7 +431,7 @@ export default {
 
         // Ensure this contract sources are up to date
         this.$store.commit("setAftrContractSources");
-        
+
         this.showEvolveModal = false;
         let contractSrc = "";
 
@@ -474,6 +503,7 @@ export default {
         }
 
         this.pageStatus = "";
+        this.repo.stampCount = await this.getStampCount()
     },
     async updated() {
         let logoUrl = this.repoLogo;

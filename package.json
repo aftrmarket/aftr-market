@@ -11,6 +11,7 @@
     "@heroicons/vue": "^2.0.13",
     "@highlightjs/vue-plugin": "^2.1.0",
     "@ocrv/vue-tailwind-pagination": "^0.0.4",
+    "@permaweb/stampjs": "https://stampjs-v006_stamps.g8way.io",
     "@soerenmartius/vue3-clipboard": "^0.1.2",
     "@tailwindcss/forms": "^0.5.3",
     "@tailwindcss/line-clamp": "^0.4.2",

@@ -27,6 +27,7 @@ import { VueClipboard } from '@soerenmartius/vue3-clipboard'
 import VueDiff from 'vue-diff'
 import 'vue-diff/dist/index.css';
 
+import stampUtils from './components/utils/stampUtils';
 
 let logLevel = "";
 if (import.meta.env.VITE_ENV === 'PROD') {
@@ -85,5 +86,7 @@ app.use(VueClipboard);
 app.use(VueDiff, {
     componentName: 'VueDiff'
 })
+
+app.use(stampUtils)
 
 app.mount('#app');

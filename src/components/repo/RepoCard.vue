@@ -1,17 +1,20 @@
 <template>
-
-    <div class="w-full justify-between p-6 space-x-6 overflow-hidden">
-        <div class="grid grid-rows-3 grid-flow-col gap-x-4 gap-y-1">
-            <div class="row-span-3 w-20">
-                <img class="w-20 h-20 bg-gray-300 rounded-full" :src="repoLogo" alt="">
+    <div class="flex p-6 space-x-4">
+        <img class="w-20 h-20 bg-gray-300 rounded-full" :src="repoLogo" alt="">
+        <div class="flex flex-col grow">
+            <div class="flex justify-between">
+                <h3 :class="actionRequiredClass" class="place-self-end">{{ repo.name }}</h3>
+                <div class="flex items-center space-x-2">
+                    <span v-if="repo.stampCount" class="text-xs">{{ repo.stampCount }}</span>
+                    <button @click.prevent="" class="tooltip">
+                        <Stamp :repo="repo" :size="24" class="fill-aftrBlue" />
+                        <span class="tooltiptext text-sm">$STAMP</span>
+                    </button>
+                </div>
             </div>
-            <div class="col-span-2 min-w-full">
-                <h3 :class="actionRequiredClass">{{ repo.name }}</h3>
-            </div>
-            <div class="row-span-2 col-span-1">
+            <div class="">
                 <div v-if="repo.desc" class="mt-1 text-gray-500 text-sm line-clamp-3 break-words">{{ repo.desc }}
                 </div>
-                <div v-else class="border-t border-white w-60"></div>
             </div>
         </div>
     </div>
@@ -23,10 +26,10 @@
         <p>{{ Object.keys(repo.balances).length }}</p>
         <p>{{ formatNumber(repo.totalActiveVotes) }}</p>
         <!--
-        <div class="pb-3 grid grid-cols-2 items-center text-base">
-            <div class="pl-3 justify-self-start">Tips(AR): <span class="font-medium text-green-500">{{ formatNumber(repo.tipsAr) }}</span></div>
-            <div class="pr-3 justify-self-end">Tips(Misc): <span class="font-medium text-green-500">{{ formatNumber(repo.tipsMisc) }}</span></div>
-        </div>-->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <div class="pb-3 grid grid-cols-2 items-center text-base">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <div class="pl-3 justify-self-start">Tips(AR): <span class="font-medium text-green-500">{{ formatNumber(repo.tipsAr) }}</span></div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <div class="pr-3 justify-self-end">Tips(Misc): <span class="font-medium text-green-500">{{ formatNumber(repo.tipsMisc) }}</span></div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </div>-->
     </div>
     <div>
         <div class="pt-4 pb-3 grid grid-cols-3 gap=2 items-center text-base">
@@ -44,7 +47,8 @@
                 </div>
                 <div v-if="concludeVote" class="tooltip">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="#FF6C8C" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                     </svg>
                     <span class="tooltiptext">{{ concludeVoteText }}</span>
                 </div>
@@ -53,16 +57,16 @@
                 <span class="capitalize px-2 sm:px-4 py-3 inline-flex leading-3 text-xs font-medium rounded-full bg-blue-100 text-blue-800">{{ repo.ticker }}</span>
             </div>
             <!---
-            <div class="-ml-px w-0 flex-1 flex justify-end pr-3">
-                <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
-                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
-                        <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
-                    </svg>
-                    <span class="pl-2">LEASE</span>
-                </button>
-            </div>
-            -->
+                                                    <div class="-ml-px w-0 flex-1 flex justify-end pr-3">
+                                                        <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+                                                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                                                <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
+                                                                <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
+                                                            </svg>
+                                                            <span class="pl-2">LEASE</span>
+                                                        </button>
+                                                    </div>
+                                                    -->
         </div>
     </div>
 </template>
@@ -70,14 +74,19 @@
 <script>
 import numeral from "numeral";
 import { mapGetters } from "vuex";
+import Stamp from "../Stamp.vue";
 
 export default {
+    components: {
+        Stamp
+    },
     props: ["repo"],
     data() {
         return {
             evolveNeeded: false,
             concludeVote: false,
             repoLogo: "",
+            stampCount: 0,
         };
     },
     computed: {
@@ -133,8 +142,28 @@ export default {
                     logoUrl = `${import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + "/" + this.repo.logo}`;
                 }
             }
+            this.repo.logo = logoUrl
             this.repoLogo = logoUrl;
         },
+        async stampRepo() {
+            let repo = this.repo
+
+            // stamp an Asset
+            try {
+                await this.$stampUtils.stamp(repo.id)
+                repo.stampCount++
+                console.log('Stamped ' + repo.name)
+            } catch (e) {
+                console.log(e)
+            }
+
+        },
+        async getStampCount() {
+            let repo = this.repo
+            // get number of stamps for a repo to display
+            repo.stampCount = (await this.$stampUtils.count(repo.id)).total
+            return repo.stampCount ? repo.stampCount : 0
+        }
     },
     created() {
         // Does repo contract need to be evolved? Only show to members of the repo
@@ -157,6 +186,7 @@ export default {
                     }
                 });
         }
+        this.repo.stampCount = await this.getStampCount()
     }
 };
 </script>

@@ -1,5 +1,4 @@
 <template>
-  <!-- <main class="-mt-32"> -->
   <div class="px-8">
     <div class="flex flex-col">
       <div class="overflow-x-auto">
@@ -27,6 +26,7 @@
                   <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Members</th>
                   <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Active Votes</th>
                   <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Member?</th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">$STAMP</th>
                 </tr>
               </thead>
               <div v-if="showMessage">No repos found...</div>
@@ -71,6 +71,14 @@
                       </svg>
                     </span>
                   </td>
+                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    <div class="flex items-center space-x-2">
+                      <span v-if="repo.stampCount" class="text-xs">{{ repo.stampCount }}</span>
+                      <button>
+                        <Stamp :repo="repo" :size="20" class="fill-aftrBlue" />
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -79,14 +87,16 @@
       </div>
     </div>
   </div>
-  <!-- </main> -->
 </template>
 
 <script>
+import { asyncScheduler } from "rxjs";
 import { mapGetters } from "vuex";
+import Stamp from "./Stamp.vue";
 
 export default {
   props: ['repos', 'searchType', 'searchInput'],
+  components: { Stamp },
   data() {
     return {
       logoUrl: "",
@@ -172,19 +182,19 @@ export default {
       }
     },
     getRepoLogo(repo) {
-        let logoUrl = "";
-        if (!repo.logo || repo.logo === '') {
-            logoUrl = "https://avatars.dicebear.com/api/pixel-art-neutral/:" + repo.id + ".svg";
+      let logoUrl = "";
+      if (!repo.logo || repo.logo === '') {
+        logoUrl = "https://avatars.dicebear.com/api/pixel-art-neutral/:" + repo.id + ".svg";
+      } else {
+        // logoUrl = "https://arweave.net/" + this.repo.logo;
+        if (import.meta.env.VITE_ARWEAVE_PORT) {
+          logoUrl = `${import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/" + repo.logo}`;
         } else {
-            // logoUrl = "https://arweave.net/" + this.repo.logo;
-            if (import.meta.env.VITE_ARWEAVE_PORT) {
-                logoUrl = `${import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + ":" + import.meta.env.VITE_ARWEAVE_PORT + "/" + repo.logo}`;
-            } else {
-                logoUrl = `${import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + "/" + repo.logo}`;
-            }
+          logoUrl = `${import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + "/" + repo.logo}`;
         }
-        this.repoLogo = logoUrl;
-        return logoUrl;
+      }
+      this.repoLogo = logoUrl;
+      return logoUrl;
     },
     sortRepo() {
       this.repos.sort(function (a, b) {
@@ -206,7 +216,44 @@ export default {
         activeVoteCount = activeVotes.length;
       }
       return activeVoteCount;
+    },
+    async stampRepo() {
+      let repo = this.repo
+
+      // stamp an Asset
+      try {
+        await this.$stampUtils.stamp(repo.id)
+        repo.stampCount++
+        console.log('Stamped ' + repo.name)
+      } catch (e) {
+        console.log(e)
+      }
+
+    },
+    async getStampCount(repo) {
+      // get number of stamps for a repo to display
+      repo.stampCount = (await this.$stampUtils.count(repo.id)).total
+      return repo.stampCount ? repo.stampCount : 0
+    },
+    async fetchStamps(repos) {
+      for (let repo of repos) {
+        repo.stampCount = await this.getStampCount(repo)
+      }
     }
+  },
+  watch: {
+    repos: {
+      async handler(allRepos, oldRepos) {
+        const newRepos = allRepos.filter(repo => {
+          return !oldRepos.includes(repo);
+        })
+        this.fetchStamps(this.repos)
+      },
+      deep: true
+    }
+  },
+  async created() {
+    await this.fetchStamps(this.repos)
   },
 }
 </script>
