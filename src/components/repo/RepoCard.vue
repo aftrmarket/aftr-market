@@ -131,7 +131,6 @@ export default {
         },
         getRepoLogo() {
             let logoUrl = "";
-
             if (!this.repo.logo || this.repo.logo === '') {
                 logoUrl = "https://avatars.dicebear.com/api/pixel-art-neutral/:" + this.repo.id + ".svg";
             } else {
@@ -142,7 +141,6 @@ export default {
                     logoUrl = `${import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + "/" + this.repo.logo}`;
                 }
             }
-            this.repo.logo = logoUrl
             this.repoLogo = logoUrl;
         },
         async stampRepo() {
