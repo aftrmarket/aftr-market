@@ -10,7 +10,7 @@ function warpInit() {
         if (import.meta.env.VITE_ENV === "PROD") {
             warp = WarpFactory.forMainnet().use(new DeployPlugin());
         } else if (import.meta.env.VITE_ENV === "TEST") {
-            warp = WarpFactory.forTestnet();
+            warp = WarpFactory.forTestnet().use(new DeployPlugin());
         } else if (import.meta.env.VITE_ENV === "DEV") {
             const arweave = arweaveInit();
             warp = WarpFactory.forLocal(import.meta.env.VITE_ARWEAVE_PORT, arweave);
@@ -90,13 +90,18 @@ async function warpCreateFromTx(initState, srcId, currentTags = undefined, aftr 
      * Returns:
      * { contractTxId: string, srcTxId: string }
      */
+    if (window.arweaveWallet) {
+        await window.arweaveWallet.connect(['ACCESS_ADDRESS', 'SIGN_TRANSACTION', 'ACCESS_PUBLIC_KEY', 'SIGNATURE']);
+    }
+    const userSigner = new InjectedArweaveSigner(window.arweaveWallet);
+    await userSigner.setPublicKey();
 
     let tags = addTags(currentTags, aftr);
 
     const warp = warpInit();
     try {
         let txIds = await warp.deployFromSourceTx({
-            wallet: "use_wallet",
+            wallet: userSigner,
             initState: initState,
             srcTxId: srcId,
             tags
