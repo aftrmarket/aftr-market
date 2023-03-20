@@ -110,9 +110,44 @@
                         name="newOwner" :class="inputBox(ownerIsValid)" />
                 </div>
             </div>
-            <div class="flex justify-end">
+
+
+            <div>
+                <h3 class="mt-4 border-t border-gray-200 pt-4 text-xl font-light leading-6">Privileges</h3>
+                <span class="text-sm text-gray-500 flex items-center">You have the option to turn off the following functions in your repo. For more information click 
+                    <button style="color:#6C8CFF" @click.prevent="privilegeInfo" type="submit" :repo="repo" class="flex items-center pl-1">
+                        here
+                        <svg v-if="!privDrawer" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#6C8CFF" class="w-5 h-5">
+                            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                        </svg>
+                        <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#6C8CFF" class="w-5 h-5">
+                            <path fill-rule="evenodd" d="M14.77 12.79a.75.75 0 01-1.06-.02L10 8.832 6.29 12.77a.75.75 0 11-1.08-1.04l4.25-4.5a.75.75 0 011.08 0l4.25 4.5a.75.75 0 01-.02 1.06z" clip-rule="evenodd" />
+                        </svg>
+                    </button> 
+                </span>
+                <div v-if="privDrawer" class="text-sm text-gray-500 text-aftrRed pt-2 pl-4">
+                    <p>The following functions are optional. By turning these off you will be limiting your repo's functionality, but you may have good reason to do so.</p>
+                    <ul class="list-disc pl-6">
+                        <li class="py-2"><b>Transfer</b> - Gives the repo the ability to transfer membership balances.</li>
+                        <li class="pb-2"><b>Deposit</b> - Allows anyone to deposit supported Arweave assets into the repo.</li>
+                        <li class="pb-2"><b>Allow</b> - Required for tradability protocols such as Verto Flex.</li>
+                        <li class="pb-2"><b>Claim</b> - Required for tradability protocols such as Verto Flex.</li>
+                        <li><b>Multi-Interactions</b> - Gives the repo the ability to perform more than one change at a time.</li>
+                    </ul>
+                </div>
+                <div class="sm:p-6 pt-2 grid grid-cols-5 items-center text-sm text-gray-700">
+                    <div><input v-model="selectedFunctions" @change="formDirty" type="checkbox" value="transfer" class="text-aftrBlue mr-2" /> <label>Transfer</label></div>
+                    <div><input v-model="selectedFunctions" @change="formDirty" type="checkbox" value="deposit" class="text-aftrBlue mr-2" /> <label>Deposit</label></div>
+                    <div><input v-model="selectedFunctions" @change="formDirty" type="checkbox" value="allow" class="text-aftrBlue mr-2" /> <label>Allow</label></div>
+                    <div><input v-model="selectedFunctions" @change="formDirty" type="checkbox" value="claim" class="text-aftrBlue mr-2" /> <label>Claim</label></div>
+                    <div><input v-model="selectedFunctions" @change="formDirty" type="checkbox" value="multiInteraction" class="text-aftrBlue mr-2" /> <label>Multi-Interactions</label></div>
+                </div>
+            </div>
+
+
+            <div class="flex justify-end mt-4 border-t border-gray-200">
                 <button v-if="isFormValid" @click.prevent="updateRepo" type="submit"
-                    class="inline-flex justify-center py-2 px-2 border border-gray shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-transparent hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+                    class="inline-flex justify-center py-2 px-2 mt-4 border border-gray shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-transparent hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
                         <path fill-rule="evenodd"
@@ -176,6 +211,9 @@ export default {
             fileInvalid: false,
             fileUpload: false,
             files: [],
+            privDrawer: false,
+            selectedFunctions: [],
+            funcChange: false,
         };
     },
     watch: {
@@ -252,6 +290,9 @@ export default {
             } else {
                 return numeral(num).format("0,0");
             }
+        },
+        privilegeInfo() {
+            this.privDrawer = !this.privDrawer;
         },
         inputBox(valid) {
             if (valid) {
@@ -360,6 +401,17 @@ export default {
                 this.isFormValid = false;
                 this.ownerIsValid = false;
             }
+
+            // Determine if functions have changed
+            const equal = this.selectedFunctions.length === this.repo.functions.length && this.selectedFunctions.every((value, index) => value === this.repo.functions[index]);
+
+            if (equal) {
+                this.isFormValid = false;
+                this.funcChange = false;
+            } else {
+                this.isFormValid = true;
+                this.funcChange = true;
+            }
         },
         async updateRepo() {
             let arweave = {};
@@ -427,6 +479,9 @@ export default {
                 }
                 if (this.newOwner !== this.repo.owner) {
                     changeMap.set('owner', this.newOwner);
+                }
+                if (this.funcChange) {
+                    changeMap.set('functions', this.selectedFunctions);
                 }
 
                 // Settings
@@ -622,6 +677,11 @@ export default {
     created() {
         this.checkEditStatus();
         this.loadSettings();
+        
+        if (typeof this.repo.functions === "undefined") {
+            this.repo.functions = [];
+        } 
+        this.selectedFunctions = this.repo.functions;
     },
     updated() {
         this.checkEditStatus();
