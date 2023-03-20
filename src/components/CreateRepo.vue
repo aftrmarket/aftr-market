@@ -173,9 +173,9 @@
                             <p>The following functions are optional. By turning these off you will be limiting your repo's functionality, but you may have good reason to do so.</p>
                             <ul class="list-disc pl-6">
                                 <li class="py-2"><b>Transfer</b> - Gives the repo the ability to transfer membership balances.</li>
-                                <li class="pb-2"><b>Deposit</b> - Allows anyone to deposit supported Arweave assets into the repo.</li>
-                                <li class="pb-2"><b>Allow</b> - Required for tradability protocols such as Verto Flex.</li>
-                                <li class="pb-2"><b>Claim</b> - Required for tradability protocols such as Verto Flex.</li>
+                                <li class="pb-2"><b>Deposit</b> - Allows anyone to deposit supported Arweave assets into this repo.</li>
+                                <li class="pb-2"><b>Allow</b> - Required for tradability protocols such as Verto Flex and for depositing this repo into another AFTR Repo.</li>
+                                <li class="pb-2"><b>Claim</b> - Required for tradability protocols such as Verto Flex and for depositing this repo into another AFTR Repo.</li>
                                 <li><b>Multi-Interactions</b> - Gives the repo the ability to perform more than one change at a time.</li>
                             </ul>
                         </div>

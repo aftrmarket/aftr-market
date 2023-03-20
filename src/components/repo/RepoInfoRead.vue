@@ -165,7 +165,7 @@
                     <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#FF6C8C" class="w-5 h-5">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
                     </svg>
-                    <b>Deposit</b> - Allows anyone to deposit supported Arweave assets into the repo.
+                    <b>Deposit</b> - Allows anyone to deposit supported Arweave assets into this repo.
                 </div>
                 <div class="flex items-center pl-4 py-2 space-x-2">
                     <svg v-if="repo.functions.includes('allow')" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#065F46" class="w-5 h-5">
@@ -174,7 +174,7 @@
                     <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#FF6C8C" class="w-5 h-5">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
                     </svg>
-                    <b>Allow</b> - Required for tradability protocols such as Verto Flex.
+                    <b>Allow</b> - Required for tradability protocols such as Verto Flex and for depositing this repo into another AFTR Repo.
                 </div>
                 <div class="flex items-center pl-4 py-2 space-x-2">
                     <svg v-if="repo.functions.includes('claim')" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#065F46" class="w-5 h-5">
@@ -183,7 +183,7 @@
                     <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#FF6C8C" class="w-5 h-5">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
                     </svg>
-                    <b>Claim</b> - Required for tradability protocols such as Verto Flex.
+                    <b>Claim</b> - Required for tradability protocols such as Verto Flex and for depositing this repo into another AFTR Repo.
                 </div>
                 <div class="flex items-center pl-4 py-2 space-x-2">
                     <svg v-if="repo.functions.includes('multiInteraction')" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#065F46" class="w-5 h-5">
