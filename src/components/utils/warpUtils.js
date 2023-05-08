@@ -131,8 +131,8 @@ function addTags(currentTags, aftr = false) {
     }
     if (aftr) {
         tags.push({ name: "Protocol", value: import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL });
-        tags.push({ name: "Implements", value: ["ANS-110"] });
-        tags.push({ name: "Type", value: ["aftr-repo"] });
+        //tags.push({ name: "Implements", value: ["ANS-110"] });
+        //tags.push({ name: "Type", value: ["aftr-repo"] });
     }
 
     return tags;
