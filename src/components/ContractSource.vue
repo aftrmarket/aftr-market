@@ -2,12 +2,6 @@
     <main class="-mt-40">
         <div class="pt-10 bg-aftrDarkGrey sm:pt-16 lg:pt-8 lg:pb-14 lg:overflow-hidden mx-auto max-w-7xl lg:px-8">
             <div class="flex items-center space-x-5">
-                <div class="flex-shrink-0">
-                    <div class="relative">
-                        <img class="h-16 w-16 rounded-full" :src="logo" alt="">
-                        <span class="absolute inset-0 shadow-inner rounded-full" aria-hidden="true"></span>
-                    </div>
-                </div>
                 <div>
                     <h1 class="text-2xl font-bold text-white">AFTR Contract Source</h1>
                     <div class="flex items-center space-x-2 text-sm font-medium font-mono text-aftrYellow">
