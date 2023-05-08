@@ -155,7 +155,7 @@ export default {
         },
         async fetchContract() {
             // assuming on test or prod
-            let route = 'https://gateway.warp.cc/gateway/contract?txId=' + this.selectedPstId + (this.network === 'TEST' ? '&testnet=true' : '')
+            let route = import.meta.env.VITE_TX_GATEWAY + '?txId=' + this.selectedPstId + (this.network === 'TEST' ? '&testnet=true' : '')
             let response = await fetch(route)
             let data = await response.json()
             let source = data.src

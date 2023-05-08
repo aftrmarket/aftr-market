@@ -87,11 +87,12 @@ export default {
             routeProtocol: "http",
             routeHost: "localhost",
             routePort: "1984",
-            logo: '../src/assets/aftr-market-logo.png',
+            logo: '/public/aftr-market-logo.png',
             contractSrc: '',
             currentAftrSrc: '',
             diffMode: '',
             show: false,
+            env: import.meta.env.VITE_ENV,
         }
     },
     components: {
@@ -134,12 +135,13 @@ export default {
         async getContractSourceId(txID) {
             let route = "";
             let response = {};
-            if (this.network === "DEV") {
+            if (this.env === "DEV") {
                 route = this.routeProtocol + "://" + this.routeHost + ":" + this.routePort + "/tx/" + txID;
                 response = await fetch(route).then(res => res.json());
                 this.tags = this.interactionTagsParser(response);
             } else {
-                route = `https://gateway.redstone.finance/gateway/contract?txId=${txID}${this.network === "TEST" ? "&testnet=true" : ""}`;
+                route = import.meta.env.VITE_TX_GATEWAY;
+                route += `/contract?txId=${txID}${this.env === "TEST" ? "&testnet=true" : ""}`;
                 response = await fetch(route);
                 if (!response.ok) {
                     alert("Could not fetch contract.");
@@ -179,12 +181,11 @@ export default {
         async getSource(contractId) {
             if (import.meta.env.VITE_ENV === "PROD" || import.meta.env.VITE_ENV === "TEST") {
                 this.$store.commit("setAftrContractSources");
-
-                let route = 'https://gateway.warp.cc/gateway/contract-source?id=' + contractId + (this.network === 'TEST' ? '&testnet=true' : '');
-                let response = await fetch(route)
-                console.log(route)
-                let data = await response.json()
-                return data.src
+                let route = import.meta.env.VITE_TX_GATEWAY + "-source?id=" + contractId + (this.env === 'TEST' ? '&testnet=true' : '');
+                let response = await fetch(route);
+                console.log(route);
+                let data = await response.json();
+                return data.src;
             } else {
                 // Check to see if any contract sources exist (getAftrContractSources variable)
                 const csArray = this.getAftrContractSources

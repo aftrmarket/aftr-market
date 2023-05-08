@@ -110,8 +110,7 @@
                                         class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md" />
                                     <label class="pl-4 block text-sm text-gray-700">
                                         Months (~<span class="text-lg text-aftrBlue">{{ monthsInBlocks(minLease)
-                                        }}</span> to <span class="text-lg text-aftrBlue">{{ monthsInBlocks(maxLease)
-}}</span> Blocks)
+                                        }}</span> to <span class="text-lg text-aftrBlue">{{ monthsInBlocks(maxLease) }}</span> Blocks)
                                     </label>
                                 </div>
                             </div>
@@ -134,8 +133,7 @@
                             <!--<input type="number" name="repoTokens" placeholder="# of Repo Tokens" v-model="repoTokens" @input="onTokenChange" :class="inputBox(repoTokensValid)" />-->
                             <div class="">
                                 <input type="radio" v-model="ownership" id="single" value="single"
-                                    class="form-radio text-aftrBlue" /><label class="px-2 text-sm text-gray-700">Single
-                                    Owner</label>
+                                    class="form-radio text-aftrBlue" /><label class="px-2 text-sm text-gray-700">Single Owner</label>
                                 <input type="radio" v-model="ownership" id="multi" value="multi"
                                     class="form-radio text-aftrBlue" /><label
                                     class="px-2 text-sm text-gray-700">Multiple Owners</label>
@@ -156,6 +154,37 @@
                                 <input v-model="newSupport" name="newSupport" type="number"
                                     :class="inputBox(supportIsValid)" />
                             </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="mt-4 border-t border-gray-200 pt-4 text-xl font-light leading-6">Privileges</h3>
+                        <span class="text-sm text-gray-500 flex items-center">You have the option to turn off the following functions in your repo. For more information click 
+                            <button style="color:#6C8CFF" @click.prevent="privilegeInfo" type="submit" :repo="repo" class="flex items-center pl-1">
+                                here
+                                <svg v-if="!privDrawer" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#6C8CFF" class="w-5 h-5">
+                                    <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                                </svg>
+                                <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#6C8CFF" class="w-5 h-5">
+                                    <path fill-rule="evenodd" d="M14.77 12.79a.75.75 0 01-1.06-.02L10 8.832 6.29 12.77a.75.75 0 11-1.08-1.04l4.25-4.5a.75.75 0 011.08 0l4.25 4.5a.75.75 0 01-.02 1.06z" clip-rule="evenodd" />
+                                </svg>
+                            </button> 
+                        </span>
+                        <div v-if="privDrawer" class="text-sm text-gray-500 text-aftrRed pt-2 pl-4">
+                            <p>The following functions are optional. By turning these off you will be limiting your repo's functionality, but you may have good reason to do so.</p>
+                            <ul class="list-disc pl-6">
+                                <li class="py-2"><b>Transfer</b> - Gives the repo the ability to transfer membership balances.</li>
+                                <li class="pb-2"><b>Deposit</b> - Allows anyone to deposit supported Arweave assets into this repo.</li>
+                                <li class="pb-2"><b>Allow</b> - Required for tradability protocols such as Verto Flex and for depositing this repo into another AFTR Repo.</li>
+                                <li class="pb-2"><b>Claim</b> - Required for tradability protocols such as Verto Flex and for depositing this repo into another AFTR Repo.</li>
+                                <li><b>Multi-Interactions</b> - Gives the repo the ability to perform more than one change at a time.</li>
+                            </ul>
+                        </div>
+                        <div class="sm:p-6 pt-2 grid grid-cols-5 items-center text-sm text-gray-700">
+                            <div><input v-model="functionsAllowed" type="checkbox" value="transfer" class="text-aftrBlue mr-2" /> <label>Transfer</label></div>
+                            <div><input v-model="functionsAllowed" type="checkbox" value="deposit" class="text-aftrBlue mr-2" /> <label>Deposit</label></div>
+                            <div><input v-model="functionsAllowed" type="checkbox" value="allow" class="text-aftrBlue mr-2" /> <label>Allow</label></div>
+                            <div><input v-model="functionsAllowed" type="checkbox" value="claim" class="text-aftrBlue mr-2" /> <label>Claim</label></div>
+                            <div><input v-model="functionsAllowed" type="checkbox" value="multiInteraction" class="text-aftrBlue mr-2" /> <label>Multi-Interactions</label></div>
                         </div>
                     </div>
                     <!--
@@ -512,6 +541,8 @@ export default {
             newSupport: 0.51,
             fileUpload: false,
             showVoteSimulator: false,
+            functionsAllowed: ["transfer", "deposit", "allow", "claim", "multiInteraction"],
+            privDrawer: false,
         };
     },
     computed: {
@@ -601,6 +632,9 @@ export default {
     methods: {
         voteSimulatorTest() {
             this.showVoteSimulator = true;
+        },
+        privilegeInfo() {
+            this.privDrawer = !this.privDrawer;
         },
         closeModal() {
             this.showVoteSimulator = false;
@@ -1013,6 +1047,7 @@ export default {
             }
 
             /***** NEED TO MAKE SURE THAT NONE OF THESE ARE MISSING */
+            this.repo.functions = this.functionsAllowed;
             this.repo.settings = [
                 ["quorum", this.newQuorum],
                 ["support", this.newSupport],
