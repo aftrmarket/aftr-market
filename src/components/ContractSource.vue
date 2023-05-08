@@ -139,7 +139,8 @@ export default {
                 response = await fetch(route).then(res => res.json());
                 this.tags = this.interactionTagsParser(response);
             } else {
-                route = `https://gateway.redstone.finance/gateway/contract?txId=${txID}${this.network === "TEST" ? "&testnet=true" : ""}`;
+                route = import.meta.env.VITE_TX_GATEWAY;
+                route += `/contract?txId=${txID}${this.network === "TEST" ? "&testnet=true" : ""}`;
                 response = await fetch(route);
                 if (!response.ok) {
                     alert("Could not fetch contract.");
@@ -179,8 +180,7 @@ export default {
         async getSource(contractId) {
             if (import.meta.env.VITE_ENV === "PROD" || import.meta.env.VITE_ENV === "TEST") {
                 this.$store.commit("setAftrContractSources");
-
-                let route = 'https://gateway.warp.cc/gateway/contract-source?id=' + contractId + (this.network === 'TEST' ? '&testnet=true' : '');
+                let route = import.meta.env.VITE_CONTRACTS_BY_SOURCE_ENDPOINT + contractId + (this.network === 'TEST' ? '&testnet=true' : '');
                 let response = await fetch(route)
                 console.log(route)
                 let data = await response.json()
