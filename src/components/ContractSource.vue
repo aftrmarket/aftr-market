@@ -158,7 +158,7 @@ export default {
                 response = await fetch(route).then(res => res.json());
                 this.tags = this.interactionTagsParser(response);
             } else {
-                route = `https://gateway.redstone.finance/gateway/contract?txId=${txID}${this.network === "TEST" ? "&testnet=true" : ""}`;
+                route = import.meta.env.VITE_TX_GATEWAY + "?txId=" + contractId + (this.env === "TEST" ? "&testnet=true" : "");
                 response = await fetch(route);
                 if (!response.ok) {
                     alert("Could not fetch contract.");

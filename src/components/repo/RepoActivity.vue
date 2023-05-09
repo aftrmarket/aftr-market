@@ -6,7 +6,8 @@
         <div v-for="(commentIndex, index) in commentsToShow" :key="activities[index]" class="pt-4 w-full">
             <div v-if="index < activities.length">
                 <div class="">
-                    <span class="text-aftrBlue text-md font-medium uppercase tracking-wide">{{ activities.length - index }}. {{ interactionText(activities[index].input.function) }}</span>
+                    <span class="text-aftrBlue text-md font-medium uppercase tracking-wide">{{ activities.length - index }}. {{ interactionText(activities[index].input.function)
+                    }}</span>
                     <span class="font-mono text-xs text-gray-500">({{ activities[index].id }})</span>
                 </div>
                 <div class="pl-8 pb-4">
@@ -205,7 +206,7 @@ export default {
             this.edges = responseData.data.data.transactions.edges;
         },
         async getInteractions(contractId) {
-            let route = 'https://gateway.redstone.finance/gateway/interactions?contractId=' + contractId + (this.network === 'TEST' ? '&testnet=true' : '');
+            let route = import.meta.env.VITE_TX_GATEWAY + "?txId=" + contractId + (this.env === "TEST" ? "&testnet=true" : "");
             let response = await fetch(route)
             let data = await response.json()
             return data.interactions
@@ -250,6 +251,7 @@ export default {
     }
 }
 </script>
+
 
 
 
