@@ -20,34 +20,28 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th scope="col"
-                                class="flex space-x-3 px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th scope="col" class="flex space-x-3 px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 <span class="py-2">Member ({{ Object.keys(repo.balances).length }})</span>
                                 <button v-if="uiEditMode" @click.prevent="addMemberRow" type="button"
                                     class="px-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
-                                        fill="currentColor">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                         <path
                                             d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" />
                                     </svg>
                                 </button>
                             </th>
-                            <th scope="col"
-                                class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Voting Power
                             </th>
-                            <th v-if="uiEditMode" scope="col"
-                                class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th v-if="uiEditMode" scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 New Allocation
                             </th>
-                            <th v-if="uiEditMode" scope="col"
-                                class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th v-if="uiEditMode" scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                             </th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-for="(tokens, addr) in repo.balances" :key="addr"
-                            class="text-xs text-gray-500 hover:bg-gray-50">
+                        <tr v-for="(tokens, addr) in repo.balances" :key="addr" class="text-xs text-gray-500 hover:bg-gray-50">
                             <td class="text-left px-4 py-2 font-mono tracking-wider">
                                 {{ addr }}
                             </td>
@@ -61,19 +55,15 @@
                             <td v-if="uiEditMode" class="text-center px-4 py-2">
                                 <button @click.prevent="removeMember(addr)" type="button"
                                     class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
-                                        fill="currentColor">
-                                        <path fill-rule="evenodd"
-                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z"
-                                            clip-rule="evenodd" />
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
                                     </svg>
                                 </button>
                             </td>
                         </tr>
                         <tr v-show="addRow" class="text-xs text-gray-500 hover:bg-gray-50">
                             <td class="text-left px-2 py-2">
-                                <input type="text" v-model="newMember"
-                                    class="mt-1 mb-1 w-full text-xs focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md">
+                                <input type="text" v-model="newMember" class="mt-1 mb-1 w-full text-xs focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md">
                             </td>
                             <td class="text-right px-4 py-2">
                                 0
@@ -85,10 +75,8 @@
                             <td class="text-center px-4 py-2">
                                 <button @click.prevent="addMember" type="button"
                                     class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
-                                        fill="currentColor">
-                                        <path fill-rule="evenodd"
-                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"
                                             clip-rule="evenodd" />
                                     </svg>
                                 </button>
@@ -99,24 +87,20 @@
             </div>
 
             <!--- Verify Proposal Start --->
-            <div v-if="uiEditMode && numChanges > 0"
-                class="col-span-2 shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+            <div v-if="uiEditMode && numChanges > 0" class="col-span-2 shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th colspan="2" scope="col"
-                                class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th colspan="2" scope="col" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Proposed Changes ({{ numChanges }})
                             </th>
-                            <th scope="col"
-                                class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th scope="col" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Cancel
                             </th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-for="(key, index) in Object.keys(memberUpdates)" :key="key"
-                            class="text-xs text-gray-500 hover:bg-gray-50">
+                        <tr v-for="(key, index) in Object.keys(memberUpdates)" :key="key" class="text-xs text-gray-500 hover:bg-gray-50">
                             <td class="px-4 py-2">
                                 {{ index + 1 }}
                             </td>
@@ -126,8 +110,7 @@
                             <td class="px-4 py-2 text-center">
                                 <button @click.prevent="removeProposal(key, 'update')" type="button"
                                     class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
-                                        fill="currentColor">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                         <path fill-rule="evenodd"
                                             d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
                                             clip-rule="evenodd" />
@@ -135,8 +118,7 @@
                                 </button>
                             </td>
                         </tr>
-                        <tr v-for="(member, index) in memberAdds" :key="member"
-                            class="text-xs text-gray-500 hover:bg-gray-50">
+                        <tr v-for="(member, index) in memberAdds" :key="member" class="text-xs text-gray-500 hover:bg-gray-50">
                             <td class="px-4 py-2">
                                 {{ Object.keys(memberUpdates).length + index + 1 }}
                             </td>
@@ -146,8 +128,7 @@
                             <td class="px-4 py-2 text-center">
                                 <button @click.prevent="removeProposal(member.recipient, 'add')" type="button"
                                     class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
-                                        fill="currentColor">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                         <path fill-rule="evenodd"
                                             d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
                                             clip-rule="evenodd" />
@@ -155,8 +136,7 @@
                                 </button>
                             </td>
                         </tr>
-                        <tr v-for="(member, index) in memberRemoves" :key="member"
-                            class="text-xs text-gray-500 hover:bg-gray-50">
+                        <tr v-for="(member, index) in memberRemoves" :key="member" class="text-xs text-gray-500 hover:bg-gray-50">
                             <td class="px-4 py-2">
                                 {{ Object.keys(memberUpdates).length + memberAdds.length + index + 1 }}
                             </td>
@@ -166,8 +146,7 @@
                             <td class="px-4 py-2 text-center">
                                 <button @click.prevent="removeProposal(member, 'remove')" type="button"
                                     class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrRed bg-white hover:bg-aftrRed hover:text-white focus:outline-none">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
-                                        fill="currentColor">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                         <path fill-rule="evenodd"
                                             d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
                                             clip-rule="evenodd" />
@@ -178,8 +157,7 @@
                     </tbody>
                 </table>
             </div>
-            <div v-if="uiEditMode && numChanges > 0"
-                class="flex flex-col justify-center px-2 py-4 text-left text-xs text-gray-500 tracking-wider">
+            <div v-if="uiEditMode && numChanges > 0" class="flex flex-col justify-center px-2 py-4 text-left text-xs text-gray-500 tracking-wider">
                 <p class="text-aftrRed uppercase">Please review the proposed changes</p>
                 {{ statusMessage }}
             </div>
@@ -190,13 +168,10 @@
                     <div class="text-right">
                         <button @click.prevent="submit" type="button"
                             class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"
-                                xmlns="http://www.w3.org/2000/svg">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z">
                                 </path>
-                                <path fill-rule="evenodd"
-                                    d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
-                                    clip-rule="evenodd"></path>
+                                <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"></path>
                             </svg>
                             <span class="pl-2">Update Repo</span>
                         </button>
@@ -314,9 +289,9 @@ export default {
             if (type === 'update') {
                 const currentQty = this.repo.balances[recipient];
                 if (currentQty > +qty) {
-                    return "<span style='color:#FF6C8C'><b>Decrease</b></span> voting power to " + this.formatNumber(String(currentQty - +qty)) + " for <b> " + recipient + "</b>";
+                    return "<span style='color:#FF6C8C'><b>Decrease</b></span> voting power by " + this.formatNumber(String(currentQty - +qty)) + " for <b> " + recipient + "</b>";
                 } else if (currentQty < +qty) {
-                    return "<span style='color:green'><b>Increase</b></span> voting power to " + this.formatNumber(String(+qty - currentQty)) + " for <b>" + recipient + "</b>";
+                    return "<span style='color:green'><b>Increase</b></span> voting power by " + this.formatNumber(String(+qty - currentQty)) + " for <b>" + recipient + "</b>";
                 } else if (currentQty === +qty) {
                     return "No change for " + recipient;
                 }
