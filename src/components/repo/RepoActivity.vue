@@ -206,7 +206,8 @@ export default {
             this.edges = responseData.data.data.transactions.edges;
         },
         async getInteractions(contractId) {
-            let route = import.meta.env.VITE_TX_GATEWAY + "?txId=" + contractId + (this.env === "TEST" ? "&testnet=true" : "");
+            let gw = import.meta.env.VITE_TX_GATEWAY;
+            let route = gw.substring(0, 26) + '/interactions?contractId=' + contractId + (this.network === 'TEST' ? '&testnet=true' : '');
             let response = await fetch(route)
             let data = await response.json()
             return data.interactions
