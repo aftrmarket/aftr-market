@@ -6,7 +6,8 @@
         <div v-for="(commentIndex, index) in commentsToShow" :key="activities[index]" class="pt-4 w-full">
             <div v-if="index < activities.length">
                 <div class="">
-                    <span class="text-aftrBlue text-md font-medium uppercase tracking-wide">{{ activities.length - index }}. {{ interactionText(activities[index].input.function) }}</span>
+                    <span class="text-aftrBlue text-md font-medium uppercase tracking-wide">{{ activities.length - index }}. {{ interactionText(activities[index].input.function)
+                    }}</span>
                     <span class="font-mono text-xs text-gray-500">({{ activities[index].id }})</span>
                 </div>
                 <div class="pl-8 pb-4">
@@ -251,6 +252,7 @@ export default {
     }
 }
 </script>
+
 
 
 
