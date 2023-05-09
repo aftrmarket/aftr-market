@@ -3,12 +3,6 @@
         <div class="pt-10 bg-aftrDarkGrey lg:pt-8 pb-14 lg:overflow-hidden mx-auto max-w-7xl px-8">
             <div class="flex items-center justify-between">
                 <div class="flex space-x-5 items-center">
-                    <div class="flex-shrink-0">
-                        <div class="relative">
-                            <img class="h-16 w-16 rounded-full" :src="logo" alt="">
-                            <span class="absolute inset-0 shadow-inner rounded-full" aria-hidden="true"></span>
-                        </div>
-                    </div>
                     <div>
                         <h1 class="text-2xl font-bold text-white">AFTR Contract Source</h1>
                         <div class="flex items-center space-x-2 text-sm font-medium font-mono text-aftrYellow">
@@ -22,17 +16,13 @@
                         </div>
                     </div>
                 </div>
-                <button @click.prevent="backToRepo" type="submit"
-                    class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 15.75L3 12m0 0l3.75-3.75M3 12h18" />
+                <button @click.prevent="backToRepo" type="submit" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                        <path fill-rule="evenodd" d="M17 10a.75.75 0 01-.75.75H5.612l4.158 3.96a.75.75 0 11-1.04 1.08l-5.5-5.25a.75.75 0 010-1.08l5.5-5.25a.75.75 0 111.04 1.08L5.612 9.25H16.25A.75.75 0 0117 10z" clip-rule="evenodd" />
                     </svg>
-
-
                     <span class="pl-2">Back to Repo</span>
                 </button>
             </div>
-
         </div>
         <div class="py-6 bg-gray-50 overflow-hidden">
             <div class="mx-auto px-4 space-y-8 sm:px-6 lg:px-8 text-sm">
@@ -229,8 +219,14 @@ export default {
         const csArray = this.getAftrContractSources
         let latestAftrContract = csArray[csArray.length - 1]
         this.diffMode = latestAftrContract == this.contractId ? 'unified' : 'split'
-        this.currentAftrSrc = latestAftrContract == this.contractId ? this.contractSrc : await this.getSource(latestAftrContract)
-        this.contractSrc = await this.getSource(this.contractId)
+        if (latestAftrContract == this.contractId) {
+            this.diffMode = 'unified'
+            this.currentAftrSrc = this.contractSrc = await this.getSource(this.contractId)
+        } else {
+            this.diffMode = 'split'
+            this.currentAftrSrc = await this.getSource(latestAftrContract)
+            this.contractSrc = await this.getSource(this.contractId)
+        }
         // const srcId = this.getContractSourceId()
     }
 };
