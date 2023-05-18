@@ -337,7 +337,7 @@ export default {
             }
 
             if (typeof this.repo.functions === 'undefined') {
-                this.repo.functions = [];
+                this.repo.functions = ["transfer", "deposit", "allow", "claim", "multiInteraction"];
             }
 
             // Only allow Vote Simulator if user is member of Repo

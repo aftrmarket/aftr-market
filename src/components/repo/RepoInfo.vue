@@ -687,7 +687,7 @@ export default {
         this.loadSettings();
         
         if (typeof this.repo.functions === "undefined") {
-            this.repo.functions = [];
+            this.repo.functions = ["transfer", "deposit", "allow", "claim", "multiInteraction"];
         } 
         this.selectedFunctions = this.repo.functions;
     },
