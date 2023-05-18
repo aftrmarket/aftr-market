@@ -70,9 +70,12 @@
                                                 class="font-mono font-medium text-aftrBlue">{{
                                                         walletAddressSubstr(getActiveAddress)
                                                 }}</span></label>
-                                        <label>Quorum: &nbsp; <span class="font-mono font-medium">50%</span></label>
-                                        <label>Support: &nbsp; <span class="font-mono font-medium">50%</span></label>
-
+                                        <label>Quorum: &nbsp; <span class="font-mono font-medium text-aftrBlue">50%</span></label>
+                                        <label>Support: &nbsp; <span class="font-mono font-medium text-aftrBlue">51%</span></label>
+                                        <label>
+                                            Function Privileges: <br/>
+                                            <span class="font-mono font-medium text-xs text-aftrBlue pl-4">Transfer, Deposit, Allow, Claim, Multi-Interactions</span>
+                                        </label>
                                     </div>
                                     <div class="flex flex-col text-sm text-aftrRed mt-4">
                                         Quickly create an AFTR Repo with these default settings. You can easily
@@ -122,7 +125,6 @@ export default {
             transferAssets: false,
             dataValid: true,
             walletPsts: [],
-
             repoTemplate: {
                 "name": "",
                 "ticker": "",
@@ -137,6 +139,7 @@ export default {
                 "claims": [],
                 "claimable": [],
                 "evolve": "",
+                "functions": ["transfer", "deposit", "allow", "claim", "multiInteraction"],
                 "settings": [
                     ["quorum", 0.5],
                     ["support", 0.51],
@@ -227,7 +230,6 @@ export default {
 
             const csArray = this.getAftrContractSources;
             const latestAftrSourceId = csArray[csArray.length - 1];
-            console.log(JSON.stringify(this.repoTemplate));
 
             const txIds = await warpCreateFromTx(JSON.stringify(this.repoTemplate), latestAftrSourceId, tags, true);
             this.repoTemplate["id"] = txIds.contractTxId;
@@ -243,7 +245,9 @@ export default {
                         //logo: this.communityLogoValue,
                         //fcp: true
                     };
+                    // Update the store for what the user has in wallet
                     this.$store.commit("addWalletPst", pst);
+                    this.$store.commit("addWalletRepo", pst);
                 }
 
                 // if(Boolean(this.arweaveMine)){

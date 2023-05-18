@@ -1,12 +1,12 @@
 import VueLogger from 'vuejs3-logger';
 import { createApp } from 'vue';
 import { createRouter, createWebHistory } from 'vue-router';
-//import { uuid } from 'vue-uuid';
-import numeral from 'numeral';
 import './index.css';
+
 
 import App from './App.vue';
 import store from './store.js';
+
 import RepoList from './components/RepoList.vue';
 import CreateRepo from './components/CreateRepo.vue';
 import Repo from './components/Repo.vue';
@@ -14,14 +14,18 @@ import UiTest from './components/UiTest.vue';
 import ContractRead from './components/ContractRead.vue';
 import Overview from './components/Overview.vue';
 import MyPortfolio from './components/MyPortfolio.vue';
-import ContractSource from './components/ContractSource.vue'
+import ContractSource from './components/ContractSource.vue';
 import Chat from './components/utils/Chat.vue';
+
 import VueSweetalert2 from 'vue-sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
 //import { readContract } from 'smartweave';
 import PerfectScrollbar from 'vue3-perfect-scrollbar'
 import 'vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css'
 import { VueClipboard } from '@soerenmartius/vue3-clipboard'
+
+import VueDiff from 'vue-diff'
+import 'vue-diff/dist/index.css';
 
 
 let logLevel = "";
@@ -66,7 +70,7 @@ const router = createRouter({
         //         window.location.href = 'https://discord.gg/YEy8VpuNXR'
         //     }
         // },
-        { path: '/:notFound(.*)', redirect: '/' }
+        { path: '/:pathMatch(.*)*', redirect: '/' }
     ],
     linkActiveClass: 'active'
 });
@@ -76,8 +80,10 @@ app.use(store);
 app.use(router);
 app.use(VueLogger, options);
 app.use(VueSweetalert2);
-app.use(PerfectScrollbar)
-app.use(VueClipboard)
-//app.use(uuid);
+app.use(PerfectScrollbar);
+app.use(VueClipboard);
+app.use(VueDiff, {
+    componentName: 'VueDiff'
+})
 
 app.mount('#app');

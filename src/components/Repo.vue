@@ -3,8 +3,8 @@
         <repo-placeholder></repo-placeholder>
     </div>
     <div v-else>
-        <repo-evolve v-if="showEvolveModal" @close="closeModal" :repoId="contractId">
-        </repo-evolve>
+        <repo-evolve v-if="showEvolveModal" @close="closeModal" :repoId="contractId"></repo-evolve>
+        <repo-offer v-if="showOffer" :repo="repo" @close="showOffer = false"></repo-offer>
         <main class="-mt-32">
             <div class="max-w-7xl mx-auto pb-12 px-4 sm:px-6 lg:px-8">
                 <!-- Page header -->
@@ -50,9 +50,7 @@
                                                 </svg>
                                             </div>
                                             <div class="ml-3 w-0 flex-1 pt-0.5">
-                                                <p class="text-sm font-medium text-gray-900">Copied address to
-                                                    clipboard
-                                                </p>
+                                                <p class="text-sm font-medium text-gray-900">Copied address to clipboard</p>
                                             </div>
                                             <div class="ml-4 flex flex-shrink-0">
                                                 <button type="button" @click="show = false"
@@ -70,8 +68,14 @@
                             </transition>
                         </div>
                     </div>
-                    <div
-                        class="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3">
+                    <div class="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-reverse sm:space-y-0 sm:space-x-3 md:mt-0 md:flex-row md:space-x-3">
+                        <button v-if="arConnected && allow3rdPartyProposals" @click.prevent="makeOffer" type="submit" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                                <path d="M10.464 8.746c.227-.18.497-.311.786-.394v2.795a2.252 2.252 0 01-.786-.393c-.394-.313-.546-.681-.546-1.004 0-.323.152-.691.546-1.004zM12.75 15.662v-2.824c.347.085.664.228.921.421.427.32.579.686.579.991 0 .305-.152.671-.579.991a2.534 2.534 0 01-.921.42z" />
+                                <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v.816a3.836 3.836 0 00-1.72.756c-.712.566-1.112 1.35-1.112 2.178 0 .829.4 1.612 1.113 2.178.502.4 1.102.647 1.719.756v2.978a2.536 2.536 0 01-.921-.421l-.879-.66a.75.75 0 00-.9 1.2l.879.66c.533.4 1.169.645 1.821.75V18a.75.75 0 001.5 0v-.81a4.124 4.124 0 001.821-.749c.745-.559 1.179-1.344 1.179-2.191 0-.847-.434-1.632-1.179-2.191a4.122 4.122 0 00-1.821-.75V8.354c.29.082.559.213.786.393l.415.33a.75.75 0 00.933-1.175l-.415-.33a3.836 3.836 0 00-1.719-.755V6z" clip-rule="evenodd" />
+                            </svg>
+                            <span class="pl-2">Offer</span>
+                        </button>
                         <label v-if="repo.evolveNeeded && allowEdits && !evolvePressedAlready" class="py-1 pr-2 text-right text-4xl animate-pulse">👉</label>
                         <button v-if="repo.evolveNeeded && allowEdits && !evolvePressedAlready" @click.prevent="evolveContract" type="submit"
                             class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
@@ -103,9 +107,9 @@
                                 <div class="sm:hidden">
                                     <label for="tabs" class="sr-only">Select a tab</label>
                                     <select id="tabs" name="tabs" class="block w-full focus:ring-aftrBlue focus:border-aftrBlue border-gray-300 rounded-md">
-                                        <option v-for="tab in tabs" :key="tab.name" :selected="tab.current">{{
-        tab.name
-}}</option>
+                                        <option v-for="tab in tabs" :key="tab.name" :selected="tab.current">
+                                            {{ tab.name }}
+                                        </option>
                                     </select>
                                 </div>
                                 <div class="hidden sm:block">
@@ -114,11 +118,15 @@
                                             <a v-for="tab in tabs" :key="tab.name" :href="tab.href" @click="tabClick(tab.name)" :class="tabText(tab)"
                                                 :aria-current="tab.current ? 'page' : undefined">
                                                 {{ tab.name }}
+                                                <span v-if="tab.name === 'Votes' && (this.repo.votes.filter((vote) => vote.status === 'active').length) > 0"
+                                                    class="inline-flex items-center justify-center w-4 h-4 ml-2 text-xs font-semibold text-white bg-aftrBlue rounded-full">
+                                                    {{ this.repo.votes.filter((vote) => vote.status === 'active').length }}
+                                                </span>
                                             </a>
                                         </nav>
                                     </div>
                                 </div>
-                                <repo-info v-if="activeTab === 'Info'" :repo="repo" :contractId="contractId" :isMember="allowEdits">
+                                <repo-info v-if="activeTab === 'Info'" :repo="repo" :contractId="repoId" :isMember="allowEdits">
                                 </repo-info>
                                 <!--<repo-names v-else-if="activeTab === 'Names'" :repo="repo" :isMember="allowEdits"></repo-names>-->
                                 <repo-settings v-else-if="activeTab === 'Custom Settings'" :repo="repo" :isMember="allowEdits">
@@ -131,11 +139,11 @@
                                 <!--<repo-leases v-else-if="activeTab === 'Leases'" :leases="repo.leases"></repo-leases>-->
                                 <!--<repo-leases v-else-if="activeTab === 'Leases'"></repo-leases>-->
                                 <!--<repo-fractions v-else-if="activeTab === 'Fractions'"></repo-fractions>-->
-                                <repo-votes v-else-if="activeTab === 'Votes'" :repo="repo" :contractId="contractId" :isMember="allowEdits">
+                                <repo-votes v-else-if="activeTab === 'Votes'" :repo="repo" :contractId="repoId" :isMember="allowEdits">
                                 </repo-votes>
                                 <repo-state v-else-if="activeTab === 'State'" :repo="repo">
                                 </repo-state>
-                                <repo-activity v-else-if="activeTab === 'Activity'" :arweave="arweave" :repoId="this.repoId" :interactions="interactions"
+                                <repo-activity v-else-if="activeTab === 'Activity'" :arweave="arweave" :repoId="repoId" :interactions="interactions"
                                     :errorMessages="interactionErrorMsgs">
                                 </repo-activity>
 
@@ -152,7 +160,7 @@
 </template>
 
 <script>
-import { warpRead } from './utils/warpUtils.js';
+import { warpRead, warpWrite } from './utils/warpUtils.js';
 import RepoInfo from './repo/RepoInfo.vue';
 import RepoMembers from './repo/RepoMembers.vue';
 import RepoTokens from './repo/RepoTokens.vue';
@@ -167,11 +175,12 @@ import RepoPlaceholder from './repo/RepoPlaceholder.vue';
 import RepoSettings from './repo/RepoSettings.vue';
 import RepoNames from './repo/RepoNames.vue';
 import RepoEvolve from "./repo/RepoEvolve.vue";
+import RepoOffer from "./repo/RepoOffer.vue";
 import { mapGetters } from "vuex";
 import { isRepoMember } from './utils/shared.js';
 
 export default {
-    components: { RepoInfo, RepoMembers, RepoTokens, RepoVotes, RepoState, RepoActivity, RepoPlaceholder, RepoSettings, RepoContractTest, RepoEvolve, RepoNames },
+    components: { RepoInfo, RepoMembers, RepoTokens, RepoVotes, RepoState, RepoActivity, RepoPlaceholder, RepoSettings, RepoContractTest, RepoEvolve, RepoNames, RepoOffer },
     props: ['repoId'],
     data() {
         return {
@@ -198,6 +207,12 @@ export default {
             interactionErrorMsgs: {},
             anyWithdrawals: false,
             concludeVoteNeeded: false,
+            currentBlockInt: 0,
+            concludedVoteIds: [],
+            repoLogo: "",
+            showOffer: false,
+            allow3rdPartyProposals: false,
+            isSwappable: false,
 
             arweaveHost: import.meta.env.VITE_ARWEAVE_HOST,
             arweavePort: import.meta.env.VITE_ARWEAVE_PORT,
@@ -211,7 +226,10 @@ export default {
         };
     },
     computed: {
-        repoLogo() {
+        ...mapGetters(["getActiveAddress", "currentBlock", "getAftrContractSources", "arConnected"]),
+    },
+    methods: {
+        async getRepoLogo() {
             let logoUrl = ""
             if (this.repo.logo) {
                 if (import.meta.env.VITE_ARWEAVE_PORT) {
@@ -219,15 +237,11 @@ export default {
                 } else {
                     logoUrl = `${import.meta.env.VITE_ARWEAVE_PROTOCOL + "://" + import.meta.env.VITE_ARWEAVE_HOST + "/" + this.repo.logo}`;
                 }
-                return logoUrl;
             } else {
                 logoUrl = "https://avatars.dicebear.com/api/pixel-art-neutral/:" + this.repo.id + ".svg";
-                return logoUrl;
             }
+            this.repoLogo = logoUrl;
         },
-        ...mapGetters(["getActiveAddress", "currentBlock", "getAftrContractSources"]),
-    },
-    methods: {
         showPopup() {
             this.show = true;
 
@@ -307,6 +321,9 @@ export default {
                 return data.srcTxId;
             }
         },
+        makeOffer() {
+            this.showOffer = true;
+        },
         async loadRepo() {
             // Add contractId to repo object
             this.repo.id = this.contractId;
@@ -366,17 +383,35 @@ export default {
             // this.repo.treasury = treasuryTotal;
 
             // Votes
-            if (this.repo.votes) {
-                this.$store.dispatch('loadCurrentBlock');
-                let currentBlock = +this.currentBlock.height;
+            if (this.allowEdits && this.repo.votes) {
+                await this.$store.dispatch('loadCurrentBlock');
+                this.currentBlockInt = +this.currentBlock.height;
                 let activeVotes = this.repo.votes.filter((vote) => vote.status === "active");
                 activeVotes.forEach((vote) => {
                     let start = +vote.start;
                     let voteLength = +vote.voteLength;
-                    if (start + voteLength < currentBlock) {
+                    if (start + voteLength < this.currentBlockInt) {
                         this.concludeVoteNeeded = true;
+                        this.concludedVoteIds.push(vote.id);
                     }
                 });
+            }
+            await this.getRepoLogo();
+        },
+        determineSwapability() {
+            if (window.location.hostname === "localhost") {
+                const settings = new Map(this.repo.settings);
+                if (settings.get("3rdPartyProposals") === true || settings.get("3rdPartyProposals") === "true") {
+                    this.allow3rdPartyProposals = true;
+                    if (settings.get("swappable") === true || settings.get("swappable") === "true") {
+                        this.isSwappable = true;
+                    } else {
+                        this.isSwappable = false;
+                    }
+                } else {
+                    this.allow3rdPartyProposals = false;
+                    this.isSwappable = false;
+                }
             }
         },
     },
@@ -391,7 +426,12 @@ export default {
     },
     async created() {
         this.pageStatus = "in-progress";
+
+        // Ensure this contract sources are up to date
+        this.$store.commit("setAftrContractSources");
+        
         this.showEvolveModal = false;
+        let contractSrc = "";
 
         try {
             this.arweave = await Arweave.init({
@@ -419,11 +459,8 @@ export default {
             this.interactionErrorMsgs = cachedValue.errorMessages;
 
             // Ensure AFTR Repo
-            const contractSrc = await this.returnContractSrc(this.arweave, this.contractId);
+            contractSrc = await this.returnContractSrc(this.arweave, this.contractId);
             this.repo.contractSrc = contractSrc;
-            // if (contractSrc !== this.getAftrContractSrcId) {
-            //     throw "Not valid AFTR Repo";
-            // }
 
             await this.loadRepo();
         } catch (error) {
@@ -437,7 +474,47 @@ export default {
             return false;
         }
 
+        if (this.allowEdits && this.concludeVoteNeeded) {
+            const input = { function: "finalize" };
+            const tx = await warpWrite(this.repo.id, input, true, undefined);
+            const contractId = this.repo.id;
+
+            // Reread contract to get latest with vote finalizations
+            const cachedValue = await warpRead(contractId);
+            this.repo = cachedValue.state;
+            this.interactions = cachedValue.validity;
+            this.interactionErrorMsgs = cachedValue.errorMessages;
+            this.repo.id = contractId;
+            this.repo.contractSrc = contractSrc;
+
+            let msg = "The following votes just became finalized: <br>";
+            for (let id of this.concludedVoteIds) {
+                msg += id.substring(0, 5) + '...' + id.substring(id.length - 5) + "<br>";
+            }
+            this.$swal({
+                icon: "info",
+                html: msg,
+                showConfirmButton: true,
+                allowOutsideClick: false,
+            });
+            this.concludeVoteNeeded = false;
+        }
+        if (import.meta.env.VITE_SWAPS) {
+            this.determineSwapability();
+        }
         this.pageStatus = "";
     },
+    async updated() {
+        let logoUrl = this.repoLogo;
+        if (logoUrl.substring(0, 15) !== "https://avatars") {
+            // Check to see if logo is invalid
+            await fetch(logoUrl)
+                .then(response => {
+                    if (response.status != 200) {
+                        this.repoLogo = "https://avatars.dicebear.com/api/pixel-art-neutral/:" + this.repo.id + ".svg";
+                    }
+                });
+        }
+    }
 };
 </script>

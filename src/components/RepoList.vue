@@ -1,7 +1,6 @@
 <template>
     <div class="pt-4 w-full">
-        <create-repo-simple v-if="showCreateSimple" @close="closeModal">
-        </create-repo-simple>
+        <create-repo-simple v-if="showCreateSimple" @close="closeModal"></create-repo-simple>
     </div>
     <div>
         <main class="-mt-32">
@@ -46,16 +45,12 @@
                             </svg>
                         </button>
                     </div>
-                    <div>
-                        <button type="button" @click.prevent="createRepo()"
-                            class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z">
-                                </path>
-                                <path
-                                    d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z">
-                                </path>
+                    <div v-if="arConnected">
+                        <button type="button" @click.prevent="createRepo()" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                                <path d="M5.566 4.657A4.505 4.505 0 016.75 4.5h10.5c.41 0 .806.055 1.183.157A3 3 0 0015.75 3h-7.5a3 3 0 00-2.684 1.657zM2.25 12a3 3 0 013-3h13.5a3 3 0 013 3v6a3 3 0 01-3 3H5.25a3 3 0 01-3-3v-6zM5.25 7.5c-.41 0-.806.055-1.184.157A3 3 0 016.75 6h10.5a3 3 0 012.683 1.657A4.505 4.505 0 0018.75 7.5H5.25z" />
                             </svg>
+
                             <span class="pl-2">Create</span>
                         </button>
                         <button type="button" @click.prevent="openModal"
@@ -70,46 +65,69 @@
                 </div>
                 <!-- List -->
 
-                <div class="bg-white rounded-lg shadow px-5 py-6">
-                    <div class="grid grid-cols-3">
+                <div class="bg-white rounded-lg shadow-md px-5 pb-6">
+                    <div class="grid grid-cols-3 py-4">
                         <div>
                             <span v-show="filterText">SHOW FILTERS HERE</span>
                         </div>
                         <div></div>
                         <div class="text-right text-sm">
-                            {{ this.repos.length }} Repos Shown
+                            {{ this.renderedRepos.length }} Repos Shown
                         </div>
                     </div>
                     <!-- <perfect-scrollbar> -->
-                    <!-- <ul v-if="layoutGrid && !isLoading && repos.length > 0" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"> -->
-                    <ul v-if="layoutGrid && repos.length > 0" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        <!-- <li v-for="repo in repos" :key="repo.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200"> -->
-                        <li v-for="repo in filteredList()" :key="repo.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
-                            <router-link :to="{ name: 'repo', params: { repoId: repo.id } }">
-                                <repo-card :repo="repo">
-                                </repo-card>
-                            </router-link>
-                        </li>
-                        <div v-if="showMessage">No repos found...</div>
-                    </ul>
-                    <!-- <repo-table v-else-if="!layoutGrid && !isLoading && repos.length > 0" :repos="repos" :searchType="searchType" :searchInput="searchInput"> -->
-                    <repo-table v-else-if="!layoutGrid && repos.length > 0" :repos="repos" :searchType="searchType" :searchInput="searchInput">
-                    </repo-table>
-                    <ul v-else-if="!isLoading && repos.length == 0" class="">
-                        No repos found...
-                    </ul>
-                    <ul v-else class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        <li v-for="index in 12" :key="index" class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
-                            <repo-card-placeholder :key="index">
-                            </repo-card-placeholder>
-                        </li>
-                    </ul>
-                    <div class="text-center">
-                        <button v-if="!isLoading && hasNextPage" @click.prevent="load" type="submit"
-                            class="mt-4 px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Load
-                            More</button>
+                    <div v-if="renderedRepos.length > 0">
+                        <div v-if="layoutGrid">
+                            <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                                <!-- <ul v-if="layoutGrid && repos.length > 0" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"> -->
+                                <!-- <li v-for="repo in repos" :key="repo.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200"> -->
+                                <li v-for="repo in filteredList()" :key="repo.id" class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
+                                    <router-link :to="{ name: 'repo', params: { repoId: repo.id } }">
+                                        <repo-card :repo="repo">
+                                        </repo-card>
+                                    </router-link>
+                                </li>
+                            </ul>
+                        </div>
+                        <div v-else-if="!layoutGrid && renderedRepos.length > 0">
+                            <repo-table :repos="renderedRepos" :searchType="searchType" :searchInput="searchInput">
+                                <!-- <repo-table v-else-if="!layoutGrid && repos.length > 0" :repos="repos" :searchType="searchType" :searchInput="searchInput"> -->
+                            </repo-table>
+                        </div>
                     </div>
                     <!-- </perfect-scrollbar> -->
+
+                    <!-- Loading button and animation -->
+                    <div v-if="repos.length != renderedRepos.length" class="text-center pt-6">
+                        <button v-show="!isLoading" @click.prevent="loadMore" type="button"
+                            class="inline-flex items-center px-4 py-2 border border-gray-200 shadow-md text-lg font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+                            Load More
+                        </button>
+                        <div v-show="isLoading">
+                            <div v-if="layoutGrid">
+                                <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                                    <li v-for="index in 9" :key="index" class="col-span-1 bg-white rounded-lg shadow divide-gray-200">
+                                        <repo-card-placeholder :key="index">
+                                        </repo-card-placeholder>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div v-else class="inline-flex items-center p-6">
+                                <svg aria-hidden="true" class="w-8 h-8 animate-spin text-aftrDarkGrey-light fill-aftrBlue" viewBox="0 0 100 101" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                                        fill="currentColor" />
+                                    <path
+                                        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                                        fill="currentFill" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <ul v-if="!isLoading && repos.length == 0" class="">
+                        No repos found...
+                    </ul>
                 </div>
 
                 <!-- <div v-if="!isLoading && noResult" class="">
@@ -131,7 +149,6 @@ import { mapGetters } from "vuex";
 import CreateRepoSimple from "./CreateRepoSimple.vue";
 import RepoTable from './RepoTable.vue';
 import { isRepoMember } from './utils/shared.js';
-import Transaction from 'arweave/node/lib/transaction';
 
 export default {
     components: { RepoCard, RepoCardPlaceholder, CreateRepoSimple, RepoTable },
@@ -172,6 +189,9 @@ export default {
             searchInput: "",
             showMessage: false,
             numRepos: 0,
+            numContractsRead: 0,
+            renderedRepos: [],
+            limit: 9
         };
     },
     // mounted() {
@@ -181,7 +201,7 @@ export default {
         searchTypeText() {
             return "Enter " + this.searchType;
         },
-        ...mapGetters(["currentBlock", "getActiveAddress", "getAftrContractSources"]),
+        ...mapGetters(["currentBlock", "getActiveAddress", "getAftrContractSources", "arConnected", "getActiveWallet"]),
     },
     methods: {
         clearData() {
@@ -195,7 +215,7 @@ export default {
         },
         filteredList() {
             if (this.searchType == "Name or Ticker Symbol") {
-                const repo = this.repos.filter((repo) =>
+                const repo = this.renderedRepos.filter((repo) =>
                     repo.name.toLowerCase().includes(this.searchInput.toLowerCase()) || repo.ticker.toLowerCase().includes(this.searchInput.toLowerCase())
                 );
                 if (repo.length == 0) {
@@ -207,7 +227,7 @@ export default {
                 return repo;
             }
             if (this.searchType == "Wallet Address") {
-                const repo = this.repos.filter(element => {
+                const repo = this.renderedRepos.filter(element => {
                     return Object.keys(element.balances).some(key => key.toLowerCase().includes(this.searchInput.toLowerCase()));
                 });
 
@@ -222,7 +242,7 @@ export default {
             }
 
             if (this.searchType == "Setting Key") {
-                const repo = this.repos.filter((repo) => {
+                const repo = this.renderedRepos.filter((repo) => {
                     return repo.settings.some((setting) => {
                         return setting[0].toLowerCase().includes(this.searchInput.toLowerCase());
                     });
@@ -239,7 +259,7 @@ export default {
             }
 
             if (this.searchType == "Setting Value") {
-                const repo = this.repos.filter((repo) => {
+                const repo = this.renderedRepos.filter((repo) => {
                     return repo.settings.some((setting) => {
                         return String(setting[1]).toLowerCase().includes(this.searchInput.toLowerCase())
                     });
@@ -256,7 +276,7 @@ export default {
             }
 
             if (this.searchType == "Asset ID") {
-                const repo = this.repos.filter(element => {
+                const repo = this.renderedRepos.filter(element => {
                     return element.tokens.some((el) => {
                         return el.tokenId.toLowerCase().includes(this.searchInput.toLowerCase())
                     });
@@ -273,7 +293,7 @@ export default {
             }
 
             if (this.searchType == "Needs Attention") {
-                const repo = this.repos.filter((repo) => { repo.evolveNeeded == true });
+                const repo = this.renderedRepos.filter((repo) => { repo.evolveNeeded == true || repo.concludeVoteNeeded == true });
                 this.numRepos = repo.length;
                 return repo;
             }
@@ -316,6 +336,13 @@ export default {
             this.isLoading = true;
             this.cursor = "";
             this.repos = [];
+            this.renderedRepos = [];
+            this.limit = 9
+            if (this.arConnected) {
+                this.getUserPsts();
+                this.getUserRepos();
+            }
+            await this.getContracts();
             await this.load();
             this.isLoading = false;
         },
@@ -329,7 +356,7 @@ export default {
         },
 
         // Loads a repo (warpRead using its contractId) from the permaweb and pushes its data to this.repos for Vue to display
-        async loadAllRepos(contractId) {
+        async buildRepo(contractId) {
             try {
                 // Added this b/c of the mount call to loadAllRepos.  Not sure why that was added.
                 if (!contractId) {
@@ -349,7 +376,7 @@ export default {
                 const contractSrc = await this.returnContractSrc(contractId);
                 const csArray = this.getAftrContractSources;
                 if (!csArray.find(id => id === contractSrc)) {
-                    this.$log.error("RepoList : loadAllRepos :: ", "Invalid AFTR Repo found - Contract ID: " + contractId);
+                    this.$log.error("RepoList : buildRepo :: ", "Invalid AFTR Repo found - Contract ID: " + contractId);
                     isAftrRepo = false;
                 }
                 const latestContractSourceId = csArray[csArray.length - 1];
@@ -368,7 +395,7 @@ export default {
                     */
 
                     if (isMember) {
-                        if (latestContractSourceId !== contractSrc) {
+                        if (latestContractSourceId !== contractSrc && latestContractSourceId !== repo.evolve) {
                             repo.evolveNeeded = true;
                         }
                         if (repo.evolve !== "") {
@@ -417,18 +444,18 @@ export default {
 
                         /*** The concludedVoteNeeded proporty was added before using Warp.  Since switching to Warp, we don't need to check this anymore b/c contract functions run during a read of the contract. */
                         // Show repo notices to members
-                        // if (isMember) {
-                        //     // Look for votes that need to be concluded
-                        //     this.$store.dispatch('loadCurrentBlock');
-                        //     let currentBlock = +this.currentBlock.height;
-                        //     activeVotes.forEach((vote) => {
-                        //         let start = +vote.start;
-                        //         let voteLength = +vote.voteLength;
-                        //         if (start + voteLength < currentBlock) {
-                        //             repo.concludeVoteNeeded = true;
-                        //         }
-                        //     });
-                        // }
+                        if (isMember) {
+                            // Look for votes that need to be concluded
+                            await this.$store.dispatch('loadCurrentBlock');
+                            let currentBlock = +this.currentBlock.height;
+                            activeVotes.forEach((vote) => {
+                                let start = +vote.start;
+                                let voteLength = +vote.voteLength;
+                                if (start + voteLength < currentBlock) {
+                                    repo.concludeVoteNeeded = true;
+                                }
+                            });
+                        }
                     } else {
                         repo.totalActiveVotes = 0;
                     }
@@ -443,37 +470,23 @@ export default {
                     //         }
                     //     }
                     // }
-                    this.repos.push(repo);
+                    this.numContractsRead++;
+                    return repo
                 }
             } catch (error) {
-                this.$log.error("RepoList : loadAllRepos :: ", "ERROR reading contract: " + error);
+                this.$log.error("RepoList : buildRepo :: ", "ERROR reading contract: " + error);
             }
         },
-        async load() {
+        async getContracts() {
             // Get the AFTR Contract Source ID for Prod
             if (import.meta.env.VITE_ENV === "PROD" || import.meta.env.VITE_ENV === "TEST") {
                 this.$store.commit("setAftrContractSources");
             }
 
-            // Get all aftr repo contracts, then load all repos
-            let aftrContractIds = await this.getAftrRepos();
-            // for (let repoId of aftrContractIds) {
-            //     await this.loadAllRepos(repoId)
-            // }
-
-            // for (let edge of txs.edges) {
-            //     let bundled = await this.arweave.api.get(edge.node.id)
-            //     let txId = bundled.data.id
-            //     await this.loadAllRepos(txId);
-            //     // await this.loadAllRepos(edge.node.id);
-            // }
-
-            this.numRepos = this.repos.length;
-        },
-        async getAftrRepos() {
             if (this.filter === 'my') {
                 for (let repoId of this.myRepos) {
-                    await this.loadAllRepos(repoId)
+                    // let repo = await this.buildRepo(repoId);
+                    this.repos.push(repoId);
                 }
             }
             else {
@@ -493,8 +506,9 @@ export default {
                         }
 
                         let data = await response.json()
-                        for (let repo of data.contracts) {
-                            await this.loadAllRepos(repo.contractId)
+                        for (let contract of data.contracts) {
+                            // let repo = await this.buildRepo(contract.contractId)
+                            this.repos.push(contract.contractId);
                         }
                     }
                 }
@@ -513,43 +527,57 @@ export default {
             // }
             // return response.data.data.transactions;
             /*** */
+
+            this.numRepos = this.repos.length;
+        },
+        async loadMore() {
+            this.limit += 9;
+            await this.load();
+        },
+        async load() {
+            this.isLoading = true;
+            let repoFactory = [];
+            for (let i = this.renderedRepos.length; i < this.limit && i < this.repos.length; i++) {
+                repoFactory.push(await this.buildRepo(this.repos[i]))
+            }
+            this.isLoading = false;
+            repoFactory.forEach(repo => this.renderedRepos.push(repo))
         },
         getUserPsts() {
             // Loads all of user's PSTs to be used as a filter on the My Repos query
-            for (const pst of this.$store.getters.getActiveWallet.psts) {
-                this.myPsts.push(pst.contractId);
-            }
+            // this.myPsts = []
+            // for (const pst of this.$store.getters.getActiveWallet.psts) {
+            //     this.myPsts.push(pst.contractId);
+            // }
+            this.myPsts = this.arConnected ? this.$store.getters.getActiveWallet.psts.map(pst => pst.contractId) : []
         },
         getUserRepos() {
             // Loads all of user's Repos to be used as a filter on the My Repos query
-            for (const repo of this.$store.getters.getActiveWallet.repos) {
-                this.myRepos.push(repo.contractId);
-            }
+            this.myRepos = this.arConnected ? this.$store.getters.getActiveWallet.repos.map(repo => repo.contractId) : []
+            // if arConnected, myRepos is now populated (or empty)
         },
         openModal() {
             this.showCreateSimple = true;
         },
         closeModal() {
             this.showCreateSimple = false;
-
         },
     },
-    async created() {
+    async mounted() {
         this.isLoading = true;
+
         this.getUserPsts();
         this.getUserRepos();
 
-        // check if user has psts
-
-        await this.load();
-
-        if (this.filter === "my" && this.repos.length == 0) {
+        if (this.myRepos.length == 0) {
             this.filter = "all"
             await this.filterChange();
         }
-        this.isLoading = false;
-    },
-
+        else {
+            await this.getContracts();
+            await this.load();
+        }
+    }
 };
 </script>
 

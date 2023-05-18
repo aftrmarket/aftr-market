@@ -1,9 +1,8 @@
 <template>
   <Dialog :open="isOpen" class="relative z-50">
-    <div
-      class="fixed inset-0 overflow-y-auto flex items-center justify-center p-4 rounded-md shadow border-b border-gray-200">
+    <div class="fixed inset-0 overflow-y-auto flex items-center justify-center p-4 rounded-md shadow border-b border-gray-200">
       <DialogPanel class="w-full max-w-4xl shadow border-b border-gray-200">
-        <div class="bg-white px-1 pt-5 pb-8 col-lg-12 rounded-md shadow border-b border-gray-200">
+        <div class="bg-white px-1 pt-5 pb-8 col-lg-12 rounded-lg shadow-2xl border border-gray-200">
           <div class="mt-3 text-center sm:mt-0 sm:ml-2 sm:text-left">
             <DialogTitle as="h3" class="text-lg leading-6 font-medium text-gray-900 break-all">Voting Simulator
             </DialogTitle>
@@ -12,11 +11,9 @@
                 <div class="text-gray-500">Voting System</div>
               </div>
               <div>
-                <input type="radio" v-model="selectedVoteCategory" value="Weighted" class="form-radio text-aftrBlue"
-                  @change="changeVoteCategory" />
+                <input type="radio" v-model="selectedVoteCategory" value="Weighted" class="form-radio text-aftrBlue" @change="changeVoteCategory" />
                 <label class="px-2 text-sm text-gray-700">Weighted</label>
-                <input type="radio" v-model="selectedVoteCategory" value="Equal" class="form-radio text-aftrBlue"
-                  @change="changeVoteCategory" />
+                <input type="radio" v-model="selectedVoteCategory" value="Equal" class="form-radio text-aftrBlue" @change="changeVoteCategory" />
                 <label class="px-2 text-sm text-gray-700">Distributed Evenly</label>
               </div>
               <div class="mt-4 mb-4 grid grid-cols-3 gap-x-4">
@@ -24,25 +21,21 @@
               </div>
               <div>
                 <label class="px-2 text-sm text-gray-700">Quorum %</label>
-                <input @change="formDirty" class="w-20" type="number" name="newQuorum" :class="inputBox(true)"
-                  v-model="selectedQuorumValue" />
+                <input @change="formDirty" class="w-20" type="number" name="newQuorum" :class="inputBox(true)" v-model="selectedQuorumValue" />
                 <label class="pl-10 px-2 text-sm text-gray-700">Support %</label>
-                <input @change="formDirty" class="w-20" type="number" name="newSupport" :class="inputBox(true)"
-                  v-model="selectedSupportValue" />
+                <input @change="formDirty" class="w-20" type="number" name="newSupport" :class="inputBox(true)" v-model="selectedSupportValue" />
               </div>
             </div>
             <div class="mt-4 mr-4 ml-2 shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
               <table class="w-full text-xs divide-y divide-gray-200 table-fixed">
                 <thead class="bg-gray-50">
                   <tr>
-                    <th scope="col"
-                      class="flex px-6 py-3 text-center font-medium text-gray-500 uppercase tracking-wider w-1/4">
+                    <th scope="col" class="flex px-6 py-3 text-center font-medium text-gray-500 uppercase tracking-wider w-1/4">
                       <span class="py-2">Member</span>
                       <button @click.prevent="addMemberRow" type="button"
                         class="px-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                          <path
-                            d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" />
+                          <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" />
                         </svg>
                       </button>
                     </th>
@@ -55,26 +48,22 @@
                   </tr>
                   <tr v-show="addRow" class="text-xs text-gray-500 hover:bg-gray-50">
                     <td class="text-left px-2 py-2">
-                      <input type="text" v-model="newMember"
-                        class="mt-1 mb-1 text-xs focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
+                      <input type="text" v-model="newMember" class="mt-1 mb-1 text-xs focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
                     </td>
                     <td class="text-right px-4 py-2">
                       <input type="number" v-model="newQty" @blur="onDirty"
                         class="mt-1 mb-1 mr-4 text-xs text-right focus:ring-aftrBlue focus:border-aftrBlue shadow-sm border-gray-300 rounded-md" />
                     </td>
                     <td class="text-center py-2">
-                      <input type="radio" value="yay" v-model="selectedCastCategory" /><label
-                        class="px-2 text-sm text-gray-700">Yay</label>
-                      <input type="radio" value="nay" v-model="selectedCastCategory" /><label
-                        class="px-2 text-sm text-gray-700">Nay</label>
+                      <input type="radio" value="yay" v-model="selectedCastCategory" /><label class="px-2 text-sm text-gray-700">Yay</label>
+                      <input type="radio" value="nay" v-model="selectedCastCategory" /><label class="px-2 text-sm text-gray-700">Nay</label>
                     </td>
 
                     <td class="text-center px-4 py-2">
                       <button @click.prevent="addMember" type="button"
                         class="inline-flex items-center px-1 py-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                          <path fill-rule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"
+                          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"
                             clip-rule="evenodd" />
                         </svg>
                       </button>
@@ -92,13 +81,10 @@
                     </td>
                     <td class="text-center text-gray-500">
                       <div class="flex justify-center items-center pl-14">
-                        <input type="radio" v-model="value.voteCast" value="yay"
-                          @change="tokenValue(value, index)" /><label class="px-2 text-sm text-gray-700">Yay</label>
-                        <input type="radio" v-model="value.voteCast" value="nay"
-                          @change="tokenValue(value, index)" /><label class="px-2 text-sm text-gray-700">Nay</label>
+                        <input type="radio" v-model="value.voteCast" value="yay" @change="tokenValue(value, index)" /><label class="px-2 text-sm text-gray-700">Yay</label>
+                        <input type="radio" v-model="value.voteCast" value="nay" @change="tokenValue(value, index)" /><label class="px-2 text-sm text-gray-700">Nay</label>
                         <button class="px-4" @click="resetInput(value, index)">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
-                            fill="currentColor">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd"
                               d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
                               clip-rule="evenodd" />
@@ -215,7 +201,7 @@ import {
 import { ExclamationCircleIcon } from '@heroicons/vue/24/outline';
 
 export default {
-  props: ["repo"],
+  props: ["repo", "vote"],
   components: {
     Dialog,
     DialogOverlay,
@@ -274,9 +260,7 @@ export default {
 
       const objEntries = Object.entries(myRepo);
       let test = Object.fromEntries(objEntries);
-
-      let voteValue = test.votingSystem
-
+      let voteValue = test.votingSystem;
       this.selectedVoteCategory = voteValue.charAt(0).toUpperCase() + voteValue.slice(1);
 
       let val = Object.entries(test.settings).map((item) => {
@@ -287,20 +271,36 @@ export default {
         if (item[1][0] == "support") {
           this.selectedSupportValue = item[1][1] * 100
         }
-      })
-      Object.entries(test.balances).map((item) =>
-        this.memberData.push({
-          member: this.idSubstr(item[0]),
-          token: item[1],
-          voteCast: "",
-        })
-      )
-
+      });
+      if (this.vote == undefined || this.vote == null) {
+        for (const [key, value] of Object.entries(this.repo.balances)) {
+            this.memberData.push({
+                member: this.idSubstr(key),
+                token: value,
+                voteCast: ""
+            });
+        }
+      } else {
+        Object.entries(this.vote.votingPower).map((item) =>
+            this.memberData.push({
+                member: this.idSubstr(item[0]),
+                token: item[1],
+                voteCast: "",
+            })
+        );
+      }
     }
 
     this.changeVoteCategory();
   },
-
+  watch: {
+    selectedQuorumValue() {
+      this.determineMessage();
+    },
+    selectedSupportValue() {
+      this.determineMessage();
+    }
+  },
   methods: {
     resetInput(value, index) {
       this.memberData.map((val, i) => {
@@ -557,30 +557,6 @@ export default {
   },
 };
 </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

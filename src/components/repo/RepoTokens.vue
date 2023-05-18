@@ -2,7 +2,8 @@
     <div class="pt-4 w-full">
         <repo-tokens-add v-if="showAddTokens" :repo="repo" @close="closeModal">
         </repo-tokens-add>
-
+        <repo-asset-directives v-if="showDirectives" :repo="repo" @close="showDirectives = false">
+        </repo-asset-directives>
 
         <!--- Finalize Withdrawals Start --->
         <div v-if="allowTransfer && wds.length > 0" class="pt-4 w-full grid grid-cols-4 gap-4">
@@ -78,49 +79,42 @@
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-gray-200" v-for="(pst1) in getRepo1()" :key="pst1.tokenId">
-                                <tr @click="toggle(pst1.tokenId)" :class="{ opened: opened.includes(pst1.tokenId) }">
+                            <tbody class="bg-white divide-y divide-gray-200" v-for="(pst) in getRepo1()" :key="pst.tokenId">
+                                <tr @click="toggle(pst.tokenId)" :class="{ opened: opened.includes(pst.tokenId) }">
                                     <td class="px-1 py-2 text-gray-500 font-mono cursor-pointer">
                                         <div class="flex items-center mt-3 ml-3 mb-3">
-                                            <div class="flex-shrink-0 h-10 w-10" @click.prevent="showTokenState(pst1.tokenId, pstLogo(pst1.tokenId, pst1.logo))">
-                                                <img class="h-10 w-10 rounded-full" :src="pstLogo(pst1.tokenId, pst1.logo)" alt="" />
+                                            <div class="flex-shrink-0 h-10 w-10" @click.prevent="showTokenState(pst.tokenId, pstLogo(pst.tokenId, pst.logo))">
+                                                <img class="h-10 w-10 rounded-full" :src="pstLogo(pst.tokenId, pst.logo)" alt="" />
                                             </div>
                                             <div class="ml-4">
-                                                <div class="font-medium text-gray-900"> {{ pst1.name + " (" +
-        pst1.ticker + ")"
-}} ({{ pst1.count }})</div>
-                                                <div class="text-gray-500 font-mono" @click.prevent="showWalletAddress(pst1.tokenId)"> {{
-        idSubstr(pst1.tokenId)
-}}</div>
+                                                <div class="font-medium text-gray-900"> {{ pst.name + " (" + pst.ticker + ")" }} ({{ pst.count }} TXs)</div>
+                                                <div class="text-gray-500 font-mono" @click.prevent="showWalletAddress(pst.tokenId)"> {{ idSubstr(pst.tokenId) }}</div>
                                             </div>
                                         </div>
                                     </td>
                                     <td class="px-1 py-2 text-gray-500 font-mono cursor-pointer"></td>
-                                    <td class="text-right px-1 py-3 text-gray-500">{{ formatNumber(pst1.tokens) }}
+                                    <td class="text-right px-1 py-3 text-gray-500">{{ formatNumber(pst.tokens) }}
                                     </td>
                                     <td class="text-right px-6 py-3 text-gray-500"></td>
                                     <td v-if="allowTransfer" class="text-right px-6 py-3 text-gray-500 w-40"></td>
                                     <td v-if="allowTransfer" class="text-right px-6 py-3 text-gray-500 w-60"></td>
-                                    <td v-if="allowTransfer" class="text-right px-6 py-3 text-gray-500"></td>
-                                    <td>
-                                        <!-- <svg v-if="arrow" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                    <td class="text-right text-gray-500">
+                                        <svg v-if="!drawerOpened.get(pst.tokenId)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                                            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
                                         </svg>
-                                        <svg v-if="!arrow && opened == pst1.tokenId" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-3 w-3" >
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
-                                        </svg>  -->
+                                        <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                                            <path fill-rule="evenodd" d="M14.77 12.79a.75.75 0 01-1.06-.02L10 8.832 6.29 12.77a.75.75 0 11-1.08-1.04l4.25-4.5a.75.75 0 011.08 0l4.25 4.5a.75.75 0 01-.02 1.06z" clip-rule="evenodd" />
+                                        </svg>
                                     </td>
                                 </tr>
-                                <tr v-for="(pst, index) in getRepo(pst1.tokenId)" v-show="opened.includes(pst1.tokenId)" :key="pst.tokenId" class="bg-gray-100">
+                                <tr v-for="(pst, index) in getRepo(pst.tokenId)" v-show="opened.includes(pst.tokenId)" :key="pst.tokenId" class="bg-gray-100">
 
                                     <td class="px-1 py-2 text-gray-500 font-mono cursor-pointer">
                                         <div class="flex items-center">
                                             <div class="ml-4">
                                                 <!-- <div class="font-medium text-gray-900"> {{ pst.name + " (" + pst.ticker + ")" }} </div> -->
                                                 <div class="text-gray-500 font-mono" @click.prevent="showWalletAddress(pst.txID)"> {{ index + 1 }}.
-                                                    {{
-        idSubstr(pst.txID)
-}}</div>
+                                                    {{ idSubstr(pst.txID) }}</div>
                                             </div>
                                         </div>
                                     </td>
@@ -164,14 +158,26 @@
         <div v-else>
             <h3 class="text-xl font-light leading-6">No current tokens in repo</h3>
         </div>
-        <div class="mt-6 flex flex-col inline-flex">
-            <button v-if="allowAdd" @click.prevent="addPst" type="button"
-                class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
-                </svg>
-                <span class="pl-2">ADD ASSETS</span>
-            </button>
+        <div class="mt-6 flex flex-col">
+            <div v-if="allowAdd" class="flex justify-between">
+                <button @click.prevent="addPst" type="button"
+                    class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <span class="pl-2">ADD ASSETS</span>
+                </button>
+                <button v-if="isMember && env !== 'PROD' && false" @click.prevent="viewDirectives" type="button"
+                    class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                        <path fill-rule="evenodd"
+                            d="M2 10a8 8 0 1116 0 8 8 0 01-16 0zm6.39-2.908a.75.75 0 01.766.027l3.5 2.25a.75.75 0 010 1.262l-3.5 2.25A.75.75 0 018 12.25v-4.5a.75.75 0 01.39-.658z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <span class="pl-2">VIEW DIRECTIVES</span>
+                </button>
+            </div>
             <div v-else class="pt-6 flex justify-start items-center">
                 <button @click="arConnect" type="button"
                     class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-aftrBlue hover:bg-aftrBlue-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
@@ -247,6 +253,7 @@
 import numeral from "numeral";
 import { mapGetters } from 'vuex';
 import RepoTokensAdd from './RepoTokensAdd.vue';
+import RepoAssetDirectives from './RepoAssetDirectives.vue'
 import { warpRead, warpWrite, arweaveInit } from '../utils/warpUtils.js';
 import SlideUpDown from 'vue3-slide-up-down';
 import Transaction from 'arweave/node/lib/transaction';
@@ -254,7 +261,7 @@ import Transaction from 'arweave/node/lib/transaction';
 
 export default {
     props: ['repo', 'isMember'],
-    components: { RepoTokensAdd, SlideUpDown },
+    components: { RepoTokensAdd, RepoAssetDirectives, SlideUpDown },
     data() {
         return {
             env: import.meta.env.VITE_ENV,
@@ -266,6 +273,7 @@ export default {
             allowAdd: false,
             allowTransfer: false,
             showAddTokens: false,
+            showDirectives: false,
             wds: [],
             //tokenSelected: [],
             transferAddrs: [],
@@ -276,7 +284,8 @@ export default {
             active: false,
             opened: [],
             repoToken: [],
-            arrow: true
+            arrow: true,
+            drawerOpened: [],
 
             /*** TODO: HANDLE TOKENS THAT ARE LOCKED! */
             /**************************************** */
@@ -332,9 +341,13 @@ export default {
         }
     },
     methods: {
+        toggleDrawer(tokenId) {
+            let status = this.drawerOpened.get(tokenId);
+            this.drawerOpened.set(tokenId, !status);
+        },
         getRepo1() {
-            console.log("************")
-            console.log(this.repo.tokens)
+            // console.log("************")
+            // console.log(this.repo.tokens)
             let data = this.repo.tokens
             let result = Object.values(data.reduce((r, { balance, lockLength, logo, name, source, start, ticker, tokenId, txID }) => {
                 r[tokenId] ??= { tokenId, count: 0, tokens: 0 };
@@ -350,8 +363,8 @@ export default {
                 return r;
             }, {}));
             // let data = [...new Map(this.repo.tokens.map(item => [item['tokenId'] , item])).values()]
-            console.log(result)
-            console.log("************")
+            // console.log(result)
+            // console.log("************")
             return result;
         },
         getRepo(id) {
@@ -373,11 +386,12 @@ export default {
             } else {
                 this.opened.push(id)
             }
+            this.toggleDrawer(id);
         },
         async showWalletAddress(walletAddress) {
             this.$swal({
                 html: walletAddress,
-                showConfirmButton: false,
+                showConfirmButton: false
             })
         },
         async showTokenState(id, logo) {
@@ -390,8 +404,43 @@ export default {
                 title: '<span style="vertical-align:middle" >' + title.replace(/^"(.*)"$/, '$1') + '</span><hr size="8">',
                 html: "<pre style= 'text-align:left'> <code>" + "<p style='color:green'> Balances : </p>" + JSON.stringify(state.balances, null, 3) + "</code> </pre>",
                 width: 800,
-                customClass: 'swal-height'
+                customClass: 'swal-height',
+                confirmButtonColor: "#6C8CFF"
             });
+
+            /*** Sync is potential future enhancement */
+            // Check for balance discrepency
+            // const repoBal = state.balances[this.repo.id];
+            // const tokens = this.repo.tokens.filter(token => token.tokenId === id);
+            // let totalBal = 0;
+            // for (let token of tokens) {
+            //     totalBal += token.balance;
+            // }
+            // if (totalBal !== repoBal) {
+            //     this.$swal.fire({
+            //         title: "Balance Discrepancy Found",
+            //         html: "A discrepency was found between repo and the asset's balance. Would like to synchronize the repo?",
+            //         icon: "warning",
+            //         showCancelButton: true,
+            //         confirmButtonText: "Yes",
+            //         cancelButtonText: "No",
+            //         confirmButtonColor: "#6C8CFF",
+            //         cancelButtonColor: "#FF6C8C",
+            //         allowOutsideClick: false
+            //     }).then(async (result) => {
+            //         if (result.isConfirmed) {
+            //             let txid = await warpWrite(this.repo.id, { function: "sync", target: id });
+            //             this.$swal.fire({
+            //                 title: "Sync completed",
+            //                 icon: "success",
+            //                 allowOutsideClick: false,
+            //                 showConfirmButton: true,
+            //                 confirmButtonColor: "#6C8CFF"
+            //             });
+            //         }
+            //     });
+            // }
+            /*** */
         },
         setFlags() {
             if (this.arConnected) {
@@ -406,6 +455,7 @@ export default {
                 this.allowTransfer = false;
             }
             // Are there any withdrawals waiting to be processed?
+            let drawerTracker = new Map();
             if (this.repo.tokens) {
                 this.repo.tokens.forEach(token => {
                     if (token.withdrawals) {
@@ -416,7 +466,10 @@ export default {
                             }
                         });
                     }
+                    // Load drawer array
+                    drawerTracker.set(token.tokenId, false);
                 });
+                this.drawerOpened = drawerTracker;
             } else {
                 this.repo.tokens = [];
             }
@@ -468,8 +521,8 @@ export default {
                 return '';
             }
         },
-        interactionTagsParser(txId) {
-            const tx = new Transaction(txId);
+        interactionTagsParser(transaction) {
+            const tx = new Transaction(transaction);
             // let tags = [];
             // contractTx.get('tags').forEach((tag) => {
             //     let key = tag.get('name', { decode: true, string: true });
@@ -535,7 +588,8 @@ export default {
                         }
                         txType = "UNSURE";
                     } else {
-                        txType = await interactionTagsParser(data.contractTx);
+                        console.log("DATA: " + JSON.stringify(data));
+                        txType = this.interactionTagsParser(data.contractTx);
                     }
                 }
             }
@@ -635,6 +689,9 @@ export default {
                 this.proposedChanges[foundIndex].qty = this.transferAmounts[index];
                 this.proposedChanges[foundIndex].target = this.transferAddrs[index];
             }
+        },
+        viewDirectives() {
+            this.showDirectives = true;
         },
         onRemoveProposalClick(index) {
             this.proposedChanges.splice(index, 1);
@@ -820,147 +877,6 @@ export default {
     },
 };
 </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 <style src="vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css"/>
 

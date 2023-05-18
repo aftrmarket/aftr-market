@@ -6,8 +6,8 @@
         <div v-for="(commentIndex, index) in commentsToShow" :key="activities[index]" class="pt-4 w-full">
             <div v-if="index < activities.length">
                 <div class="">
-                    <span class="text-aftrBlue text-md font-medium uppercase tracking-wide">{{ activities.length - index
-}}. {{ interactionText(activities[index].input.function) }}</span>
+                    <span class="text-aftrBlue text-md font-medium uppercase tracking-wide">{{ activities.length - index }}. {{ interactionText(activities[index].input.function)
+                    }}</span>
                     <span class="font-mono text-xs text-gray-500">({{ activities[index].id }})</span>
                 </div>
                 <div class="pl-8 pb-4">
@@ -35,14 +35,10 @@
                             </span>
                         </div>
                     </div>
-                    <div class="pl-10 pt-2 text-xs">Block <span class="font-mono text-gray-500">{{
-        activities[index].block
-}}</span></div>
+                    <div class="pl-10 pt-2 text-xs">Block <span class="font-mono text-gray-500">{{ activities[index].block }}</span></div>
                     <div class="pl-10 pt-2 text-xs">
                         Caller
-                        <span v-if="activities[index].result" class="font-mono text-green-600">{{
-        activities[index].owner
-}}</span>
+                        <span v-if="activities[index].result" class="font-mono text-green-600">{{ activities[index].owner }}</span>
                         <span v-else class="font-mono text-red-600">{{ activities[index].owner }}</span>
                     </div>
                 </div>
@@ -91,7 +87,6 @@ export default {
             })
         },
         parseActivity(data) {
-            console.log(data)
             // Parses the query response and returns an object with the needed variables
             let activity = {};
             activity.id = data.id;
@@ -100,7 +95,6 @@ export default {
             activity.block = data.block.height;
             activity.result = this.interactions[activity.id];
 
-            console.log("activity.result ", activity.result);
             // Parse Input tag to get the interaction specifics
             for (let tag of data.tags) {
                 if (tag.name === "Input") {
@@ -158,6 +152,9 @@ export default {
                     }
                 }
             }
+            if (htmlText === "Inputs:<br/>") {
+                htmlText = "";
+            }
             return htmlText;
         },
         getErrorInputs(obj) {
@@ -209,8 +206,8 @@ export default {
             this.edges = responseData.data.data.transactions.edges;
         },
         async getInteractions(contractId) {
-            console.log(contractId);
-            let route = 'https://gateway.redstone.finance/gateway/interactions?contractId=' + contractId + (this.network === 'TEST' ? '&testnet=true' : '');
+            let gw = import.meta.env.VITE_TX_GATEWAY;
+            let route = gw.substring(0, 26) + '/interactions?contractId=' + contractId + (this.network === 'TEST' ? '&testnet=true' : '');
             let response = await fetch(route)
             let data = await response.json()
             return data.interactions
@@ -255,6 +252,7 @@ export default {
     }
 }
 </script>
+
 
 
 

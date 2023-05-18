@@ -12,7 +12,7 @@
                 <img class="w-10" src="../../assets/aftr-market-logo.png" alt="Logo">
                 <span
                   class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-aftrDarkGrey-light text-aftrYellow">
-                  alpha
+                  beta
                 </span>
               </div>
               <div class="hidden md:block">
@@ -79,7 +79,7 @@
                 </button>
               </div>
               <div v-else class="flex items-center">
-                <div class="text-aftrGo text-sm font-light mr-20">
+                <div v-if="siteMode!=='PROD'" class="text-aftrGo text-sm font-light mr-20">
                   {{ currentArBalance }}
                 </div>
                 <div class="text-aftrGo text-sm font-light">
@@ -112,6 +112,7 @@
 
 import ArConnectWindow from './ArConnectWindow.vue';
 import { arweaveInit } from './../utils/warpUtils.js';
+import { mapGetters } from "vuex";
 
 export default {
   components: { ArConnectWindow },
@@ -168,13 +169,14 @@ export default {
         return "";
       }
     },
+    ...mapGetters(["arConnected"]),
   },
   methods: {
     goHome() {
       this.$router.push("../repos");
     },
     goMyPortfolio() {
-      if (!this.$store.getters.arConnected) {
+      if (!this.arConnected) {
         // alert("Please login to Aftr-Market")
         this.$swal({
           icon: 'error',
@@ -217,6 +219,11 @@ export default {
   },
   mounted() {
     this.arweave = arweaveInit();
+    window.addEventListener("arweaveWalletLoaded", async () => {
+        if (!this.arConnected && this.$route.name !== "overview") {
+            await this.$store.dispatch('arConnect');
+        }
+    });
   }
 };
 </script>

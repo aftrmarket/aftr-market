@@ -2,9 +2,9 @@
   <TransitionRoot as="template" :show="open">
     <Dialog as="div" auto-reopen="true" class="relative z-50" @close="open = false">
       <div
-        class="fixed inset-0 overflow-y-auto flex items-center justify-center p-4 rounded-md shadow border-b border-gray-200">
-        <DialogPanel class="w-full max-w-4xl shadow border-b border-gray-200">
-          <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+        class="fixed inset-0 overflow-y-auto flex items-center justify-center p-4">
+        <DialogPanel class="w-full max-w-4xl">
+          <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 rounded-lg shadow-2xl border border-gray-200">
             <div class="sm:flex sm:items-start">
               <div
                 class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
@@ -90,7 +90,7 @@
                         d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
                         clip-rule="evenodd" />
                     </svg>
-                    <span class="pt-1.5 text-green-700 font-bold text-xl">{{ voteData.statusNote }}</span>
+                    <span :class="statusMsgClass(voteData.status)">{{ voteData.statusNote }}</span>
                   </div>
                 </div>
               </div>
@@ -151,11 +151,17 @@ export default {
       }
     },
     totalBalance() {
-      console.log("voteData", this.repo, this.voteData, this.repo.settings[0][1])
       this.total = Object.values(this.repo.balances).reduce((accumulator, object) => {
         return accumulator + object;
       }, 0)
-    }
+    },
+    statusMsgClass(status) {
+        if (status === "passed") {
+            return "pt-1.5 text-green-700 font-bold text-xl";
+        } else {
+            return "pt-1.5 text-red-500 font-bold text-xl";
+        }
+    },
   },
   setup() {
     const open = ref(true);
@@ -166,29 +172,6 @@ export default {
   },
 };
 </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 <style src="vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css"/>
 <style scoped>

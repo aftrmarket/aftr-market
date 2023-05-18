@@ -1,3 +1,4 @@
+import { DeployPlugin, InjectedArweaveSigner } from 'warp-contracts-plugin-deploy';
 import { WarpFactory } from "warp-contracts/web";
 import Arweave, { init } from "arweave";
 
@@ -7,9 +8,9 @@ function warpInit() {
     try {
         // Using Warp
         if (import.meta.env.VITE_ENV === "PROD") {
-            warp = WarpFactory.forMainnet();
+            warp = WarpFactory.forMainnet().use(new DeployPlugin());
         } else if (import.meta.env.VITE_ENV === "TEST") {
-            warp = WarpFactory.forTestnet();
+            warp = WarpFactory.forTestnet().use(new DeployPlugin());
         } else if (import.meta.env.VITE_ENV === "DEV") {
             const arweave = arweaveInit();
             warp = WarpFactory.forLocal(import.meta.env.VITE_ARWEAVE_PORT, arweave);
@@ -47,6 +48,7 @@ async function warpWrite(contractId, input, internalWrites = true, bundling = tr
                 disableBundling: !bundling
             })
             .connect("use_wallet");
+        console.log(contract)
         const { originalTxId } = await contract.writeInteraction(input);
         return originalTxId;
     } catch (e) {
@@ -60,16 +62,22 @@ async function warpCreateContract(source, initState, currentTags = undefined, af
      * Returns:
      * { contractTxId: string, srcTxId: string }
      */
+    if (window.arweaveWallet) {
+        await window.arweaveWallet.connect(['ACCESS_ADDRESS', 'SIGN_TRANSACTION', 'ACCESS_PUBLIC_KEY', 'SIGNATURE']);
+    }
+    const userSigner = new InjectedArweaveSigner(window.arweaveWallet);
+    await userSigner.setPublicKey();
 
     let tags = addTags(currentTags, aftr);
     const warp = warpInit();
     try {
         let txIds = await warp.deploy({
-            wallet: "use_wallet",
+            wallet: userSigner,
             initState: initState,
             src: source,
             tags
         });
+        console.log('TXIDS ::  ' + txIds)
         return txIds;
     } catch (e) {
         console.log("ERROR deploying AFTR contract: " + e);
@@ -82,13 +90,18 @@ async function warpCreateFromTx(initState, srcId, currentTags = undefined, aftr 
      * Returns:
      * { contractTxId: string, srcTxId: string }
      */
+    if (window.arweaveWallet) {
+        await window.arweaveWallet.connect(['ACCESS_ADDRESS', 'SIGN_TRANSACTION', 'ACCESS_PUBLIC_KEY', 'SIGNATURE']);
+    }
+    const userSigner = new InjectedArweaveSigner(window.arweaveWallet);
+    await userSigner.setPublicKey();
 
     let tags = addTags(currentTags, aftr);
 
     const warp = warpInit();
     try {
         let txIds = await warp.deployFromSourceTx({
-            wallet: "use_wallet",
+            wallet: userSigner,
             initState: initState,
             srcTxId: srcId,
             tags
@@ -118,8 +131,8 @@ function addTags(currentTags, aftr = false) {
     }
     if (aftr) {
         tags.push({ name: "Protocol", value: import.meta.env.VITE_SMARTWEAVE_TAG_PROTOCOL });
-        tags.push({ name: "Implements", value: ["ANS-110"] });
-        tags.push({ name: "Type", value: ["aftr-repo"] });
+        //tags.push({ name: "Implements", value: ["ANS-110"] });
+        //tags.push({ name: "Type", value: ["aftr-repo"] });
     }
 
     return tags;
@@ -202,6 +215,7 @@ async function post(ctx) {
         }
     })
     return { id: ctx.atomicId }
-}
+};
+
 
 export { warpInit, warpRead, warpWrite, warpCreateContract, warpCreateFromTx, arweaveInit, upload, getAsByteArray, readFile, dispatch, post };

@@ -82,7 +82,12 @@
                                             @input="calcPstPrice" :class="inputBox(pstInputValid)" />
                                         <span v-if="pstInputTokens && false" class="block text-xs pt-2 pl-4 pr-6">@ {{
                                                 formatNumber(pricePerToken, true)
-                                        }} AR {{ pstInputTokens ? " = " + formatNumber(pstValue, true) + " AR" : "" }}</span>
+                                        }} AR {{ pstInputTokens ? " = " + formatNumber(pstValue, true) + " AR" : "" }}</span><br/><br/>
+
+
+                                        <div class="block text-sm font-medium text-gray-700 pt-2 pb-2">
+                                            <input class="mr-1" v-model="disclaimer" type="checkbox"> Please acknowledge that you're using a beta version of the platform. Use at your own discretion.
+                                        </div>
                                     </div>
                                     <!--
                   <div class="mt-2">
@@ -95,9 +100,9 @@
                                 </div>
                             </div>
                         </div>
-                        <repo-alert v-if="pstInputValid && pstInputTokens" :repo="msg"></repo-alert>
+                        <repo-alert v-if="pstInputValid && pstInputTokens && disclaimer" :repo="msg"></repo-alert>
                         <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                            <button type="button" v-if="pstInputValid && pstInputTokens"
+                            <button type="button" v-if="pstInputValid && pstInputTokens && disclaimer"
                                 class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm"
                                 @click="transferTokens">
                                 Deposit
@@ -158,6 +163,7 @@ export default {
             nfTokenTicker: "",
             nfTokenName: "",
             nfMsg: "",
+            disclaimer: false,
         }
     },
     computed: {
@@ -166,7 +172,11 @@ export default {
                 return this.nfTokenBal;
             } else {
                 const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.contractId === this.selectedPstId);
-                return currentPst.balance;
+                if (currentPst.balance !== undefined) {
+                    return currentPst.balance;
+                } else {
+                    return 0;
+                }
             }
         },
         pstTicker() {
@@ -174,7 +184,11 @@ export default {
                 return this.nfTokenTicker;
             } else {
                 const currentPst = this.$store.getters.getActiveWallet.psts.find((item) => item.contractId === this.selectedPstId);
-                return currentPst.ticker;
+                if (currentPst.ticker !== undefined) {
+                    return currentPst.ticker;
+                } else {
+                    return "";
+                }
             }
         },
         repoTokenBox() {
@@ -275,8 +289,13 @@ export default {
             }
 
             // Test to see if user has enough balance on the contract
-            if (stateInteractions.state.balances[this.getActiveAddress] - Number(this.pstInputTokens) <= 0 || !stateInteractions.state.balances[this.getActiveAddress]) {
+            if (!stateInteractions.state.balances[this.getActiveAddress]) {
                 msg = "Can't deposit this asset because you don't appear to have a balance on this contract.";
+                return msg;
+            }
+
+            if (stateInteractions.state.balances[this.getActiveAddress] - Number(this.pstInputTokens) < 0) {
+                msg = "Can't deposit this asset because your balance is too low on the other contract.";
                 return msg;
             }
 

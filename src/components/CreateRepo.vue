@@ -110,8 +110,7 @@
                                         class="mt-1 focus:ring-aftrBlue focus:border-aftrBlue shadow-sm sm:text-sm border-gray-300 rounded-md" />
                                     <label class="pl-4 block text-sm text-gray-700">
                                         Months (~<span class="text-lg text-aftrBlue">{{ monthsInBlocks(minLease)
-                                        }}</span> to <span class="text-lg text-aftrBlue">{{ monthsInBlocks(maxLease)
-}}</span> Blocks)
+                                        }}</span> to <span class="text-lg text-aftrBlue">{{ monthsInBlocks(maxLease) }}</span> Blocks)
                                     </label>
                                 </div>
                             </div>
@@ -134,8 +133,7 @@
                             <!--<input type="number" name="repoTokens" placeholder="# of Repo Tokens" v-model="repoTokens" @input="onTokenChange" :class="inputBox(repoTokensValid)" />-->
                             <div class="">
                                 <input type="radio" v-model="ownership" id="single" value="single"
-                                    class="form-radio text-aftrBlue" /><label class="px-2 text-sm text-gray-700">Single
-                                    Owner</label>
+                                    class="form-radio text-aftrBlue" /><label class="px-2 text-sm text-gray-700">Single Owner</label>
                                 <input type="radio" v-model="ownership" id="multi" value="multi"
                                     class="form-radio text-aftrBlue" /><label
                                     class="px-2 text-sm text-gray-700">Multiple Owners</label>
@@ -156,6 +154,37 @@
                                 <input v-model="newSupport" name="newSupport" type="number"
                                     :class="inputBox(supportIsValid)" />
                             </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="mt-4 border-t border-gray-200 pt-4 text-xl font-light leading-6">Privileges</h3>
+                        <span class="text-sm text-gray-500 flex items-center">You have the option to turn off the following functions in your repo. For more information click 
+                            <button style="color:#6C8CFF" @click.prevent="privilegeInfo" type="submit" :repo="repo" class="flex items-center pl-1">
+                                here
+                                <svg v-if="!privDrawer" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#6C8CFF" class="w-5 h-5">
+                                    <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                                </svg>
+                                <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#6C8CFF" class="w-5 h-5">
+                                    <path fill-rule="evenodd" d="M14.77 12.79a.75.75 0 01-1.06-.02L10 8.832 6.29 12.77a.75.75 0 11-1.08-1.04l4.25-4.5a.75.75 0 011.08 0l4.25 4.5a.75.75 0 01-.02 1.06z" clip-rule="evenodd" />
+                                </svg>
+                            </button> 
+                        </span>
+                        <div v-if="privDrawer" class="text-sm text-gray-500 text-aftrRed pt-2 pl-4">
+                            <p>The following functions are optional. By turning these off you will be limiting your repo's functionality, but you may have good reason to do so.</p>
+                            <ul class="list-disc pl-6">
+                                <li class="py-2"><b>Transfer</b> - Gives the repo the ability to transfer membership balances.</li>
+                                <li class="pb-2"><b>Deposit</b> - Allows anyone to deposit supported Arweave assets into this repo.</li>
+                                <li class="pb-2"><b>Allow</b> - Required for tradability protocols such as Verto Flex and for depositing this repo into another AFTR Repo.</li>
+                                <li class="pb-2"><b>Claim</b> - Required for tradability protocols such as Verto Flex and for depositing this repo into another AFTR Repo.</li>
+                                <li><b>Multi-Interactions</b> - Gives the repo the ability to perform more than one change at a time.</li>
+                            </ul>
+                        </div>
+                        <div class="sm:p-6 pt-2 grid grid-cols-5 items-center text-sm text-gray-700">
+                            <div><input v-model="functionsAllowed" type="checkbox" value="transfer" class="text-aftrBlue mr-2" /> <label>Transfer</label></div>
+                            <div><input v-model="functionsAllowed" type="checkbox" value="deposit" class="text-aftrBlue mr-2" /> <label>Deposit</label></div>
+                            <div><input v-model="functionsAllowed" type="checkbox" value="allow" class="text-aftrBlue mr-2" /> <label>Allow</label></div>
+                            <div><input v-model="functionsAllowed" type="checkbox" value="claim" class="text-aftrBlue mr-2" /> <label>Claim</label></div>
+                            <div><input v-model="functionsAllowed" type="checkbox" value="multiInteraction" class="text-aftrBlue mr-2" /> <label>Multi-Interactions</label></div>
                         </div>
                     </div>
                     <!--
@@ -411,16 +440,9 @@
                             </svg>
                             <span class="pl-2">Cancel</span>
                         </button>
-                        <button v-if="isInputValid" type="submit" @click.prevent="createRepo"
-                            class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z">
-                                </path>
-                                <path
-                                    d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z">
-                                </path>
+                        <button v-if="isInputValid" type="submit" @click.prevent="createRepo" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-aftrBlue bg-white hover:bg-aftrBlue hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aftrBlue">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                                <path d="M5.566 4.657A4.505 4.505 0 016.75 4.5h10.5c.41 0 .806.055 1.183.157A3 3 0 0015.75 3h-7.5a3 3 0 00-2.684 1.657zM2.25 12a3 3 0 013-3h13.5a3 3 0 013 3v6a3 3 0 01-3 3H5.25a3 3 0 01-3-3v-6zM5.25 7.5c-.41 0-.806.055-1.184.157A3 3 0 016.75 6h10.5a3 3 0 012.683 1.657A4.505 4.505 0 0018.75 7.5H5.25z" />
                             </svg>
                             <span class="pl-2">Create Repo</span>
                         </button>
@@ -505,7 +527,6 @@ export default {
             memberAmountValid: false,
             memberRowValid: false,
             daoRowBalance: [],
-            fileInfo: "",
             fileInvalid: false,
             communityLogoValue: "",
             totalSize: 0,
@@ -520,6 +541,8 @@ export default {
             newSupport: 0.51,
             fileUpload: false,
             showVoteSimulator: false,
+            functionsAllowed: ["transfer", "deposit", "allow", "claim", "multiInteraction"],
+            privDrawer: false,
         };
     },
     computed: {
@@ -569,7 +592,8 @@ export default {
             if (this.fileInvalid) {
                 return "Not a valid image. Please try again."
             } else if (this.totalSize === 0) {
-                return "If file size is less than 100kb, upload is free.  Overwise AR fees apply.";
+                //return "If file size is less than 100kb, upload is free.  Overwise AR fees apply.";
+                return "Image must be less than 120kb."
             } else {
                 return "File size: " + this.formatNumber(this.totalSize);
             }
@@ -608,6 +632,9 @@ export default {
     methods: {
         voteSimulatorTest() {
             this.showVoteSimulator = true;
+        },
+        privilegeInfo() {
+            this.privDrawer = !this.privDrawer;
         },
         closeModal() {
             this.showVoteSimulator = false;
@@ -674,52 +701,23 @@ export default {
                 URL.revokeObjectURL(this.repoLogo);
             }
             this.repoLogo = URL.createObjectURL(file);
-            this.fileInfo = file.size + ", " + file.name + ", " + file.type;
-            const filename = file.name.replace(/ /g, "") + file.lastModified;
-
-            // const { data: winston } = await arweave.api.get(
-            //     `price/${file.size}`
-            // );
-            // const ar = arweave.ar.winstonToAr(winston, {
-            //     formatted: true,
-            //     decimals: 5,
-            //     trim: true,
-            // });
-            // if (import.meta.env.VITE_ENV === "DEV") {
-            //     this.address = await arweave.wallets.jwkToAddress(wallet);
-            // } else {
-            //     this.address = await arweave.wallets.jwkToAddress("use_wallet");
-            // }
-            // const bal = await arweave.wallets.getBalance(this.address);
-            // this.balance = arweave.ar.winstonToAr(bal);
 
             // Total size should be < ? so that it's a free transaction
             this.totalSize = file.size;
             this.$log.info("CreateRepo : onFileChange :: ", "totalSize", this.totalSize, this.balance);
-
-            /**** SHOULD THIS BE > 0? */
-            if (this.totalSize != 0) {
-                // const { data: winston } = await arweave.api.get(
-                //     `price/${this.totalSize}`
-                // );
-                // this.fee = +winston * 0.1;
-                // const ar = arweave.ar.winstonToAr(winston);
-                // const arFee = arweave.ar.winstonToAr(this.fee.toString());
-                // const total = arweave.ar.winstonToAr(
-                //     (+winston + this.fee).toString()
-                // );
-                // this.$log.info("total", total);
-                // this.totalCost = total;
-                // if (total > this.balance) {
-                //     return alert("You don't have enough AR to upload this file!");
-                // }
-
-                //if (import.meta.env.VITE_ENV === "DEV") {
-                //    await this.deployFile(this.files, arweave, wallet);
-                //} else {
-                //    await this.deployFile(this.files, arweave, "use_wallet");
-                //}
+            if (this.totalSize > 120000) {
+                this.$swal({
+                    icon: "error",
+                    html: "The image file size is too big.",
+                    showConfirmButton: true,
+                    allowOutsideClick: false
+                });
+                URL.revokeObjectURL(this.repoLogo);
+                this.fileInvalid = true;
+            } else {
+                this.fileInvalid = false;
             }
+            
         },
         nameValidate() {
             if (this.repo.name === "") {
@@ -1049,6 +1047,7 @@ export default {
             }
 
             /***** NEED TO MAKE SURE THAT NONE OF THESE ARE MISSING */
+            this.repo.functions = this.functionsAllowed;
             this.repo.settings = [
                 ["quorum", this.newQuorum],
                 ["support", this.newSupport],
@@ -1121,7 +1120,9 @@ export default {
                         //logo: this.communityLogoValue,
                         //fcp: true
                     };
+                    // Update store
                     this.$store.commit("addWalletPst", pst);
+                    this.$store.commit("addWalletRepo", pst);
                 }
 
                 this.$log.info("CreateRepo : createRepo :: ", "ID = " + this.repo["id"]);

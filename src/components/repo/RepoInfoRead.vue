@@ -38,7 +38,7 @@
                 </router-link>
             </div>
         </div>
-        <div v-if="repo.desc !== '' && repo.desc !== undefined" class="px-4 py-4 sm:px-6">
+        <div v-if="repo.desc" class="px-4 py-4 sm:px-6">
             <div class="block text-lg text-gray-900">Description</div>
             <div class="block text-lg text-gray-500 font-medium">{{ repo.desc }}</div>
         </div>
@@ -143,6 +143,57 @@
                         {{ formatNumber(currentRepoSettings.get('support'), true) }} %
                     </div>
                 </div>
+            </div>
+        </div>
+        <div>
+            <h3 class="mt-4 border-t border-gray-200 pt-4 text-xl font-light leading-6">Privileges</h3>
+            <div class="text-sm text-gray-500 pt-2 pl-4">
+                <p>The following functions are optional and can be turned off depending on your specific needs. By turning these off, you will be limiting your repo's functionality, but you may have good reason to do so.  Your repo is setup as follows:</p>
+                <div class="flex items-center pl-4 py-2 space-x-2">
+                    <svg v-if="repo.functions.includes('transfer')" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#065F46" class="w-5 h-5">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                    </svg>
+                    <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#FF6C8C" class="w-5 h-5">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
+                    </svg>
+                    <b>Transfer</b> - Gives the repo the ability to transfer membership balances.
+                </div>
+                <div class="flex items-center pl-4 py-2 space-x-2">
+                    <svg v-if="repo.functions.includes('deposit')" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#065F46" class="w-5 h-5">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                    </svg>
+                    <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#FF6C8C" class="w-5 h-5">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
+                    </svg>
+                    <b>Deposit</b> - Allows anyone to deposit supported Arweave assets into this repo.
+                </div>
+                <div class="flex items-center pl-4 py-2 space-x-2">
+                    <svg v-if="repo.functions.includes('allow')" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#065F46" class="w-5 h-5">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                    </svg>
+                    <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#FF6C8C" class="w-5 h-5">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
+                    </svg>
+                    <b>Allow</b> - Required for tradability protocols such as Verto Flex and for depositing this repo into another AFTR Repo.
+                </div>
+                <div class="flex items-center pl-4 py-2 space-x-2">
+                    <svg v-if="repo.functions.includes('claim')" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#065F46" class="w-5 h-5">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                    </svg>
+                    <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#FF6C8C" class="w-5 h-5">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
+                    </svg>
+                    <b>Claim</b> - Required for tradability protocols such as Verto Flex and for depositing this repo into another AFTR Repo.
+                </div>
+                <div class="flex items-center pl-4 py-2 space-x-2">
+                    <svg v-if="repo.functions.includes('multiInteraction')" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#065F46" class="w-5 h-5">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                    </svg>
+                    <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#FF6C8C" class="w-5 h-5">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
+                    </svg>
+                    <b>Multi-Interactions</b> -  Gives the repo the ability to perform more than one change at a time.
+                </div>                
             </div>
         </div>
     </div>
@@ -283,6 +334,10 @@ export default {
                 const activeVotes = this.repo.votes.filter(vote => vote.status === 'active');
                 this.counts.votes.active = activeVotes.length;
                 this.counts.votes.finalized = this.counts.votes.total - this.counts.votes.active;
+            }
+
+            if (typeof this.repo.functions === 'undefined') {
+                this.repo.functions = ["transfer", "deposit", "allow", "claim", "multiInteraction"];
             }
 
             // Only allow Vote Simulator if user is member of Repo
