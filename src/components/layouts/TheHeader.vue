@@ -10,8 +10,7 @@
             <div class="flex items-center">
               <div class="flex-shrink-0 flex items-center space-x-2">
                 <img class="w-10" src="../../assets/aftr-market-logo.png" alt="Logo">
-                <span
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-aftrDarkGrey-light text-aftrYellow">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-aftrDarkGrey-light text-aftrYellow">
                   beta
                 </span>
               </div>
@@ -50,8 +49,7 @@
                     clip-rule="evenodd" />
                 </svg>
               </div>
-              <select v-if="devMode" v-model="siteMode" @change="switchMode" id="selectedSiteMode"
-                name="selectedSiteMode"
+              <select v-if="devMode" v-model="siteMode" @change="switchMode" id="selectedSiteMode" name="selectedSiteMode"
                 class="mt-1 block w-full pl-3 pr-10 py-2 bg-aftrDarkGrey text-white border-gray-300 focus:outline-none focus:ring-aftrYellow focus:border-aftrYellow sm:text-sm rounded-md">
                 <option value="" selected disabled>{{ showSiteMode }}</option>
                 <option v-show="siteMode !== 'PROD'" value="PROD">MAINNET</option>
@@ -67,8 +65,10 @@
             </div>
             <!-- Network Selection End -->
 
+            <OthentLogin :apiid="othentKey" />
+
             <!-- ArConnect Begin -->
-            <div>
+            <!-- <div>
               <div v-if="!$store.getters.arConnected" class="flex items-center">
                 <div class="text-aftrDarkGrey-light text-sm font-light">
                   No Wallet Connected
@@ -79,7 +79,7 @@
                 </button>
               </div>
               <div v-else class="flex items-center">
-                <div v-if="siteMode!=='PROD'" class="text-aftrGo text-sm font-light mr-20">
+                <div v-if="siteMode !== 'PROD'" class="text-aftrGo text-sm font-light mr-20">
                   {{ currentArBalance }}
                 </div>
                 <div class="text-aftrGo text-sm font-light">
@@ -92,7 +92,7 @@
                   </button>
                 </div>
               </div>
-            </div>
+            </div> -->
             <!-- ArConnect End -->
           </div>
         </div>
@@ -114,8 +114,11 @@ import ArConnectWindow from './ArConnectWindow.vue';
 import { arweaveInit } from './../utils/warpUtils.js';
 import { mapGetters } from "vuex";
 
+import { applyReactInVue, applyPureReactInVue } from 'veaury'
+import { OthentLogin } from "@othent/react-components";
+
 export default {
-  components: { ArConnectWindow },
+  components: { ArConnectWindow, OthentLogin: applyReactInVue(OthentLogin) },
   data() {
     return {
       arConnected: false,
@@ -128,6 +131,7 @@ export default {
       showArconnect: false,
       arweave: {},
       arBal: 0,
+      othentKey: 'fabd3bc02e1ef8d9764d6c29384b5215'
     };
   },
   computed: {
@@ -220,9 +224,9 @@ export default {
   mounted() {
     this.arweave = arweaveInit();
     window.addEventListener("arweaveWalletLoaded", async () => {
-        if (!this.arConnected && this.$route.name !== "overview") {
-            await this.$store.dispatch('arConnect');
-        }
+      if (!this.arConnected && this.$route.name !== "overview") {
+        await this.$store.dispatch('arConnect');
+      }
     });
   }
 };

@@ -186,10 +186,10 @@ export default {
                 }
             }, 1000)
         },
-        async getSource(contractId) {
+        async getSource(contractSourceId) {
             if (import.meta.env.VITE_ENV === "PROD" || import.meta.env.VITE_ENV === "TEST") {
                 this.$store.commit("setAftrContractSources");
-                let route = import.meta.env.VITE_TX_GATEWAY + "-source?id=" + contractId + (this.env === 'TEST' ? '&testnet=true' : '');
+                let route = import.meta.env.VITE_TX_GATEWAY + "-source?id=" + contractSourceId + (this.env === 'TEST' ? '&testnet=true' : '');
                 let response = await fetch(route);
                 console.log(route);
                 let data = await response.json();

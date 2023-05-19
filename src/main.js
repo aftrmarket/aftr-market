@@ -27,7 +27,6 @@ import { VueClipboard } from '@soerenmartius/vue3-clipboard'
 import VueDiff from 'vue-diff'
 import 'vue-diff/dist/index.css';
 
-
 let logLevel = "";
 if (import.meta.env.VITE_ENV === 'PROD') {
     logLevel = "fatal";
