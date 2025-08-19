@@ -1,3 +1,9 @@
 {
-    "rewrites": [{ "source": "/:path*", "destination": "/index.html" }]
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "destination": "https://www.aftr.pro/:1",
+      "permanent": true
+    }
+  ]
 }
