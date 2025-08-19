@@ -1,8 +1,8 @@
 {
   "redirects": [
     {
-      "source": "/:path*",
-      "destination": "https://www.aftr.pro/:path*",
+      "source": "/",
+      "destination": "https://www.aftr.pro",
       "permanent": true
     }
   ]
